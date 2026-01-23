@@ -1,0 +1,2184 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WES HUB 360 - Dashboard (Static)</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
+  </head>
+  <body>
+    <div class="app-shell" id="appShell">
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <button class="icon-btn menu-btn" id="menuToggle" aria-label="Menu">
+            <span class="material-symbols-rounded">menu</span>
+          </button>
+        </div>
+        <div class="logo">
+          <img class="logo-big" src="./assets/logo_big.svg" alt="WES HUB 360" />
+          <img class="logo-small" src="./assets/logo_small.svg" alt="WES" />
+        </div>
+        <nav class="nav" id="sideNav">
+          <a class="nav-item active" href="#/dashboard" data-route="dashboard"><span class="material-symbols-rounded">grid_view</span><span class="nav-label">Painel</span></a>
+
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="automation" type="button">
+              <span class="material-symbols-rounded">smart_toy</span>
+              <span class="nav-label">Automação</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-automation">
+              <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
+              <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
+              <a class="submenu-item" href="#/dashboard/agents"><span class="submenu-label">Agentes</span></a>
+              <a class="submenu-item" href="#/dashboard/queues"><span class="submenu-label">Filas</span></a>
+            </div>
+          </div>
+
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="infrastructure" type="button">
+              <span class="material-symbols-rounded">computer</span>
+              <span class="nav-label">Infraestrutura</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-infrastructure">
+              <a class="submenu-item" href="#/dashboard/executors"><span class="submenu-label">Executores</span></a>
+              <a class="submenu-item" href="#/dashboard/packages"><span class="submenu-label">Pacotes</span></a>
+            </div>
+          </div>
+
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="storage" type="button">
+              <span class="material-symbols-rounded">storage</span>
+              <span class="nav-label">Armazenamento</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-storage">
+              <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a>
+              <a class="submenu-item" href="#/dashboard/input-files"><span class="submenu-label">Arquivos de entrada</span></a>
+            </div>
+          </div>
+
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="administration" type="button">
+              <span class="material-symbols-rounded">admin_panel_settings</span>
+              <span class="nav-label">Administração</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-administration">
+              <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
+              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Logs de auditoria</span></a>
+              <a class="submenu-item" href="#/dashboard/organization"><span class="submenu-label">Organização</span></a>
+              <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Ambientes</span></a>
+            </div>
+          </div>
+
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="processes" type="button">
+              <span class="material-symbols-rounded">link</span>
+              <span class="nav-label">Processos</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-processes">
+              <a class="submenu-item" href="#/dashboard/bpmn"><span class="submenu-label">BPMN</span></a>
+              <a class="submenu-item" href="#/dashboard/fluxos"><span class="submenu-label">Fluxos</span></a>
+            </div>
+          </div>
+
+          <div class="nav-divider"></div>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button class="topbar-title topbar-title-btn has-tooltip" id="dashboardToggle" type="button" data-tooltip="Clique para alternar entre a versão preenchida e a versão vazia do painel">
+            Dashboard
+          </button>
+          <div class="topbar-actions">
+            <div class="notifications" id="notificationsMenu">
+              <button class="icon-btn" id="notificationsToggle" aria-label="Notificações">
+                <span class="material-symbols-rounded">notifications</span>
+              </button>
+              <div class="notifications-dropdown" id="notificationsDropdown">
+                <div class="notifications-header">
+                  <span>Notificações</span>
+                  <button class="mark-read" type="button">Marcar como lida</button>
+                </div>
+                <ul class="notifications-list">
+                  <li>
+                    <div class="notification-title">Execução de job concluída</div>
+                    <div class="notification-meta">Relatório diário gerado com sucesso • 2 min atrás</div>
+                  </li>
+                  <li>
+                    <div class="notification-title">Novo executor registrado</div>
+                    <div class="notification-meta">Production-server-01 está agora online • 15 min atrás</div>
+                  </li>
+                  <li>
+                    <div class="notification-title">Pacote enviado</div>
+                    <div class="notification-meta">data-pipeline-v2.1.0 pronto para deploy • 1 hora atrás</div>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div class="user-pill" id="userMenu">
+              <div class="user-avatar">A</div>
+              <div class="user-meta">
+                <div class="user-name">Alfeu Vinicius Souza</div>
+                <div class="user-tenant">AVAS</div>
+              </div>
+              <span class="material-symbols-rounded user-caret">expand_more</span>
+              <div class="user-dropdown" id="userDropdown">
+                <button>
+                  <span class="material-symbols-rounded">person</span>
+                  Perfil
+                </button>
+                <a href="#/dashboard/settings">
+                  <span class="material-symbols-rounded">settings</span>
+                  Configurações
+                </a>
+                <button class="danger">
+                  <span class="material-symbols-rounded">logout</span>
+                  Sair
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <section class="content">
+          <div class="page is-active" id="page-dashboard" data-title="Dashboard">
+            <div class="section" id="dashboardViewDefault">
+            <h2>Ações rápidas</h2>
+            <div class="quick-actions">
+              <button class="btn primary">Rodar automação</button>
+              <button class="btn outline">Criar horário</button>
+              <button class="btn outline">Subir pacote</button>
+              <button class="btn outline">Registrar executor</button>
+            </div>
+
+            <div class="stats-cards">
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">bolt</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Automações</div>
+                  <div class="stat-sub">0 ativas</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">computer</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Executores</div>
+                  <div class="stat-sub">0 online</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">trending_up</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Execuções</div>
+                  <div class="stat-sub">0 bem-sucedido, 0 falhou</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">inventory_2</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">0</div>
+                  <div class="stat-label">Pacotes</div>
+                  <div class="stat-sub">Pacotes de automação</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-row">
+              <div class="panel panel-wide">
+                <div class="panel-header">
+                  <h3>Atividade recente</h3>
+                  <a href="#">Ver todos</a>
+                </div>
+                <div class="panel-empty">Nenhuma atividade recente</div>
+              </div>
+
+              <div class="panel panel-mid">
+                <div class="panel-header">
+                  <h3>Estatísticas de execução</h3>
+                </div>
+                <div class="donut">
+                  <div class="donut-inner">
+                    <div class="donut-value">0</div>
+                    <div class="donut-label">Total</div>
+                  </div>
+                </div>
+                <div class="mini-cards">
+                  <div class="mini-card success">0<br /><span>Bem-sucedido</span></div>
+                  <div class="mini-card danger">0<br /><span>Falhou</span></div>
+                </div>
+                <div class="panel-footer">Visão geral dos últimos 30 dias.</div>
+              </div>
+
+              <div class="panel panel-wide">
+                <div class="panel-header">
+                  <div class="panel-title">
+                    <h3>Alertas</h3>
+                    <span class="badge">0</span>
+                  </div>
+                  <div class="panel-actions">
+                    <button class="btn filter-btn" id="alertFilterBtn">
+                      <span class="material-symbols-rounded">filter_list</span>Filtro
+                    </button>
+                    <button class="icon-btn" aria-label="Atualizar"><span class="material-symbols-rounded">refresh</span></button>
+                  </div>
+                </div>
+                <div class="panel-empty">Nenhum alerta aberto</div>
+                <div class="menu" id="alertFilterMenu">
+                  <button data-filter="">Todos</button>
+                  <button data-filter="critical">Críticos</button>
+                  <button data-filter="warning">Avisos</button>
+                </div>
+              </div>
+            </div>
+            <div class="insights">
+              <div class="insights-header">
+                <div class="insights-title">
+                  <h2>Insights de IA</h2>
+                  <span class="badge" id="insightsCount">4</span>
+                </div>
+                <button class="icon-btn" aria-label="Atualizar insights">
+                  <span class="material-symbols-rounded">refresh</span>
+                </button>
+              </div>
+              <div class="insights-empty" id="insightsEmpty">
+                Nenhum insight foi gerado ainda. Clique em atualizar para aparecer algum insight.
+              </div>
+              <div class="insights-grid" id="insightsGrid">
+                <div class="insight-card">
+                  <div class="insight-header">
+                    <div class="insight-title">Capacidade de processamento pode ser insuficiente</div>
+                    <span class="insight-tag">Atenção</span>
+                  </div>
+                  <div class="insight-desc">Você tem 6 agendamentos ativos. Considere distribuir para evitar picos de carga.</div>
+                  <ul class="insight-list">
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                  </ul>
+                  <div class="insight-actions">
+                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
+                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
+                  </div>
+                </div>
+                <div class="insight-card">
+                  <div class="insight-header">
+                    <div class="insight-title">Execuções com falhas recorrentes</div>
+                    <span class="insight-tag">Atenção</span>
+                  </div>
+                  <div class="insight-desc">Há aumento no tempo de execução em tarefas críticas.</div>
+                  <ul class="insight-list">
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                  </ul>
+                  <div class="insight-actions">
+                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
+                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
+                  </div>
+                </div>
+                <div class="insight-card">
+                  <div class="insight-header">
+                    <div class="insight-title">Executor com baixa disponibilidade</div>
+                    <span class="insight-tag">Atenção</span>
+                  </div>
+                  <div class="insight-desc">Executor-02 está offline há mais de 30 minutos.</div>
+                  <ul class="insight-list">
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                  </ul>
+                  <div class="insight-actions">
+                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
+                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
+                  </div>
+                </div>
+                <div class="insight-card">
+                  <div class="insight-header">
+                    <div class="insight-title">Sugestão de otimização</div>
+                    <span class="insight-tag">Atenção</span>
+                  </div>
+                  <div class="insight-desc">Agrupe execuções em horários de menor carga.</div>
+                  <ul class="insight-list">
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                    <li>Priorizar jobs críticos</li>
+                  </ul>
+                  <div class="insight-actions">
+                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
+                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+            <div class="section is-hidden" id="dashboardViewDetail">
+            <h2>Ações rápidas</h2>
+            <div class="quick-actions">
+              <button class="btn primary">Rodar automação</button>
+              <button class="btn outline">Criar horário</button>
+              <button class="btn outline">Subir pacote</button>
+              <button class="btn outline">Registrar executor</button>
+            </div>
+
+            <div class="stats-cards">
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">bolt</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">12</div>
+                  <div class="stat-label">Automações</div>
+                  <div class="stat-sub">5 ativas</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">computer</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">4</div>
+                  <div class="stat-label">Executores</div>
+                  <div class="stat-sub">3 online</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">monitoring</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">28</div>
+                  <div class="stat-label">Execuções</div>
+                  <div class="stat-sub">23 bem-sucedido, 5 falhou</div>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon"><span class="material-symbols-rounded">inventory_2</span></div>
+                <div class="stat-body">
+                  <div class="stat-value">8</div>
+                  <div class="stat-label">Pacotes</div>
+                  <div class="stat-sub">Pacotes de automação</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-row">
+              <div class="panel panel-wide">
+                <div class="panel-header">
+                  <h3>Atividade recente</h3>
+                  <a href="#">Ver todos</a>
+                </div>
+                <div class="recent-list">
+                  <div class="recent-item">
+                    <span class="material-symbols-rounded">history</span>
+                    <div>
+                      <div class="recent-title">Geração do relatório diário</div>
+                      <div class="recent-meta">Executado com sucesso • 10 min atrás</div>
+                    </div>
+                  </div>
+                  <div class="recent-item">
+                    <span class="material-symbols-rounded">history</span>
+                    <div>
+                      <div class="recent-title">Importação de credenciais</div>
+                      <div class="recent-meta">Concluído • 1 hora atrás</div>
+                    </div>
+                  </div>
+                  <div class="recent-item">
+                    <span class="material-symbols-rounded">history</span>
+                    <div>
+                      <div class="recent-title">Executor atualizado</div>
+                      <div class="recent-meta">Versão 2.1 aplicada • ontem</div>
+                    </div>
+                  </div>
+                  <div class="recent-item">
+                    <span class="material-symbols-rounded">history</span>
+                    <div>
+                      <div class="recent-title">Novo agendamento criado</div>
+                      <div class="recent-meta">Rotina semanal ativa • ontem</div>
+                    </div>
+                  </div>
+                  <div class="recent-item">
+                    <span class="material-symbols-rounded">history</span>
+                    <div>
+                      <div class="recent-title">Execução reprocessada</div>
+                      <div class="recent-meta">Falha corrigida • 2 dias atrás</div>
+                    </div>
+                  </div>
+                  <div class="recent-item">
+                    <span class="material-symbols-rounded">history</span>
+                    <div>
+                      <div class="recent-title">Credencial renovada</div>
+                      <div class="recent-meta">Token atualizado • 3 dias atrás</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel panel-mid">
+                <div class="panel-header">
+                  <h3>Estatísticas de execução</h3>
+                </div>
+                <div class="donut">
+                  <div class="donut-inner">
+                    <div class="donut-value">100</div>
+                    <div class="donut-label">Total</div>
+                  </div>
+                </div>
+                <div class="mini-cards">
+                  <div class="mini-card success">80<br /><span>Bem-sucedido</span></div>
+                  <div class="mini-card danger">20<br /><span>Falhou</span></div>
+                </div>
+                <div class="panel-footer">Visão geral dos últimos 30 dias.</div>
+              </div>
+
+              <div class="panel panel-wide">
+                <div class="panel-header">
+                  <div class="panel-title">
+                    <h3>Alertas</h3>
+                    <span class="badge">3</span>
+                  </div>
+                  <div class="panel-actions">
+                    <button class="btn filter-btn" id="alertFilterBtnAlt">
+                      <span class="material-symbols-rounded">filter_list</span>Filtro
+                    </button>
+                    <button class="icon-btn" aria-label="Atualizar"><span class="material-symbols-rounded">refresh</span></button>
+                  </div>
+                </div>
+                <div class="alert-list">
+                  <div class="alert-item">
+                    <span class="alert-badge critical">2</span>
+                    <div>
+                      <div class="alert-title">Possíveis conflitos de agendamento</div>
+                      <div class="alert-meta">Último: 10 min atrás</div>
+                    </div>
+                  </div>
+                  <div class="alert-item">
+                    <span class="alert-badge warning">1</span>
+                    <div>
+                      <div class="alert-title">Executor com baixa disponibilidade</div>
+                      <div class="alert-meta">Último: 30 min atrás</div>
+                    </div>
+                  </div>
+                  <div class="alert-item">
+                    <span class="alert-badge critical">1</span>
+                    <div>
+                      <div class="alert-title">Fila com atraso elevado</div>
+                      <div class="alert-meta">Último: 45 min atrás</div>
+                    </div>
+                  </div>
+                  <div class="alert-item">
+                    <span class="alert-badge warning">1</span>
+                    <div>
+                      <div class="alert-title">Pacote aguardando publicação</div>
+                      <div class="alert-meta">Último: 1 hora atrás</div>
+                    </div>
+                  </div>
+                  <div class="alert-item">
+                    <span class="alert-badge critical">1</span>
+                    <div>
+                      <div class="alert-title">Executor sem resposta</div>
+                      <div class="alert-meta">Último: 2 horas atrás</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="menu" id="alertFilterMenuAlt">
+                  <button data-filter="">Todos</button>
+                  <button data-filter="critical">Críticos</button>
+                  <button data-filter="warning">Avisos</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="insights">
+              <div class="insights-header">
+                <div class="insights-title">
+                  <h2>Insights de IA</h2>
+                  <span class="badge" id="insightsCountAlt">0</span>
+                </div>
+                <button class="icon-btn" aria-label="Atualizar insights">
+                  <span class="material-symbols-rounded">refresh</span>
+                </button>
+              </div>
+              <div class="insights-empty is-visible" id="insightsEmptyAlt">
+                Nenhum insight foi gerado ainda. Clique em atualizar para aparecer algum insight.
+              </div>
+              <div class="insights-grid is-hidden" id="insightsGridAlt"></div>
+            </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-automations" data-title="Automações">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Automações</h2>
+                  <p class="page-subtitle">Gerencie automações, pacotes e execuções recentes.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar automações">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn primary">Criar automação</button>
+                </div>
+              </div>
+              <div class="tabs tabs-underline">
+                <button class="tab active" data-tab="automations">Automações</button>
+                <button class="tab" data-tab="executions">Execuções</button>
+              </div>
+              <div class="tab-panel active" data-panel="automations">
+                <div class="filters-grid">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar agente pelo nome" />
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <button class="btn filter-btn" id="automationFilterBtn">
+                      <span class="material-symbols-rounded">filter_list</span>Filtros
+                    </button>
+                    <div class="menu" id="automationFilterMenu">
+                      <div class="filter-footer">
+                        <button class="filter-clear" type="button">Limpar filtros</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>Status</span>
+                        <button class="filter-option active" data-filter="status" data-value="">Todos</button>
+                        <button class="filter-option" data-filter="status" data-value="active">Ativo</button>
+                        <button class="filter-option" data-filter="status" data-value="paused">Pausado</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>Prioridade</span>
+                        <button class="filter-option active" data-filter="priority" data-value="">Todas</button>
+                        <button class="filter-option" data-filter="priority" data-value="high">Alta</button>
+                        <button class="filter-option" data-filter="priority" data-value="medium">Média</button>
+                        <button class="filter-option" data-filter="priority" data-value="low">Baixa</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="data-table automations-table">
+                  <div class="data-row header">
+                    <span>Automação</span>
+                    <span>Descrição</span>
+                    <span>Pacote</span>
+                    <span>Última execução</span>
+                    <span>Prioridade</span>
+                    <span>Status</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>Relatório diário</span>
+                    <span class="muted">Gera relatórios operacionais diários.</span>
+                    <span>reports-v2.1</span>
+                    <span>12/03/2025 • 08:30</span>
+                    <span class="chip priority-medium">Média</span>
+                    <span class="chip success">Ativo</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon" aria-label="Executar">
+                        <span class="material-symbols-rounded">play_arrow</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes da automação</div>
+                        <div class="details-item"><span>Nome</span><strong>Relatório diário</strong></div>
+                        <div class="details-item"><span>Pacote</span><strong>reports-v2.1</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
+                        <div class="details-item"><span>Prioridade</span><strong>Média</strong></div>
+                        <div class="details-item"><span>Última execução</span><strong>12/03/2025 • 08:30</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span>Monitoramento de filas</span>
+                    <span class="muted">Acompanha o volume das filas críticas.</span>
+                    <span>queues-v1.4</span>
+                    <span>11/03/2025 • 18:10</span>
+                    <span class="chip priority-high">Alta</span>
+                    <span class="chip warning">Pausado</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon" aria-label="Pausar">
+                        <span class="material-symbols-rounded">pause</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes da automação</div>
+                        <div class="details-item"><span>Nome</span><strong>Monitoramento de filas</strong></div>
+                        <div class="details-item"><span>Pacote</span><strong>queues-v1.4</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Pausado</strong></div>
+                        <div class="details-item"><span>Prioridade</span><strong>Alta</strong></div>
+                        <div class="details-item"><span>Última execução</span><strong>11/03/2025 • 18:10</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                </div>
+                <div class="table-pagination">
+                  <button class="icon-btn" aria-label="Anterior">
+                    <span class="material-symbols-rounded">chevron_left</span>
+                  </button>
+                  <button class="page-number active" type="button">1</button>
+                  <button class="page-number" type="button">2</button>
+                  <button class="page-number" type="button">3</button>
+                  <span class="page-ellipsis">…</span>
+                  <button class="page-number" type="button">10</button>
+                  <button class="page-number" type="button">11</button>
+                  <button class="page-number" type="button">12</button>
+                  <button class="icon-btn" aria-label="Próximo">
+                    <span class="material-symbols-rounded">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="executions">
+                <div class="filters-grid">
+                  <div class="form-field">
+                    <label>Período</label>
+                    <button class="btn outline period-btn" id="periodFilterBtn">
+                      <span class="material-symbols-rounded">calendar_month</span>Filtrar período
+                    </button>
+                    <div class="menu period-menu" id="periodFilterMenu">
+                      <div class="period-toggle">
+                        <button class="period-option active" data-mode="range">Entre períodos</button>
+                        <button class="period-option" data-mode="single">Data específica</button>
+                      </div>
+                      <div class="period-fields">
+                        <div class="period-field range-only">
+                          <label>Início</label>
+                          <input type="date" />
+                        </div>
+                        <div class="period-field range-only">
+                          <label>Fim</label>
+                          <input type="date" />
+                        </div>
+                        <div class="period-field single-only is-hidden">
+                          <label>Data</label>
+                          <input type="date" />
+                        </div>
+                      </div>
+                      <div class="period-footer">
+                        <button class="btn filter-btn">Filtrar período</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="data-table executions-table">
+                  <div class="data-row header">
+                    <span>Automação</span>
+                    <span>Início</span>
+                    <span>Fim</span>
+                    <span>Tempo decorrido</span>
+                    <span>Status</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>Relatório diário</span>
+                    <span>12/03/2025 • 08:00</span>
+                    <span>12/03/2025 • 08:30</span>
+                    <span>30 min</span>
+                    <span class="chip success">Completa</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes da execução</div>
+                        <div class="details-item"><span>Automação</span><strong>Relatório diário</strong></div>
+                        <div class="details-item"><span>Início</span><strong>12/03/2025 • 08:00</strong></div>
+                        <div class="details-item"><span>Fim</span><strong>12/03/2025 • 08:30</strong></div>
+                        <div class="details-item"><span>Tempo</span><strong>30 min</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Completa</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span>Monitoramento de filas</span>
+                    <span>11/03/2025 • 18:00</span>
+                    <span>11/03/2025 • 18:10</span>
+                    <span>10 min</span>
+                    <span class="chip warning">Interrompida</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes da execução</div>
+                        <div class="details-item"><span>Automação</span><strong>Monitoramento de filas</strong></div>
+                        <div class="details-item"><span>Início</span><strong>11/03/2025 • 18:00</strong></div>
+                        <div class="details-item"><span>Fim</span><strong>11/03/2025 • 18:10</strong></div>
+                        <div class="details-item"><span>Tempo</span><strong>10 min</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Interrompida</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                </div>
+                <div class="table-pagination">
+                  <button class="icon-btn" aria-label="Anterior">
+                    <span class="material-symbols-rounded">chevron_left</span>
+                  </button>
+                  <button class="page-number active" type="button">1</button>
+                  <button class="page-number" type="button">2</button>
+                  <button class="page-number" type="button">3</button>
+                  <span class="page-ellipsis">…</span>
+                  <button class="page-number" type="button">10</button>
+                  <button class="page-number" type="button">11</button>
+                  <button class="page-number" type="button">12</button>
+                  <button class="icon-btn" aria-label="Próximo">
+                    <span class="material-symbols-rounded">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-schedules" data-title="Agendamentos">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Agendamentos</h2>
+                  <p class="page-subtitle">Crie e acompanhe execuções programadas.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar agendamentos">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="icon-btn" aria-label="Download agendamentos">
+                    <span class="material-symbols-rounded">download</span>
+                  </button>
+                  <button class="btn primary">Criar agendamento</button>
+                </div>
+              </div>
+              <div class="filters-grid filters-single">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar agendamento" />
+                  </div>
+                </div>
+              </div>
+              <div class="data-table">
+                <div class="data-row header">
+                  <span>Agendamento</span>
+                  <span>Automação</span>
+                  <span>Agendamento</span>
+                  <span>Status</span>
+                  <span>Próxima execução</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span>Relatório diário</span>
+                  <span>reports-v2.1</span>
+                  <span>Todos os dias às 09:00</span>
+                  <span class="chip success">Ativo</span>
+                  <span>Amanhã • 09:00</span>
+                  <span class="row-actions has-details">
+                    <button class="icon-btn action-icon" aria-label="Pausar">
+                      <span class="material-symbols-rounded">pause</span>
+                    </button>
+                    <button class="icon-btn action-icon" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                    <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                    <div class="details-card">
+                      <div class="details-title">Detalhes do agendamento</div>
+                      <div class="details-item"><span>Agendamento</span><strong>Relatório diário</strong></div>
+                      <div class="details-item"><span>Automação</span><strong>reports-v2.1</strong></div>
+                      <div class="details-item"><span>Frequência</span><strong>Todos os dias às 09:00</strong></div>
+                      <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
+                      <div class="details-item"><span>Próxima execução</span><strong>Amanhã • 09:00</strong></div>
+                    </div>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span>Monitorar filas</span>
+                  <span>queues-v1.4</span>
+                  <span>A cada 30 minutos</span>
+                  <span class="chip warning">Pausado</span>
+                  <span>—</span>
+                  <span class="row-actions has-details">
+                    <button class="icon-btn action-icon" aria-label="Ativar">
+                      <span class="material-symbols-rounded">play_arrow</span>
+                    </button>
+                    <button class="icon-btn action-icon" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                    <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                    <div class="details-card">
+                      <div class="details-title">Detalhes do agendamento</div>
+                      <div class="details-item"><span>Agendamento</span><strong>Monitorar filas</strong></div>
+                      <div class="details-item"><span>Automação</span><strong>queues-v1.4</strong></div>
+                      <div class="details-item"><span>Frequência</span><strong>A cada 30 minutos</strong></div>
+                      <div class="details-item"><span>Status</span><strong>Pausado</strong></div>
+                      <div class="details-item"><span>Próxima execução</span><strong>—</strong></div>
+                    </div>
+                  </span>
+                </div>
+              </div>
+              <div class="table-pagination">
+                <button class="icon-btn" aria-label="Anterior">
+                  <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <button class="page-number active" type="button">1</button>
+                <button class="page-number" type="button">2</button>
+                <button class="page-number" type="button">3</button>
+                <span class="page-ellipsis">…</span>
+                <button class="page-number" type="button">10</button>
+                <button class="page-number" type="button">11</button>
+                <button class="page-number" type="button">12</button>
+                <button class="icon-btn" aria-label="Próximo">
+                  <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-agents" data-title="Agentes">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Agentes</h2>
+                  <p class="page-subtitle">Gerencie agentes e seus conhecimentos internos.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar agentes">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn primary" id="openAgentModal">Criar agente</button>
+                </div>
+              </div>
+              <div class="filters-grid filters-single">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar agente pelo nome" />
+                  </div>
+                </div>
+              </div>
+              <div class="agents-table">
+                <div class="agents-row header">
+                  <span>Nome do agente</span>
+                  <span>ID</span>
+                  <span>Conhecimento interno</span>
+                  <span>Descrição</span>
+                  <span>Ações</span>
+                </div>
+                <div class="agents-row">
+                  <span>Atlas Core</span>
+                  <span>AGT-1024</span>
+                  <span class="link">Sim</span>
+                  <span>Orquestra pipelines de dados e relatórios.</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                      <span class="material-symbols-rounded">add</span>
+                    </button>
+                    <div class="menu add-menu">
+                      <button type="button">Adicionar arquivo</button>
+                      <button type="button">Adicionar texto</button>
+                    </div>
+                    <button class="icon-btn action-icon" aria-label="Conversar">
+                      <span class="material-symbols-rounded">chat</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="agents-row">
+                  <span>Nimbus Ops</span>
+                  <span>AGT-2077</span>
+                  <span class="link">Não</span>
+                  <span>Monitoramento de filas e indicadores críticos.</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon muted-icon add-toggle" aria-label="Adicionar">
+                      <span class="material-symbols-rounded">add</span>
+                    </button>
+                    <div class="menu add-menu">
+                      <button type="button">Adicionar arquivo</button>
+                      <button type="button">Adicionar texto</button>
+                    </div>
+                    <button class="icon-btn action-icon" aria-label="Conversar">
+                      <span class="material-symbols-rounded">chat</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="agents-row">
+                  <span>Pulse Finance</span>
+                  <span>AGT-3310</span>
+                  <span class="link">Sim</span>
+                  <span>Conciliação automática e análises financeiras.</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                      <span class="material-symbols-rounded">add</span>
+                    </button>
+                    <div class="menu add-menu">
+                      <button type="button">Adicionar arquivo</button>
+                      <button type="button">Adicionar texto</button>
+                    </div>
+                    <button class="icon-btn action-icon" aria-label="Conversar">
+                      <span class="material-symbols-rounded">chat</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="table-pagination">
+                <button class="icon-btn" aria-label="Anterior">
+                  <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <button class="page-number active" type="button">1</button>
+                <button class="page-number" type="button">2</button>
+                <button class="page-number" type="button">3</button>
+                <span class="page-ellipsis">…</span>
+                <button class="page-number" type="button">10</button>
+                <button class="page-number" type="button">11</button>
+                <button class="page-number" type="button">12</button>
+                <button class="icon-btn" aria-label="Próximo">
+                  <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="modal" id="agentModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agentModalTitle">
+              <div class="modal-header">
+                <h3 id="agentModalTitle">Criação de agentes</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <label class="modal-label">Nome do agente</label>
+                <input class="modal-input" type="text" placeholder="Digite o nome do agente" />
+                <label class="modal-label">Descrição do agente</label>
+                <textarea class="modal-textarea" rows="3" placeholder="Digite a descrição do agente"></textarea>
+                <label class="modal-label">Prompt do sistema</label>
+                <textarea class="modal-textarea" rows="3" placeholder="Digite o prompt do sistema"></textarea>
+                <div class="modal-toggle">
+                  <span>Permitir conhecimento interno</span>
+                  <label class="switch">
+                    <input type="checkbox" />
+                    <span class="switch-track"></span>
+                  </label>
+                  <span class="switch-label">Não</span>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn primary" disabled>Criar agente</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-queues" data-title="Filas">
+            <div class="section empty-state">
+              <h2>Filas</h2>
+              <p>Esta página exibirá filas de execução e seus status. Em breve.</p>
+            </div>
+          </div>
+
+          <div class="page" id="page-executors" data-title="Executores">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Executores</h2>
+                  <p class="page-subtitle">Gerencie executores, licenças e contas de serviço.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar executores">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn outline">
+                    <span class="material-symbols-rounded">download</span>
+                    Download executor
+                  </button>
+                  <button class="btn primary">Criar executor</button>
+                </div>
+              </div>
+              <div class="info-banner dismissible" id="firstTimeBanner">
+                Primeira vez? Baixe o aplicativo do executor e depois crie credenciais para começar.
+                <button class="icon-btn banner-close" aria-label="Fechar aviso">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="tabs tabs-underline">
+                <button class="tab active" data-tab="executors-main">Executores</button>
+                <button class="tab" data-tab="executors-status">Monitoramento</button>
+                <button class="tab" data-tab="executors-licenses">Licenças</button>
+                <button class="tab" data-tab="executors-service">Contas de serviço</button>
+              </div>
+              <div class="tab-panel active" data-panel="executors-main">
+                <div class="license-card">
+                  <div class="license-header">
+                    <div class="license-title">
+                      <h3>Uso de licenças</h3>
+                      <span class="license-alert material-symbols-rounded">warning</span>
+                    </div>
+                    <div class="license-actions">
+                      <button class="icon-btn" aria-label="Atualizar licenças">
+                        <span class="material-symbols-rounded">refresh</span>
+                      </button>
+                      <button class="icon-btn license-toggle" aria-label="Expandir">
+                        <span class="material-symbols-rounded">expand_more</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="license-body">
+                    <div class="license-usage">
+                      <div class="license-count">
+                        <span class="license-count-main">1</span>
+                        <span class="license-count-total">/ 1</span>
+                      </div>
+                      <div class="license-util">
+                        <span>Utilização</span>
+                        <strong>100%</strong>
+                        <div class="license-bar">
+                          <span class="license-bar-fill"></span>
+                        </div>
+                      </div>
+                    </div>
+                  <div class="license-meta">
+                    <span class="license-label">Licenças ativas</span>
+                    <span class="license-pill">1 licença</span>
+                  </div>
+                  <div class="license-warning">
+                    <span class="material-symbols-rounded">warning</span>
+                    Nenhuma licença disponível. Faça upgrade do seu plano ou libere licenças sem uso para criar mais executores.
+                  </div>
+                </div>
+              </div>
+                <div class="filters-grid">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar executor pelo nome" />
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <button class="btn filter-btn" id="executorFilterBtn">
+                      <span class="material-symbols-rounded">filter_list</span>Filtros
+                    </button>
+                    <div class="menu filter-menu two-col" id="executorFilterMenu">
+                      <div class="filter-footer">
+                        <button class="filter-clear" type="button">Limpar filtros</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>Ambiente</span>
+                        <button class="filter-option active" data-filter="env" data-value="">Todos</button>
+                        <button class="filter-option" data-filter="env" data-value="production">Production</button>
+                        <button class="filter-option" data-filter="env" data-value="staging">Staging</button>
+                        <button class="filter-option" data-filter="env" data-value="development">Development</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>Status</span>
+                        <button class="filter-option active" data-filter="status" data-value="">Todos</button>
+                        <button class="filter-option" data-filter="status" data-value="active">Ativo</button>
+                        <button class="filter-option" data-filter="status" data-value="suspended">Suspenso</button>
+                        <button class="filter-option" data-filter="status" data-value="revoked">Revogado</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="data-table executors-table">
+                  <div class="data-row header">
+                    <span>Executor</span>
+                    <span>Status</span>
+                    <span>Ambiente</span>
+                    <span>Data de criação</span>
+                    <span>Último ping</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>executor-prod-01</span>
+                    <span class="chip success">Online</span>
+                    <span>Production</span>
+                    <span>12/03/2025</span>
+                    <span>Agora</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes do executor</div>
+                        <div class="details-item"><span>Executor</span><strong>executor-prod-01</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Online</strong></div>
+                        <div class="details-item"><span>Ambiente</span><strong>Production</strong></div>
+                        <div class="details-item"><span>Data de criação</span><strong>12/03/2025</strong></div>
+                        <div class="details-item"><span>Último ping</span><strong>Agora</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span>executor-stg-02</span>
+                    <span class="chip warning">Offline</span>
+                    <span>Staging</span>
+                    <span>28/02/2025</span>
+                    <span>5 min atrás</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes do executor</div>
+                        <div class="details-item"><span>Executor</span><strong>executor-stg-02</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Offline</strong></div>
+                        <div class="details-item"><span>Ambiente</span><strong>Staging</strong></div>
+                        <div class="details-item"><span>Data de criação</span><strong>28/02/2025</strong></div>
+                        <div class="details-item"><span>Último ping</span><strong>5 min atrás</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="executors-status">
+                <div class="monitoring-header">
+                  <div>
+                    <h3>Dashboard de status das máquinas</h3>
+                    <p>Monitoramento em tempo real e saúde de todas as máquinas.</p>
+                    <span class="monitoring-updated">Última atualização: 13:57:13</span>
+                  </div>
+                  <div class="monitoring-actions">
+                    <button class="icon-btn" aria-label="Atualizar monitoramento">
+                      <span class="material-symbols-rounded">refresh</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="status-cards">
+                  <div class="status-card success">
+                    <span class="material-symbols-rounded">check_circle</span>
+                    <div>
+                      <strong>1</strong>
+                      <span>Máquinas saudáveis</span>
+                    </div>
+                  </div>
+                  <div class="status-card warning">
+                    <span class="material-symbols-rounded">warning</span>
+                    <div>
+                      <strong>0</strong>
+                      <span>Máquinas em alerta</span>
+                    </div>
+                  </div>
+                  <div class="status-card danger">
+                    <span class="material-symbols-rounded">error</span>
+                    <div>
+                      <strong>0</strong>
+                      <span>Máquinas críticas</span>
+                    </div>
+                  </div>
+                  <div class="status-card muted">
+                    <span class="material-symbols-rounded">schedule</span>
+                    <div>
+                      <strong>0</strong>
+                      <span>Máquinas offline</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="monitoring-panel">
+                  <div class="panel-header">
+                    <h4>Visão da frota (1 máquina ativa)</h4>
+                  </div>
+                  <div class="fleet-grid">
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">desktop_windows</span>
+                      <div class="fleet-info">
+                        <span>Uso de CPU</span>
+                        <strong>0%</strong>
+                      </div>
+                      <div class="fleet-bar"><span style="width: 10%"></span></div>
+                    </div>
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">memory</span>
+                      <div class="fleet-info">
+                        <span>Uso de memória</span>
+                        <strong>0%</strong>
+                      </div>
+                      <div class="fleet-bar"><span style="width: 10%"></span></div>
+                    </div>
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">storage</span>
+                      <div class="fleet-info">
+                        <span>Uso de disco</span>
+                        <strong>0%</strong>
+                      </div>
+                      <div class="fleet-bar"><span style="width: 10%"></span></div>
+                    </div>
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">network_check</span>
+                      <div class="fleet-info">
+                        <span>Carga de rede</span>
+                        <strong>4 MB/s</strong>
+                      </div>
+                      <div class="fleet-bar success"><span style="width: 40%"></span></div>
+                    </div>
+                  </div>
+                  <div class="trend">
+                    <h5>Tendência 24 horas</h5>
+                    <p>CPU avg: 0% · Memória avg: 0% · Disco avg: 0% · Rede avg: 1MB/s</p>
+                  </div>
+                </div>
+                <div class="monitoring-panel">
+                  <div class="panel-header">
+                    <h4>Status das máquinas (1 total)</h4>
+                  </div>
+                  <div class="data-table monitoring-table">
+                    <div class="data-row header">
+                      <span>Máquina</span>
+                      <span>Status</span>
+                      <span>Ambiente</span>
+                      <span>Última leitura</span>
+                      <span>Tempo ativo</span>
+                      <span>CPU</span>
+                      <span>Memória</span>
+                      <span>Disco</span>
+                      <span>Ações</span>
+                    </div>
+                    <div class="data-row">
+                      <span>04d1f883...</span>
+                      <span class="chip success">Saudável</span>
+                      <span class="chip">production</span>
+                      <span>22/01/2026, 13:57:07</span>
+                      <span>11d 20h 3m</span>
+                      <span>-</span>
+                      <span>-</span>
+                      <span>-</span>
+                      <span class="row-actions">
+                        <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                          <span class="material-symbols-rounded">more_vert</span>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="executors-licenses">
+                <div class="licenses-header">
+                  <div>
+                    <h3>Painel de licenças</h3>
+                    <p>Monitore uso, políticas e saúde do sistema.</p>
+                  </div>
+                  <div class="licenses-actions">
+                    <button class="icon-btn" aria-label="Atualizar licenças">
+                      <span class="material-symbols-rounded">refresh</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="license-metrics">
+                  <div class="metric-card">
+                    <strong>1</strong>
+                    <span>Licenças ativas</span>
+                    <span class="muted">de 1 disponível</span>
+                  </div>
+                  <div class="metric-card">
+                    <strong>0</strong>
+                    <span>Licenças disponíveis</span>
+                    <span class="muted">Prontas para novas máquinas</span>
+                  </div>
+                  <div class="metric-card alert">
+                    <strong>100%</strong>
+                    <span>Taxa de utilização</span>
+                    <div class="metric-bar"><span></span></div>
+                  </div>
+                  <div class="metric-card">
+                    <strong>1</strong>
+                    <span>Sessões totais</span>
+                    <span class="muted">Período ativo</span>
+                  </div>
+                </div>
+                <div class="license-policy">
+                  <h4>Política de licenças</h4>
+                  <div class="policy-grid">
+                    <div>
+                      <span>Concorrência máxima</span>
+                      <strong>1</strong>
+                    </div>
+                    <div>
+                      <span>Total máximo</span>
+                      <strong>Ilimitado</strong>
+                    </div>
+                    <div>
+                      <span>Timeout de sessão</span>
+                      <strong>60 minutos</strong>
+                    </div>
+                    <div>
+                      <span>Limite diário de execução</span>
+                      <strong>Ilimitado</strong>
+                    </div>
+                    <div class="policy-chip">
+                      <span>Vincular máquina</span>
+                      <strong class="chip">Obrigatório</strong>
+                    </div>
+                    <div class="policy-chip">
+                      <span>Multimáquina</span>
+                      <strong class="chip warning">Restrito</strong>
+                    </div>
+                  </div>
+                </div>
+                <div class="monitoring-panel">
+                  <div class="panel-header">
+                    <h4>Máquinas ativas (1)</h4>
+                  </div>
+                  <div class="data-table license-table">
+                    <div class="data-row header">
+                      <span>Máquina</span>
+                      <span>Alocado em</span>
+                      <span>Sessões</span>
+                      <span>Tempo de execução</span>
+                      <span>Última atividade</span>
+                    </div>
+                    <div class="data-row">
+                      <span>Unknown<br /><span class="muted">exec_9bc...</span></span>
+                      <span>14/01/2026, 20:59:46</span>
+                      <span class="chip">1</span>
+                      <span>0h 0m</span>
+                      <span>14/01/2026, 20:59:46</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="monitoring-panel">
+                  <div class="panel-header">
+                    <h4>Atividade recente</h4>
+                  </div>
+                  <div class="data-table license-table">
+                    <div class="data-row header">
+                      <span>ID da máquina</span>
+                      <span>Ação</span>
+                      <span>Data</span>
+                      <span>Duração</span>
+                      <span>Motivo</span>
+                    </div>
+                    <div class="data-row">
+                      <span>exec_9bc...</span>
+                      <span class="chip">Alocado</span>
+                      <span>14/01/2026, 20:59:46</span>
+                      <span>Ativo</span>
+                      <span>-</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="executors-service">
+                <div class="page-header">
+                  <div>
+                    <h3>Contas de serviço</h3>
+                  </div>
+                  <div class="page-actions">
+                    <button class="icon-btn" aria-label="Atualizar contas de serviço">
+                      <span class="material-symbols-rounded">refresh</span>
+                    </button>
+                    <button class="btn primary">
+                      <span class="material-symbols-rounded">add</span>
+                      Adicionar conta
+                    </button>
+                  </div>
+                </div>
+                <div class="filters-grid">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar contas" />
+                    </div>
+                  </div>
+                </div>
+                <div class="data-table">
+                  <div class="data-row header">
+                    <span>Usuário</span>
+                    <span>Nome de exibição</span>
+                    <span>Tipo</span>
+                    <span>Descrição</span>
+                    <span>Status</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>vinauth</span>
+                    <span>Conta Integrações</span>
+                    <span>Serviço</span>
+                    <span class="muted">Conta para automações internas.</span>
+                    <span class="chip success">Ativo</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-packages" data-title="Pacotes">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Pacotes</h2>
+                  <p class="page-subtitle">Upload, versão e deploy de pacotes.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar pacotes">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn primary">
+                    <span class="material-symbols-rounded">cloud_upload</span>
+                    Enviar pacote
+                  </button>
+                </div>
+              </div>
+              <div class="filters-header">
+                <h3>Filtrar pacotes</h3>
+              </div>
+              <div class="filters-grid filters-packages">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar pacote pelo nome" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="packagesFilterBtn">
+                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  </button>
+                  <div class="menu" id="packagesFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Tags</span>
+                      <button class="filter-option active" data-filter="tag" data-value="">Todas</button>
+                      <button class="filter-option" data-filter="tag" data-value="wrapped">Wrapped</button>
+                      <button class="filter-option" data-filter="tag" data-value="automation">Automation</button>
+                      <button class="filter-option" data-filter="tag" data-value="etl">ETL</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Ordenação</span>
+                      <button class="filter-option active" data-filter="sort" data-value="">Mais recentes</button>
+                      <button class="filter-option" data-filter="sort" data-value="oldest">Mais antigos</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="data-table packages-table">
+                <div class="data-row header">
+                  <span>Nome do pacote</span>
+                  <span>Versão</span>
+                  <span>Descrição</span>
+                  <span>Tags</span>
+                  <span>Criado</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span>buscar_dados</span>
+                  <span class="chip">1.0.0</span>
+                  <span class="muted">Pacote criado pelo Skipper Java Executor</span>
+                    <span class="tag-list">
+                      <span class="tag-chip">wrapped</span>
+                      <span class="tag-chip">automation</span>
+                      <span class="tag-more" data-tags="monitoring">+1</span>
+                    </span>
+                  <span>22/01/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Download">
+                      <span class="material-symbols-rounded">download</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span>buscar_dados_c</span>
+                  <span class="chip">1.0.4</span>
+                  <span class="muted">Pacote criado pelo Skipper Java Executor</span>
+                    <span class="tag-list">
+                      <span class="tag-chip">wrapped</span>
+                      <span class="tag-chip">automation</span>
+                      <span class="tag-more" data-tags="analytics">+1</span>
+                    </span>
+                  <span>20/01/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Download">
+                      <span class="material-symbols-rounded">download</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span>daily_report_generator</span>
+                  <span class="chip">1.2.0</span>
+                  <span class="muted">Gera relatórios diários do negócio.</span>
+                  <span class="tag-list">
+                    <span class="muted">Sem tags</span>
+                  </span>
+                  <span>30/11/2025</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Download">
+                      <span class="material-symbols-rounded">download</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="table-pagination">
+                <button class="icon-btn" aria-label="Anterior">
+                  <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <button class="page-number active" type="button">1</button>
+                <button class="page-number" type="button">2</button>
+                <button class="page-number" type="button">3</button>
+                <span class="page-ellipsis">…</span>
+                <button class="page-number" type="button">10</button>
+                <button class="page-number" type="button">11</button>
+                <button class="page-number" type="button">12</button>
+                <button class="icon-btn" aria-label="Próximo">
+                  <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-credentials" data-title="Credenciais">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Credenciais</h2>
+                  <p class="page-subtitle">Armazene segredos e conexões seguras.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary">Adicionar credencial</button>
+                </div>
+              </div>
+              <div class="info-banner">
+                Todas as credenciais são criptografadas e podem ser usadas em automações.
+              </div>
+              <div class="data-table credentials-table">
+                <div class="data-row header cols-5">
+                  <span>Nome</span>
+                  <span>Tipo</span>
+                  <span>Atualizado</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row cols-5">
+                  <span>DB Produção</span>
+                  <span class="chip">Database</span>
+                  <span>Há 2 dias</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row cols-5">
+                  <span>AWS Billing</span>
+                  <span class="chip">AWS</span>
+                  <span>Hoje</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-input-files" data-title="Arquivos de entrada">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Arquivos de entrada</h2>
+                  <p class="page-subtitle">Gerencie arquivos usados em automações.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary">Enviar arquivo</button>
+                </div>
+              </div>
+              <div class="data-table">
+                <div class="data-row header cols-5">
+                  <span>Arquivo</span>
+                  <span>Tipo</span>
+                  <span>Visibilidade</span>
+                  <span>Atualizado</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row cols-5">
+                  <span>clientes.csv</span>
+                  <span class="chip">CSV</span>
+                  <span>Público</span>
+                  <span>Hoje</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Baixar">
+                      <span class="material-symbols-rounded">download</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row cols-5">
+                  <span>config.json</span>
+                  <span class="chip">JSON</span>
+                  <span>Privado</span>
+                  <span>Ontem</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Baixar">
+                      <span class="material-symbols-rounded">download</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-users" data-title="Usuários">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Usuários</h2>
+                  <p class="page-subtitle">Controle de acesso, papéis e permissões.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar usuários">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn outline">
+                    <span class="material-symbols-rounded">group</span>
+                    Gerenciar funções
+                  </button>
+                  <button class="btn primary">
+                    <span class="material-symbols-rounded">person_add</span>
+                    Adicionar usuário
+                  </button>
+                </div>
+              </div>
+              <div class="tabs tabs-underline">
+                <button class="tab active" data-tab="users-tab">Usuários (2)</button>
+                <button class="tab" data-tab="roles-tab">Funções (4)</button>
+              </div>
+              <div class="filters-grid users-filters">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar usuários" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="usersFilterBtn">
+                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  </button>
+                  <div class="menu filter-menu two-col" id="usersFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Status</span>
+                      <button class="filter-option active" data-filter="status" data-value="">Todos</button>
+                      <button class="filter-option" data-filter="status" data-value="active">Ativo</button>
+                      <button class="filter-option" data-filter="status" data-value="inactive">Inativo</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Função</span>
+                      <button class="filter-option active" data-filter="role" data-value="">Todas</button>
+                      <button class="filter-option" data-filter="role" data-value="admin">admin</button>
+                      <button class="filter-option" data-filter="role" data-value="superuser">superuser</button>
+                      <button class="filter-option" data-filter="role" data-value="user">user</button>
+                      <button class="filter-option" data-filter="role" data-value="viewer">viewer</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel active" data-panel="users-tab">
+                <div class="data-table users-table">
+                  <div class="data-row header">
+                    <span>Usuário</span>
+                    <span>E-mail</span>
+                    <span>Funções</span>
+                    <span>Status</span>
+                    <span>Criado</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span class="user-cell">
+                      <span class="user-avatar small">W</span>
+                      <span>
+                        <strong>WES ADMIN</strong>
+                        <span class="muted">ID: c80f2d54...</span>
+                      </span>
+                    </span>
+                    <span>admin@wes.com</span>
+                    <span class="chip">admin</span>
+                    <span class="chip success">ativo</span>
+                    <span>22/01/2026</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span class="user-cell">
+                      <span class="user-avatar small">A</span>
+                      <span>
+                        <strong>Alfeu Vinicius Souza</strong>
+                        <span class="muted">ID: 7c3e76f1...</span>
+                      </span>
+                    </span>
+                    <span>viniciusaires@hotmail.com</span>
+                    <span class="chip">admin</span>
+                    <span class="chip success">ativo</span>
+                    <span>24/08/2025</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+                <div class="table-pagination">
+                  <button class="icon-btn" aria-label="Anterior">
+                    <span class="material-symbols-rounded">chevron_left</span>
+                  </button>
+                  <button class="page-number active" type="button">1</button>
+                  <button class="page-number" type="button">2</button>
+                  <button class="page-number" type="button">3</button>
+                  <span class="page-ellipsis">…</span>
+                  <button class="page-number" type="button">10</button>
+                  <button class="page-number" type="button">11</button>
+                  <button class="page-number" type="button">12</button>
+                  <button class="icon-btn" aria-label="Próximo">
+                    <span class="material-symbols-rounded">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="roles-tab">
+                <div class="data-table roles-table">
+                  <div class="data-row header">
+                    <span>Função</span>
+                    <span>Descrição</span>
+                    <span>Permissões</span>
+                    <span>Usuários</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span class="role-cell">
+                      <span class="material-symbols-rounded">admin_panel_settings</span>
+                      admin
+                    </span>
+                    <span class="muted">Administrador com permissões de gestão do tenant.</span>
+                    <span>36</span>
+                    <span>2</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span class="role-cell">
+                      <span class="material-symbols-rounded">person</span>
+                      superuser
+                    </span>
+                    <span class="muted">Super administrador com todas as permissões.</span>
+                    <span>0</span>
+                    <span>0</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span class="role-cell">
+                      <span class="material-symbols-rounded">person</span>
+                      user
+                    </span>
+                    <span class="muted">Usuário padrão com permissões básicas.</span>
+                    <span>0</span>
+                    <span>0</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span class="role-cell">
+                      <span class="material-symbols-rounded">visibility</span>
+                      viewer
+                    </span>
+                    <span class="muted">Acesso somente leitura.</span>
+                    <span>0</span>
+                    <span>0</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-audit" data-title="Logs de auditoria">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Logs de auditoria</h2>
+                  <p class="page-subtitle">Histórico de eventos e alterações no sistema.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar logs">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                </div>
+              </div>
+              <div class="stats-cards">
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">check_circle</span></div>
+                  <div>
+                    <div class="stat-value">320</div>
+                    <div class="stat-label">Eventos</div>
+                    <div class="stat-sub">Últimos 7 dias</div>
+                  </div>
+                </div>
+                <div class="stat-card warning">
+                  <div class="stat-icon"><span class="material-symbols-rounded">warning</span></div>
+                  <div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Alertas</div>
+                    <div class="stat-sub">Críticos</div>
+                  </div>
+                </div>
+              </div>
+              <div class="filters-grid">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar logs" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="auditFilterBtn">
+                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  </button>
+                  <div class="menu" id="auditFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Tipo</span>
+                      <button class="filter-option active" data-filter="type" data-value="">Todos</button>
+                      <button class="filter-option" data-filter="type" data-value="login">Login</button>
+                      <button class="filter-option" data-filter="type" data-value="update">Atualização</button>
+                      <button class="filter-option" data-filter="type" data-value="delete">Exclusão</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Período</span>
+                      <button class="filter-option active" data-filter="period" data-value="">Últimos 7 dias</button>
+                      <button class="filter-option" data-filter="period" data-value="30d">Últimos 30 dias</button>
+                      <button class="filter-option" data-filter="period" data-value="all">Todo período</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="data-table">
+                <div class="data-row header cols-5">
+                  <span>Usuário</span>
+                  <span>Ação</span>
+                  <span>Recurso</span>
+                  <span>Data</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row cols-5">
+                  <span>Test User</span>
+                  <span class="chip">update</span>
+                  <span>Executores</span>
+                  <span>Hoje • 09:40</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row cols-5">
+                  <span>Admin</span>
+                  <span class="chip">login</span>
+                  <span>Conta</span>
+                  <span>Ontem • 20:15</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+              <div class="table-pagination">
+                <button class="icon-btn" aria-label="Anterior">
+                  <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <button class="page-number active" type="button">1</button>
+                <button class="page-number" type="button">2</button>
+                <button class="page-number" type="button">3</button>
+                <span class="page-ellipsis">…</span>
+                <button class="page-number" type="button">10</button>
+                <button class="page-number" type="button">11</button>
+                <button class="page-number" type="button">12</button>
+                <button class="icon-btn" aria-label="Próximo">
+                  <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-organization" data-title="Organização">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Organização</h2>
+                  <p class="page-subtitle">Plano, billing e chaves de API.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn outline">Gerenciar</button>
+                  <button class="btn primary">Upgrade</button>
+                </div>
+              </div>
+              <div class="tabs">
+                <button class="tab active">Visão geral</button>
+                <button class="tab">Assinatura</button>
+                <button class="tab">Faturamento</button>
+                <button class="tab">API Keys</button>
+                <button class="tab">Ambientes</button>
+              </div>
+              <div class="stats-cards">
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
+                  <div>
+                    <div class="stat-value">Pro</div>
+                    <div class="stat-label">Plano</div>
+                    <div class="stat-sub">Renova em 20 dias</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">dns</span></div>
+                  <div>
+                    <div class="stat-value">12/20</div>
+                    <div class="stat-label">Executores</div>
+                    <div class="stat-sub">Em uso</div>
+                  </div>
+                </div>
+              </div>
+              <div class="data-table">
+                <div class="data-row header">
+                  <span>Ambiente</span>
+                  <span>Status</span>
+                  <span>Executores</span>
+                  <span>Recursos</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span>Production</span>
+                  <span class="chip success">Ativo</span>
+                  <span>12/20</span>
+                  <span>CPU 85% • Mem 72%</span>
+                  <span class="row-actions"><button class="btn outline small">Detalhes</button></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-environments" data-title="Ambientes">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Ambientes</h2>
+                  <p class="page-subtitle">Gerencie ambientes e limites de recursos.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar ambientes">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn primary">Criar ambiente</button>
+                </div>
+              </div>
+              <div class="data-table">
+                <div class="data-row header">
+                  <span>Ambiente</span>
+                  <span>Tipo</span>
+                  <span>Executores</span>
+                  <span>Limites</span>
+                  <span>Status</span>
+                </div>
+                <div class="data-row">
+                  <span>Production</span>
+                  <span>Produção</span>
+                  <span>12/20</span>
+                  <span>CPU 8 • Mem 32GB</span>
+                  <span class="chip success">Ativo</span>
+                </div>
+                <div class="data-row">
+                  <span>Staging</span>
+                  <span>Staging</span>
+                  <span>5/10</span>
+                  <span>CPU 4 • Mem 16GB</span>
+                  <span class="chip warning">Ativo</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-bpmn" data-title="BPMN">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>BPMN</h2>
+                  <p class="page-subtitle">Editor integrado para processos BPMN.</p>
+                </div>
+              </div>
+              <div class="embed-frame">
+                <div class="embed-placeholder">Conteúdo BPMN embutido</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-fluxos" data-title="Fluxos">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Fluxos</h2>
+                  <p class="page-subtitle">Workflows visuais para automações.</p>
+                </div>
+              </div>
+              <div class="embed-frame">
+                <div class="embed-placeholder">Conteúdo de fluxos embutido</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-settings" data-title="Configurações">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Configurações</h2>
+                  <p class="page-subtitle">Preferências de conta, notificações e segurança.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary">Salvar alterações</button>
+                </div>
+              </div>
+              <div class="tabs">
+                <button class="tab active">Geral</button>
+                <button class="tab">Notificações</button>
+                <button class="tab">Segurança</button>
+                <button class="tab">Dispositivos</button>
+              </div>
+              <div class="settings-grid">
+                <div class="settings-card">
+                  <h4>Idioma</h4>
+                  <select>
+                    <option>Português (BR)</option>
+                    <option>English</option>
+                  </select>
+                </div>
+                <div class="settings-card">
+                  <h4>Tema</h4>
+                  <select>
+                    <option>Automático</option>
+                    <option>Claro</option>
+                    <option>Escuro</option>
+                  </select>
+                </div>
+                <div class="settings-card">
+                  <h4>Notificações</h4>
+                  <p>Ativar alertas por email e push.</p>
+                  <button class="btn outline small">Configurar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

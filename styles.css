@@ -354,6 +354,31 @@ body {
   cursor: pointer;
 }
 
+.has-tooltip {
+  position: relative;
+}
+
+.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: #111827;
+  color: #ffffff;
+  font-size: var(--md-body-small);
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+}
+
+.has-tooltip:hover::after {
+  opacity: 1;
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;
@@ -1986,7 +2011,7 @@ body {
 }
 
 .btn.primary {
-  background: linear-gradient(90deg, #38BCFF 0%, #20A4FE 25%, #1991FA 50%, #0B82F9 75%, #016FF4 100%);
+  background: #016ff4;
   color: #fff;
   border: none;
   background-clip: padding-box;
@@ -2006,7 +2031,7 @@ body {
 }
 
 .btn.primary:hover {
-  filter: brightness(0.9);
+  background: #0b5fe3;
 }
 
 .btn.outline {

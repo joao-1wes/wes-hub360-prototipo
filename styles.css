@@ -1395,6 +1395,7 @@ body {
 .modal-footer {
   display: flex;
   justify-content: flex-end;
+  gap: 10px;
 }
 
 .tag-list {
@@ -1996,6 +1997,14 @@ body {
   gap: 16px;
 }
 
+.settings-section + .settings-section {
+  margin-top: 20px;
+}
+
+.settings-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
 .settings-card {
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -2007,6 +2016,95 @@ body {
   margin: 0 0 8px;
   font-size: var(--md-title-medium);
   line-height: 24px;
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: var(--md-body-medium);
+  color: #111827;
+}
+
+.settings-muted {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+}
+
+.settings-label {
+  display: block;
+  margin: 14px 0 8px;
+  font-weight: 600;
+  color: #111827;
+  font-size: var(--md-body-medium);
+}
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.settings-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.settings-item .material-symbols-rounded {
+  color: #2563eb;
+  font-size: 22px;
+}
+
+.settings-item-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.settings-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-action-left {
+  padding: 0;
+}
+
+.settings-item .action-icon.danger {
+  color: #dc5f5f;
+}
+
+.settings-tabs {
+  margin-bottom: 16px;
+}
+
+.settings-panel .data-table {
+  gap: 8px;
+}
+
+.settings-table .data-row {
+  grid-template-columns: 1.6fr 1.2fr 1.2fr 0.8fr 0.6fr;
+}
+
+.settings-table.security-table .data-row {
+  grid-template-columns: 1.6fr 1.2fr 1.4fr 0.8fr;
+}
+
+.settings-table .row-actions {
+  justify-content: flex-start;
 }
 
 .agents-table {
@@ -2139,6 +2237,18 @@ body {
 
 .btn.primary:hover {
   background: #0b5fe3;
+}
+
+.btn:disabled,
+.btn[disabled] {
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.btn.primary:disabled,
+.btn.primary[disabled] {
+  background: #dbe4f1;
+  color: #8aa2c8;
 }
 
 .btn.outline {

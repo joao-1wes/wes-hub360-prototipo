@@ -34,6 +34,8 @@ const openBillingModal = document.getElementById('openBillingModal');
 const billingModal = document.getElementById('billingModal');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
+const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
+const settingsPanels = document.querySelectorAll('#page-settings .settings-panel');
 const pages = document.querySelectorAll('.page');
 const navLinks = document.querySelectorAll('.nav-item[data-route], .submenu-item[href^="#/"]');
 const detailsToggles = document.querySelectorAll('.details-toggle');
@@ -53,6 +55,8 @@ const singleField = document.querySelector('.period-field.single-only');
 const addToggles = document.querySelectorAll('.add-toggle');
 const licenseToggles = document.querySelectorAll('.license-toggle');
 const firstTimeBanner = document.getElementById('firstTimeBanner');
+const settingsSaveBtn = document.getElementById('settingsSaveBtn');
+const settingsPage = document.getElementById('page-settings');
 
 if (filterBtn && filterMenu) {
   filterBtn.addEventListener('click', (event) => {
@@ -489,9 +493,48 @@ if (orgTabs.length && orgPanels.length) {
   });
 }
 
+
 if (menuToggle && appShell) {
   menuToggle.addEventListener('click', () => {
     appShell.classList.toggle('sidebar-collapsed');
+  });
+}
+
+if (settingsPage && settingsSaveBtn) {
+  const settingsFields = settingsPage.querySelectorAll('input, select, textarea');
+  const initialValues = new Map();
+
+  const readValue = (field) => {
+    if (field.type === 'checkbox' || field.type === 'radio') {
+      return field.checked;
+    }
+    return field.value;
+  };
+
+  const updateSaveState = () => {
+    const dirty = Array.from(settingsFields).some((field) => readValue(field) !== initialValues.get(field));
+    settingsSaveBtn.disabled = !dirty;
+  };
+
+  settingsFields.forEach((field) => {
+    initialValues.set(field, readValue(field));
+    field.addEventListener('input', updateSaveState);
+    field.addEventListener('change', updateSaveState);
+  });
+
+  updateSaveState();
+}
+
+if (settingsTabs.length && settingsPanels.length) {
+  settingsTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      settingsTabs.forEach((item) => item.classList.remove('active'));
+      tab.classList.add('active');
+      settingsPanels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panel === target);
+      });
+    });
   });
 }
 

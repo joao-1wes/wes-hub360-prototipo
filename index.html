@@ -2018,8 +2018,7 @@
                   <p class="page-subtitle">Plano, faturamento e chaves de API.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn outline">Gerenciar</button>
-                  <button class="btn primary">Atualizar plano</button>
+                  <button class="btn primary">Gerenciar</button>
                 </div>
               </div>
               <div class="tabs tabs-underline">
@@ -2310,12 +2309,10 @@
               <div class="page-header">
                 <div>
                   <h2>BPMN</h2>
-                  <p class="page-subtitle">Editor integrado para processos BPMN.</p>
+                  <p class="page-subtitle">Estamos preparando esta área. Em breve você poderá criar e editar processos.</p>
                 </div>
               </div>
-              <div class="embed-frame">
-                <div class="embed-placeholder">Conteúdo BPMN embutido</div>
-              </div>
+              <div class="empty-state">Funcionalidade em desenvolvimento. Aguarde as próximas versões.</div>
             </div>
           </div>
 
@@ -2324,12 +2321,10 @@
               <div class="page-header">
                 <div>
                   <h2>Fluxos</h2>
-                  <p class="page-subtitle">Workflows visuais para automações.</p>
+                  <p class="page-subtitle">Área em construção. Em breve você terá acesso aos fluxos.</p>
                 </div>
               </div>
-              <div class="embed-frame">
-                <div class="embed-placeholder">Conteúdo de fluxos embutido</div>
-              </div>
+              <div class="empty-state">Funcionalidade em desenvolvimento. Aguarde as próximas versões.</div>
             </div>
           </div>
 
@@ -2341,35 +2336,141 @@
                   <p class="page-subtitle">Preferências de conta, notificações e segurança.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary">Salvar alterações</button>
+                  <button class="btn primary" id="settingsSaveBtn" disabled>Salvar alterações</button>
                 </div>
               </div>
-              <div class="tabs">
-                <button class="tab active">Geral</button>
-                <button class="tab">Notificações</button>
-                <button class="tab">Segurança</button>
-                <button class="tab">Dispositivos</button>
+              <div class="settings-section">
+                <div class="settings-grid">
+                  <div class="settings-card">
+                    <h4>Notificações por e-mail</h4>
+                    <div class="toggle-row">
+                      <label class="switch">
+                        <input type="checkbox" checked />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span>Ativar notificações por e-mail</span>
+                    </div>
+                    <div class="toggle-row">
+                      <label class="switch">
+                        <input type="checkbox" checked />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span>Conclusão de jobs</span>
+                    </div>
+                    <div class="toggle-row">
+                      <label class="switch">
+                        <input type="checkbox" checked />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span>Falhas de jobs</span>
+                    </div>
+                    <div class="toggle-row">
+                      <label class="switch">
+                        <input type="checkbox" />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span>Atualizações do sistema</span>
+                    </div>
+                  </div>
+                  <div class="settings-card">
+                    <h4>Notificações push</h4>
+                    <div class="toggle-row">
+                      <label class="switch">
+                        <input type="checkbox" />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span>Ativar notificações push</span>
+                    </div>
+                    <p class="settings-muted">Receba notificações em tempo real no navegador para eventos importantes.</p>
+                  </div>
+                </div>
               </div>
-              <div class="settings-grid">
-                <div class="settings-card">
-                  <h4>Idioma</h4>
-                  <select>
-                    <option>Português (BR)</option>
-                    <option>English</option>
-                  </select>
+              <div class="settings-section">
+                <div class="settings-grid settings-grid-3">
+                  <div class="settings-card">
+                    <h4>Senha e autenticação</h4>
+                    <button class="btn outline small">
+                      <span class="material-symbols-rounded">key</span>
+                      Alterar senha
+                    </button>
+                    <div class="toggle-row">
+                      <label class="switch">
+                        <input type="checkbox" />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span>Autenticação em dois fatores</span>
+                    </div>
+                    <label class="settings-label">Tempo de sessão (minutos)</label>
+                    <select>
+                      <option>30 minutos</option>
+                      <option>60 minutos</option>
+                      <option>120 minutos</option>
+                    </select>
+                  </div>
                 </div>
-                <div class="settings-card">
-                  <h4>Tema</h4>
-                  <select>
-                    <option>Automático</option>
-                    <option>Claro</option>
-                    <option>Escuro</option>
-                  </select>
+              </div>
+
+              <div class="settings-section">
+                <div class="tabs tabs-underline settings-tabs">
+                  <button class="tab settings-tab active" data-tab="active-sessions">Sessões ativas</button>
+                  <button class="tab settings-tab" data-tab="security-log">Log de segurança</button>
                 </div>
-                <div class="settings-card">
-                  <h4>Notificações</h4>
-                  <p>Ativar alertas por email e push.</p>
-                  <button class="btn outline small">Configurar</button>
+
+                <div class="tab-panel settings-panel active" data-panel="active-sessions">
+                  <div class="data-table settings-table sessions-table">
+                    <div class="data-row header">
+                      <span>Dispositivo</span>
+                      <span>Local</span>
+                      <span>Último acesso</span>
+                      <span>Status</span>
+                      <span>Ações</span>
+                    </div>
+                    <div class="data-row">
+                      <span>Sessão atual</span>
+                      <span>São Paulo, SP</span>
+                      <span>2 min atrás</span>
+                      <span class="chip">Atual</span>
+                      <span class="row-actions">
+                        <button class="icon-btn action-icon danger" aria-label="Encerrar sessão">
+                          <span class="material-symbols-rounded">delete</span>
+                        </button>
+                      </span>
+                    </div>
+                    <div class="data-row">
+                      <span>Chrome no Windows</span>
+                      <span>Rio de Janeiro, RJ</span>
+                      <span>2 dias atrás</span>
+                      <span class="chip">Ativa</span>
+                      <span class="row-actions">
+                        <button class="icon-btn action-icon danger" aria-label="Encerrar sessão">
+                          <span class="material-symbols-rounded">delete</span>
+                        </button>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-panel settings-panel" data-panel="security-log">
+                  <div class="data-table settings-table security-table">
+                    <div class="data-row header">
+                      <span>Evento</span>
+                      <span>Data</span>
+                      <span>Local</span>
+                      <span>Status</span>
+                    </div>
+                    <div class="data-row">
+                      <span>Login</span>
+                      <span>28/01/2025 10:30</span>
+                      <span>São Paulo, SP</span>
+                      <span class="chip success">Sucesso</span>
+                    </div>
+                    <div class="data-row">
+                      <span>Alteração de senha</span>
+                      <span>27/01/2025 15:45</span>
+                      <span>São Paulo, SP</span>
+                      <span class="chip success">Sucesso</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>WES HUB 360 - Dashboard (Static)</title>
+    <title>WES HUB 360 - Painel (Estático)</title>
     <link rel="stylesheet" href="./styles.css" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
@@ -94,7 +94,7 @@
       <main class="main">
         <header class="topbar">
           <button class="topbar-title topbar-title-btn has-tooltip" id="dashboardToggle" type="button" data-tooltip="Clique para alternar entre a versão preenchida e a versão vazia do painel">
-            Dashboard
+            Painel
           </button>
           <div class="topbar-actions">
             <div class="notifications" id="notificationsMenu">
@@ -113,7 +113,7 @@
                   </li>
                   <li>
                     <div class="notification-title">Novo executor registrado</div>
-                    <div class="notification-meta">Production-server-01 está agora online • 15 min atrás</div>
+                    <div class="notification-meta">Servidor-producao-01 está agora online • 15 min atrás</div>
                   </li>
                   <li>
                     <div class="notification-title">Pacote enviado</div>
@@ -148,7 +148,7 @@
         </header>
 
         <section class="content">
-          <div class="page is-active" id="page-dashboard" data-title="Dashboard">
+          <div class="page is-active" id="page-dashboard" data-title="Painel">
             <div class="section" id="dashboardViewDefault">
             <h2>Ações rápidas</h2>
             <div class="quick-actions">
@@ -764,7 +764,7 @@
                   <button class="icon-btn" aria-label="Atualizar agendamentos">
                     <span class="material-symbols-rounded">refresh</span>
                   </button>
-                  <button class="icon-btn" aria-label="Download agendamentos">
+                  <button class="icon-btn" aria-label="Baixar agendamentos">
                     <span class="material-symbols-rounded">download</span>
                   </button>
                   <button class="btn primary">Criar agendamento</button>
@@ -1026,7 +1026,7 @@
                   </button>
                   <button class="btn outline">
                     <span class="material-symbols-rounded">download</span>
-                    Download executor
+                    Baixar executor
                   </button>
                   <button class="btn primary">Criar executor</button>
                 </div>
@@ -1101,9 +1101,9 @@
                       <div class="filter-group">
                         <span>Ambiente</span>
                         <button class="filter-option active" data-filter="env" data-value="">Todos</button>
-                        <button class="filter-option" data-filter="env" data-value="production">Production</button>
-                        <button class="filter-option" data-filter="env" data-value="staging">Staging</button>
-                        <button class="filter-option" data-filter="env" data-value="development">Development</button>
+                        <button class="filter-option" data-filter="env" data-value="production">Produção</button>
+                        <button class="filter-option" data-filter="env" data-value="staging">Homologação</button>
+                        <button class="filter-option" data-filter="env" data-value="development">Desenvolvimento</button>
                       </div>
                       <div class="filter-group">
                         <span>Status</span>
@@ -1127,7 +1127,7 @@
                   <div class="data-row">
                     <span>executor-prod-01</span>
                     <span class="chip success">Online</span>
-                    <span>Production</span>
+                    <span>Produção</span>
                     <span>12/03/2025</span>
                     <span>Agora</span>
                     <span class="row-actions has-details">
@@ -1144,7 +1144,7 @@
                         <div class="details-title">Detalhes do executor</div>
                         <div class="details-item"><span>Executor</span><strong>executor-prod-01</strong></div>
                         <div class="details-item"><span>Status</span><strong>Online</strong></div>
-                        <div class="details-item"><span>Ambiente</span><strong>Production</strong></div>
+                        <div class="details-item"><span>Ambiente</span><strong>Produção</strong></div>
                         <div class="details-item"><span>Data de criação</span><strong>12/03/2025</strong></div>
                         <div class="details-item"><span>Último ping</span><strong>Agora</strong></div>
                       </div>
@@ -1153,7 +1153,7 @@
                   <div class="data-row">
                     <span>executor-stg-02</span>
                     <span class="chip warning">Offline</span>
-                    <span>Staging</span>
+                    <span>Homologação</span>
                     <span>28/02/2025</span>
                     <span>5 min atrás</span>
                     <span class="row-actions has-details">
@@ -1170,7 +1170,7 @@
                         <div class="details-title">Detalhes do executor</div>
                         <div class="details-item"><span>Executor</span><strong>executor-stg-02</strong></div>
                         <div class="details-item"><span>Status</span><strong>Offline</strong></div>
-                        <div class="details-item"><span>Ambiente</span><strong>Staging</strong></div>
+                        <div class="details-item"><span>Ambiente</span><strong>Homologação</strong></div>
                         <div class="details-item"><span>Data de criação</span><strong>28/02/2025</strong></div>
                         <div class="details-item"><span>Último ping</span><strong>5 min atrás</strong></div>
                       </div>
@@ -1181,7 +1181,7 @@
               <div class="tab-panel" data-panel="executors-status">
                 <div class="monitoring-header">
                   <div>
-                    <h3>Dashboard de status das máquinas</h3>
+                    <h3>Painel de status das máquinas</h3>
                     <p>Monitoramento em tempo real e saúde de todas as máquinas.</p>
                     <span class="monitoring-updated">Última atualização: 13:57:13</span>
                   </div>
@@ -1261,7 +1261,7 @@
                   </div>
                   <div class="trend">
                     <h5>Tendência 24 horas</h5>
-                    <p>CPU avg: 0% · Memória avg: 0% · Disco avg: 0% · Rede avg: 1MB/s</p>
+                    <p>CPU média: 0% · Memória média: 0% · Disco médio: 0% · Rede média: 1MB/s</p>
                   </div>
                 </div>
                 <div class="monitoring-panel">
@@ -1374,7 +1374,7 @@
                       <span>Última atividade</span>
                     </div>
                     <div class="data-row">
-                      <span>Unknown<br /><span class="muted">exec_9bc...</span></span>
+                      <span>Desconhecido<br /><span class="muted">exec_9bc...</span></span>
                       <span>14/01/2026, 20:59:46</span>
                       <span class="chip">1</span>
                       <span>0h 0m</span>
@@ -1461,7 +1461,7 @@
               <div class="page-header">
                 <div>
                   <h2>Pacotes</h2>
-                  <p class="page-subtitle">Upload, versão e deploy de pacotes.</p>
+                  <p class="page-subtitle">Upload, versão e implantação de pacotes.</p>
                 </div>
                 <div class="page-actions">
                   <button class="icon-btn" aria-label="Atualizar pacotes">
@@ -1494,8 +1494,8 @@
                     <div class="filter-group">
                       <span>Tags</span>
                       <button class="filter-option active" data-filter="tag" data-value="">Todas</button>
-                      <button class="filter-option" data-filter="tag" data-value="wrapped">Wrapped</button>
-                      <button class="filter-option" data-filter="tag" data-value="automation">Automation</button>
+                      <button class="filter-option" data-filter="tag" data-value="wrapped">Empacotado</button>
+                      <button class="filter-option" data-filter="tag" data-value="automation">Automação</button>
                       <button class="filter-option" data-filter="tag" data-value="etl">ETL</button>
                     </div>
                     <div class="filter-group">
@@ -1520,13 +1520,13 @@
                   <span class="chip">1.0.0</span>
                   <span class="muted">Pacote criado pelo Skipper Java Executor</span>
                     <span class="tag-list">
-                      <span class="tag-chip">wrapped</span>
-                      <span class="tag-chip">automation</span>
-                      <span class="tag-more" data-tags="monitoring">+1</span>
+                      <span class="tag-chip">empacotado</span>
+                      <span class="tag-chip">automação</span>
+                      <span class="tag-more" data-tags="monitoramento">+1</span>
                     </span>
                   <span>22/01/2026</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Download">
+                    <button class="icon-btn action-icon" aria-label="Baixar">
                       <span class="material-symbols-rounded">download</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -1539,13 +1539,13 @@
                   <span class="chip">1.0.4</span>
                   <span class="muted">Pacote criado pelo Skipper Java Executor</span>
                     <span class="tag-list">
-                      <span class="tag-chip">wrapped</span>
-                      <span class="tag-chip">automation</span>
-                      <span class="tag-more" data-tags="analytics">+1</span>
+                      <span class="tag-chip">empacotado</span>
+                      <span class="tag-chip">automação</span>
+                      <span class="tag-more" data-tags="análise">+1</span>
                     </span>
                   <span>20/01/2026</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Download">
+                    <button class="icon-btn action-icon" aria-label="Baixar">
                       <span class="material-symbols-rounded">download</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -1562,7 +1562,7 @@
                   </span>
                   <span>30/11/2025</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Download">
+                    <button class="icon-btn action-icon" aria-label="Baixar">
                       <span class="material-symbols-rounded">download</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -1624,7 +1624,7 @@
                   </span>
                 </div>
                 <div class="data-row cols-5">
-                  <span>AWS Billing</span>
+                  <span>Cobrança AWS</span>
                   <span class="chip">AWS</span>
                   <span>Hoje</span>
                   <span class="row-actions">
@@ -1740,10 +1740,10 @@
                     <div class="filter-group">
                       <span>Função</span>
                       <button class="filter-option active" data-filter="role" data-value="">Todas</button>
-                      <button class="filter-option" data-filter="role" data-value="admin">admin</button>
-                      <button class="filter-option" data-filter="role" data-value="superuser">superuser</button>
-                      <button class="filter-option" data-filter="role" data-value="user">user</button>
-                      <button class="filter-option" data-filter="role" data-value="viewer">viewer</button>
+                      <button class="filter-option" data-filter="role" data-value="admin">administrador</button>
+                      <button class="filter-option" data-filter="role" data-value="superuser">superusuário</button>
+                      <button class="filter-option" data-filter="role" data-value="user">usuário</button>
+                      <button class="filter-option" data-filter="role" data-value="viewer">visualizador</button>
                     </div>
                   </div>
                 </div>
@@ -1767,7 +1767,7 @@
                       </span>
                     </span>
                     <span>admin@wes.com</span>
-                    <span class="chip">admin</span>
+                    <span class="chip">administrador</span>
                     <span class="chip success">ativo</span>
                     <span>22/01/2026</span>
                     <span class="row-actions">
@@ -1788,7 +1788,7 @@
                       </span>
                     </span>
                     <span>viniciusaires@hotmail.com</span>
-                    <span class="chip">admin</span>
+                    <span class="chip">administrador</span>
                     <span class="chip success">ativo</span>
                     <span>24/08/2025</span>
                     <span class="row-actions">
@@ -1829,7 +1829,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">admin_panel_settings</span>
-                      admin
+                      administrador
                     </span>
                     <span class="muted">Administrador com permissões de gestão do tenant.</span>
                     <span>36</span>
@@ -1846,7 +1846,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">person</span>
-                      superuser
+                      superusuário
                     </span>
                     <span class="muted">Super administrador com todas as permissões.</span>
                     <span>0</span>
@@ -1863,7 +1863,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">person</span>
-                      user
+                      usuário
                     </span>
                     <span class="muted">Usuário padrão com permissões básicas.</span>
                     <span>0</span>
@@ -1880,7 +1880,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">visibility</span>
-                      viewer
+                      visualizador
                     </span>
                     <span class="muted">Acesso somente leitura.</span>
                     <span>0</span>
@@ -1971,7 +1971,7 @@
                 </div>
                 <div class="data-row cols-5">
                   <span>Test User</span>
-                  <span class="chip">update</span>
+                  <span class="chip">atualização</span>
                   <span>Executores</span>
                   <span>Hoje • 09:40</span>
                   <span class="row-actions">
@@ -1981,7 +1981,7 @@
                   </span>
                 </div>
                 <div class="data-row cols-5">
-                  <span>Admin</span>
+                  <span>Administrador</span>
                   <span class="chip">login</span>
                   <span>Conta</span>
                   <span>Ontem • 20:15</span>
@@ -2015,52 +2015,251 @@
               <div class="page-header">
                 <div>
                   <h2>Organização</h2>
-                  <p class="page-subtitle">Plano, billing e chaves de API.</p>
+                  <p class="page-subtitle">Plano, faturamento e chaves de API.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn outline">Gerenciar</button>
-                  <button class="btn primary">Upgrade</button>
+                  <button class="btn primary">Atualizar plano</button>
                 </div>
               </div>
-              <div class="tabs">
-                <button class="tab active">Visão geral</button>
-                <button class="tab">Assinatura</button>
-                <button class="tab">Faturamento</button>
-                <button class="tab">API Keys</button>
-                <button class="tab">Ambientes</button>
+              <div class="tabs tabs-underline">
+                <button class="tab active" data-tab="org-overview">Visão geral</button>
+                <button class="tab" data-tab="org-subscription">Assinatura</button>
+                <button class="tab" data-tab="org-billing">Faturamento</button>
+                <button class="tab" data-tab="org-keys">Chaves de API</button>
+                <button class="tab" data-tab="org-envs">Ambientes</button>
               </div>
-              <div class="stats-cards">
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
-                  <div>
-                    <div class="stat-value">Pro</div>
-                    <div class="stat-label">Plano</div>
-                    <div class="stat-sub">Renova em 20 dias</div>
+              <div class="tab-panel active" data-panel="org-overview">
+                <div class="stats-cards">
+                  <div class="stat-card">
+                    <div class="stat-icon"><span class="material-symbols-rounded">workspace_premium</span></div>
+                    <div>
+                      <div class="stat-value">Pro</div>
+                      <div class="stat-label">Plano</div>
+                      <div class="stat-sub">Renova em 20 dias</div>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon"><span class="material-symbols-rounded">dns</span></div>
+                    <div>
+                      <div class="stat-value">12/20</div>
+                      <div class="stat-label">Executores</div>
+                      <div class="stat-sub">Em uso</div>
+                    </div>
                   </div>
                 </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">dns</span></div>
-                  <div>
-                    <div class="stat-value">12/20</div>
-                    <div class="stat-label">Executores</div>
-                    <div class="stat-sub">Em uso</div>
+                <div class="data-table">
+                  <div class="data-row header">
+                    <span>Ambiente</span>
+                    <span>Status</span>
+                    <span>Executores</span>
+                    <span>Recursos</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>Produção</span>
+                    <span class="chip success">Ativo</span>
+                    <span>12/20</span>
+                    <span>CPU 85% • Memória 72%</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
                   </div>
                 </div>
               </div>
-              <div class="data-table">
-                <div class="data-row header">
-                  <span>Ambiente</span>
-                  <span>Status</span>
-                  <span>Executores</span>
-                  <span>Recursos</span>
-                  <span>Ações</span>
+              <div class="tab-panel" data-panel="org-subscription">
+                <div class="stats-cards">
+                  <div class="stat-card">
+                    <div class="stat-icon"><span class="material-symbols-rounded">calendar_month</span></div>
+                    <div>
+                      <div class="stat-value">20 dias</div>
+                      <div class="stat-label">Próxima renovação</div>
+                      <div class="stat-sub">Plano Pro</div>
+                    </div>
+                  </div>
+                  <div class="stat-card">
+                    <div class="stat-icon"><span class="material-symbols-rounded">credit_card</span></div>
+                    <div>
+                      <div class="stat-value">Mensal</div>
+                      <div class="stat-label">Cobrança</div>
+                      <div class="stat-sub">Cartão final 4242</div>
+                    </div>
+                    <button class="icon-btn action-icon" id="openBillingModal" aria-label="Editar pagamento">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                  </div>
                 </div>
-                <div class="data-row">
-                  <span>Production</span>
-                  <span class="chip success">Ativo</span>
-                  <span>12/20</span>
-                  <span>CPU 85% • Mem 72%</span>
-                  <span class="row-actions"><button class="btn outline small">Detalhes</button></span>
+                <div class="subscription-cards">
+                  <div class="subscription-card">
+                    <div class="subscription-title">Básico</div>
+                    <div class="subscription-price">R$ 99/mês</div>
+                    <div class="subscription-desc">Para equipes pequenas com necessidades essenciais.</div>
+                    <ul>
+                      <li>Até 3 executores</li>
+                      <li>Suporte por e-mail</li>
+                      <li>Alertas básicos</li>
+                    </ul>
+                    <button class="btn outline">Selecionar</button>
+                  </div>
+                  <div class="subscription-card featured">
+                    <div class="subscription-title">Profissional</div>
+                    <div class="subscription-price">R$ 249/mês</div>
+                    <div class="subscription-desc">Plano mais popular para times em crescimento.</div>
+                    <ul>
+                      <li>Até 10 executores</li>
+                      <li>Suporte prioritário</li>
+                      <li>Relatórios avançados</li>
+                    </ul>
+                    <button class="btn primary">Atual</button>
+                  </div>
+                  <div class="subscription-card">
+                    <div class="subscription-title">Corporativo</div>
+                    <div class="subscription-price">Sob consulta</div>
+                    <div class="subscription-desc">Para operações em larga escala e customizações.</div>
+                    <ul>
+                      <li>Executores ilimitados</li>
+                      <li>Suporte dedicado</li>
+                      <li>SLA customizado</li>
+                    </ul>
+                    <button class="btn outline">Falar com vendas</button>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="org-billing">
+                <div class="data-table">
+                  <div class="data-row header cols-5">
+                    <span>Fatura</span>
+                    <span>Período</span>
+                    <span>Valor</span>
+                    <span>Status</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row cols-5">
+                    <span>INV-2026-01</span>
+                    <span>01/01/2026 - 31/01/2026</span>
+                    <span>R$ 1.200,00</span>
+                    <span class="chip success">Pago</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="org-keys">
+                <div class="page-actions align-right">
+                  <button class="btn primary">
+                    <span class="material-symbols-rounded">add</span>
+                    Criar nova chave
+                  </button>
+                </div>
+                <div class="filters-grid">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar chave" />
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <button class="btn filter-btn" id="keysFilterBtn">
+                      <span class="material-symbols-rounded">filter_list</span>Filtros
+                    </button>
+                    <div class="menu" id="keysFilterMenu">
+                      <div class="filter-footer">
+                        <button class="filter-clear" type="button">Limpar filtros</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>Status</span>
+                        <button class="filter-option active" data-filter="status" data-value="">Todos</button>
+                        <button class="filter-option" data-filter="status" data-value="active">Ativo</button>
+                        <button class="filter-option" data-filter="status" data-value="inactive">Inativo</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="data-table">
+                  <div class="data-row header cols-5">
+                    <span>Chave</span>
+                    <span>Descrição</span>
+                    <span>Criada em</span>
+                    <span>Status</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row cols-5">
+                    <span>sk_live_8f...23</span>
+                    <span class="muted">Integração ERP</span>
+                    <span>10/01/2026</span>
+                    <span class="chip success">Ativa</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Copiar chave">
+                        <span class="material-symbols-rounded">content_copy</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="org-envs">
+                <div class="data-table">
+                  <div class="data-row header">
+                    <span>Ambiente</span>
+                    <span>Status</span>
+                    <span>Executores</span>
+                    <span>Recursos</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>Produção</span>
+                    <span class="chip success">Ativo</span>
+                    <span>12/20</span>
+                    <span>CPU 85% • Memória 72%</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="modal" id="billingModal" aria-hidden="true">
+                <div class="modal-backdrop" data-modal-close></div>
+                <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="billingModalTitle">
+                  <div class="modal-header">
+                    <h3 id="billingModalTitle">Editar pagamento</h3>
+                    <button class="icon-btn" aria-label="Fechar" data-modal-close>
+                      <span class="material-symbols-rounded">close</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <label class="modal-label">Nome no cartão</label>
+                    <input class="modal-input" type="text" placeholder="Digite o nome impresso no cartão" />
+                    <label class="modal-label">Número do cartão</label>
+                    <input class="modal-input" type="text" placeholder="0000 0000 0000 0000" />
+                    <div class="modal-row">
+                      <div>
+                        <label class="modal-label">Validade</label>
+                        <input class="modal-input" type="text" placeholder="MM/AA" />
+                      </div>
+                      <div>
+                        <label class="modal-label">CVV</label>
+                        <input class="modal-input" type="text" placeholder="***" />
+                      </div>
+                    </div>
+                    <label class="modal-label">Endereço de cobrança</label>
+                    <input class="modal-input" type="text" placeholder="Rua, número, complemento" />
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn outline" data-modal-close>Cancelar</button>
+                    <button class="btn primary">Salvar pagamento</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2089,17 +2288,17 @@
                   <span>Status</span>
                 </div>
                 <div class="data-row">
-                  <span>Production</span>
+                  <span>Produção</span>
                   <span>Produção</span>
                   <span>12/20</span>
-                  <span>CPU 8 • Mem 32GB</span>
+                  <span>CPU 8 • Memória 32GB</span>
                   <span class="chip success">Ativo</span>
                 </div>
                 <div class="data-row">
-                  <span>Staging</span>
-                  <span>Staging</span>
+                  <span>Homologação</span>
+                  <span>Homologação</span>
                   <span>5/10</span>
-                  <span>CPU 4 • Mem 16GB</span>
+                  <span>CPU 4 • Memória 16GB</span>
                   <span class="chip warning">Ativo</span>
                 </div>
               </div>
@@ -2176,6 +2375,10 @@
             </div>
           </div>
         </section>
+
+        <button class="fab has-tooltip" type="button" data-tooltip="Conversar" aria-label="Conversar">
+          <span class="material-symbols-rounded">chat</span>
+        </button>
       </main>
     </div>
 

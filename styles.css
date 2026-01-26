@@ -379,6 +379,35 @@ body {
   opacity: 1;
 }
 
+.fab {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #016ff4;
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 12px 24px rgba(1, 111, 244, 0.25);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+}
+
+.fab .material-symbols-rounded {
+  font-size: 24px;
+}
+
+.fab.has-tooltip::after {
+  top: auto;
+  left: auto;
+  right: 0;
+  bottom: calc(100% + 8px);
+}
+
 .topbar-actions {
   display: flex;
   align-items: center;
@@ -472,10 +501,32 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 .icon-btn:hover {
   background: #eef6ff;
+}
+
+.icon-btn[aria-label]::after {
+  content: attr(aria-label);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: #111827;
+  color: #ffffff;
+  font-size: var(--md-body-small);
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+}
+
+.icon-btn[aria-label]:hover::after {
+  opacity: 1;
 }
 
 .material-symbols-rounded {
@@ -623,6 +674,10 @@ body {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.page-actions.align-right {
+  justify-content: flex-end;
 }
 
 .tabs {
@@ -1168,6 +1223,52 @@ body {
   color: #2563eb;
 }
 
+.subscription-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.subscription-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 10px;
+}
+
+.subscription-card.featured {
+  border-color: #016ff4;
+  box-shadow: 0 12px 24px rgba(1, 111, 244, 0.15);
+}
+
+.subscription-title {
+  font-weight: 700;
+  font-size: var(--md-title-medium);
+}
+
+.subscription-price {
+  font-size: var(--md-title-large);
+  color: #016ff4;
+}
+
+.subscription-desc {
+  color: var(--muted);
+  font-size: var(--md-body-small);
+}
+
+.subscription-card ul {
+  padding-left: 18px;
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  color: #111827;
+  font-size: var(--md-body-small);
+}
+
 .modal {
   position: fixed;
   inset: 0;
@@ -1213,6 +1314,12 @@ body {
 
 .modal-body {
   display: grid;
+  gap: 12px;
+}
+
+.modal-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
   gap: 12px;
 }
 

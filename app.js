@@ -30,6 +30,10 @@ const auditFilterBtn = document.getElementById('auditFilterBtn');
 const auditFilterMenu = document.getElementById('auditFilterMenu');
 const openAgentModal = document.getElementById('openAgentModal');
 const agentModal = document.getElementById('agentModal');
+const openBillingModal = document.getElementById('openBillingModal');
+const billingModal = document.getElementById('billingModal');
+const keysFilterBtn = document.getElementById('keysFilterBtn');
+const keysFilterMenu = document.getElementById('keysFilterMenu');
 const pages = document.querySelectorAll('.page');
 const navLinks = document.querySelectorAll('.nav-item[data-route], .submenu-item[href^="#/"]');
 const detailsToggles = document.querySelectorAll('.details-toggle');
@@ -39,6 +43,8 @@ const executorTabs = document.querySelectorAll('#page-executors .tab');
 const executorPanels = document.querySelectorAll('#page-executors .tab-panel');
 const usersTabs = document.querySelectorAll('#page-users .tab');
 const usersPanels = document.querySelectorAll('#page-users .tab-panel');
+const orgTabs = document.querySelectorAll('#page-organization .tab');
+const orgPanels = document.querySelectorAll('#page-organization .tab-panel');
 const periodFilterBtn = document.getElementById('periodFilterBtn');
 const periodFilterMenu = document.getElementById('periodFilterMenu');
 const periodOptions = document.querySelectorAll('.period-option');
@@ -267,6 +273,43 @@ if (auditFilterBtn && auditFilterMenu) {
   }
 }
 
+if (keysFilterBtn && keysFilterMenu) {
+  keysFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    keysFilterMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    keysFilterMenu.classList.remove('open');
+  });
+
+  const filterOptions = keysFilterMenu.querySelectorAll('.filter-option');
+  const clearButton = keysFilterMenu.querySelector('.filter-clear');
+
+  filterOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const group = button.dataset.filter;
+      keysFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      keysFilterMenu.classList.remove('open');
+    });
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      keysFilterMenu
+        .querySelectorAll('.filter-option')
+        .forEach((item) => item.classList.remove('active'));
+      keysFilterMenu
+        .querySelectorAll('.filter-option[data-value=""]')
+        .forEach((item) => item.classList.add('active'));
+      keysFilterMenu.classList.remove('open');
+    });
+  }
+}
+
 if (openAgentModal && agentModal) {
   openAgentModal.addEventListener('click', () => {
     agentModal.classList.add('open');
@@ -278,6 +321,21 @@ if (openAgentModal && agentModal) {
     if (closeTarget) {
       agentModal.classList.remove('open');
       agentModal.setAttribute('aria-hidden', 'true');
+    }
+  });
+}
+
+if (openBillingModal && billingModal) {
+  openBillingModal.addEventListener('click', () => {
+    billingModal.classList.add('open');
+    billingModal.setAttribute('aria-hidden', 'false');
+  });
+
+  billingModal.addEventListener('click', (event) => {
+    const closeTarget = event.target.closest('[data-modal-close]');
+    if (closeTarget) {
+      billingModal.classList.remove('open');
+      billingModal.setAttribute('aria-hidden', 'true');
     }
   });
 }
@@ -412,6 +470,19 @@ if (usersTabs.length && usersPanels.length) {
       usersTabs.forEach((item) => item.classList.remove('active'));
       tab.classList.add('active');
       usersPanels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panel === target);
+      });
+    });
+  });
+}
+
+if (orgTabs.length && orgPanels.length) {
+  orgTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      orgTabs.forEach((item) => item.classList.remove('active'));
+      tab.classList.add('active');
+      orgPanels.forEach((panel) => {
         panel.classList.toggle('active', panel.dataset.panel === target);
       });
     });

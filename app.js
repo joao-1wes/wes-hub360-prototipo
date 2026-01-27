@@ -47,6 +47,7 @@ const usersTabs = document.querySelectorAll('#page-users .tab');
 const usersPanels = document.querySelectorAll('#page-users .tab-panel');
 const orgTabs = document.querySelectorAll('#page-organization .tab');
 const orgPanels = document.querySelectorAll('#page-organization .tab-panel');
+const orgActionButtons = document.querySelectorAll('#page-organization .org-action');
 const periodFilterBtn = document.getElementById('periodFilterBtn');
 const periodFilterMenu = document.getElementById('periodFilterMenu');
 const periodOptions = document.querySelectorAll('.period-option');
@@ -481,6 +482,14 @@ if (usersTabs.length && usersPanels.length) {
 }
 
 if (orgTabs.length && orgPanels.length) {
+  const updateOrgActions = (activeTab) => {
+    const isKeys = activeTab === 'org-keys';
+    orgActionButtons.forEach((button) => {
+      const isKeysAction = button.dataset.orgAction === 'keys';
+      button.classList.toggle('is-hidden', isKeysAction !== isKeys);
+    });
+  };
+
   orgTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
       const target = tab.dataset.tab;
@@ -489,8 +498,12 @@ if (orgTabs.length && orgPanels.length) {
       orgPanels.forEach((panel) => {
         panel.classList.toggle('active', panel.dataset.panel === target);
       });
+      updateOrgActions(target);
     });
   });
+
+  const initialTab = document.querySelector('#page-organization .tab.active');
+  updateOrgActions(initialTab ? initialTab.dataset.tab : 'org-overview');
 }
 
 

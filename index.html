@@ -2018,7 +2018,14 @@
                   <p class="page-subtitle">Plano, faturamento e chaves de API.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary">Gerenciar</button>
+                  <button class="btn primary org-action" data-org-action="default">
+                    <span class="material-symbols-rounded">add</span>
+                    Adicionar
+                  </button>
+                  <button class="btn primary org-action is-hidden" data-org-action="keys">
+                    <span class="material-symbols-rounded">add</span>
+                    Criar nova chave
+                  </button>
                 </div>
               </div>
               <div class="tabs tabs-underline">
@@ -2149,12 +2156,6 @@
                 </div>
               </div>
               <div class="tab-panel" data-panel="org-keys">
-                <div class="page-actions align-right">
-                  <button class="btn primary">
-                    <span class="material-symbols-rounded">add</span>
-                    Criar nova chave
-                  </button>
-                </div>
                 <div class="filters-grid">
                   <div class="form-field">
                     <div class="search-field">

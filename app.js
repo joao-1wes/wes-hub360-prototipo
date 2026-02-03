@@ -30,6 +30,21 @@ const auditFilterBtn = document.getElementById('auditFilterBtn');
 const auditFilterMenu = document.getElementById('auditFilterMenu');
 const openAgentModal = document.getElementById('openAgentModal');
 const agentModal = document.getElementById('agentModal');
+const agentChatModal = document.getElementById('agentChatModal');
+const agentChatTitle = document.getElementById('agentChatTitle');
+const agentChatSubtitle = document.getElementById('agentChatSubtitle');
+const agentChatButtons = document.querySelectorAll('.agent-chat-toggle');
+const chatAttachToggle = document.querySelector('.chat-attach-toggle');
+const chatAttachMenu = document.querySelector('.chat-attach-menu');
+const chatSkillToggle = document.querySelector('.chat-skill-toggle');
+const chatSkillMenu = document.querySelector('.chat-skill-menu');
+const chatSkillSwitches = document.querySelectorAll('.chat-skill-item input[type="checkbox"]');
+const chatAttachGroup = document.querySelector('.chat-attach-group');
+const chatSkillStatusDot = document.querySelector('.chat-skill-status .status-dot');
+const chatHistoryItems = document.querySelectorAll('.chat-history-item');
+const chatHistoryTitles = document.querySelectorAll('.chat-history-title');
+const chatHistoryEdits = document.querySelectorAll('.chat-history-edit');
+const chatSendButton = document.querySelector('.chat-send');
 const openBillingModal = document.getElementById('openBillingModal');
 const billingModal = document.getElementById('billingModal');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
@@ -328,6 +343,223 @@ if (openAgentModal && agentModal) {
       agentModal.setAttribute('aria-hidden', 'true');
     }
   });
+}
+
+if (agentChatModal && agentChatButtons.length) {
+  agentChatButtons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const row = button.closest('.agents-row');
+      let agentName = 'Agente';
+      let agentId = '';
+
+      if (row) {
+        const cells = Array.from(row.children).filter(
+          (child) => child.tagName === 'SPAN' && !child.classList.contains('row-actions')
+        );
+        if (cells[0]) agentName = cells[0].textContent.trim();
+        if (cells[1]) agentId = cells[1].textContent.trim();
+      }
+
+      if (agentChatTitle) {
+        agentChatTitle.textContent = `Chat com ${agentName}`;
+      }
+      if (agentChatSubtitle) {
+        const activeHistory = document.querySelector('.chat-history-item.active');
+        if (activeHistory) {
+          const historyTitle = activeHistory.querySelector('.chat-history-title')?.value || 'Conversa';
+          const historyDate = activeHistory.querySelector('.chat-history-date')?.textContent?.trim() || 'Hoje';
+          agentChatSubtitle.textContent = `${historyTitle} • Última conversa ${historyDate}`;
+        } else {
+          agentChatSubtitle.textContent = agentId ? `${agentId} • Online agora` : 'Online agora';
+        }
+      }
+
+      agentChatModal.classList.add('open');
+      agentChatModal.setAttribute('aria-hidden', 'false');
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+      updateSkillStatus();
+    });
+  });
+
+  agentChatModal.addEventListener('click', (event) => {
+    const closeTarget = event.target.closest('[data-modal-close]');
+    if (closeTarget) {
+      agentChatModal.classList.remove('open');
+      agentChatModal.setAttribute('aria-hidden', 'true');
+      if (chatAttachMenu) {
+        chatAttachMenu.classList.remove('open');
+      }
+      if (chatSkillMenu) {
+        chatSkillMenu.classList.remove('open');
+      }
+    }
+  });
+}
+
+if (chatHistoryItems.length) {
+  chatHistoryItems.forEach((item) => {
+    item.addEventListener('click', () => {
+      chatHistoryItems.forEach((card) => card.classList.remove('active'));
+      item.classList.add('active');
+      const title = item.querySelector('.chat-history-title')?.value || 'Conversa';
+      const date = item.querySelector('.chat-history-date')?.textContent?.trim() || 'Hoje';
+      if (agentChatSubtitle) {
+        agentChatSubtitle.textContent = `${title} • Última conversa ${date}`;
+      }
+    });
+
+    item.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        item.click();
+      }
+    });
+  });
+}
+
+if (chatHistoryTitles.length) {
+  chatHistoryTitles.forEach((input) => {
+    input.addEventListener('click', (event) => {
+      event.stopPropagation();
+    });
+
+    input.addEventListener('input', () => {
+      const parent = input.closest('.chat-history-item');
+      if (parent && parent.classList.contains('active') && agentChatSubtitle) {
+        const date = parent.querySelector('.chat-history-date')?.textContent?.trim() || 'Hoje';
+        agentChatSubtitle.textContent = `${input.value || 'Conversa'} • Última conversa ${date}`;
+      }
+    });
+
+    input.addEventListener('blur', () => {
+      input.setAttribute('readonly', 'true');
+      const parent = input.closest('.chat-history-item');
+      if (parent) {
+        parent.classList.remove('editing');
+      }
+    });
+
+    input.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        input.blur();
+      }
+      if (event.key === 'Escape') {
+        const previous = input.dataset.prevValue;
+        if (typeof previous === 'string') {
+          input.value = previous;
+        }
+        input.blur();
+      }
+    });
+  });
+}
+
+if (chatHistoryEdits.length) {
+  chatHistoryEdits.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const parent = button.closest('.chat-history-item');
+      const input = parent?.querySelector('.chat-history-title');
+      if (!input || !parent) return;
+      input.dataset.prevValue = input.value;
+      input.removeAttribute('readonly');
+      parent.classList.add('editing');
+      input.focus();
+      input.select();
+    });
+  });
+}
+
+if (chatSendButton) {
+  chatSendButton.addEventListener('click', () => {
+    const activeHistory = document.querySelector('.chat-history-item.active');
+    if (!activeHistory) return;
+    const date = new Date();
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const formatted = `${day}/${month}/${year}`;
+    const dateEl = activeHistory.querySelector('.chat-history-date');
+    if (dateEl) {
+      dateEl.textContent = formatted;
+    }
+    const title = activeHistory.querySelector('.chat-history-title')?.value || 'Conversa';
+    if (agentChatSubtitle) {
+      agentChatSubtitle.textContent = `${title} • Última conversa ${formatted}`;
+    }
+  });
+}
+
+const closeChatMenus = () => {
+  if (chatAttachMenu) {
+    chatAttachMenu.classList.remove('open');
+  }
+  if (chatSkillMenu) {
+    chatSkillMenu.classList.remove('open');
+  }
+  if (chatAttachGroup) {
+    chatAttachGroup.classList.remove('is-open');
+    chatAttachGroup.classList.remove('is-skill-open');
+  }
+  if (chatAttachToggle) {
+    chatAttachToggle.setAttribute('aria-expanded', 'false');
+  }
+};
+
+document.addEventListener('click', (event) => {
+  const attachToggleTarget = event.target.closest('.chat-attach-toggle');
+  const skillToggleTarget = event.target.closest('.chat-skill-toggle');
+  const insideAttachGroup = chatAttachGroup && chatAttachGroup.contains(event.target);
+
+  if (attachToggleTarget && chatAttachMenu) {
+    event.stopPropagation();
+    const isOpen = chatAttachMenu.classList.toggle('open');
+    if (chatAttachGroup) {
+      chatAttachGroup.classList.toggle('is-open', isOpen);
+      chatAttachGroup.classList.remove('is-skill-open');
+    }
+    if (chatAttachToggle) {
+      chatAttachToggle.setAttribute('aria-expanded', String(isOpen));
+    }
+    if (!isOpen && chatSkillMenu) {
+      chatSkillMenu.classList.remove('open');
+    }
+    return;
+  }
+
+  if (skillToggleTarget && chatSkillMenu) {
+    event.stopPropagation();
+    const isOpen = chatSkillMenu.classList.toggle('open');
+    if (chatAttachGroup) {
+      chatAttachGroup.classList.toggle('is-skill-open', isOpen);
+      chatAttachGroup.classList.add('is-open');
+    }
+    return;
+  }
+
+  if (insideAttachGroup) {
+    return;
+  }
+
+  closeChatMenus();
+});
+
+const updateSkillStatus = () => {
+  if (!chatSkillStatusDot) return;
+  const anyEnabled = Array.from(chatSkillSwitches).some((toggle) => toggle.checked);
+  chatSkillStatusDot.classList.toggle('is-active', anyEnabled);
+  chatSkillStatusDot.classList.toggle('is-inactive', !anyEnabled);
+};
+
+if (chatSkillSwitches.length) {
+  chatSkillSwitches.forEach((toggle) => {
+    toggle.addEventListener('change', updateSkillStatus);
+  });
+  updateSkillStatus();
 }
 
 if (openBillingModal && billingModal) {
@@ -748,3 +980,7 @@ const updateActivePage = () => {
 
 updateActivePage();
 window.addEventListener('hashchange', updateActivePage);
+
+if (window.lucide) {
+  window.lucide.createIcons();
+}

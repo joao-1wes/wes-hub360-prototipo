@@ -904,10 +904,16 @@
                       <span class="material-symbols-rounded">add</span>
                     </button>
                     <div class="menu add-menu">
-                      <button type="button">Adicionar arquivo</button>
-                      <button type="button">Adicionar texto</button>
+                      <button type="button" class="menu-item">
+                        <i data-lucide="upload"></i>
+                        <span>Adicionar arquivo</span>
+                      </button>
+                      <button type="button" class="menu-item">
+                        <i data-lucide="file-text"></i>
+                        <span>Adicionar texto</span>
+                      </button>
                     </div>
-                    <button class="icon-btn action-icon" aria-label="Conversar">
+                    <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
                       <span class="material-symbols-rounded">chat</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -925,10 +931,16 @@
                       <span class="material-symbols-rounded">add</span>
                     </button>
                     <div class="menu add-menu">
-                      <button type="button">Adicionar arquivo</button>
-                      <button type="button">Adicionar texto</button>
+                      <button type="button" class="menu-item">
+                        <i data-lucide="upload"></i>
+                        <span>Adicionar arquivo</span>
+                      </button>
+                      <button type="button" class="menu-item">
+                        <i data-lucide="file-text"></i>
+                        <span>Adicionar texto</span>
+                      </button>
                     </div>
-                    <button class="icon-btn action-icon" aria-label="Conversar">
+                    <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
                       <span class="material-symbols-rounded">chat</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -946,10 +958,16 @@
                       <span class="material-symbols-rounded">add</span>
                     </button>
                     <div class="menu add-menu">
-                      <button type="button">Adicionar arquivo</button>
-                      <button type="button">Adicionar texto</button>
+                      <button type="button" class="menu-item">
+                        <i data-lucide="upload"></i>
+                        <span>Adicionar arquivo</span>
+                      </button>
+                      <button type="button" class="menu-item">
+                        <i data-lucide="file-text"></i>
+                        <span>Adicionar texto</span>
+                      </button>
                     </div>
-                    <button class="icon-btn action-icon" aria-label="Conversar">
+                    <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
                       <span class="material-symbols-rounded">chat</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -1002,6 +1020,119 @@
               </div>
               <div class="modal-footer">
                 <button class="btn primary" disabled>Criar agente</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal" id="agentChatModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog chat-dialog" role="dialog" aria-modal="true" aria-labelledby="agentChatTitle">
+              <div class="chat-layout">
+                <aside class="chat-sidebar">
+                  <div class="chat-sidebar-header">
+                    <i data-lucide="history"></i>
+                    <span>Histórico</span>
+                  </div>
+                  <div class="chat-history">
+                    <div class="chat-history-item active" role="button" tabindex="0">
+                      <div class="chat-history-date">03/02/2026</div>
+                      <div class="chat-history-title-row">
+                        <input class="chat-history-title" type="text" value="Resumo de alertas" readonly />
+                        <button class="icon-btn chat-history-edit" type="button" aria-label="Editar título">
+                          <i data-lucide="edit-3"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="chat-history-item" role="button" tabindex="0">
+                      <div class="chat-history-date">01/02/2026</div>
+                      <div class="chat-history-title-row">
+                        <input class="chat-history-title" type="text" value="Relatório semanal" readonly />
+                        <button class="icon-btn chat-history-edit" type="button" aria-label="Editar título">
+                          <i data-lucide="edit-3"></i>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="chat-history-item" role="button" tabindex="0">
+                      <div class="chat-history-date">28/01/2026</div>
+                      <div class="chat-history-title-row">
+                        <input class="chat-history-title" type="text" value="Integrações críticas" readonly />
+                        <button class="icon-btn chat-history-edit" type="button" aria-label="Editar título">
+                          <i data-lucide="edit-3"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+                <div class="chat-main">
+                  <div class="modal-header chat-header">
+                    <div>
+                      <div class="chat-title-row">
+                        <h3 id="agentChatTitle">Chat com agente</h3>
+                        <div class="chat-skill-status" aria-label="Habilidades">
+                          <i data-lucide="puzzle"></i>
+                          <span class="status-dot is-inactive" aria-hidden="true"></span>
+                        </div>
+                      </div>
+                      <p class="chat-subtitle" id="agentChatSubtitle">Selecione um agente para iniciar</p>
+                    </div>
+                    <button class="icon-btn" aria-label="Fechar" data-modal-close>
+                      <i data-lucide="x"></i>
+                    </button>
+                  </div>
+                  <div class="chat-body">
+                    <div class="chat-thread">
+                      <div class="chat-message agent">
+                        <div class="chat-meta">Agente • 10:24</div>
+                        <div class="chat-bubble">Olá! Posso ajudar com relatórios, integrações ou automações.</div>
+                      </div>
+                      <div class="chat-message user">
+                        <div class="chat-meta">Você • 10:25</div>
+                        <div class="chat-bubble">Quero um resumo dos últimos alertas críticos.</div>
+                      </div>
+                      <div class="chat-message agent">
+                        <div class="chat-meta">Agente • 10:25</div>
+                        <div class="chat-bubble">Claro. Vou consolidar os alertas críticos das últimas 24 horas.</div>
+                      </div>
+                    </div>
+                    <div class="chat-composer">
+                      <div class="chat-attach-group">
+                        <button class="icon-btn chat-attach-toggle" type="button" aria-label="Adicionar" aria-expanded="false">
+                          <i data-lucide="plus"></i>
+                        </button>
+                        <div class="chat-menu chat-attach-menu">
+                          <button type="button" class="menu-item">
+                            <i data-lucide="paperclip"></i>
+                            <span>Inserir arquivo</span>
+                          </button>
+                          <button type="button" class="menu-item chat-skill-toggle">
+                            <i data-lucide="puzzle"></i>
+                            <span>Habilidades</span>
+                            <i data-lucide="chevron-right" class="menu-caret"></i>
+                          </button>
+                          <div class="chat-menu chat-skill-menu">
+                            <div class="chat-skill-item">
+                              <span>CEP</span>
+                              <label class="switch small">
+                                <input type="checkbox" />
+                                <span class="switch-track"></span>
+                              </label>
+                            </div>
+                            <div class="chat-skill-item">
+                              <span>Clima</span>
+                              <label class="switch small">
+                                <input type="checkbox" />
+                                <span class="switch-track"></span>
+                              </label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <input class="chat-input" type="text" placeholder="Digite sua mensagem" />
+                      <button class="btn primary small chat-send icon-only" type="button" aria-label="Enviar">
+                        <i data-lucide="send"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -2484,6 +2615,7 @@
       </main>
     </div>
 
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./app.js"></script>
   </body>
 </html>

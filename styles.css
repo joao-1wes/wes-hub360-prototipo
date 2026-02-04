@@ -1410,7 +1410,7 @@ body {
   height: min(70vh, 620px);
   background: #ffffff;
   border-radius: 14px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .chat-sidebar {
@@ -1419,6 +1419,9 @@ body {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
+  overflow: visible;
+  position: relative;
+  z-index: 2;
 }
 
 .chat-sidebar-header {
@@ -1429,6 +1432,63 @@ body {
   font-weight: 700;
   color: #111827;
   border-bottom: 1px solid var(--border);
+  justify-content: space-between;
+  position: relative;
+  z-index: 3;
+}
+
+.chat-sidebar-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.chat-sidebar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chat-sidebar-actions .icon-btn {
+  padding: 6px;
+}
+
+.chat-sidebar-actions .icon-btn .lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.chat-sidebar-actions .icon-btn.has-tooltip::after {
+  top: calc(100% + 8px);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%);
+  z-index: 200;
+}
+
+.chat-new-btn.has-tooltip::after {
+  display: none;
+}
+
+.floating-tooltip {
+  position: fixed;
+  background: #111827;
+  color: #ffffff;
+  font-size: var(--md-body-small);
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.24);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.floating-tooltip.is-visible {
+  opacity: 1;
 }
 
 .chat-sidebar-header .lucide {
@@ -1444,18 +1504,25 @@ body {
   gap: 10px;
   padding: 14px;
   overflow-y: auto;
+  overflow-x: visible;
+  flex: 1;
+  position: relative;
+  z-index: 1;
 }
 
 .chat-history-item {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid transparent;
   background: #ffffff;
   text-align: left;
   cursor: pointer;
+  min-height: 72px;
+  position: relative;
+  overflow: visible;
 }
 
 .chat-history-item.active {
@@ -1483,6 +1550,7 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
+  position: relative;
 }
 
 .chat-history-title[readonly] {
@@ -1496,20 +1564,45 @@ body {
   outline: none;
 }
 
-.chat-history-edit {
+.chat-history-menu-toggle {
   padding: 4px;
   color: #94a3b8;
 }
 
-.chat-history-edit:hover {
+.chat-history-menu-toggle:hover {
   background: #eef6ff;
   color: #016ff4;
 }
 
-.chat-history-edit .lucide {
+.chat-history-menu-toggle .lucide {
   width: 16px;
   height: 16px;
   stroke-width: 2;
+}
+
+.chat-history-menu {
+  top: 0;
+  left: calc(100% + 10px);
+  right: auto;
+  min-width: 180px;
+  z-index: 999;
+}
+
+.chat-history-menu.is-floating {
+  position: fixed;
+  z-index: 1000;
+}
+
+.chat-history-menu .ui-menu-item.danger {
+  color: #dc5f5f;
+}
+
+.chat-history-menu .ui-menu-item.danger .lucide {
+  color: #dc5f5f;
+}
+
+.chat-history-menu .ui-menu-item {
+  padding: 12px 18px;
 }
 
 .chat-main {
@@ -1517,6 +1610,8 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .chat-header {
@@ -1537,6 +1632,7 @@ body {
   padding: 4px 8px;
   border-radius: 999px;
   background: #eef6ff;
+  position: relative;
 }
 
 .chat-skill-status .lucide {
@@ -1562,6 +1658,27 @@ body {
   background: #cbd5f5;
 }
 
+.chat-skill-status::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  background: #111827;
+  color: #ffffff;
+  font-size: var(--md-body-small);
+  padding: 6px 8px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 20;
+}
+
+.chat-skill-status:hover::after {
+  opacity: 1;
+}
+
 .chat-subtitle {
   margin: 4px 0 0;
   font-size: var(--md-body-small);
@@ -1574,6 +1691,48 @@ body {
   height: auto;
   flex: 1;
   background: #f8fafc;
+}
+
+.chat-empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.chat-empty.is-hidden {
+  display: none;
+}
+
+.chat-empty-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 22px 24px;
+  box-shadow: var(--shadow);
+  max-width: 420px;
+  width: 100%;
+}
+
+.chat-empty-title {
+  font-size: var(--md-title-medium);
+  line-height: 24px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.chat-empty-text {
+  font-size: var(--md-body-medium);
+  line-height: 22px;
+  color: #111827;
+  margin-bottom: 12px;
+}
+
+.chat-empty-hint {
+  font-size: var(--md-body-small);
+  line-height: 18px;
+  color: var(--muted);
 }
 
 .chat-thread {
@@ -1674,29 +1833,29 @@ body {
   z-index: 50;
 }
 
-.chat-attach-menu .menu-item,
-.chat-skill-menu .menu-item {
+.chat-attach-menu .ui-menu-item,
+.chat-skill-menu .ui-menu-item {
   color: #111827;
   font-weight: 600;
   background: transparent;
   padding: 10px 14px;
 }
 
-.chat-attach-menu .menu-item .lucide,
-.chat-skill-menu .menu-item .lucide {
+.chat-attach-menu .ui-menu-item .lucide,
+.chat-skill-menu .ui-menu-item .lucide {
   color: #016ff4;
 }
 
-.chat-attach-menu .menu-item:hover,
-.chat-skill-menu .menu-item:hover {
+.chat-attach-menu .ui-menu-item:hover,
+.chat-skill-menu .ui-menu-item:hover {
   background: #eef6ff;
 }
 
-.chat-attach-menu .menu-item + .menu-item {
+.chat-attach-menu .ui-menu-item + .ui-menu-item {
   border-top: 1px solid var(--border);
 }
 
-.chat-attach-menu .menu-item .menu-caret {
+.chat-attach-menu .ui-menu-item .menu-caret {
   color: #016ff4;
 }
 
@@ -1746,6 +1905,7 @@ body {
   border-radius: 999px;
   padding: 10px 14px;
   font-size: var(--md-body-medium);
+  height: 40px;
 }
 
 .chat-send {
@@ -1762,6 +1922,13 @@ body {
 .chat-send.icon-only {
   padding: 8px 12px;
   min-width: 40px;
+}
+
+.chat-send.has-tooltip::after {
+  top: auto;
+  left: auto;
+  right: 0;
+  bottom: calc(100% + 6px);
 }
 
 @media (max-width: 900px) {
@@ -2563,7 +2730,7 @@ body {
   padding: 6px 0;
 }
 
-.menu-item {
+.ui-menu-item {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -2576,18 +2743,18 @@ body {
   cursor: pointer;
 }
 
-.menu-item .lucide {
+.ui-menu-item .lucide {
   width: 18px;
   height: 18px;
   stroke-width: 2;
   color: #64748b;
 }
 
-.menu-item:hover .lucide {
+.ui-menu-item:hover .lucide {
   color: #016ff4;
 }
 
-.menu-item .menu-caret {
+.ui-menu-item .menu-caret {
   margin-left: auto;
   width: 16px;
   height: 16px;

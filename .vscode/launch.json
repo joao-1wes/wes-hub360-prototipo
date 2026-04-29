@@ -1,0 +1,43 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Edge + localhost (depurar)",
+      "url": "http://127.0.0.1:5500/index.html",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
+      "preLaunchTask": "Servidor estático (porta 5500)"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Edge x86 + localhost (se o outro falhar)",
+      "url": "http://127.0.0.1:5500/index.html",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile",
+      "preLaunchTask": "Servidor estático (porta 5500)"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Edge + arquivo index.html",
+      "url": "file:///C:/sistemas_wes/history/dashboard-static/index.html",
+      "webRoot": "${workspaceFolder}",
+      "runtimeExecutable": "C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe",
+      "userDataDir": "${workspaceFolder}/.vscode/edge-debug-profile"
+    },
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Google Chrome + localhost",
+      "url": "http://127.0.0.1:5500/index.html",
+      "webRoot": "${workspaceFolder}",
+      "userDataDir": "${workspaceFolder}/.vscode/chrome-debug-profile",
+      "preLaunchTask": "Servidor estático (porta 5500)"
+    }
+  ]
+}

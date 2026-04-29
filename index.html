@@ -24,11 +24,11 @@
           <a class="nav-item active" href="#/dashboard" data-route="dashboard"><span class="material-symbols-rounded">grid_view</span><span class="nav-label">Painel</span></a>
 
           <div class="nav-group">
-            <button class="nav-item nav-trigger" data-menu="automation" type="button">
+            <a class="nav-item nav-trigger" data-menu="automation" data-route="dashboard/automations" href="#/dashboard/automations">
               <span class="material-symbols-rounded">smart_toy</span>
               <span class="nav-label">Automação</span>
               <span class="nav-caret">▾</span>
-            </button>
+            </a>
             <div class="submenu" id="submenu-automation">
               <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
               <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
@@ -46,6 +46,17 @@
             <div class="submenu" id="submenu-infrastructure">
               <a class="submenu-item" href="#/dashboard/executors"><span class="submenu-label">Executores</span></a>
               <a class="submenu-item" href="#/dashboard/packages"><span class="submenu-label">Pacotes</span></a>
+            </div>
+          </div>
+
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="integrations" type="button">
+              <span class="material-symbols-rounded">hub</span>
+              <span class="nav-label">Integrações</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-integrations">
+              <a class="submenu-item" href="#/dashboard/channels"><span class="submenu-label">Canais</span></a>
             </div>
           </div>
 
@@ -138,10 +149,6 @@
                   <span class="material-symbols-rounded">settings</span>
                   Configurações
                 </a>
-                <button class="danger">
-                  <span class="material-symbols-rounded">logout</span>
-                  Sair
-                </button>
               </div>
             </div>
           </div>
@@ -870,123 +877,533 @@
                 <div>
                   <h2>Agentes</h2>
                   <p class="page-subtitle">Gerencie agentes e seus conhecimentos internos.</p>
+                  <p id="agentsApiStatus" class="agents-api-status" hidden role="status"></p>
                 </div>
-                <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar agentes">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
-                  <button class="btn primary" id="openAgentModal">Criar agente</button>
-                </div>
-              </div>
-              <div class="filters-grid filters-single">
-                <div class="form-field">
-                  <div class="search-field">
-                    <span class="material-symbols-rounded">search</span>
-                    <input type="text" placeholder="Buscar agente pelo nome" />
+                <div class="page-actions agents-page-actions">
+                  <div class="page-actions-btn-group">
+                    <div class="agents-create-menu-wrap">
+                      <button type="button" class="btn primary agents-create-menu-toggle add-toggle" id="agentsCreateMenuToggle" aria-haspopup="menu" aria-expanded="false">
+                        Novo
+                        <span class="material-symbols-rounded agents-create-menu-caret" aria-hidden="true">expand_more</span>
+                      </button>
+                      <div class="menu add-menu agents-create-menu" id="agentsCreateMenu" role="menu" aria-labelledby="agentsCreateMenuToggle">
+                        <button type="button" class="ui-menu-item agents-create-project-btn" id="agentsCreateProjectBtn" role="menuitem">
+                          <i data-lucide="folder-plus"></i>
+                          <span>Criar projeto</span>
+                        </button>
+                        <button type="button" class="ui-menu-item" id="openAgentModal" role="menuitem">
+                          <i data-lucide="bot"></i>
+                          <span>Criar agente</span>
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div class="agents-table">
-                <div class="agents-row header">
-                  <span>Nome do agente</span>
-                  <span>ID</span>
-                  <span>Conhecimento interno</span>
-                  <span>Descrição</span>
-                  <span>Ações</span>
-                </div>
-                <div class="agents-row">
-                  <span>Atlas Core</span>
-                  <span>AGT-1024</span>
-                  <span class="link">Sim</span>
-                  <span>Orquestra pipelines de dados e relatórios.</span>
-                  <span class="row-actions">
-                    <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
-                      <span class="material-symbols-rounded">add</span>
-                    </button>
-                    <div class="menu add-menu">
-                      <button type="button" class="ui-menu-item">
-                        <i data-lucide="upload"></i>
-                        <span>Adicionar arquivo</span>
+              <div class="agents-project-breadcrumb is-hidden" id="agentsProjectBreadcrumb" hidden>
+                <a href="#/dashboard/agents" class="agents-project-back">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  Projetos
+                </a>
+                <span class="agents-project-breadcrumb-sep" aria-hidden="true">/</span>
+                <span id="agentsProjectBreadcrumbTitle" class="agents-project-breadcrumb-current"></span>
+              </div>
+              <div class="agents-page-scope-block">
+                <div class="agents-folder-accordion is-open" id="agentsFolderAccordion">
+                  <button type="button" class="agents-folder-accordion-toggle" id="agentsFolderAccordionToggle" aria-expanded="true" aria-controls="agentsFolderAccordionPanel">
+                    <span class="agents-folder-accordion-label">Projetos</span>
+                    <span class="material-symbols-rounded agents-folder-accordion-caret" aria-hidden="true">expand_more</span>
+                  </button>
+                  <div class="agents-folder-accordion-panel" id="agentsFolderAccordionPanel">
+                    <div class="agents-folder-strip" id="agentsFolderStrip">
+                      <button type="button" class="icon-btn agents-folder-strip-nav agents-folder-strip-nav--prev" aria-label="Projetos anteriores" hidden>
+                        <span class="material-symbols-rounded">chevron_left</span>
                       </button>
-                      <button type="button" class="ui-menu-item">
-                        <i data-lucide="file-text"></i>
-                        <span>Adicionar texto</span>
+                      <div class="agents-folder-strip-viewport">
+                      <div class="agents-org-panel" data-hub-org="avas">
+                        <div class="agents-projects-grid">
+                        <a class="agents-project-card" href="#/dashboard/agents/project/avas-operacoes" data-agents-project="avas-operacoes">
+                          <span class="agents-project-card-icon agents-project-card-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                          <span class="agents-project-card-kicker">Projeto</span>
+                          <strong class="agents-project-card-name">Operações integradas</strong>
+                        </a>
+                        <a class="agents-project-card" href="#/dashboard/agents/project/avas-controladoria" data-agents-project="avas-controladoria">
+                          <span class="agents-project-card-icon agents-project-card-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                          <span class="agents-project-card-kicker">Projeto</span>
+                          <strong class="agents-project-card-name">Controladoria e fechamento</strong>
+                        </a>
+                      </div>
+                    </div>
+                    <div class="agents-org-panel is-hidden" data-hub-org="techcorp">
+                      <div class="agents-projects-grid">
+                        <a class="agents-project-card" href="#/dashboard/agents/project/techcorp-integracoes" data-agents-project="techcorp-integracoes">
+                          <span class="agents-project-card-icon agents-project-card-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                          <span class="agents-project-card-kicker">Projeto</span>
+                          <strong class="agents-project-card-name">Integrações e contratos</strong>
+                        </a>
+                        <a class="agents-project-card" href="#/dashboard/agents/project/techcorp-pipeline" data-agents-project="techcorp-pipeline">
+                          <span class="agents-project-card-icon agents-project-card-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                          <span class="agents-project-card-kicker">Projeto</span>
+                          <strong class="agents-project-card-name">Data & pipeline</strong>
+                        </a>
+                      </div>
+                    </div>
+                      </div>
+                      <button type="button" class="icon-btn agents-folder-strip-nav agents-folder-strip-nav--next" aria-label="Próximos projetos" hidden>
+                        <span class="material-symbols-rounded">chevron_right</span>
                       </button>
                     </div>
-                    <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
-                      <span class="material-symbols-rounded">chat</span>
-                    </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir">
-                      <span class="material-symbols-rounded">delete</span>
-                    </button>
-                  </span>
+                  </div>
                 </div>
-                <div class="agents-row">
-                  <span>Nimbus Ops</span>
-                  <span>AGT-2077</span>
-                  <span class="link">Não</span>
-                  <span>Monitoramento de filas e indicadores críticos.</span>
-                  <span class="row-actions">
-                    <button class="icon-btn action-icon muted-icon add-toggle" aria-label="Adicionar">
-                      <span class="material-symbols-rounded">add</span>
-                    </button>
-                    <div class="menu add-menu">
-                      <button type="button" class="ui-menu-item">
-                        <i data-lucide="upload"></i>
-                        <span>Adicionar arquivo</span>
-                      </button>
-                      <button type="button" class="ui-menu-item">
-                        <i data-lucide="file-text"></i>
-                        <span>Adicionar texto</span>
-                      </button>
+                <div class="agents-environment-toolbar" id="agentsEnvironmentToolbar">
+                  <div class="agents-scope-toolbar-search">
+                    <div class="search-field agents-search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="search" id="agentsSearchInput" placeholder="Buscar agente pelo nome" autocomplete="off" aria-label="Buscar agente pelo nome" />
                     </div>
-                    <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
-                      <span class="material-symbols-rounded">chat</span>
-                    </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir">
-                      <span class="material-symbols-rounded">delete</span>
-                    </button>
-                  </span>
-                </div>
-                <div class="agents-row">
-                  <span>Pulse Finance</span>
-                  <span>AGT-3310</span>
-                  <span class="link">Sim</span>
-                  <span>Conciliação automática e análises financeiras.</span>
-                  <span class="row-actions">
-                    <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
-                      <span class="material-symbols-rounded">add</span>
-                    </button>
-                    <div class="menu add-menu">
-                      <button type="button" class="ui-menu-item">
-                        <i data-lucide="upload"></i>
-                        <span>Adicionar arquivo</span>
-                      </button>
-                      <button type="button" class="ui-menu-item">
-                        <i data-lucide="file-text"></i>
-                        <span>Adicionar texto</span>
-                      </button>
+                  </div>
+                  <div class="agents-environment-toolbar-controls" id="agentsScopeControls">
+                    <div class="hub-select-wrap agents-environment-select-wrap">
+                      <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="layers-3"></i></span>
+                      <select class="hub-select" id="agentsPageEnvironmentSelect" aria-label="Filtrar agentes por ambiente">
+                        <option value="">Todos os ambientes</option>
+                        <option value="operacoes">Operações</option>
+                        <option value="financeiro">Financeiro</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="rh">RH</option>
+                      </select>
+                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                     </div>
-                    <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
-                      <span class="material-symbols-rounded">chat</span>
-                    </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir">
-                      <span class="material-symbols-rounded">delete</span>
-                    </button>
-                  </span>
+                    <select class="hub-select agents-page-org-select-native" id="agentsPageOrgSelect" aria-hidden="true" tabindex="-1" hidden>
+                      <option value="">Carregando organizações</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div class="table-pagination">
+              <div class="agents-all-agents-section" id="agentsAllAgentsSection">
+                <div class="agents-table agents-all-agents-table" id="agentsAllAgentsTable" aria-label="Lista de agentes da organização">
+                  <div class="agents-row header">
+                    <span>Nome do agente</span>
+                    <span>ID</span>
+                    <span>Conhecimento interno</span>
+                    <span>Ambiente</span>
+                    <span>Descrição</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="agents-row" data-hub-org="avas" data-hub-context="backoffice" data-agents-environment="operacoes">
+                    <span><strong>Atlas Core</strong><span class="agent-context-chip">Backoffice</span></span>
+                    <span>AGT-1024</span>
+                    <span class="link">Sim</span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-description">Orquestra pipelines de dados e relatórios.</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                        <span class="material-symbols-rounded">add</span>
+                      </button>
+                      <div class="menu add-menu">
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="upload"></i>
+                          <span>Adicionar arquivo</span>
+                        </button>
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="file-text"></i>
+                          <span>Adicionar texto</span>
+                        </button>
+                      </div>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                        <span class="material-symbols-rounded">chat</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="agents-row" data-hub-org="avas" data-hub-context="backoffice" data-agents-environment="operacoes">
+                    <span><strong>Nimbus Ops</strong><span class="agent-context-chip">Backoffice</span></span>
+                    <span>AGT-2077</span>
+                    <span class="link">Não</span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-description">Monitoramento de filas e indicadores críticos.</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon muted-icon add-toggle" aria-label="Adicionar">
+                        <span class="material-symbols-rounded">add</span>
+                      </button>
+                      <div class="menu add-menu">
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="upload"></i>
+                          <span>Adicionar arquivo</span>
+                        </button>
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="file-text"></i>
+                          <span>Adicionar texto</span>
+                        </button>
+                      </div>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                        <span class="material-symbols-rounded">chat</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="agents-row" data-hub-org="avas" data-hub-context="financeiro" data-agents-environment="financeiro">
+                    <span><strong>Pulse Finance</strong><span class="agent-context-chip">Financeiro</span></span>
+                    <span>AGT-3310</span>
+                    <span class="link">Sim</span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
+                    <span class="agents-row-description">Conciliação automática e análises financeiras.</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                        <span class="material-symbols-rounded">add</span>
+                      </button>
+                      <div class="menu add-menu">
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="upload"></i>
+                          <span>Adicionar arquivo</span>
+                        </button>
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="file-text"></i>
+                          <span>Adicionar texto</span>
+                        </button>
+                      </div>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                        <span class="material-symbols-rounded">chat</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="agents-row" data-hub-org="techcorp" data-hub-context="api" data-agents-environment="operacoes">
+                    <span><strong>Sentinel API</strong><span class="agent-context-chip">API</span></span>
+                    <span>AGT-8841</span>
+                    <span class="link">Sim</span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-description">Diagnóstico de filas e contratos de integração.</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                        <span class="material-symbols-rounded">add</span>
+                      </button>
+                      <div class="menu add-menu">
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="upload"></i>
+                          <span>Adicionar arquivo</span>
+                        </button>
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="file-text"></i>
+                          <span>Adicionar texto</span>
+                        </button>
+                      </div>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                        <span class="material-symbols-rounded">chat</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="agents-row" data-hub-org="techcorp" data-hub-context="pipeline" data-agents-environment="operacoes">
+                    <span><strong>Stream ETL</strong><span class="agent-context-chip">Pipeline</span></span>
+                    <span>AGT-9902</span>
+                    <span class="link">Não</span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-description">Migração de esquemas e validação de cargas.</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                        <span class="material-symbols-rounded">add</span>
+                      </button>
+                      <div class="menu add-menu">
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="upload"></i>
+                          <span>Adicionar arquivo</span>
+                        </button>
+                        <button type="button" class="ui-menu-item">
+                          <i data-lucide="file-text"></i>
+                          <span>Adicionar texto</span>
+                        </button>
+                      </div>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                        <span class="material-symbols-rounded">chat</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="agents-by-org" id="agentsByOrg">
+                <div class="agents-org-panel" data-hub-org="avas">
+                  <div class="agents-project-detail is-hidden" data-agents-project="avas-operacoes" data-project-title="Operações integradas" hidden>
+                    <div class="agents-project-folder-head">
+                      <span class="agents-project-folder-icon agents-project-folder-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div class="agents-project-folder-titles">
+                        <h3 class="agents-project-folder-name">Operações integradas</h3>
+                      </div>
+                    </div>
+                    <div class="agents-project-folder-body">
+                  <div class="agents-context-block" data-hub-context="backoffice">
+                    <div class="agents-context-bar">
+                      <div>
+                        <span class="agents-context-kicker">Contexto</span>
+                        <h3 class="agents-context-title">Backoffice</h3>
+                        <p class="agents-context-desc">Frente operacional e suporte interno</p>
+                      </div>
+                      <span class="agents-context-badge" data-scope-active-badge>Em foco</span>
+                    </div>
+                    <div class="agents-table">
+                      <div class="agents-row header">
+                        <span>Agente</span>
+                        <span>ID</span>
+                        <span>Conhecimento</span>
+                        <span>Ambiente</span>
+                        <span>Descrição</span>
+                        <span>Ações</span>
+                      </div>
+                      <div class="agents-row" data-agents-environment="operacoes">
+                        <span><strong>Atlas Core</strong><span class="agent-context-chip">Backoffice</span></span>
+                        <span>AGT-1024</span>
+                        <span class="link">Sim</span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-description">Orquestra pipelines de dados e relatórios.</span>
+                        <span class="row-actions">
+                          <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                            <span class="material-symbols-rounded">add</span>
+                          </button>
+                          <div class="menu add-menu">
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="upload"></i>
+                              <span>Adicionar arquivo</span>
+                            </button>
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="file-text"></i>
+                              <span>Adicionar texto</span>
+                            </button>
+                          </div>
+                          <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                            <span class="material-symbols-rounded">chat</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" aria-label="Excluir">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </span>
+                      </div>
+                      <div class="agents-row" data-agents-environment="operacoes">
+                        <span><strong>Nimbus Ops</strong><span class="agent-context-chip">Backoffice</span></span>
+                        <span>AGT-2077</span>
+                        <span class="link">Não</span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-description">Monitoramento de filas e indicadores críticos.</span>
+                        <span class="row-actions">
+                          <button class="icon-btn action-icon muted-icon add-toggle" aria-label="Adicionar">
+                            <span class="material-symbols-rounded">add</span>
+                          </button>
+                          <div class="menu add-menu">
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="upload"></i>
+                              <span>Adicionar arquivo</span>
+                            </button>
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="file-text"></i>
+                              <span>Adicionar texto</span>
+                            </button>
+                          </div>
+                          <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                            <span class="material-symbols-rounded">chat</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" aria-label="Excluir">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                    </div>
+                  </div>
+                  <div class="agents-project-detail is-hidden" data-agents-project="avas-controladoria" data-project-title="Controladoria e fechamento" hidden>
+                    <div class="agents-project-folder-head">
+                      <span class="agents-project-folder-icon agents-project-folder-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div class="agents-project-folder-titles">
+                        <h3 class="agents-project-folder-name">Controladoria e fechamento</h3>
+                      </div>
+                    </div>
+                    <div class="agents-project-folder-body">
+                  <div class="agents-context-block" data-hub-context="financeiro">
+                    <div class="agents-context-bar">
+                      <div>
+                        <span class="agents-context-kicker">Contexto</span>
+                        <h3 class="agents-context-title">Financeiro</h3>
+                        <p class="agents-context-desc">Conciliação, fechamento e análises</p>
+                      </div>
+                      <span class="agents-context-badge is-muted">Espaço separado</span>
+                    </div>
+                    <div class="agents-table">
+                      <div class="agents-row header">
+                        <span>Agente</span>
+                        <span>ID</span>
+                        <span>Conhecimento</span>
+                        <span>Ambiente</span>
+                        <span>Descrição</span>
+                        <span>Ações</span>
+                      </div>
+                      <div class="agents-row" data-agents-environment="financeiro">
+                        <span><strong>Pulse Finance</strong><span class="agent-context-chip">Financeiro</span></span>
+                        <span>AGT-3310</span>
+                        <span class="link">Sim</span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
+                        <span class="agents-row-description">Conciliação automática e análises financeiras.</span>
+                        <span class="row-actions">
+                          <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                            <span class="material-symbols-rounded">add</span>
+                          </button>
+                          <div class="menu add-menu">
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="upload"></i>
+                              <span>Adicionar arquivo</span>
+                            </button>
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="file-text"></i>
+                              <span>Adicionar texto</span>
+                            </button>
+                          </div>
+                          <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                            <span class="material-symbols-rounded">chat</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" aria-label="Excluir">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="agents-org-panel is-hidden" data-hub-org="techcorp">
+                  <div class="agents-project-detail is-hidden" data-agents-project="techcorp-integracoes" data-project-title="Integrações e contratos" hidden>
+                    <div class="agents-project-folder-head">
+                      <span class="agents-project-folder-icon agents-project-folder-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div class="agents-project-folder-titles">
+                        <h3 class="agents-project-folder-name">Integrações e contratos</h3>
+                      </div>
+                    </div>
+                    <div class="agents-project-folder-body">
+                  <div class="agents-context-block" data-hub-context="api">
+                    <div class="agents-context-bar">
+                      <div>
+                        <span class="agents-context-kicker">Contexto</span>
+                        <h3 class="agents-context-title">API e integrações</h3>
+                        <p class="agents-context-desc">Contratos, webhooks e diagnóstico de APIs</p>
+                      </div>
+                      <span class="agents-context-badge" data-scope-active-badge>Em foco</span>
+                    </div>
+                    <div class="agents-table">
+                      <div class="agents-row header">
+                        <span>Agente</span>
+                        <span>ID</span>
+                        <span>Conhecimento</span>
+                        <span>Ambiente</span>
+                        <span>Descrição</span>
+                        <span>Ações</span>
+                      </div>
+                      <div class="agents-row" data-agents-environment="operacoes">
+                        <span><strong>Sentinel API</strong><span class="agent-context-chip">API</span></span>
+                        <span>AGT-8841</span>
+                        <span class="link">Sim</span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-description">Diagnóstico de filas e contratos de integração.</span>
+                        <span class="row-actions">
+                          <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                            <span class="material-symbols-rounded">add</span>
+                          </button>
+                          <div class="menu add-menu">
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="upload"></i>
+                              <span>Adicionar arquivo</span>
+                            </button>
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="file-text"></i>
+                              <span>Adicionar texto</span>
+                            </button>
+                          </div>
+                          <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                            <span class="material-symbols-rounded">chat</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" aria-label="Excluir">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                    </div>
+                  </div>
+                  <div class="agents-project-detail is-hidden" data-agents-project="techcorp-pipeline" data-project-title="Data & pipeline" hidden>
+                    <div class="agents-project-folder-head">
+                      <span class="agents-project-folder-icon agents-project-folder-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div class="agents-project-folder-titles">
+                        <h3 class="agents-project-folder-name">Data & pipeline</h3>
+                      </div>
+                    </div>
+                    <div class="agents-project-folder-body">
+                  <div class="agents-context-block" data-hub-context="pipeline">
+                    <div class="agents-context-bar">
+                      <div>
+                        <span class="agents-context-kicker">Contexto</span>
+                        <h3 class="agents-context-title">Data pipeline</h3>
+                        <p class="agents-context-desc">ETL, qualidade de dados e migrações</p>
+                      </div>
+                      <span class="agents-context-badge is-muted">Espaço separado</span>
+                    </div>
+                    <div class="agents-table">
+                      <div class="agents-row header">
+                        <span>Agente</span>
+                        <span>ID</span>
+                        <span>Conhecimento</span>
+                        <span>Ambiente</span>
+                        <span>Descrição</span>
+                        <span>Ações</span>
+                      </div>
+                      <div class="agents-row" data-agents-environment="operacoes">
+                        <span><strong>Stream ETL</strong><span class="agent-context-chip">Pipeline</span></span>
+                        <span>AGT-9902</span>
+                        <span class="link">Não</span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-description">Migração de esquemas e validação de cargas.</span>
+                        <span class="row-actions">
+                          <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
+                            <span class="material-symbols-rounded">add</span>
+                          </button>
+                          <div class="menu add-menu">
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="upload"></i>
+                              <span>Adicionar arquivo</span>
+                            </button>
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="file-text"></i>
+                              <span>Adicionar texto</span>
+                            </button>
+                          </div>
+                          <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                            <span class="material-symbols-rounded">chat</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" aria-label="Excluir">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-pagination agents-page-pagination" id="agentsPagePagination">
                 <button class="icon-btn" aria-label="Anterior">
                   <span class="material-symbols-rounded">chevron_left</span>
                 </button>
-                <button class="page-number active" type="button">1</button>
-                <button class="page-number" type="button">2</button>
-                <button class="page-number" type="button">3</button>
-                <span class="page-ellipsis">…</span>
-                <button class="page-number" type="button">10</button>
-                <button class="page-number" type="button">11</button>
-                <button class="page-number" type="button">12</button>
+                <div class="pagination-pages" id="agentsPageNumbers"></div>
                 <button class="icon-btn" aria-label="Próximo">
                   <span class="material-symbols-rounded">chevron_right</span>
                 </button>
@@ -998,28 +1415,158 @@
             <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agentModalTitle">
               <div class="modal-header">
                 <h3 id="agentModalTitle">Criação de agentes</h3>
-                <button class="icon-btn" aria-label="Fechar" data-modal-close>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
                   <span class="material-symbols-rounded">close</span>
                 </button>
               </div>
-              <div class="modal-body">
-                <label class="modal-label">Nome do agente</label>
-                <input class="modal-input" type="text" placeholder="Digite o nome do agente" />
-                <label class="modal-label">Descrição do agente</label>
-                <textarea class="modal-textarea" rows="3" placeholder="Digite a descrição do agente"></textarea>
-                <label class="modal-label">Prompt do sistema</label>
-                <textarea class="modal-textarea" rows="3" placeholder="Digite o prompt do sistema"></textarea>
-                <div class="modal-toggle">
-                  <span>Permitir conhecimento interno</span>
-                  <label class="switch">
-                    <input type="checkbox" />
-                    <span class="switch-track"></span>
-                  </label>
-                  <span class="switch-label">Não</span>
+              <form id="agentModalForm" novalidate>
+                <div class="modal-body">
+                  <p id="agentModalError" class="modal-form-error" role="alert" hidden></p>
+                  <label class="modal-label modal-label--required" for="agentModalName">Nome do agente</label>
+                  <input
+                    class="modal-input"
+                    id="agentModalName"
+                    name="name"
+                    type="text"
+                    required
+                    maxlength="200"
+                    autocomplete="off"
+                    placeholder="Digite o nome do agente"
+                  />
+                  <label class="modal-label modal-label--required" for="agentModalDescription">Descrição do agente</label>
+                  <textarea
+                    class="modal-textarea"
+                    id="agentModalDescription"
+                    name="description"
+                    rows="3"
+                    required
+                    maxlength="4000"
+                    placeholder="Digite a descrição do agente"
+                  ></textarea>
+                  <div class="modal-label-row">
+                    <label class="modal-label modal-label--required" for="agentModalSystemPrompt">Prompt do sistema</label>
+                    <button class="agent-prompt-tool agent-prompt-enhance" type="button" id="agentModalPromptEnhance" hidden>Melhorar prompt</button>
+                  </div>
+                  <textarea
+                    class="modal-textarea"
+                    id="agentModalSystemPrompt"
+                    name="system_prompt"
+                    rows="3"
+                    required
+                    maxlength="32000"
+                    placeholder="Digite o prompt do sistema"
+                  ></textarea>
+                  <div class="modal-toggle">
+                    <span class="modal-toggle-label modal-toggle-label--required">Permitir conhecimento interno?</span>
+                    <label class="switch">
+                      <input type="checkbox" id="agentModalUseRag" name="use_rag" />
+                      <span class="switch-track"></span>
+                    </label>
+                    <span class="switch-label" id="agentModalRagLabel">Não</span>
+                  </div>
+                  <div class="modal-scope-box" id="agentModalScopeBox">
+                    <div class="modal-scope-row modal-scope-row--stack">
+                      <label class="modal-scope-key modal-toggle-label--required" for="agentModalEnvironment">Ambiente</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                        <select class="hub-select" id="agentModalEnvironment" aria-label="Ambiente do agente">
+                          <option value="">Selecione o ambiente</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                    <div class="modal-scope-row modal-scope-row--stack">
+                      <label class="modal-scope-key" for="agentModalProject">Projeto</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                        <select class="hub-select" id="agentModalProject" aria-label="Projeto do agente">
+                          <option value="">Carregue o escopo (login / API)</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+                <div class="modal-footer">
+                  <button class="btn primary" type="submit" id="agentModalSubmit">Criar agente</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="modal" id="projectModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+              <div class="modal-header">
+                <h3 id="projectModalTitle">Criar projeto</h3>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
               </div>
+              <form id="projectModalForm" class="modal-body">
+                <p id="projectModalError" class="modal-form-error" role="alert" hidden></p>
+                <label class="modal-label modal-label--required" for="projectModalName">Nome do projeto</label>
+                <input
+                  class="modal-input"
+                  id="projectModalName"
+                  name="projectName"
+                  type="text"
+                  required
+                  maxlength="120"
+                  autocomplete="off"
+                  placeholder="Ex.: Operações integradas"
+                />
+                <label class="modal-label modal-label--required" for="projectModalEnvironment">Ambiente</label>
+                <div class="hub-select-wrap hub-select-wrap--block">
+                  <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">layers</span>
+                  <select id="projectModalEnvironment" name="project_environment" class="hub-select" required aria-label="Ambiente do projeto">
+                    <option value="">Selecione o ambiente</option>
+                  </select>
+                  <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                </div>
+                <select id="projectModalOrg" name="organization" hidden aria-hidden="true" tabindex="-1"></select>
+                <label class="modal-label modal-label--required" for="wesProjectDescription">Descrição do projeto</label>
+                <textarea
+                  class="modal-textarea"
+                  id="wesProjectDescription"
+                  name="description"
+                  rows="3"
+                  required
+                  maxlength="4000"
+                  placeholder="Digite a descrição do projeto"
+                ></textarea>
+                <div class="modal-label" id="projectModalAgentsLabel">Agentes do projeto</div>
+                <div class="hub-select-wrap hub-select-wrap--block">
+                  <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">smart_toy</span>
+                  <select id="projectModalAvailableAgent" name="project_available_agent" class="hub-select" aria-label="Selecionar agente disponível">
+                    <option value="">Selecione o agente</option>
+                  </select>
+                  <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                </div>
+                <div
+                  id="projectModalAgentsList"
+                  class="project-modal-agents-list"
+                  role="group"
+                  aria-labelledby="projectModalAgentsLabel"
+                >
+                  <p class="project-modal-agents-empty">Nenhum agente vinculado.</p>
+                </div>
+                <div class="modal-field-hint">Você pode vincular mais de um agente ao mesmo projeto.</div>
+                <div id="projectModalPromptBlock" hidden>
+                  <label class="modal-label" for="projectModalPrompt">Prompt do projeto</label>
+                  <textarea
+                    class="modal-textarea"
+                    id="projectModalPrompt"
+                    name="project_prompt"
+                    rows="4"
+                    maxlength="32000"
+                    placeholder="Digite um prompt de apoio para orientar os agentes deste projeto"
+                  ></textarea>
+                </div>
+              </form>
               <div class="modal-footer">
-                <button class="btn primary" disabled>Criar agente</button>
+                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="submit" form="projectModalForm" class="btn primary" id="projectModalSubmit">Criar projeto</button>
               </div>
             </div>
           </div>
@@ -1040,7 +1587,8 @@
                     </div>
                   </div>
                   <div class="chat-history">
-                    <div class="chat-history-item active" role="button" tabindex="0">
+                    <p class="chat-scope-empty" id="agentChatHistoryEmpty" hidden>Nenhuma conversa neste contexto.</p>
+                    <div class="chat-history-item active" role="button" tabindex="0" data-hub-context="backoffice">
                       <div class="chat-history-date">03/02/2026</div>
                       <div class="chat-history-title-row">
                         <input class="chat-history-title" type="text" value="Resumo de alertas" readonly />
@@ -1059,7 +1607,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="chat-history-item" role="button" tabindex="0">
+                    <div class="chat-history-item" role="button" tabindex="0" data-hub-context="backoffice">
                       <div class="chat-history-date">01/02/2026</div>
                       <div class="chat-history-title-row">
                         <input class="chat-history-title" type="text" value="Relatório semanal" readonly />
@@ -1078,7 +1626,7 @@
                         </div>
                       </div>
                     </div>
-                    <div class="chat-history-item" role="button" tabindex="0">
+                    <div class="chat-history-item" role="button" tabindex="0" data-hub-context="financeiro">
                       <div class="chat-history-date">28/01/2026</div>
                       <div class="chat-history-title-row">
                         <input class="chat-history-title" type="text" value="Integrações críticas" readonly />
@@ -1127,15 +1675,30 @@
                     </div>
                     <div class="chat-thread">
                       <div class="chat-message agent">
-                        <div class="chat-meta">Agente • 10:24</div>
+                        <div class="chat-meta">
+                          <span>Agente • 10:24</span>
+                          <button class="chat-meta-audio" type="button" aria-label="Ouvir mensagem" title="Ouvir mensagem">
+                            <i data-lucide="volume-2"></i>
+                          </button>
+                        </div>
                         <div class="chat-bubble">Olá! Posso ajudar com relatórios, integrações ou automações.</div>
                       </div>
                       <div class="chat-message user">
-                        <div class="chat-meta">Você • 10:25</div>
+                        <div class="chat-meta">
+                          <span>Você • 10:25</span>
+                          <button class="chat-meta-audio" type="button" aria-label="Ouvir mensagem" title="Ouvir mensagem">
+                            <i data-lucide="volume-2"></i>
+                          </button>
+                        </div>
                         <div class="chat-bubble">Quero um resumo dos últimos alertas críticos.</div>
                       </div>
                       <div class="chat-message agent">
-                        <div class="chat-meta">Agente • 10:25</div>
+                        <div class="chat-meta">
+                          <span>Agente • 10:25</span>
+                          <button class="chat-meta-audio" type="button" aria-label="Ouvir mensagem" title="Ouvir mensagem">
+                            <i data-lucide="volume-2"></i>
+                          </button>
+                        </div>
                         <div class="chat-bubble">Claro. Vou consolidar os alertas críticos das últimas 24 horas.</div>
                       </div>
                     </div>
@@ -1171,14 +1734,42 @@
                             </div>
                           </div>
                         </div>
-                      </div>
-                      <input class="chat-input" type="text" placeholder="Digite sua mensagem" />
-                      <button class="btn primary small chat-send icon-only has-tooltip" type="button" aria-label="Enviar" data-tooltip="Enviar">
-                        <i data-lucide="send"></i>
-                      </button>
+	                      </div>
+	                      <input class="chat-input" type="text" placeholder="Digite sua mensagem" />
+	                      <button class="btn outline small chat-mic icon-only has-tooltip" type="button" aria-label="Ditar mensagem" data-tooltip="Ditar mensagem">
+	                        <i data-lucide="mic"></i>
+	                      </button>
+	                      <button class="btn primary small chat-send icon-only has-tooltip" type="button" aria-label="Enviar" data-tooltip="Enviar">
+	                        <i data-lucide="send"></i>
+	                      </button>
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="modal" id="agentHistoryScopeModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agentHistoryScopeTitle">
+              <div class="modal-header">
+                <h3 id="agentHistoryScopeTitle">Escolher pasta do histórico</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <i data-lucide="x"></i>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p class="modal-field-hint">Selecione o projeto para isolar o histórico e mostrar os agentes dessa pasta.</p>
+                <label class="modal-label" for="agentHistoryScopeProject">Pasta</label>
+                <div class="hub-select-wrap hub-select-wrap--block">
+                  <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                  <select id="agentHistoryScopeProject" class="hub-select" aria-label="Pasta do histórico"></select>
+                  <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                </div>
+                <p class="modal-form-error" id="agentHistoryScopeError" hidden></p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="button" class="btn primary" id="agentHistoryScopeConfirm">Continuar</button>
               </div>
             </div>
           </div>
@@ -1766,6 +2357,355 @@
             </div>
           </div>
 
+          <div class="page" id="page-channels" data-title="Canais">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Canais</h2>
+                  <p class="page-subtitle">
+                    Gerencie os canais que o Hub 360 usa para se comunicar com clientes em mensageria, voz e jornadas híbridas.
+                  </p>
+                  <div class="channels-usage-inline">
+                    <strong>Usado em:</strong>
+                    <span><span class="material-symbols-rounded" aria-hidden="true">chat_bubble</span>Mensageria</span>
+                    <span><span class="material-symbols-rounded" aria-hidden="true">swap_calls</span>Fluxo híbrido</span>
+                    <span><span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>Agentes IA</span>
+                  </div>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar canais">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                  <button class="btn primary" id="openChannelModal" type="button">
+                    Nova integração
+                  </button>
+                </div>
+              </div>
+              <div class="stats-cards">
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">hub</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Canais ativos</div>
+                    <div class="stat-sub">1 padrão e 2 auxiliares</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">chat</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">142</div>
+                    <div class="stat-label">Mensagens hoje</div>
+                    <div class="stat-sub">Notificações e confirmações</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">swap_calls</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Fluxos híbridos</div>
+                    <div class="stat-sub">Voz com continuidade no chat</div>
+                  </div>
+                </div>
+                <div class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded">smart_toy</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">6</div>
+                    <div class="stat-label">Agentes usando canais</div>
+                    <div class="stat-sub">Distribuídos entre operações e suporte</div>
+                  </div>
+                </div>
+              </div>
+              <div class="filters-grid filters-single">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar canais pelo nome ou identificador" />
+                  </div>
+                </div>
+              </div>
+              <div class="data-table channels-table">
+                <div class="data-row header">
+                  <span>Canal</span>
+                  <span>Nome</span>
+                  <span>Identificador</span>
+                  <span>Status</span>
+                  <span>Uso principal</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span class="channel-cell">
+                    <span class="channel-icon">
+                      <span class="material-symbols-rounded">send</span>
+                    </span>
+                    <span>
+                      <strong>Telegram</strong>
+                      <span class="muted">Mensageria oficial</span>
+                    </span>
+                  </span>
+                  <span>Conexão padrão</span>
+                  <span class="channel-code">@wes_hub_bot</span>
+                  <span class="chip success">Ativa</span>
+                  <span class="muted">Lembretes, confirmações e retomada pós-voz</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar canal">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir canal">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span class="channel-cell">
+                    <span class="channel-icon">
+                      <span class="material-symbols-rounded">call</span>
+                    </span>
+                    <span>
+                      <strong>Voz externa</strong>
+                      <span class="muted">Fluxo híbrido</span>
+                    </span>
+                  </span>
+                  <span>URA inicial</span>
+                  <span class="channel-code">voice://entrada-principal</span>
+                  <span class="chip success">Ativa</span>
+                  <span class="muted">Triagem inicial antes da continuidade no chat</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar canal">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir canal">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-telegram-config" data-title="Configuração do Telegram">
+            <div class="section telegram-config-page">
+              <div class="telegram-page-topbar">
+                <a class="telegram-back-link" href="#/dashboard/channels">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para canais</span>
+                </a>
+              </div>
+              <div class="page-header telegram-page-header">
+                <div>
+                  <h2>Configuração do Telegram</h2>
+                  <p class="page-subtitle">Etapa 1 de 3</p>
+                </div>
+              </div>
+              <div class="telegram-config-body">
+                <section class="telegram-config-section">
+                  <div class="telegram-config-section-head">
+                    <h4>Configuração inicial</h4>
+                    <p>Identifique o bot e valide a conexão. Ao salvar, os próximos passos ficam disponíveis.</p>
+                  </div>
+
+                  <div class="telegram-help-card" id="telegramHelpCard">
+                    <div class="telegram-help-card-head">
+                      <div class="telegram-help-card-title">
+                        <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                        <strong>Ainda não tem um bot?</strong>
+                      </div>
+                      <button class="telegram-help-card-close" type="button" aria-label="Fechar ajuda para criar bot">
+                        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                      </button>
+                    </div>
+                    <p class="telegram-help-summary">
+                      Abrimos uma tela separada com o roteiro completo para criar o bot no <code>@BotFather</code>, copiar o token e voltar para concluir a integração.
+                    </p>
+                    <a class="telegram-help-link" href="#/dashboard/channels/telegram/botfather">
+                      <span class="telegram-help-link-text">Ver passo a passo</span>
+                      <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+                    </a>
+                  </div>
+
+                  <label class="modal-label modal-label--required" for="telegramIntegrationName">Nome interno da integração</label>
+                  <input
+                    class="modal-input"
+                    id="telegramIntegrationName"
+                    type="text"
+                    value="Conexão Padrão"
+                    placeholder="Ex.: Telegram Suporte"
+                  />
+                  <p class="modal-field-hint">Esse é o nome que sua equipe verá nos seletores de canal e nas telas de fluxo.</p>
+
+                  <div class="telegram-token-row">
+                    <div class="telegram-token-field">
+                      <label class="modal-label modal-label--required" for="telegramBotToken">Bot token</label>
+                      <input
+                        class="modal-input"
+                        id="telegramBotToken"
+                        type="text"
+                        placeholder="123456:ABC-DEF..."
+                      />
+                    </div>
+                    <button class="btn outline telegram-validate-btn" type="button">Validar conexão</button>
+                  </div>
+                  <p class="modal-field-hint">
+                    Token gerado pelo <code>@BotFather</code>. Ao validar, buscamos os dados do bot no Telegram para preencher automaticamente as informações públicas.
+                  </p>
+
+                  <div class="telegram-bot-summary">
+                    <div class="telegram-bot-summary-main">
+                      <span class="telegram-bot-avatar">WE</span>
+                      <div>
+                        <strong>wes</strong>
+                        <p>@wes_hub_bot · id 8659500973</p>
+                      </div>
+                    </div>
+                    <span class="chip success">Conectado</span>
+                  </div>
+
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label" for="telegramBotUsername">Nome de usuário público do bot</label>
+                      <input class="modal-input" id="telegramBotUsername" type="text" value="wes_hub_bot" />
+                      <p class="modal-field-hint">Identificador público do Telegram. É o texto usado depois do <code>@</code>.</p>
+                    </div>
+                    <div>
+                      <label class="modal-label" for="telegramBotPublicLink">Link público</label>
+                      <div class="modal-input-action-wrap">
+                        <input class="modal-input modal-input--with-action" id="telegramBotPublicLink" type="text" value="https://t.me/wes_hub_bot" readonly />
+                        <button class="icon-btn modal-input-action" id="copyTelegramPublicLink" type="button" aria-label="Copiar link público">
+                          <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                        </button>
+                      </div>
+                      <p class="modal-field-hint">Gerado a partir do nome de usuário público do bot.</p>
+                    </div>
+                  </div>
+
+                  <div class="modal-toggle telegram-status-toggle">
+                    <span class="modal-toggle-label" id="telegramIntegrationStatusLabel">Status</span>
+                    <label class="switch" for="telegramIntegrationStatus">
+                      <input type="checkbox" id="telegramIntegrationStatus" aria-labelledby="telegramIntegrationStatusLabel" checked />
+                      <span class="switch-track"></span>
+                    </label>
+                    <span class="switch-label" id="telegramIntegrationStatusValue">Ativa</span>
+                  </div>
+                  <p class="modal-field-hint">
+                    Você pode manter mais de uma integração Telegram ativa no tenant. Quando necessário, o fluxo escolhe a configuração mais recente.
+                  </p>
+                </section>
+              </div>
+              <div class="telegram-config-actions">
+                <a href="#/dashboard/channels" class="btn outline">Cancelar</a>
+                <button type="button" class="btn primary">
+                  <span class="material-symbols-rounded">save</span>
+                  Salvar e continuar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-telegram-botfather" data-title="Criar bot no BotFather">
+            <div class="section telegram-config-page">
+              <div class="telegram-page-topbar">
+                <a class="telegram-back-link" href="#/dashboard/channels/telegram">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para configuração</span>
+                </a>
+              </div>
+              <div class="page-header telegram-page-header">
+                <div>
+                  <h2>Criar bot no BotFather</h2>
+                  <p class="page-subtitle">Passo a passo para gerar o token e voltar para a integração.</p>
+                </div>
+              </div>
+              <div class="telegram-config-body">
+                <section class="telegram-config-section telegram-guide-section">
+                  <div class="telegram-config-section-head">
+                    <h4>Como gerar o token do Telegram</h4>
+                    <p>Siga essa sequência no Telegram e depois volte para colar o token na etapa 1.</p>
+                  </div>
+
+                  <a class="telegram-help-link" href="https://t.me/BotFather" target="_blank" rel="noreferrer">
+                    <span class="telegram-help-link-text">Abrir @BotFather</span>
+                    <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
+                  </a>
+
+                  <ol class="telegram-help-steps telegram-help-steps--guide">
+                    <li>No Telegram, abra o <code>@BotFather</code> e toque em <code>Start</code> ou envie <code>/start</code>.</li>
+                    <li>Envie o comando <code>/newbot</code> para começar a criação de um novo bot.</li>
+                    <li>Informe o nome visível do bot. Esse é o nome que as pessoas verão nas conversas.</li>
+                    <li>Escolha o nome de usuário público do bot. Ele precisa ser único e terminar com <code>bot</code>, como <code>meu_atendimento_bot</code>.</li>
+                    <li>Copie o token retornado pelo <code>@BotFather</code> e cole no campo <strong>Bot token</strong> da tela anterior.</li>
+                    <li>Volte para a configuração do Telegram, clique em <strong>Validar conexão</strong> e revise os dados preenchidos automaticamente.</li>
+                  </ol>
+
+                  <div class="telegram-guide-tip">
+                    <strong>Dica</strong>
+                    <p>Se quiser trocar foto, descrição ou comandos do bot depois, isso também pode ser feito pelo próprio <code>@BotFather</code>.</p>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="channelModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog channel-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="channelModalTitle">
+              <div class="modal-header channel-picker-header">
+                <h3 id="channelModalTitle">Qual canal você quer conectar?</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body channel-picker-body">
+                <p class="channel-picker-subtitle">
+                  Escolha o tipo de integração. Você pode conectar mais de uma conta por canal e deixar todas disponíveis para os fluxos.
+                </p>
+                <div class="channel-picker-grid">
+                  <button class="channel-picker-card" type="button" aria-label="Selecionar Telegram" id="openTelegramConfigModal">
+                    <span class="channel-picker-icon channel-picker-icon--telegram" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path
+                          fill="currentColor"
+                          d="M21.5 4.2 3.9 11c-1.2.5-1.2 1.2-.2 1.5l4.5 1.4 1.7 5.4c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.5-2.4 5.2 3.8c1 .6 1.6.3 1.9-.9l3.2-14.9c.4-1.5-.5-2.2-1.8-1.7ZM9 13.6l10.3-6.5c.5-.3 1-.1.6.3l-8.5 7.7-.3 3.2L9 13.6Z"
+                        />
+                      </svg>
+                    </span>
+                    <span class="channel-picker-copy">
+                      <span class="channel-picker-title">Telegram</span>
+                      <span class="channel-picker-description">
+                        Bot para mensagens, continuidade pós-voz e atendimento com agentes IA.
+                      </span>
+                    </span>
+                  </button>
+                  <button class="channel-picker-card" type="button" aria-label="Selecionar WhatsApp Business">
+                    <span class="channel-picker-icon channel-picker-icon--whatsapp" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path
+                          fill="currentColor"
+                          d="M19.1 4.9A9.8 9.8 0 0 0 12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.6 1.4 5.1L2 22l5-1.3A10 10 0 0 0 12 22c5.5 0 10-4.5 10-10 0-2.7-1-5.2-2.9-7.1Zm-7.1 15.4c-1.5 0-2.9-.4-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 0 1 3.8 12C3.8 7.5 7.5 3.8 12 3.8S20.2 7.5 20.2 12 16.5 20.2 12 20.2Zm4.5-6.1-.6-.3c-.2-.1-1.1-.6-1.2-.6-.2-.1-.3-.1-.5.1l-.4.6c-.1.1-.2.2-.4.1a6.8 6.8 0 0 1-2-1.2 7.7 7.7 0 0 1-1.5-1.9c-.2-.2 0-.3.1-.4l.3-.3.2-.4c.1-.1.1-.2 0-.4l-.6-1.5c-.1-.3-.3-.3-.5-.3h-.4c-.2 0-.4.1-.6.3s-.8.7-.8 1.8.8 2.1.9 2.3c.1.1 1.6 2.5 4 3.4 2.3.9 2.3.6 2.7.6.4 0 1.3-.5 1.4-1 .2-.5.2-.9.2-1s-.1-.1-.3-.2Z"
+                        />
+                      </svg>
+                    </span>
+                    <span class="channel-picker-copy">
+                      <span class="channel-picker-title">WhatsApp (WABA)</span>
+                      <span class="channel-picker-description">
+                        Conta oficial para mensagens, campanhas e atendimento pelo WhatsApp Business.
+                      </span>
+                    </span>
+                  </button>
+                  <button class="channel-picker-card" type="button" aria-label="Selecionar SMS">
+                    <span class="channel-picker-icon channel-picker-icon--sms" aria-hidden="true">
+                      <span class="material-symbols-rounded">sms</span>
+                    </span>
+                    <span class="channel-picker-copy">
+                      <span class="channel-picker-title">SMS</span>
+                      <span class="channel-picker-description">
+                        Provedor para avisos rápidos, códigos de confirmação e mensagens transacionais.
+                      </span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-credentials" data-title="Credenciais">
             <div class="section">
               <div class="page-header">
@@ -2076,6 +3016,162 @@
             </div>
           </div>
 
+          <div class="page" id="page-history" data-title="Painel de histórico">
+            <div class="section history-panel-section">
+              <div class="page-header">
+                <div>
+                  <h2>Painel de histórico</h2>
+                  <p class="page-subtitle">
+                    Neste painel, o histórico segue a hierarquia
+                    <strong>Ambiente</strong> > <strong>Contexto de projeto</strong> > <strong>conversas</strong>.
+                    Nada se mistura entre contextos ou entre ambientes.
+                  </p>
+                </div>
+                <div class="page-actions">
+                  <button class="icon-btn" aria-label="Atualizar" type="button">
+                    <span class="material-symbols-rounded">refresh</span>
+                  </button>
+                </div>
+              </div>
+              <div class="history-hierarchy-legend" aria-hidden="true">
+                <span class="history-hierarchy-step"><span class="history-hi">1</span> Ambiente</span>
+                <span class="history-hierarchy-arrow">→</span>
+                <span class="history-hierarchy-step"><span class="history-hi">2</span> Contexto</span>
+                <span class="history-hierarchy-arrow">→</span>
+                <span class="history-hierarchy-step"><span class="history-hi">3</span> Histórico</span>
+              </div>
+              <div class="history-scope-banner" role="status">
+                <span class="material-symbols-rounded">shield_lock</span>
+                <div>
+                  <strong>Espaçoos independentes</strong>
+                  <p>
+                    Cada contexto é um projeto/frente isolado: referências e histórico de um não aparecem em outro. A
+                    lista abaixo mostra <strong>somente a organização ativa</strong> na barra superior — outras
+                    organizações não são exibidas.
+                  </p>
+                </div>
+              </div>
+              <p class="history-org-only-notice" id="historyOrgOnlyNotice" role="status" aria-live="polite"></p>
+              <div class="history-org-block" data-hub-org="avas">
+                <div class="history-org-header">
+                 
+                </div>
+                <div class="history-context-stack">
+                  <div class="history-context-card" data-hub-context="backoffice">
+                    <button type="button" class="history-context-head history-context-toggle" aria-expanded="true" aria-controls="history-list-backoffice">
+                      <span class="history-context-icon-lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <span class="history-context-badge">2 conversas</span>
+                      <span class="material-symbols-rounded history-context-caret">expand_less</span>
+                    </button>
+                    <ul class="history-thread-list" id="history-list-backoffice">
+                      <li>
+                        <button type="button" class="history-thread-row">
+                          <span class="history-thread-date">03/02/2026</span>
+                          <span class="history-thread-main">
+                            <span class="history-thread-title">Resumo de alertas</span>
+                            <span class="history-thread-agent">Agente · Atlas Core</span>
+                          </span>
+                          <span class="material-symbols-rounded history-thread-chevron">chevron_right</span>
+                        </button>
+                      </li>
+                      <li>
+                        <button type="button" class="history-thread-row">
+                          <span class="history-thread-date">01/02/2026</span>
+                          <span class="history-thread-main">
+                            <span class="history-thread-title">Relatório semanal</span>
+                            <span class="history-thread-agent">Agente · Nimbus Ops</span>
+                          </span>
+                          <span class="material-symbols-rounded history-thread-chevron">chevron_right</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="history-context-card" data-hub-context="financeiro">
+                    <button type="button" class="history-context-head history-context-toggle" aria-expanded="true" aria-controls="history-list-financeiro">
+                      <span class="history-context-icon-lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div>
+                        <span class="history-context-label">Contexto de projeto</span>
+                        <h4>Financeiro</h4>
+                      </div>
+                      <span class="history-context-badge">1 conversa</span>
+                      <span class="material-symbols-rounded history-context-caret">expand_less</span>
+                    </button>
+                    <ul class="history-thread-list" id="history-list-financeiro">
+                      <li>
+                        <button type="button" class="history-thread-row">
+                          <span class="history-thread-date">27/01/2026</span>
+                          <span class="history-thread-main">
+                            <span class="history-thread-title">Conciliação e fechamento</span>
+                            <span class="history-thread-agent">Agente · Pulse Finance</span>
+                          </span>
+                          <span class="material-symbols-rounded history-thread-chevron">chevron_right</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="history-org-block history-org-block-alt" data-hub-org="techcorp">
+                <div class="history-org-header">
+                  <span class="material-symbols-rounded">corporate_fare</span>
+                  <div>
+                    <span class="history-org-label">Organização</span>
+                    <h3 class="history-org-title">TechCorp</h3>
+                  </div>
+                  <span class="history-org-seal">Separada de AVAS</span>
+                </div>
+                <div class="history-context-stack">
+                  <div class="history-context-card" data-hub-context="api">
+                    <button type="button" class="history-context-head history-context-toggle" aria-expanded="true" aria-controls="history-list-api">
+                      <span class="history-context-icon-lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div>
+                        <span class="history-context-label">Contexto de projeto</span>
+                        <h4>API e integrações</h4>
+                      </div>
+                      <span class="history-context-badge">1 conversa</span>
+                      <span class="material-symbols-rounded history-context-caret">expand_less</span>
+                    </button>
+                    <ul class="history-thread-list" id="history-list-api">
+                      <li>
+                        <button type="button" class="history-thread-row">
+                          <span class="history-thread-date">28/01/2026</span>
+                          <span class="history-thread-main">
+                            <span class="history-thread-title">Diagnóstico de filas</span>
+                            <span class="history-thread-agent">Agente · Sentinel API</span>
+                          </span>
+                          <span class="material-symbols-rounded history-thread-chevron">chevron_right</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="history-context-card" data-hub-context="pipeline">
+                    <button type="button" class="history-context-head history-context-toggle" aria-expanded="true" aria-controls="history-list-pipeline">
+                      <span class="history-context-icon-lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
+                      <div>
+                        <span class="history-context-label">Contexto de projeto</span>
+                        <h4>Data pipeline</h4>
+                      </div>
+                      <span class="history-context-badge">1 conversa</span>
+                      <span class="material-symbols-rounded history-context-caret">expand_less</span>
+                    </button>
+                    <ul class="history-thread-list" id="history-list-pipeline">
+                      <li>
+                        <button type="button" class="history-thread-row">
+                          <span class="history-thread-date">15/01/2026</span>
+                          <span class="history-thread-main">
+                            <span class="history-thread-title">Migração de esquema</span>
+                            <span class="history-thread-agent">Agente · Stream ETL</span>
+                          </span>
+                          <span class="material-symbols-rounded history-thread-chevron">chevron_right</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-audit" data-title="Logs de auditoria">
             <div class="section">
               <div class="page-header">
@@ -2207,6 +3303,7 @@
               </div>
               <div class="tabs tabs-underline">
                 <button class="tab active" data-tab="org-overview">Visão geral</button>
+                <button class="tab" data-tab="org-contexts">Contextos</button>
                 <button class="tab" data-tab="org-subscription">Assinatura</button>
                 <button class="tab" data-tab="org-billing">Faturamento</button>
                 <button class="tab" data-tab="org-keys">Chaves de API</button>
@@ -2243,10 +3340,68 @@
                     <span>Produção</span>
                     <span class="chip success">Ativo</span>
                     <span>12/20</span>
-                    <span>CPU 85% • Memória 72%</span>
+                    <span>CPU 85% â€¢ Memória 72%</span>
                     <span class="row-actions">
                       <button class="icon-btn action-icon" aria-label="Ver detalhes">
                         <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="org-contexts">
+                <div class="page-header" style="margin-bottom: 12px">
+                  <div>
+                    <p class="page-subtitle" style="margin: 0">
+                      Contextos definem espaços isolados: projetos, frentes ou áreas. Cada agente pertence a um único
+                      contexto dentro desta organização. Contextos de outras organizações não aparecem aqui.
+                    </p>
+                  </div>
+                  <div class="page-actions">
+                    <button class="btn primary" type="button">
+                      <span class="material-symbols-rounded">add</span>
+                      Novo contexto
+                    </button>
+                  </div>
+                </div>
+                <div class="data-table">
+                  <div class="data-row header cols-5">
+                    <span>Contexto</span>
+                    <span>Tipo / frente</span>
+                    <span>Agentes</span>
+                    <span>Isolamento</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row cols-5">
+                    <span><strong>Backoffice</strong></span>
+                    <span>Operações internas</span>
+                    <span>2</span>
+                    <span class="chip success">Somente este espaço</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row cols-5">
+                    <span><strong>Financeiro</strong></span>
+                    <span>Fechamento e conciliação</span>
+                    <span>1</span>
+                    <span class="chip success">Somente este espaço</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row cols-5">
+                    <span><strong>Piloto IA</strong></span>
+                    <span>Experimentação</span>
+                    <span>0</span>
+                    <span class="chip success">Somente este espaço</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
                       </button>
                     </span>
                   </div>
@@ -2578,12 +3733,16 @@
                       </label>
                       <span>Autenticação em dois fatores</span>
                     </div>
-                    <label class="settings-label">Tempo de sessão (minutos)</label>
-                    <select>
-                      <option>30 minutos</option>
-                      <option>60 minutos</option>
-                      <option>120 minutos</option>
-                    </select>
+                    <label class="settings-label" for="settingsSessionSelect">Tempo de sessão (minutos)</label>
+                    <div class="hub-select-wrap hub-select-wrap--block settings-hub-select">
+                      <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">schedule</span>
+                      <select class="hub-select" id="settingsSessionSelect" aria-label="Tempo de sessão">
+                        <option>30 minutos</option>
+                        <option>60 minutos</option>
+                        <option>120 minutos</option>
+                      </select>
+                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2655,13 +3814,71 @@
           </div>
         </section>
 
-        <button class="fab has-tooltip" type="button" data-tooltip="Conversar" aria-label="Conversar">
+        <div id="directChatDrawer" class="direct-chat-drawer" aria-hidden="true">
+          <div class="direct-chat-backdrop" data-direct-chat-close tabindex="-1" aria-hidden="true"></div>
+          <aside
+            class="direct-chat-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="directChatDrawerTitle"
+          >
+            <div class="direct-chat-header">
+              <div>
+                <h3 id="directChatDrawerTitle">Chat direto</h3>
+                <p class="direct-chat-sub">API <code>/chat</code> — mesma sessão do login (<code>X-User-Id</code>).</p>
+              </div>
+              <div class="direct-chat-header-actions">
+                <button type="button" class="btn outline btn-sm" id="directChatNewBtn">Nova conversa</button>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-direct-chat-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+            </div>
+            <div class="direct-chat-body">
+              <div class="direct-chat-empty" id="directChatEmpty">
+                Envie uma mensagem para falar com o modelo. Cada "Nova conversa" inicia outro <code>conversation_id</code> no servidor.
+              </div>
+              <div class="direct-chat-thread" id="directChatThread" aria-live="polite"></div>
+            </div>
+            <p class="direct-chat-error" id="directChatError" hidden></p>
+            <div class="direct-chat-composer">
+              <label class="direct-chat-sr-only" for="directChatInput">Mensagem</label>
+              <textarea
+                id="directChatInput"
+                class="direct-chat-input"
+                rows="2"
+                placeholder="Digite sua mensagem…"
+                maxlength="32000"
+                autocomplete="off"
+              ></textarea>
+              <button type="button" class="btn primary" id="directChatSend" disabled>Enviar</button>
+            </div>
+          </aside>
+        </div>
+
+        <button
+          class="fab has-tooltip"
+          id="directChatFab"
+          type="button"
+          data-tooltip="Chat direto"
+          aria-label="Abrir chat direto"
+          aria-haspopup="dialog"
+          aria-controls="directChatDrawer"
+        >
           <span class="material-symbols-rounded">chat</span>
         </button>
       </main>
     </div>
 
+    <div class="app-toast" id="appToast" role="status" aria-live="polite" aria-atomic="true" hidden>
+      <div class="app-toast-content">
+        <span class="app-toast-icon material-symbols-rounded" aria-hidden="true">check_circle</span>
+        <span id="appToastMessage">Link copiado</span>
+      </div>
+    </div>
+
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="./auth.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

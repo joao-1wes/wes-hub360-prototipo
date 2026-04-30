@@ -2363,14 +2363,8 @@
                 <div>
                   <h2>Canais</h2>
                   <p class="page-subtitle">
-                    Gerencie os canais que o Hub 360 usa para se comunicar com clientes em mensageria, voz e jornadas híbridas.
+                    Gerencie os canais que o Hub 360 usa para se comunicar com clientes em mensageria, fluxo híbrido e agentes IA.
                   </p>
-                  <div class="channels-usage-inline">
-                    <strong>Usado em:</strong>
-                    <span><span class="material-symbols-rounded" aria-hidden="true">chat_bubble</span>Mensageria</span>
-                    <span><span class="material-symbols-rounded" aria-hidden="true">swap_calls</span>Fluxo híbrido</span>
-                    <span><span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>Agentes IA</span>
-                  </div>
                 </div>
                 <div class="page-actions">
                   <button class="icon-btn" aria-label="Atualizar canais">
@@ -2379,40 +2373,6 @@
                   <button class="btn primary" id="openChannelModal" type="button">
                     Nova integração
                   </button>
-                </div>
-              </div>
-              <div class="stats-cards">
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">hub</span></div>
-                  <div class="stat-body">
-                    <div class="stat-value">3</div>
-                    <div class="stat-label">Canais ativos</div>
-                    <div class="stat-sub">1 padrão e 2 auxiliares</div>
-                  </div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">chat</span></div>
-                  <div class="stat-body">
-                    <div class="stat-value">142</div>
-                    <div class="stat-label">Mensagens hoje</div>
-                    <div class="stat-sub">Notificações e confirmações</div>
-                  </div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">swap_calls</span></div>
-                  <div class="stat-body">
-                    <div class="stat-value">18</div>
-                    <div class="stat-label">Fluxos híbridos</div>
-                    <div class="stat-sub">Voz com continuidade no chat</div>
-                  </div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">smart_toy</span></div>
-                  <div class="stat-body">
-                    <div class="stat-value">6</div>
-                    <div class="stat-label">Agentes usando canais</div>
-                    <div class="stat-sub">Distribuídos entre operações e suporte</div>
-                  </div>
                 </div>
               </div>
               <div class="filters-grid filters-single">
@@ -2493,108 +2453,202 @@
               <div class="page-header telegram-page-header">
                 <div>
                   <h2>Configuração do Telegram</h2>
-                  <p class="page-subtitle">Etapa 1 de 3</p>
+                  <p class="telegram-config-stage">Identifique o bot e valide a conexão para liberar o teste opcional e a confirmação final.</p>
                 </div>
               </div>
-              <div class="telegram-config-body">
-                <section class="telegram-config-section">
-                  <div class="telegram-config-section-head">
-                    <h4>Configuração inicial</h4>
-                    <p>Identifique o bot e valide a conexão. Ao salvar, os próximos passos ficam disponíveis.</p>
-                  </div>
 
-                  <div class="telegram-help-card" id="telegramHelpCard">
-                    <div class="telegram-help-card-head">
-                      <div class="telegram-help-card-title">
-                        <span class="material-symbols-rounded" aria-hidden="true">info</span>
-                        <strong>Ainda não tem um bot?</strong>
-                      </div>
-                      <button class="telegram-help-card-close" type="button" aria-label="Fechar ajuda para criar bot">
-                        <span class="material-symbols-rounded" aria-hidden="true">close</span>
-                      </button>
-                    </div>
-                    <p class="telegram-help-summary">
-                      Abrimos uma tela separada com o roteiro completo para criar o bot no <code>@BotFather</code>, copiar o token e voltar para concluir a integração.
-                    </p>
-                    <a class="telegram-help-link" href="#/dashboard/channels/telegram/botfather">
-                      <span class="telegram-help-link-text">Ver passo a passo</span>
-                      <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
-                    </a>
+              <div class="telegram-help-card" id="telegramHelpCard">
+                <div class="telegram-help-card-head">
+                  <div class="telegram-help-card-title">
+                    <strong>Ainda não tem um bot?</strong>
                   </div>
-
-                  <label class="modal-label modal-label--required" for="telegramIntegrationName">Nome interno da integração</label>
-                  <input
-                    class="modal-input"
-                    id="telegramIntegrationName"
-                    type="text"
-                    value="Conexão Padrão"
-                    placeholder="Ex.: Telegram Suporte"
-                  />
-                  <p class="modal-field-hint">Esse é o nome que sua equipe verá nos seletores de canal e nas telas de fluxo.</p>
-
-                  <div class="telegram-token-row">
-                    <div class="telegram-token-field">
-                      <label class="modal-label modal-label--required" for="telegramBotToken">Bot token</label>
-                      <input
-                        class="modal-input"
-                        id="telegramBotToken"
-                        type="text"
-                        placeholder="123456:ABC-DEF..."
-                      />
-                    </div>
-                    <button class="btn outline telegram-validate-btn" type="button">Validar conexão</button>
-                  </div>
-                  <p class="modal-field-hint">
-                    Token gerado pelo <code>@BotFather</code>. Ao validar, buscamos os dados do bot no Telegram para preencher automaticamente as informações públicas.
-                  </p>
-
-                  <div class="telegram-bot-summary">
-                    <div class="telegram-bot-summary-main">
-                      <span class="telegram-bot-avatar">WE</span>
-                      <div>
-                        <strong>wes</strong>
-                        <p>@wes_hub_bot · id 8659500973</p>
-                      </div>
-                    </div>
-                    <span class="chip success">Conectado</span>
-                  </div>
-
-                  <div class="modal-row">
-                    <div>
-                      <label class="modal-label" for="telegramBotUsername">Nome de usuário público do bot</label>
-                      <input class="modal-input" id="telegramBotUsername" type="text" value="wes_hub_bot" />
-                      <p class="modal-field-hint">Identificador público do Telegram. É o texto usado depois do <code>@</code>.</p>
-                    </div>
-                    <div>
-                      <label class="modal-label" for="telegramBotPublicLink">Link público</label>
-                      <div class="modal-input-action-wrap">
-                        <input class="modal-input modal-input--with-action" id="telegramBotPublicLink" type="text" value="https://t.me/wes_hub_bot" readonly />
-                        <button class="icon-btn modal-input-action" id="copyTelegramPublicLink" type="button" aria-label="Copiar link público">
-                          <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
-                        </button>
-                      </div>
-                      <p class="modal-field-hint">Gerado a partir do nome de usuário público do bot.</p>
-                    </div>
-                  </div>
-
-                  <div class="modal-toggle telegram-status-toggle">
-                    <span class="modal-toggle-label" id="telegramIntegrationStatusLabel">Status</span>
-                    <label class="switch" for="telegramIntegrationStatus">
-                      <input type="checkbox" id="telegramIntegrationStatus" aria-labelledby="telegramIntegrationStatusLabel" checked />
-                      <span class="switch-track"></span>
-                    </label>
-                    <span class="switch-label" id="telegramIntegrationStatusValue">Ativa</span>
-                  </div>
-                  <p class="modal-field-hint">
-                    Você pode manter mais de uma integração Telegram ativa no tenant. Quando necessário, o fluxo escolhe a configuração mais recente.
-                  </p>
-                </section>
+                  <button class="telegram-help-card-close" type="button" aria-label="Fechar ajuda para criar bot">
+                    <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                  </button>
+                </div>
+                <p class="telegram-help-summary">
+                  Abrimos uma tela separada com o roteiro completo para criar o bot no <code>@BotFather</code>, copiar o token e voltar para concluir a integração.
+                </p>
+                <a class="telegram-help-link" href="#/dashboard/channels/telegram/botfather">
+                  <span class="telegram-help-link-text">Ver passo a passo</span>
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span>
+                </a>
               </div>
+
+              <label class="modal-label modal-label--required" for="telegramIntegrationName">Nome interno da integração</label>
+              <input
+                class="modal-input"
+                id="telegramIntegrationName"
+                type="text"
+                value="Conexão Padrão"
+                placeholder="Ex.: Telegram Suporte"
+              />
+              <p class="modal-field-hint">Esse é o nome que sua equipe verá nos seletores de canal e nas telas de fluxo.</p>
+
+              <div class="telegram-token-row">
+                <div class="telegram-token-field">
+                  <label class="modal-label modal-label--required" for="telegramBotToken">Bot token</label>
+                  <div class="modal-input-action-wrap">
+                    <input
+                      class="modal-input modal-input--with-action"
+                      id="telegramBotToken"
+                      type="password"
+                      placeholder="123456:ABC-DEF..."
+                    />
+                    <button class="icon-btn modal-input-action" id="toggleTelegramBotToken" type="button" aria-label="Mostrar bot token" aria-pressed="false">
+                      <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                    </button>
+                  </div>
+                </div>
+                <button class="btn outline telegram-validate-btn" id="telegramValidateButton" type="button">Validar conexão</button>
+              </div>
+              <p class="modal-field-hint">
+                Token gerado pelo <code>@BotFather</code>. Ao validar, buscamos os dados do bot no Telegram para preencher automaticamente as informações públicas.
+              </p>
+
+              <div class="telegram-bot-summary" id="telegramBotSummary" hidden>
+                <div class="telegram-bot-summary-main">
+                  <span class="telegram-bot-avatar">WE</span>
+                  <div>
+                    <strong id="telegramBotDisplayName">wes</strong>
+                    <p><span id="telegramBotDisplayHandle">@wes_hub_bot</span> · id <span id="telegramBotDisplayId">8659500973</span></p>
+                  </div>
+                </div>
+                <span class="chip success">Conectado</span>
+              </div>
+
+              <div class="modal-row">
+                <div>
+                  <label class="modal-label" for="telegramBotUsername">Nome de usuário público do bot</label>
+                  <input class="modal-input" id="telegramBotUsername" type="text" value="wes_hub_bot" />
+                  <p class="modal-field-hint">Identificador público do Telegram. É o texto usado depois do <code>@</code>.</p>
+                </div>
+                <div>
+                  <label class="modal-label" for="telegramBotPublicLink">Link público</label>
+                  <div class="modal-input-action-wrap">
+                    <input class="modal-input modal-input--with-action" id="telegramBotPublicLink" type="text" value="https://t.me/wes_hub_bot" readonly />
+                    <button class="icon-btn modal-input-action" id="copyTelegramPublicLink" type="button" aria-label="Copiar link público">
+                      <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                    </button>
+                  </div>
+                  <p class="modal-field-hint">Gerado a partir do nome de usuário público do bot.</p>
+                </div>
+              </div>
+
+              <div class="modal-toggle telegram-status-toggle">
+                <span class="modal-toggle-label" id="telegramIntegrationStatusLabel">Status</span>
+                <label class="switch" for="telegramIntegrationStatus">
+                  <input type="checkbox" id="telegramIntegrationStatus" aria-labelledby="telegramIntegrationStatusLabel" checked />
+                  <span class="switch-track"></span>
+                </label>
+                <span class="switch-label" id="telegramIntegrationStatusValue">Ativa</span>
+              </div>
+              <p class="modal-field-hint">
+                Você pode manter mais de uma integração Telegram ativa no tenant. Quando necessário, o fluxo escolhe a configuração mais recente.
+              </p>
+              
+              <div class="telegram-config-divider"></div>
+
+              <div class="telegram-section-title">
+                <div class="telegram-config-section-head">
+                  <h4>Teste de envio</h4>
+                  <p>Confirme que o bot consegue enviar mensagens para um destinatário real. Você pode pular esta etapa.</p>
+                </div>
+              </div>
+
+              <label class="modal-label" for="telegramTestChatId">Chat ID numérico do destinatário</label>
+              <input
+                class="modal-input"
+                id="telegramTestChatId"
+                type="text"
+                inputmode="numeric"
+                placeholder="Ex.: 123456789"
+              />
+              <p class="modal-field-hint">
+                Informe o ID numérico do usuário que vai receber a mensagem, não o handle do bot. O destinatário precisa ter enviado <code>/start</code> para esse bot ao menos uma vez.
+              </p>
+
+              <div class="telegram-test-actions">
+                <button class="btn outline" id="telegramSendTestButton" type="button" disabled>
+                  <span class="material-symbols-rounded" aria-hidden="true">send</span>
+                  Enviar mensagem de teste
+                </button>
+                <div class="telegram-test-feedback" id="telegramTestFeedback" hidden>
+                  <span class="chip success">Enviado</span>
+                  <span id="telegramTestFeedbackText">Mensagem de teste enviada com sucesso.</span>
+                </div>
+              </div>
+
+              <div class="telegram-config-divider"></div>
+
               <div class="telegram-config-actions">
                 <a href="#/dashboard/channels" class="btn outline">Cancelar</a>
-                <button type="button" class="btn primary">
+                <button type="button" class="btn primary" id="telegramSaveContinueButton" disabled>
                   <span class="material-symbols-rounded">save</span>
                   Salvar e continuar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="telegramSummaryModal" aria-hidden="true">
+            <div class="modal-backdrop" data-telegram-summary-close></div>
+            <div class="modal-dialog telegram-summary-dialog" role="dialog" aria-modal="true" aria-labelledby="telegramSummaryModalTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="telegramSummaryModalTitle">Resumo da conexão</h3>
+                  <p class="telegram-summary-subtitle">Confira os dados da integração antes de concluir a criação.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-telegram-summary-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="telegram-summary-card">
+                  <div class="telegram-summary-card-head">
+                    <div class="telegram-section-title telegram-section-title--compact">
+                      <span class="material-symbols-rounded" aria-hidden="true">fact_check</span>
+                      <div>
+                        <strong>Resumo da conexão</strong>
+                        <p>Revise os principais dados públicos e internos antes de concluir.</p>
+                      </div>
+                    </div>
+                    <span class="chip success" id="telegramSummaryStatusChip">Ativa</span>
+                  </div>
+
+                  <div class="telegram-summary-list">
+                    <div class="telegram-summary-row">
+                      <span>Nome interno</span>
+                      <strong id="telegramSummaryName">-</strong>
+                    </div>
+                    <div class="telegram-summary-row">
+                      <span>Bot</span>
+                      <strong id="telegramSummaryBot">-</strong>
+                    </div>
+                    <div class="telegram-summary-row">
+                      <span>Handle</span>
+                      <strong id="telegramSummaryHandle">-</strong>
+                    </div>
+                    <div class="telegram-summary-row">
+                      <span>Link público</span>
+                      <a id="telegramSummaryLink" href="#" target="_blank" rel="noreferrer">-</a>
+                    </div>
+                    <div class="telegram-summary-row">
+                      <span>ID do bot</span>
+                      <strong id="telegramSummaryBotId">-</strong>
+                    </div>
+                    <div class="telegram-summary-row">
+                      <span>Teste de envio</span>
+                      <strong id="telegramSummaryTestStatus">Pulado</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer telegram-summary-actions">
+                <button class="btn outline" id="telegramSummaryBackButton" type="button">Voltar</button>
+                <button class="btn primary" id="telegramSummaryConfirmButton" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">check</span>
+                  Concluir
                 </button>
               </div>
             </div>

@@ -69,12 +69,35 @@ const billingModal = document.getElementById('billingModal');
 const openChannelModal = document.getElementById('openChannelModal');
 const channelModal = document.getElementById('channelModal');
 const openTelegramConfigModal = document.getElementById('openTelegramConfigModal');
+const telegramIntegrationName = document.getElementById('telegramIntegrationName');
+const telegramBotToken = document.getElementById('telegramBotToken');
+const toggleTelegramBotToken = document.getElementById('toggleTelegramBotToken');
+const telegramValidateButton = document.getElementById('telegramValidateButton');
+const telegramSaveContinueButton = document.getElementById('telegramSaveContinueButton');
+const telegramBotSummary = document.getElementById('telegramBotSummary');
+const telegramBotDisplayName = document.getElementById('telegramBotDisplayName');
+const telegramBotDisplayHandle = document.getElementById('telegramBotDisplayHandle');
+const telegramBotDisplayId = document.getElementById('telegramBotDisplayId');
 const telegramBotUsername = document.getElementById('telegramBotUsername');
 const telegramBotPublicLink = document.getElementById('telegramBotPublicLink');
 const copyTelegramPublicLink = document.getElementById('copyTelegramPublicLink');
+const telegramTestChatId = document.getElementById('telegramTestChatId');
+const telegramSendTestButton = document.getElementById('telegramSendTestButton');
+const telegramTestFeedback = document.getElementById('telegramTestFeedback');
+const telegramTestFeedbackText = document.getElementById('telegramTestFeedbackText');
 const telegramIntegrationStatus = document.getElementById('telegramIntegrationStatus');
 const telegramIntegrationStatusValue = document.getElementById('telegramIntegrationStatusValue');
 const telegramHelpCard = document.getElementById('telegramHelpCard');
+const telegramSummaryModal = document.getElementById('telegramSummaryModal');
+const telegramSummaryBackButton = document.getElementById('telegramSummaryBackButton');
+const telegramSummaryConfirmButton = document.getElementById('telegramSummaryConfirmButton');
+const telegramSummaryStatusChip = document.getElementById('telegramSummaryStatusChip');
+const telegramSummaryName = document.getElementById('telegramSummaryName');
+const telegramSummaryBot = document.getElementById('telegramSummaryBot');
+const telegramSummaryHandle = document.getElementById('telegramSummaryHandle');
+const telegramSummaryLink = document.getElementById('telegramSummaryLink');
+const telegramSummaryBotId = document.getElementById('telegramSummaryBotId');
+const telegramSummaryTestStatus = document.getElementById('telegramSummaryTestStatus');
 const appToast = document.getElementById('appToast');
 const appToastMessage = document.getElementById('appToastMessage');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
@@ -129,6 +152,8 @@ let lucideRefreshQueued = false;
 let activeChatSpeechButton = null;
 let projectModalAvailableAgents = [];
 let appToastTimer = null;
+let telegramConnectionValidated = false;
+let telegramTestSent = false;
 
 function scheduleLucideRefresh() {
   if (!window.lucide?.createIcons || lucideRefreshQueued) return;
@@ -154,6 +179,161 @@ function updateTelegramPublicLink() {
   const username = normalizeTelegramUsername(telegramBotUsername.value);
   telegramBotUsername.value = username;
   telegramBotPublicLink.value = username ? `https://t.me/${username}` : '';
+}
+
+function syncTelegramBotSummaryVisibility() {
+  if (!telegramBotSummary) return;
+  telegramBotSummary.hidden = !telegramConnectionValidated;
+}
+
+function syncTelegramBotTokenVisibility() {
+  if (!telegramBotToken || !toggleTelegramBotToken) return;
+  const isVisible = telegramBotToken.type === 'text';
+  const icon = toggleTelegramBotToken.querySelector('.material-symbols-rounded');
+  toggleTelegramBotToken.setAttribute('aria-label', isVisible ? 'Ocultar bot token' : 'Mostrar bot token');
+  toggleTelegramBotToken.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+  if (icon) {
+    icon.textContent = isVisible ? 'visibility_off' : 'visibility';
+  }
+}
+
+function toggleTelegramBotTokenVisibility() {
+  if (!telegramBotToken) return;
+  telegramBotToken.type = telegramBotToken.type === 'password' ? 'text' : 'password';
+  syncTelegramBotTokenVisibility();
+}
+
+function syncTelegramSaveContinueState() {
+  if (!telegramSaveContinueButton) return;
+  telegramSaveContinueButton.disabled = !telegramConnectionValidated;
+}
+
+function isTelegramChatIdValid(value) {
+  return /^-?\d{5,}$/.test(String(value || '').trim());
+}
+
+function syncTelegramSendTestState() {
+  if (!telegramSendTestButton) return;
+  const chatId = String(telegramTestChatId?.value || '').trim();
+  telegramSendTestButton.disabled = !(telegramConnectionValidated && isTelegramChatIdValid(chatId));
+}
+
+function syncTelegramFlowState() {
+  syncTelegramSaveContinueState();
+  syncTelegramBotSummaryVisibility();
+  syncTelegramSendTestState();
+}
+
+function resetTelegramTestState() {
+  telegramTestSent = false;
+  if (telegramTestFeedback) telegramTestFeedback.hidden = true;
+  syncTelegramSendTestState();
+}
+
+function closeTelegramSummaryModal() {
+  if (!telegramSummaryModal) return;
+  telegramSummaryModal.classList.remove('open');
+  telegramSummaryModal.setAttribute('aria-hidden', 'true');
+}
+
+function resetTelegramConnectionValidation() {
+  telegramConnectionValidated = false;
+  resetTelegramTestState();
+  closeTelegramSummaryModal();
+  syncTelegramFlowState();
+}
+
+function isTelegramTokenFormatValid(value) {
+  return /^\d{5,}:[A-Za-z0-9_-]{10,}$/.test(String(value || '').trim());
+}
+
+function validateTelegramConnection() {
+  const token = String(telegramBotToken?.value || '').trim();
+  const isValid = isTelegramTokenFormatValid(token);
+
+  telegramConnectionValidated = isValid;
+  if (!isValid) resetTelegramTestState();
+  syncTelegramFlowState();
+
+  if (!isValid) {
+    showAppToast('Informe um bot token válido antes de continuar');
+    telegramBotToken?.focus();
+    telegramBotToken?.select();
+    return;
+  }
+
+  showAppToast('Conexão validada com sucesso');
+}
+
+function sendTelegramTestMessage() {
+  const chatId = String(telegramTestChatId?.value || '').trim();
+  if (!telegramConnectionValidated) {
+    showAppToast('Valide a conexão antes de enviar o teste');
+    return;
+  }
+  if (!isTelegramChatIdValid(chatId)) {
+    showAppToast('Informe um Chat ID numérico válido');
+    telegramTestChatId?.focus();
+    telegramTestChatId?.select();
+    return;
+  }
+
+  telegramTestSent = true;
+  if (telegramTestFeedbackText) {
+    telegramTestFeedbackText.textContent = `Mensagem de teste enviada para o Chat ID ${chatId}.`;
+  }
+  if (telegramTestFeedback) telegramTestFeedback.hidden = false;
+  syncTelegramSendTestState();
+  showAppToast('Mensagem de teste enviada com sucesso');
+}
+
+function populateTelegramSummary() {
+  const integrationName = String(telegramIntegrationName?.value || '').trim() || 'Não definido';
+  const botName = String(telegramBotDisplayName?.textContent || '').trim() || 'Bot não identificado';
+  const botHandle = String(telegramBotDisplayHandle?.textContent || '').trim() || 'Não definido';
+  const botId = String(telegramBotDisplayId?.textContent || '').trim() || 'Não definido';
+  const publicLink = String(telegramBotPublicLink?.value || '').trim();
+  const isActive = Boolean(telegramIntegrationStatus?.checked);
+  const testStatus = telegramTestSent
+    ? `Enviado para ${String(telegramTestChatId?.value || '').trim()}`
+    : 'Pulado';
+
+  if (telegramSummaryName) telegramSummaryName.textContent = integrationName;
+  if (telegramSummaryBot) telegramSummaryBot.textContent = botName;
+  if (telegramSummaryHandle) telegramSummaryHandle.textContent = botHandle;
+  if (telegramSummaryBotId) telegramSummaryBotId.textContent = botId;
+  if (telegramSummaryTestStatus) telegramSummaryTestStatus.textContent = testStatus;
+
+  if (telegramSummaryLink) {
+    telegramSummaryLink.textContent = publicLink || 'Não disponível';
+    if (publicLink) {
+      telegramSummaryLink.setAttribute('href', publicLink);
+    } else {
+      telegramSummaryLink.removeAttribute('href');
+    }
+  }
+
+  if (telegramSummaryStatusChip) {
+    telegramSummaryStatusChip.textContent = isActive ? 'Ativa' : 'Pausada';
+    telegramSummaryStatusChip.classList.toggle('success', isActive);
+    telegramSummaryStatusChip.classList.toggle('warning', !isActive);
+  }
+}
+
+function openTelegramSummaryModal() {
+  if (!telegramConnectionValidated) return;
+  populateTelegramSummary();
+  if (!telegramSummaryModal) return;
+  telegramSummaryModal.classList.add('open');
+  telegramSummaryModal.setAttribute('aria-hidden', 'false');
+}
+
+function completeTelegramConfiguration() {
+  closeTelegramSummaryModal();
+  showAppToast('Integração criada com sucesso');
+  window.setTimeout(() => {
+    window.location.hash = '#/dashboard/channels';
+  }, 180);
 }
 
 function showAppToast(message) {
@@ -265,8 +445,8 @@ function playChatMessageAudio(button) {
   window.speechSynthesis.speak(utterance);
 }
 
-// Futuro ditado: transcrever a fala para o input sem envio automatico,
-// para o usuario revisar e corrigir antes de enviar manualmente.
+// Futuro ditado: transcrever a fala para o input sem envio automático,
+// para o usuário revisar e corrigir antes de enviar manualmente.
 function setChatDictationState(isActive) {
   if (!chatDictationButton) return;
   const nextTooltip = isActive ? 'Encerrar ditado' : 'Ditar mensagem';
@@ -1833,6 +2013,56 @@ if (copyTelegramPublicLink) {
   });
 }
 
+if (telegramBotToken && toggleTelegramBotToken) {
+  toggleTelegramBotToken.addEventListener('click', toggleTelegramBotTokenVisibility);
+  syncTelegramBotTokenVisibility();
+}
+
+if (telegramBotToken) {
+  telegramBotToken.addEventListener('input', resetTelegramConnectionValidation);
+}
+
+if (telegramValidateButton) {
+  telegramValidateButton.addEventListener('click', validateTelegramConnection);
+}
+
+if (telegramTestChatId) {
+  telegramTestChatId.addEventListener('input', () => {
+    if (telegramTestSent) {
+      resetTelegramTestState();
+      return;
+    }
+    syncTelegramSendTestState();
+  });
+}
+
+if (telegramSendTestButton) {
+  telegramSendTestButton.addEventListener('click', sendTelegramTestMessage);
+}
+
+if (telegramSaveContinueButton) {
+  telegramSaveContinueButton.addEventListener('click', openTelegramSummaryModal);
+}
+
+if (telegramSummaryModal) {
+  telegramSummaryModal.addEventListener('click', (event) => {
+    const closeTarget = event.target.closest('[data-telegram-summary-close]');
+    if (closeTarget) {
+      closeTelegramSummaryModal();
+    }
+  });
+}
+
+if (telegramSummaryBackButton) {
+  telegramSummaryBackButton.addEventListener('click', closeTelegramSummaryModal);
+}
+
+if (telegramSummaryConfirmButton) {
+  telegramSummaryConfirmButton.addEventListener('click', completeTelegramConfiguration);
+}
+
+syncTelegramFlowState();
+
 if (telegramIntegrationStatus) {
   telegramIntegrationStatus.addEventListener('change', syncTelegramIntegrationStatus);
   syncTelegramIntegrationStatus();
@@ -1982,7 +2212,7 @@ if (telegramHelpCard) {
   try {
     telegramHelpCard.hidden = window.localStorage?.getItem(TELEGRAM_HELP_CARD_DISMISSED_STORAGE_KEY) === '1';
   } catch (error) {
-    console.warn('Nao foi possivel ler preferencia do card de ajuda do Telegram.', error);
+    console.warn('Não foi possível ler preferência do card de ajuda do Telegram.', error);
   }
 
   const closeButton = telegramHelpCard.querySelector('.telegram-help-card-close');
@@ -1992,7 +2222,7 @@ if (telegramHelpCard) {
       try {
         window.localStorage?.setItem(TELEGRAM_HELP_CARD_DISMISSED_STORAGE_KEY, '1');
       } catch (error) {
-        console.warn('Nao foi possivel salvar preferencia do card de ajuda do Telegram.', error);
+        console.warn('Não foi possível salvar preferência do card de ajuda do Telegram.', error);
       }
     });
   }
@@ -2901,7 +3131,7 @@ function resolveAgentsPageEnvironmentIdForProject(projectMeta = {}) {
 }
 
 function getAgentsPageEnvironmentLabel(environmentId) {
-  return AGENTS_PAGE_ENVIRONMENTS.find((item) => item.id === environmentId)?.label || 'Nao definido';
+  return AGENTS_PAGE_ENVIRONMENTS.find((item) => item.id === environmentId)?.label || 'Não definido';
 }
 
 function syncAgentsPageEnvironmentSelect() {
@@ -3116,7 +3346,7 @@ function buildAgentRowElement(agent) {
   const environmentLabel = getAgentsPageEnvironmentLabel(row.dataset.agentsEnvironment);
   const name = escapeHtmlWes(agent.name || '');
   const idCell = escapeHtmlWes(`${String(agent.id).slice(0, 8)}...`);
-  const rag = agent.use_rag ? 'Sim' : 'Nao';
+  const rag = agent.use_rag ? 'Sim' : 'Não';
   const hasProject = Boolean(agent.project_id);
   const desc = escapeHtmlWes(`${(agent.description || '').trim()}${hasProject ? '' : ' • Sem projeto'}`.trim());
   row.innerHTML = `<span><strong>${name}</strong></span><span title="${escapeHtmlWes(agent.id)}">${idCell}</span><span class="link">${rag}</span><span class="agents-row-environment"><span class="agents-environment-badge">${escapeHtmlWes(environmentLabel)}</span></span><span class="agents-row-description">${desc}</span><span class="row-actions"><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar"><span class="material-symbols-rounded">chat</span></button></span>`;
@@ -3175,10 +3405,10 @@ async function deleteAgentWithConfirmation(row) {
       const namesText = names.length ? `\n\nProjetos vinculados:\n- ${names.join('\n- ')}` : '';
       const message =
         count > 1
-          ? `O agente "${agentName}" esta vinculado a ${count} projetos e sera excluido de todos.${namesText}\n\nDeseja continuar?`
+          ? `O agente "${agentName}" está vinculado a ${count} projetos e será excluído de todos.${namesText}\n\nDeseja continuar?`
           : count === 1
-            ? `O agente "${agentName}" sera excluido definitivamente.${namesText}\n\nDeseja continuar?`
-            : `O agente "${agentName}" esta sem projeto e sera excluido definitivamente.\n\nDeseja continuar?`;
+            ? `O agente "${agentName}" será excluído definitivamente.${namesText}\n\nDeseja continuar?`
+            : `O agente "${agentName}" está sem projeto e será excluído definitivamente.\n\nDeseja continuar?`;
       if (!window.confirm(message)) return;
       const confirmed = await performDelete('?confirm=true');
       if (!confirmed.res.ok) {
@@ -3192,7 +3422,7 @@ async function deleteAgentWithConfirmation(row) {
     if (typeof refreshAgentsTableFromApi === 'function') await refreshAgentsTableFromApi();
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    window.alert(message || 'Nao foi possivel excluir o agente.');
+    window.alert(message || 'Não foi possível excluir o agente.');
   }
 }
 
@@ -3224,7 +3454,7 @@ async function refreshAgentsTableFromApi() {
           : Array.isArray(body?.detail)
             ? body.detail.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join('; ')
             : rawText || res.statusText;
-      setAgentsApiStatus(`Nao foi possivel listar agentes (${res.status}): ${detail}`, true);
+      setAgentsApiStatus(`Não foi possível listar agentes (${res.status}): ${detail}`, true);
       return;
     }
     const agents = body;
@@ -3245,7 +3475,7 @@ async function refreshAgentsTableFromApi() {
     renderAgentsProjectDetailsFromApi(agents);
     if (agents.length === 0) {
       setAgentsApiStatus(
-        'Nenhum agente para este usuario na organização selecionada.',
+        'Nenhum agente para este usuário na organização selecionada.',
         false
       );
     } else {

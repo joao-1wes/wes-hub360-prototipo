@@ -33,7 +33,9 @@
               <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
               <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
               <a class="submenu-item" href="#/dashboard/agents"><span class="submenu-label">Agentes</span></a>
-              <a class="submenu-item" href="#/dashboard/queues"><span class="submenu-label">Filas</span></a>
+              <a class="submenu-item" href="#/dashboard/voice-messaging"><span class="submenu-label">Mensageria por voz</span></a>
+              <a class="submenu-item" href="#/dashboard/campaigns"><span class="submenu-label">Campanhas</span></a>
+              <a class="submenu-item" href="#/dashboard/hybrid-flows"><span class="submenu-label">Fluxos híbridos</span></a>
             </div>
           </div>
 
@@ -236,7 +238,6 @@
                     <button class="btn filter-btn" id="alertFilterBtn">
                       <span class="material-symbols-rounded">filter_list</span>Filtro
                     </button>
-                    <button class="icon-btn" aria-label="Atualizar"><span class="material-symbols-rounded">refresh</span></button>
                   </div>
                 </div>
                 <div class="panel-empty">Nenhum alerta aberto</div>
@@ -253,12 +254,9 @@
                   <h2>Insights de IA</h2>
                   <span class="badge" id="insightsCount">4</span>
                 </div>
-                <button class="icon-btn" aria-label="Atualizar insights">
-                  <span class="material-symbols-rounded">refresh</span>
-                </button>
               </div>
               <div class="insights-empty" id="insightsEmpty">
-                Nenhum insight foi gerado ainda. Clique em atualizar para aparecer algum insight.
+                Nenhum insight foi gerado ainda.
               </div>
               <div class="insights-grid" id="insightsGrid">
                 <div class="insight-card">
@@ -456,7 +454,6 @@
                     <button class="btn filter-btn" id="alertFilterBtnAlt">
                       <span class="material-symbols-rounded">filter_list</span>Filtro
                     </button>
-                    <button class="icon-btn" aria-label="Atualizar"><span class="material-symbols-rounded">refresh</span></button>
                   </div>
                 </div>
                 <div class="alert-list">
@@ -510,12 +507,9 @@
                   <h2>Insights de IA</h2>
                   <span class="badge" id="insightsCountAlt">0</span>
                 </div>
-                <button class="icon-btn" aria-label="Atualizar insights">
-                  <span class="material-symbols-rounded">refresh</span>
-                </button>
               </div>
               <div class="insights-empty is-visible" id="insightsEmptyAlt">
-                Nenhum insight foi gerado ainda. Clique em atualizar para aparecer algum insight.
+                Nenhum insight foi gerado ainda.
               </div>
               <div class="insights-grid is-hidden" id="insightsGridAlt"></div>
             </div>
@@ -530,10 +524,7 @@
                   <p class="page-subtitle">Gerencie automações, pacotes e execuções recentes.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar automações">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
-                  <button class="btn primary">Criar automação</button>
+                  <button class="btn primary" id="openAutomationModal" type="button">Criar automação</button>
                 </div>
               </div>
               <div class="tabs tabs-underline">
@@ -582,64 +573,74 @@
                     <span>Status</span>
                     <span>Ações</span>
                   </div>
-                  <div class="data-row">
+                  <div
+                    class="data-row automation-row"
+                    data-automation-id="relatorio-diario"
+                    data-automation-name="Relatório diário"
+                    data-automation-description="Gera relatórios operacionais diários."
+                    data-automation-package="reports"
+                    data-automation-version="v2.1.0"
+                    data-automation-priority="medium"
+                    data-automation-params='{"periodicidade":"diaria","destino":"operacoes"}'
+                    data-automation-status="active"
+                  >
                     <span>Relatório diário</span>
                     <span class="muted">Gera relatórios operacionais diários.</span>
-                    <span>reports-v2.1</span>
+                    <span>reports • v2.1.0</span>
                     <span>12/03/2025 • 08:30</span>
                     <span class="chip priority-medium">Média</span>
-                    <span class="chip success">Ativo</span>
-                    <span class="row-actions has-details">
-                      <button class="icon-btn action-icon" aria-label="Executar">
+                    <span class="automation-status-switch is-active">
+                      <label class="switch small" for="automationStatusDaily">
+                        <input type="checkbox" id="automationStatusDaily" checked />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span class="automation-status-switch-label">Ativo</span>
+                    </span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Executar" type="button">
                         <span class="material-symbols-rounded">play_arrow</span>
                       </button>
-                      <button class="icon-btn action-icon" aria-label="Editar">
+                      <button class="icon-btn action-icon automation-edit-trigger" aria-label="Editar" type="button">
                         <span class="material-symbols-rounded">edit</span>
                       </button>
-                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <button class="icon-btn action-icon danger automation-delete-trigger" aria-label="Excluir" type="button">
                         <span class="material-symbols-rounded">delete</span>
                       </button>
-                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                      <div class="details-card">
-                        <div class="details-title">Detalhes da automação</div>
-                        <div class="details-item"><span>Nome</span><strong>Relatório diário</strong></div>
-                        <div class="details-item"><span>Pacote</span><strong>reports-v2.1</strong></div>
-                        <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
-                        <div class="details-item"><span>Prioridade</span><strong>Média</strong></div>
-                        <div class="details-item"><span>Última execução</span><strong>12/03/2025 • 08:30</strong></div>
-                      </div>
                     </span>
                   </div>
-                  <div class="data-row">
+                  <div
+                    class="data-row automation-row"
+                    data-automation-id="monitoramento-filas"
+                    data-automation-name="Monitoramento de filas"
+                    data-automation-description="Acompanha o volume das filas críticas."
+                    data-automation-package="queues"
+                    data-automation-version="v1.4.0"
+                    data-automation-priority="high"
+                    data-automation-params='{"fila":"critica","alerta":"imediato"}'
+                    data-automation-status="inactive"
+                  >
                     <span>Monitoramento de filas</span>
                     <span class="muted">Acompanha o volume das filas críticas.</span>
-                    <span>queues-v1.4</span>
+                    <span>queues • v1.4.0</span>
                     <span>11/03/2025 • 18:10</span>
                     <span class="chip priority-high">Alta</span>
-                    <span class="chip warning">Pausado</span>
-                    <span class="row-actions has-details">
-                      <button class="icon-btn action-icon" aria-label="Pausar">
+                    <span class="automation-status-switch is-inactive">
+                      <label class="switch small" for="automationStatusQueues">
+                        <input type="checkbox" id="automationStatusQueues" />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span class="automation-status-switch-label">Inativo</span>
+                    </span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Pausar" type="button">
                         <span class="material-symbols-rounded">pause</span>
                       </button>
-                      <button class="icon-btn action-icon" aria-label="Editar">
+                      <button class="icon-btn action-icon automation-edit-trigger" aria-label="Editar" type="button">
                         <span class="material-symbols-rounded">edit</span>
                       </button>
-                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <button class="icon-btn action-icon danger automation-delete-trigger" aria-label="Excluir" type="button">
                         <span class="material-symbols-rounded">delete</span>
                       </button>
-                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                      <div class="details-card">
-                        <div class="details-title">Detalhes da automação</div>
-                        <div class="details-item"><span>Nome</span><strong>Monitoramento de filas</strong></div>
-                        <div class="details-item"><span>Pacote</span><strong>queues-v1.4</strong></div>
-                        <div class="details-item"><span>Status</span><strong>Pausado</strong></div>
-                        <div class="details-item"><span>Prioridade</span><strong>Alta</strong></div>
-                        <div class="details-item"><span>Última execução</span><strong>11/03/2025 • 18:10</strong></div>
-                      </div>
                     </span>
                   </div>
                 </div>
@@ -706,18 +707,7 @@
                     <span>12/03/2025 • 08:30</span>
                     <span>30 min</span>
                     <span class="chip success">Completa</span>
-                    <span class="row-actions has-details">
-                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                      <div class="details-card">
-                        <div class="details-title">Detalhes da execução</div>
-                        <div class="details-item"><span>Automação</span><strong>Relatório diário</strong></div>
-                        <div class="details-item"><span>Início</span><strong>12/03/2025 • 08:00</strong></div>
-                        <div class="details-item"><span>Fim</span><strong>12/03/2025 • 08:30</strong></div>
-                        <div class="details-item"><span>Tempo</span><strong>30 min</strong></div>
-                        <div class="details-item"><span>Status</span><strong>Completa</strong></div>
-                      </div>
+                    <span class="row-actions">
                     </span>
                   </div>
                   <div class="data-row">
@@ -726,18 +716,7 @@
                     <span>11/03/2025 • 18:10</span>
                     <span>10 min</span>
                     <span class="chip warning">Interrompida</span>
-                    <span class="row-actions has-details">
-                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                      <div class="details-card">
-                        <div class="details-title">Detalhes da execução</div>
-                        <div class="details-item"><span>Automação</span><strong>Monitoramento de filas</strong></div>
-                        <div class="details-item"><span>Início</span><strong>11/03/2025 • 18:00</strong></div>
-                        <div class="details-item"><span>Fim</span><strong>11/03/2025 • 18:10</strong></div>
-                        <div class="details-item"><span>Tempo</span><strong>10 min</strong></div>
-                        <div class="details-item"><span>Status</span><strong>Interrompida</strong></div>
-                      </div>
+                    <span class="row-actions">
                     </span>
                   </div>
                 </div>
@@ -768,9 +747,6 @@
                   <p class="page-subtitle">Crie e acompanhe execuções programadas.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar agendamentos">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                   <button class="icon-btn" aria-label="Baixar agendamentos">
                     <span class="material-symbols-rounded">download</span>
                   </button>
@@ -1412,16 +1388,19 @@
           </div>
           <div class="modal" id="agentModal" aria-hidden="true">
             <div class="modal-backdrop" data-modal-close></div>
-            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agentModalTitle">
-              <div class="modal-header">
-                <h3 id="agentModalTitle">Criação de agentes</h3>
-                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
-                  <span class="material-symbols-rounded">close</span>
-                </button>
-              </div>
+            <div class="modal-dialog agent-create-dialog" role="dialog" aria-modal="true" aria-labelledby="agentModalTitle">
               <form id="agentModalForm" novalidate>
-                <div class="modal-body">
+                <div class="modal-header agent-create-header">
+                  <div class="agent-create-header-title">
+                    <h3 id="agentModalTitle">Criação de agentes</h3>
+                  </div>
+                  <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body agent-create-body">
                   <p id="agentModalError" class="modal-form-error" role="alert" hidden></p>
+
                   <label class="modal-label modal-label--required" for="agentModalName">Nome do agente</label>
                   <input
                     class="modal-input"
@@ -1433,40 +1412,49 @@
                     autocomplete="off"
                     placeholder="Digite o nome do agente"
                   />
-                  <label class="modal-label modal-label--required" for="agentModalDescription">Descrição do agente</label>
+                  <div class="agent-create-field-meta">
+                    <p class="modal-field-hint">Nome interno usado para identificar o agente nas listas e seletores.</p>
+                    <span class="agent-create-counter" id="agentModalNameCounter">0/200</span>
+                  </div>
+
+                  <label class="modal-label" for="agentModalDescription">Descrição do agente</label>
                   <textarea
-                    class="modal-textarea"
+                    class="modal-textarea agent-create-description"
                     id="agentModalDescription"
                     name="description"
-                    rows="3"
-                    required
+                    rows="4"
                     maxlength="4000"
                     placeholder="Digite a descrição do agente"
                   ></textarea>
-                  <div class="modal-label-row">
+                  <div class="agent-create-field-meta">
+                    <p class="modal-field-hint">Explique de forma breve o papel desse agente e o tipo de tarefa que ele executa.</p>
+                    <span class="agent-create-counter" id="agentModalDescriptionCounter">0/4000</span>
+                  </div>
+
+                  <div class="agent-create-prompt-header">
                     <label class="modal-label modal-label--required" for="agentModalSystemPrompt">Prompt do sistema</label>
-                    <button class="agent-prompt-tool agent-prompt-enhance" type="button" id="agentModalPromptEnhance" hidden>Melhorar prompt</button>
+                    <button class="btn outline agent-create-ai-btn" type="button" id="agentModalPromptEnhance">
+                      <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+                      Melhorar com IA
+                    </button>
                   </div>
                   <textarea
-                    class="modal-textarea"
+                    class="modal-textarea agent-create-prompt"
                     id="agentModalSystemPrompt"
                     name="system_prompt"
-                    rows="3"
+                    rows="8"
                     required
-                    maxlength="32000"
+                    maxlength="20000"
                     placeholder="Digite o prompt do sistema"
                   ></textarea>
-                  <div class="modal-toggle">
-                    <span class="modal-toggle-label modal-toggle-label--required">Permitir conhecimento interno?</span>
-                    <label class="switch">
-                      <input type="checkbox" id="agentModalUseRag" name="use_rag" />
-                      <span class="switch-track"></span>
-                    </label>
-                    <span class="switch-label" id="agentModalRagLabel">Não</span>
+                  <div class="agent-create-field-meta">
+                    <p class="modal-field-hint">Defina instruções, objetivo, tom de resposta e restrições operacionais do agente.</p>
+                    <span class="agent-create-counter" id="agentModalPromptCounter">0/20000</span>
                   </div>
-                  <div class="modal-scope-box" id="agentModalScopeBox">
-                    <div class="modal-scope-row modal-scope-row--stack">
-                      <label class="modal-scope-key modal-toggle-label--required" for="agentModalEnvironment">Ambiente</label>
+
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label modal-label--required" for="agentModalEnvironment">Ambiente</label>
                       <div class="hub-select-wrap hub-select-wrap--block">
                         <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
                         <select class="hub-select" id="agentModalEnvironment" aria-label="Ambiente do agente">
@@ -1474,21 +1462,161 @@
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
+                      <p class="modal-field-hint">Define o ambiente principal em que esse agente vai operar.</p>
                     </div>
-                    <div class="modal-scope-row modal-scope-row--stack">
-                      <label class="modal-scope-key" for="agentModalProject">Projeto</label>
+                    <div>
+                      <label class="modal-label" for="agentModalProject">Projeto</label>
                       <div class="hub-select-wrap hub-select-wrap--block">
                         <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
                         <select class="hub-select" id="agentModalProject" aria-label="Projeto do agente">
-                          <option value="">Carregue o escopo (login / API)</option>
+                          <option value="">Carregue o escopo</option>
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                      <p class="modal-field-hint">Opcional, use um projeto para organizar agentes por frente ou operação.</p>
+                    </div>
+                  </div>
+
+                  <div class="agent-capability-switch-row">
+                    <div class="agent-capability-simple-toggle agent-capability-simple-toggle--rag">
+                      <strong>Conhecimento interno (RAG)</strong>
+                      <label class="switch">
+                        <input type="checkbox" id="agentModalUseRag" name="use_rag" />
+                        <span class="switch-track"></span>
+                      </label>
+                    </div>
+
+                    <div class="agent-capability-card agent-capability-card--voice">
+                      <div class="agent-capability-card-top">
+                        <div class="agent-capability-card-copy">
+                          <strong>Resposta por voz</strong>
+                          <p>Permite que o agente responda também em áudio (TTS).</p>
+                        </div>
+                        <label class="switch">
+                          <input type="checkbox" id="agentModalVoiceEnabled" name="voice_enabled" />
+                          <span class="switch-track"></span>
+                        </label>
+                      </div>
+
+                      <div class="agent-capability-card-body is-hidden" id="agentModalVoiceOptions" hidden>
+                        <div class="modal-row">
+                          <div>
+                            <label class="modal-label" for="agentModalVoiceLocale">Idioma / região</label>
+                          <div class="hub-select-wrap hub-select-wrap--block">
+                            <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">language</span>
+                            <select class="hub-select" id="agentModalVoiceLocale" aria-label="Idioma ou região da voz">
+                              <option value="pt-BR">pt-BR</option>
+                              <option value="pt-PT">pt-PT</option>
+                              <option value="en-US">en-US</option>
+                            </select>
+                            <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                          </div>
+                        </div>
+                        <div>
+                          <label class="modal-label" for="agentModalVoice">Voz</label>
+                          <div class="agent-create-voice-row">
+                            <div class="hub-select-wrap hub-select-wrap--block">
+                              <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">record_voice_over</span>
+                              <select class="hub-select" id="agentModalVoice" aria-label="Voz do agente">
+                                <option value="Antonio">Antonio</option>
+                                <option value="Clara">Clara</option>
+                                <option value="Marina">Marina</option>
+                              </select>
+                              <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                            </div>
+                            <button class="icon-btn agent-create-voice-preview" id="agentModalVoicePreview" type="button" aria-label="Ouvir prévia da voz">
+                              <span class="material-symbols-rounded" aria-hidden="true">volume_up</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                      <p class="modal-field-hint">Esses ajustes são salvos com o agente e valem em todas as ligações de voz.</p>
+
+                      <div class="agent-audio-panel">
+                        <button class="agent-audio-panel-toggle" id="agentModalAudioToggle" type="button" aria-expanded="true" aria-controls="agentModalAudioPanelBody">
+                          <div class="agent-audio-panel-heading">
+                            <span class="agent-create-section-icon" aria-hidden="true">
+                              <span class="material-symbols-rounded">tune</span>
+                            </span>
+                            <div>
+                              <strong>Áudio e captura</strong>
+                              <p>Opcional, ajuste se tiver problemas de eco, microfone ou de ouvir o assistente.</p>
+                            </div>
+                          </div>
+                          <span class="material-symbols-rounded agent-audio-panel-caret" aria-hidden="true">expand_less</span>
+                        </button>
+                        <div class="agent-audio-panel-body" id="agentModalAudioPanelBody">
+                          <p class="modal-field-hint">Algumas opções só passam a valer na próxima ligação.</p>
+
+                          <div class="agent-capability-inline-toggle">
+                            <div>
+                              <strong>Reproduzir áudio do assistente</strong>
+                              <p>Desligue para usar apenas o microfone sem ouvir as respostas em voz.</p>
+                            </div>
+                            <label class="switch">
+                              <input type="checkbox" id="agentModalAudioPlayback" name="audio_playback" checked />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+
+                          <div class="agent-capability-inline-toggle">
+                            <div>
+                              <strong>Modo fone de ouvido</strong>
+                              <p>Reduz o cancelamento de eco do navegador para deixar a sua voz mais natural quando estiver com fone fechado.</p>
+                            </div>
+                            <label class="switch">
+                              <input type="checkbox" id="agentModalHeadphoneMode" name="headphone_mode" />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+
+                          <div class="agent-capability-inline-toggle">
+                            <div>
+                              <strong>Não capturar microfone enquanto o assistente fala</strong>
+                              <p>Evita que o microfone pegue a voz do assistente e reduz interrupções indesejadas.</p>
+                            </div>
+                            <label class="switch">
+                              <input type="checkbox" id="agentModalMuteMicWhileSpeaking" name="mute_mic_while_speaking" />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+
+                          <div class="modal-row">
+                            <div>
+                              <label class="modal-label" for="agentModalMicProfile">Perfil do microfone</label>
+                              <div class="hub-select-wrap hub-select-wrap--block">
+                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">mic</span>
+                                <select class="hub-select" id="agentModalMicProfile" aria-label="Perfil do microfone">
+                                  <option value="default">Padrão</option>
+                                  <option value="speech">Focado em fala</option>
+                                  <option value="noisy">Ambiente ruidoso</option>
+                                </select>
+                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                              </div>
+                              <p class="modal-field-hint">Define como o navegador trata eco, ruído e ganho.</p>
+                            </div>
+                            <div>
+                              <label class="modal-label" for="agentModalInterruptSensitivity">Sensibilidade da interrupção por voz</label>
+                              <div class="hub-select-wrap hub-select-wrap--block">
+                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">equalizer</span>
+                                <select class="hub-select" id="agentModalInterruptSensitivity" aria-label="Sensibilidade da interrupção por voz">
+                                  <option value="default">Padrão</option>
+                                  <option value="low">Baixa</option>
+                                  <option value="high">Alta</option>
+                                </select>
+                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                              </div>
+                              <p class="modal-field-hint">Ajusta o quanto a fala do usuário interrompe respostas em andamento.</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn primary" type="submit" id="agentModalSubmit">Criar agente</button>
+                  <button class="btn outline" data-modal-close type="button">Cancelar</button>
+                  <button class="btn primary" type="submit" id="agentModalSubmit" disabled>Criar agente</button>
                 </div>
               </form>
             </div>
@@ -1562,6 +1690,19 @@
                     maxlength="32000"
                     placeholder="Digite um prompt de apoio para orientar os agentes deste projeto"
                   ></textarea>
+                </div>
+                <div class="project-modal-danger" id="projectModalDangerZone" hidden>
+                  <div class="project-modal-danger-title">Zona de perigo</div>
+                  <p class="project-modal-danger-text">
+                    Tem certeza que quer fazer isso? Essa ação não poderá ser desfeita.
+                  </p>
+                  <label class="project-modal-danger-confirm">
+                    <input type="checkbox" id="projectModalDeleteConfirm" />
+                    <span>Entendo que essa ação é irreversível e quero continuar.</span>
+                  </label>
+                  <button type="button" class="btn danger project-modal-delete-btn" id="projectModalDeleteBtn" disabled>
+                    Excluir projeto
+                  </button>
                 </div>
               </form>
               <div class="modal-footer">
@@ -1774,10 +1915,198 @@
             </div>
           </div>
 
-          <div class="page" id="page-queues" data-title="Filas">
-            <div class="section empty-state">
-              <h2>Filas</h2>
-              <p>Esta página exibirá filas de execução e seus status. Em breve.</p>
+          <div class="modal" id="automationModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog automation-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="automationModalTitle">
+              <form id="automationModalForm" novalidate>
+                <div class="modal-header">
+                  <h3 id="automationModalTitle">Criar automação</h3>
+                  <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body automation-modal-body">
+                  <p id="automationModalError" class="modal-form-error" role="alert" hidden></p>
+
+                  <section class="automation-modal-section">
+                    <div class="modal-row">
+                      <div>
+                        <label class="modal-label modal-label--required" for="automationModalName">Nome da automação</label>
+                        <input
+                          class="modal-input"
+                          id="automationModalName"
+                          name="automation_name"
+                          type="text"
+                          maxlength="200"
+                          autocomplete="off"
+                          placeholder="Ex.: Wiki_teste"
+                          required
+                        />
+                        <p class="modal-field-hint">Introduza um nome descritivo para a automação.</p>
+                      </div>
+                      <div>
+                        <label class="modal-label modal-label--required" for="automationModalPriority">Prioridade</label>
+                        <div class="hub-select-wrap hub-select-wrap--block">
+                          <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">flag</span>
+                          <select id="automationModalPriority" class="hub-select" aria-label="Prioridade da automação" required>
+                            <option value="medium">Média</option>
+                            <option value="high">Alta</option>
+                            <option value="low">Baixa</option>
+                          </select>
+                          <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <label class="modal-label" for="automationModalDescription">Descrição</label>
+                    <textarea
+                      class="modal-textarea"
+                      id="automationModalDescription"
+                      name="automation_description"
+                      rows="5"
+                      maxlength="4000"
+                      placeholder="Descreva brevemente o que esta automação faz"
+                    ></textarea>
+                    <p class="modal-field-hint">Descreva brevemente o que esta automação faz.</p>
+                  </section>
+
+                  <section class="automation-modal-section">
+                    <h4 class="automation-modal-section-title">Pacote e versão</h4>
+                    <label class="modal-label" for="automationModalPackageSearch">Pesquisar pacotes</label>
+                    <input
+                      class="modal-input"
+                      id="automationModalPackageSearch"
+                      name="automation_package_search"
+                      type="text"
+                      autocomplete="off"
+                      placeholder="Escreva para filtrar pacotes por nome ou descrição"
+                    />
+                    <p class="modal-field-hint">Escreva para filtrar pacotes por nome ou descrição.</p>
+
+                    <div class="modal-row">
+                      <div>
+                        <label class="modal-label modal-label--required" for="automationModalPackage">Selecionar pacote</label>
+                        <div class="hub-select-wrap hub-select-wrap--block">
+                          <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">inventory_2</span>
+                          <select id="automationModalPackage" class="hub-select" aria-label="Selecionar pacote" required></select>
+                          <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                        </div>
+                        <p class="modal-field-hint" id="automationModalPackageHint">0 pacotes disponíveis.</p>
+                      </div>
+                      <div>
+                        <label class="modal-label modal-label--required" for="automationModalVersion">Versão</label>
+                        <div class="hub-select-wrap hub-select-wrap--block">
+                          <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">history</span>
+                          <select id="automationModalVersion" class="hub-select" aria-label="Versão do pacote" required></select>
+                          <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="automation-modal-section automation-modal-section--last">
+                    <h4 class="automation-modal-section-title">Parâmetros de configuração</h4>
+                    <label class="modal-label" for="automationModalParams">Parâmetros (formato JSON)</label>
+                    <textarea
+                      class="modal-textarea automation-modal-code"
+                      id="automationModalParams"
+                      name="automation_params"
+                      rows="5"
+                      spellcheck="false"
+                      placeholder="{ }"
+                    >{}</textarea>
+                    <p class="modal-field-hint">Introduza parâmetros em JSON válido. Exemplo: {"input_file":"data.csv","timeout":30}</p>
+                  </section>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-modal-close type="button">Cancelar</button>
+                  <button class="btn primary" type="submit" id="automationModalSubmit">Criar automação</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="page" id="page-voice-messaging" data-title="Mensageria por voz">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Mensageria por voz</h2>
+                  <p class="page-subtitle">Estruture jornadas de voz e acompanhe a operação deste canal em um único lugar.</p>
+                </div>
+              </div>
+              <div class="info-banner">
+                Esta página-base já está pronta no padrão visual do projeto. O conteúdo funcional pode ser encaixado aqui no próximo passo.
+              </div>
+              <div class="panel-row">
+                <div class="panel panel-wide">
+                  <div class="panel-header">
+                    <h3>Visão geral</h3>
+                  </div>
+                  <div class="panel-empty">Espaço reservado para indicadores, filtros e status da mensageria por voz.</div>
+                </div>
+                <div class="panel panel-mid">
+                  <div class="panel-header">
+                    <h3>Próximos blocos</h3>
+                  </div>
+                  <div class="panel-empty">Aqui entram ações rápidas, cards de resumo ou qualquer conteúdo que você enviar depois.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-campaigns" data-title="Campanhas">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Campanhas</h2>
+                  <p class="page-subtitle">Centralize criação, acompanhamento e performance das campanhas dentro da área de Automação.</p>
+                </div>
+              </div>
+              <div class="info-banner">
+                Estrutura inicial criada para manter consistência com o restante do painel. O conteúdo detalhado pode ser adicionado depois.
+              </div>
+              <div class="panel-row">
+                <div class="panel panel-wide">
+                  <div class="panel-header">
+                    <h3>Painel principal</h3>
+                  </div>
+                  <div class="panel-empty">Espaço reservado para lista de campanhas, filtros, status e ações da página.</div>
+                </div>
+                <div class="panel panel-mid">
+                  <div class="panel-header">
+                    <h3>Resumo</h3>
+                  </div>
+                  <div class="panel-empty">Área pronta para métricas, cards laterais ou fluxos complementares.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-hybrid-flows" data-title="Fluxos híbridos">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Fluxos híbridos</h2>
+                  <p class="page-subtitle">Organize experiências que combinam automação, voz, mensageria e agentes em uma mesma jornada.</p>
+                </div>
+              </div>
+              <div class="info-banner">
+                Página-base criada no padrão atual de UI. Quando você enviar o conteúdo, eu encaixo aqui sem refazer a navegação.
+              </div>
+              <div class="panel-row">
+                <div class="panel panel-wide">
+                  <div class="panel-header">
+                    <h3>Fluxos disponíveis</h3>
+                  </div>
+                  <div class="panel-empty">Espaço reservado para estrutura principal da página, listagens e estados dos fluxos híbridos.</div>
+                </div>
+                <div class="panel panel-mid">
+                  <div class="panel-header">
+                    <h3>Complementos</h3>
+                  </div>
+                  <div class="panel-empty">Aqui podem entrar atalhos, insights, etapas do fluxo ou blocos auxiliares.</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -1789,9 +2118,6 @@
                   <p class="page-subtitle">Gerencie executores, licenças e contas de serviço.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar executores">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                   <button class="btn outline">
                     <span class="material-symbols-rounded">download</span>
                     Baixar executor
@@ -1817,11 +2143,8 @@
                     <div class="license-title">
                       <h3>Uso de licenças</h3>
                       <span class="license-alert material-symbols-rounded">warning</span>
-                    </div>
-                    <div class="license-actions">
-                      <button class="icon-btn" aria-label="Atualizar licenças">
-                        <span class="material-symbols-rounded">refresh</span>
-                      </button>
+                  </div>
+                  <div class="license-actions">
                       <button class="icon-btn license-toggle" aria-label="Expandir">
                         <span class="material-symbols-rounded">expand_more</span>
                       </button>
@@ -1879,6 +2202,72 @@
                         <button class="filter-option" data-filter="status" data-value="active">Ativo</button>
                         <button class="filter-option" data-filter="status" data-value="suspended">Suspenso</button>
                         <button class="filter-option" data-filter="status" data-value="revoked">Revogado</button>
+                      </div>
+                    </div>
+                  </div>
+
+                          <div class="agent-capability-inline-toggle">
+                            <div>
+                              <strong>Reproduzir áudio do assistente</strong>
+                              <p>Desligue para usar apenas o microfone sem ouvir as respostas em voz.</p>
+                            </div>
+                            <label class="switch">
+                              <input type="checkbox" id="agentModalAudioPlayback" name="audio_playback" checked />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+
+                          <div class="agent-capability-inline-toggle">
+                            <div>
+                              <strong>Modo fone de ouvido</strong>
+                              <p>Reduz o cancelamento de eco do navegador para deixar a sua voz mais natural quando estiver com fone fechado.</p>
+                            </div>
+                            <label class="switch">
+                              <input type="checkbox" id="agentModalHeadphoneMode" name="headphone_mode" />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+
+                          <div class="agent-capability-inline-toggle">
+                            <div>
+                              <strong>Não capturar microfone enquanto o assistente fala</strong>
+                              <p>Evita que o microfone pegue a voz do assistente e reduz interrupções indesejadas.</p>
+                            </div>
+                            <label class="switch">
+                              <input type="checkbox" id="agentModalMuteMicWhileSpeaking" name="mute_mic_while_speaking" />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+
+                          <div class="modal-row">
+                            <div>
+                              <label class="modal-label" for="agentModalMicProfile">Perfil do microfone</label>
+                              <div class="hub-select-wrap hub-select-wrap--block">
+                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">mic</span>
+                                <select class="hub-select" id="agentModalMicProfile" aria-label="Perfil do microfone">
+                                  <option value="default">Padrão</option>
+                                  <option value="speech">Focado em fala</option>
+                                  <option value="noisy">Ambiente ruidoso</option>
+                                </select>
+                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                              </div>
+                              <p class="modal-field-hint">Define como o navegador trata eco, ruído e ganho.</p>
+                            </div>
+                            <div>
+                              <label class="modal-label" for="agentModalInterruptSensitivity">Sensibilidade da interrupção por voz</label>
+                              <div class="hub-select-wrap hub-select-wrap--block">
+                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">equalizer</span>
+                                <select class="hub-select" id="agentModalInterruptSensitivity" aria-label="Sensibilidade da interrupção por voz">
+                                  <option value="default">Padrão</option>
+                                  <option value="low">Baixa</option>
+                                  <option value="high">Alta</option>
+                                </select>
+                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                              </div>
+                              <p class="modal-field-hint">Ajusta o quanto a fala do usuário interrompe respostas em andamento.</p>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1954,9 +2343,6 @@
                     <span class="monitoring-updated">Última atualização: 13:57:13</span>
                   </div>
                   <div class="monitoring-actions">
-                    <button class="icon-btn" aria-label="Atualizar monitoramento">
-                      <span class="material-symbols-rounded">refresh</span>
-                    </button>
                   </div>
                 </div>
                 <div class="status-cards">
@@ -2073,9 +2459,6 @@
                     <p>Monitore uso, políticas e saúde do sistema.</p>
                   </div>
                   <div class="licenses-actions">
-                    <button class="icon-btn" aria-label="Atualizar licenças">
-                      <span class="material-symbols-rounded">refresh</span>
-                    </button>
                   </div>
                 </div>
                 <div class="license-metrics">
@@ -2176,11 +2559,8 @@
                 <div class="page-header">
                   <div>
                     <h3>Contas de serviço</h3>
-                  </div>
-                  <div class="page-actions">
-                    <button class="icon-btn" aria-label="Atualizar contas de serviço">
-                      <span class="material-symbols-rounded">refresh</span>
-                    </button>
+                </div>
+                <div class="page-actions">
                     <button class="btn primary">
                       <span class="material-symbols-rounded">add</span>
                       Adicionar conta
@@ -2232,9 +2612,6 @@
                   <p class="page-subtitle">Upload, versão e implantação de pacotes.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar pacotes">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                   <button class="btn primary">
                     <span class="material-symbols-rounded">cloud_upload</span>
                     Enviar pacote
@@ -2363,13 +2740,10 @@
                 <div>
                   <h2>Canais</h2>
                   <p class="page-subtitle">
-                    Gerencie os canais que o Hub 360 usa para se comunicar com clientes em mensageria, fluxo híbrido e agentes IA.
+                    Gerencie os canais que o Hub 360 usa para se comunicar com clientes em mensageria, voz e jornadas híbridas.
                   </p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar canais">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                   <button class="btn primary" id="openChannelModal" type="button">
                     Nova integração
                   </button>
@@ -2870,9 +3244,6 @@
                   <p class="page-subtitle">Controle de acesso, papéis e permissões.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar usuários">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                   <button class="btn outline">
                     <span class="material-symbols-rounded">group</span>
                     Gerenciar funções
@@ -3082,9 +3453,6 @@
                   </p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar" type="button">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                 </div>
               </div>
               <div class="history-hierarchy-legend" aria-hidden="true">
@@ -3234,9 +3602,6 @@
                   <p class="page-subtitle">Histórico de eventos e alterações no sistema.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar logs">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                 </div>
               </div>
               <div class="stats-cards">
@@ -3659,9 +4024,6 @@
                   <p class="page-subtitle">Gerencie ambientes e limites de recursos.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="icon-btn" aria-label="Atualizar ambientes">
-                    <span class="material-symbols-rounded">refresh</span>
-                  </button>
                   <button class="btn primary">Criar ambiente</button>
                 </div>
               </div>

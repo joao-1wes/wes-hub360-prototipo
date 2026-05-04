@@ -29,6 +29,7 @@ const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
 const auditFilterBtn = document.getElementById('auditFilterBtn');
 const auditFilterMenu = document.getElementById('auditFilterMenu');
+const directChatFab = document.getElementById('directChatFab');
 const agentsCreateMenu = document.getElementById('agentsCreateMenu');
 const agentsCreateMenuToggle = document.getElementById('agentsCreateMenuToggle');
 const agentsCreateMenuWrap = document.querySelector('.agents-create-menu-wrap');
@@ -100,6 +101,20 @@ const telegramSummaryBotId = document.getElementById('telegramSummaryBotId');
 const telegramSummaryTestStatus = document.getElementById('telegramSummaryTestStatus');
 const appToast = document.getElementById('appToast');
 const appToastMessage = document.getElementById('appToastMessage');
+const openAutomationModal = document.getElementById('openAutomationModal');
+const automationModal = document.getElementById('automationModal');
+const automationModalForm = document.getElementById('automationModalForm');
+const automationModalTitle = document.getElementById('automationModalTitle');
+const automationModalError = document.getElementById('automationModalError');
+const automationModalName = document.getElementById('automationModalName');
+const automationModalPriority = document.getElementById('automationModalPriority');
+const automationModalDescription = document.getElementById('automationModalDescription');
+const automationModalPackageSearch = document.getElementById('automationModalPackageSearch');
+const automationModalPackage = document.getElementById('automationModalPackage');
+const automationModalPackageHint = document.getElementById('automationModalPackageHint');
+const automationModalVersion = document.getElementById('automationModalVersion');
+const automationModalParams = document.getElementById('automationModalParams');
+const automationModalSubmit = document.getElementById('automationModalSubmit');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
 const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
@@ -107,8 +122,10 @@ const settingsPanels = document.querySelectorAll('#page-settings .settings-panel
 const pages = document.querySelectorAll('.page');
 const navLinks = document.querySelectorAll('.nav-item[data-route], .submenu-item[href^="#/"]');
 const detailsToggles = document.querySelectorAll('.details-toggle');
+const automationStatusSwitches = document.querySelectorAll('.automation-status-switch .switch input');
 const automationTabs = document.querySelectorAll('#page-automations .tab');
 const automationPanels = document.querySelectorAll('#page-automations .tab-panel');
+const automationsTable = document.querySelector('#page-automations .automations-table');
 const executorTabs = document.querySelectorAll('#page-executors .tab');
 const executorPanels = document.querySelectorAll('#page-executors .tab-panel');
 const usersTabs = document.querySelectorAll('#page-users .tab');
@@ -128,6 +145,26 @@ const AGENT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesAgentEnvironmentOverrides';
 const PROJECT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesProjectEnvironmentOverrides';
 const PROJECT_PROMPT_OVERRIDES_STORAGE_KEY = 'wesProjectPromptOverrides';
 const TELEGRAM_HELP_CARD_DISMISSED_STORAGE_KEY = 'wesTelegramHelpCardDismissed';
+const AUTOMATION_PACKAGE_OPTIONS = Object.freeze([
+  {
+    id: 'teste_wiki',
+    label: 'teste_wiki',
+    description: 'Pacote criado pelo Executor WES Java',
+    versions: ['v1.0.0'],
+  },
+  {
+    id: 'reports',
+    label: 'reports',
+    description: 'Pacote para geração de relatórios operacionais.',
+    versions: ['v2.1.0', 'v2.0.0'],
+  },
+  {
+    id: 'queues',
+    label: 'queues',
+    description: 'Pacote de monitoramento e alertas de filas críticas.',
+    versions: ['v1.4.0', 'v1.3.0'],
+  },
+]);
 
 let agentsPageEnvironmentId = '';
 let agentEnvironmentOverrides = readAgentEnvironmentOverrides();
@@ -155,6 +192,52 @@ let appToastTimer = null;
 let telegramConnectionValidated = false;
 let telegramTestSent = false;
 
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}
+
+function resetDashboardScrollPosition() {
+  const targets = [
+    document.scrollingElement,
+    document.documentElement,
+    document.body,
+    document.querySelector('.main'),
+    document.querySelector('.content'),
+  ].filter(Boolean);
+
+  targets.forEach((target) => {
+    target.scrollTop = 0;
+    target.scrollLeft = 0;
+  });
+
+  window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+}
+
+let routeScrollLockTimer = null;
+
+function forceRouteScrollTop(routeKey) {
+  if (routeScrollLockTimer) {
+    clearInterval(routeScrollLockTimer);
+    routeScrollLockTimer = null;
+  }
+
+  const shouldLock = routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/');
+  if (!shouldLock) {
+    resetDashboardScrollPosition();
+    return;
+  }
+
+  const startedAt = Date.now();
+  resetDashboardScrollPosition();
+  routeScrollLockTimer = window.setInterval(() => {
+    resetDashboardScrollPosition();
+    if (Date.now() - startedAt >= 1500) {
+      clearInterval(routeScrollLockTimer);
+      routeScrollLockTimer = null;
+    }
+  }, 32);
+}
+
 function scheduleLucideRefresh() {
   if (!window.lucide?.createIcons || lucideRefreshQueued) return;
   lucideRefreshQueued = true;
@@ -169,6 +252,7 @@ function scheduleLucideRefresh() {
 }
 
 window.scheduleLucideRefresh = scheduleLucideRefresh;
+enhanceFilterOptionIcons();
 
 function normalizeTelegramUsername(value) {
   return value.replace(/^@+/, '').replace(/\s+/g, '').trim();
@@ -381,6 +465,152 @@ function syncTelegramIntegrationStatus() {
   telegramIntegrationStatusValue.textContent = isActive ? 'Ativa' : 'Pausada';
   statusWrap?.classList.toggle('is-active', isActive);
   statusWrap?.classList.toggle('is-paused', !isActive);
+}
+
+function syncAutomationStatusSwitch(input) {
+  const wrap = input?.closest('.automation-status-switch');
+  const label = wrap?.querySelector('.automation-status-switch-label');
+  if (!wrap || !label) return;
+  const isActive = input.checked;
+  wrap.classList.toggle('is-active', isActive);
+  wrap.classList.toggle('is-inactive', !isActive);
+  label.textContent = isActive ? 'Ativo' : 'Inativo';
+}
+
+function enhanceFilterOptionIcons() {
+  const filterOptions = document.querySelectorAll('.filter-option');
+  if (!filterOptions.length) return;
+
+  filterOptions.forEach((option) => {
+    if (option.querySelector('.filter-option-check')) return;
+    const icon = document.createElement('span');
+    icon.className = 'filter-option-check';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5"></path>
+      </svg>
+    `;
+    option.appendChild(icon);
+  });
+}
+
+function getAutomationPackageById(packageId) {
+  return AUTOMATION_PACKAGE_OPTIONS.find((item) => item.id === packageId) || null;
+}
+
+function filterAutomationPackages(searchText = '') {
+  const normalized = String(searchText || '').trim().toLowerCase();
+  if (!normalized) return [...AUTOMATION_PACKAGE_OPTIONS];
+  return AUTOMATION_PACKAGE_OPTIONS.filter((item) => {
+    const haystack = `${item.label} ${item.description}`.toLowerCase();
+    return haystack.includes(normalized);
+  });
+}
+
+function getAutomationPriorityLabel(priority) {
+  if (priority === 'high') return 'Alta';
+  if (priority === 'low') return 'Baixa';
+  return 'Média';
+}
+
+function getAutomationPriorityClass(priority) {
+  if (priority === 'high') return 'priority-high';
+  if (priority === 'low') return 'priority-low';
+  return 'priority-medium';
+}
+
+function slugifyAutomationName(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function formatAutomationPackageDisplay(packageId, version) {
+  const pkg = getAutomationPackageById(packageId);
+  const label = pkg?.label || String(packageId || '').trim();
+  return version ? `${label} • ${version}` : label;
+}
+
+function formatAutomationParamsValue(rawValue) {
+  const fallback = '{}';
+  const sourceText = String(rawValue || '').trim();
+  if (!sourceText) return fallback;
+
+  try {
+    return JSON.stringify(JSON.parse(sourceText), null, 2);
+  } catch {
+    return sourceText;
+  }
+}
+
+function createAutomationRow(data) {
+  const row = document.createElement('div');
+  const automationId = String(data.id || '').trim() || `automacao-${Date.now()}`;
+  const status = data.status === 'inactive' ? 'inactive' : 'active';
+  const switchId = `automationStatus${automationId.replace(/[^a-zA-Z0-9]+/g, '') || Date.now()}`;
+  const priority = data.priority === 'high' || data.priority === 'low' ? data.priority : 'medium';
+  const packageDisplay = formatAutomationPackageDisplay(data.packageId, data.version);
+
+  row.className = 'data-row automation-row';
+  row.dataset.automationId = automationId;
+  row.dataset.automationName = data.name;
+  row.dataset.automationDescription = data.description;
+  row.dataset.automationPackage = data.packageId;
+  row.dataset.automationVersion = data.version;
+  row.dataset.automationPriority = priority;
+  row.dataset.automationParams = JSON.stringify(data.paramsObject || {});
+  row.dataset.automationStatus = status;
+
+  row.innerHTML = `
+    <span>${escapeHtmlWes(data.name)}</span>
+    <span class="muted">${escapeHtmlWes(data.description)}</span>
+    <span>${escapeHtmlWes(packageDisplay)}</span>
+    <span>${escapeHtmlWes(data.lastExecution || 'Ainda não executada')}</span>
+    <span class="chip ${getAutomationPriorityClass(priority)}">${getAutomationPriorityLabel(priority)}</span>
+    <span class="automation-status-switch ${status === 'active' ? 'is-active' : 'is-inactive'}">
+      <label class="switch small" for="${escapeHtmlWes(switchId)}">
+        <input type="checkbox" id="${escapeHtmlWes(switchId)}" ${status === 'active' ? 'checked' : ''} />
+        <span class="switch-track"></span>
+      </label>
+      <span class="automation-status-switch-label">${status === 'active' ? 'Ativo' : 'Inativo'}</span>
+    </span>
+    <span class="row-actions">
+      <button class="icon-btn action-icon" aria-label="Executar" type="button">
+        <span class="material-symbols-rounded">play_arrow</span>
+      </button>
+      <button class="icon-btn action-icon automation-edit-trigger" aria-label="Editar" type="button">
+        <span class="material-symbols-rounded">edit</span>
+      </button>
+      <button class="icon-btn action-icon danger automation-delete-trigger" aria-label="Excluir" type="button">
+        <span class="material-symbols-rounded">delete</span>
+      </button>
+    </span>
+  `;
+
+  return row;
+}
+
+function readAutomationRowData(row) {
+  if (!row) return null;
+  const cells = row.querySelectorAll(':scope > span');
+  const paramsValue = formatAutomationParamsValue(row.dataset.automationParams);
+  const statusInput = row.querySelector('.automation-status-switch input');
+
+  return {
+    id: String(row.dataset.automationId || '').trim(),
+    name: String(row.dataset.automationName || cells[0]?.textContent || '').trim(),
+    description: String(row.dataset.automationDescription || cells[1]?.textContent || '').trim(),
+    packageId: String(row.dataset.automationPackage || '').trim(),
+    version: String(row.dataset.automationVersion || '').trim(),
+    priority: String(row.dataset.automationPriority || 'medium').trim(),
+    params: paramsValue,
+    lastExecution: String(cells[3]?.textContent || '').trim(),
+    status: statusInput?.checked ? 'active' : 'inactive',
+  };
 }
 
 function clearChatSpeechState() {
@@ -946,7 +1176,11 @@ if (openAgentModal && agentModal) {
   openAgentModal.addEventListener('click', async () => {
     closeAgentsCreateMenu();
     if (typeof refreshHubScopeFromApi === 'function' && window.WesDashboardAuth?.isAuthenticated()) {
-      await refreshHubScopeFromApi();
+      try {
+        await refreshHubScopeFromApi();
+      } catch (error) {
+        console.warn('Não foi possível atualizar o escopo antes de abrir o modal de agente.', error);
+      }
     }
     if (typeof hubSyncFromState === 'function') hubSyncFromState();
     const errEl = document.getElementById('agentModalError');
@@ -958,10 +1192,24 @@ if (openAgentModal && agentModal) {
     const ctxWrap = ctxSelect?.closest('.hub-select-wrap');
     const form = document.getElementById('agentModalForm');
     const descInput = document.getElementById('agentModalDescription');
+    const nameCounter = document.getElementById('agentModalNameCounter');
+    const descCounter = document.getElementById('agentModalDescriptionCounter');
     const promptInput = document.getElementById('agentModalSystemPrompt');
-    const promptEnhanceBtn = document.getElementById('agentModalPromptEnhance');
+    const promptCounter = document.getElementById('agentModalPromptCounter');
     const ragInput = document.getElementById('agentModalUseRag');
-    const ragLabel = document.getElementById('agentModalRagLabel');
+    const submitBtn = document.getElementById('agentModalSubmit');
+    const voiceInput = document.getElementById('agentModalVoiceEnabled');
+    const voiceOptions = document.getElementById('agentModalVoiceOptions');
+    const voiceLocale = document.getElementById('agentModalVoiceLocale');
+    const voiceSelect = document.getElementById('agentModalVoice');
+    const voicePreviewButton = document.getElementById('agentModalVoicePreview');
+    const audioPlayback = document.getElementById('agentModalAudioPlayback');
+    const headphoneMode = document.getElementById('agentModalHeadphoneMode');
+    const muteMicWhileSpeaking = document.getElementById('agentModalMuteMicWhileSpeaking');
+    const micProfile = document.getElementById('agentModalMicProfile');
+    const interruptSensitivity = document.getElementById('agentModalInterruptSensitivity');
+    const audioPanelBody = document.getElementById('agentModalAudioPanelBody');
+    const audioPanelToggle = document.getElementById('agentModalAudioToggle');
     if (errEl) {
       errEl.textContent = '';
       errEl.hidden = true;
@@ -969,9 +1217,38 @@ if (openAgentModal && agentModal) {
     form?.reset();
     if (descInput) descInput.value = '';
     if (promptInput) promptInput.value = '';
-    if (promptEnhanceBtn) promptEnhanceBtn.hidden = true;
+    if (nameCounter) nameCounter.textContent = '0/200';
+    if (descCounter) descCounter.textContent = '0/4000';
+    if (promptCounter) promptCounter.textContent = '0/20000';
     if (ragInput) ragInput.checked = false;
-    if (ragLabel) ragLabel.textContent = 'Não';
+    if (voiceInput) voiceInput.checked = false;
+    if (voiceOptions) {
+      voiceOptions.classList.add('is-hidden');
+      voiceOptions.hidden = true;
+    }
+    if (voiceLocale) voiceLocale.value = 'pt-BR';
+    if (voiceSelect) voiceSelect.value = 'Antonio';
+    if (voiceLocale) voiceLocale.disabled = true;
+    if (voiceSelect) voiceSelect.disabled = true;
+    if (voicePreviewButton) voicePreviewButton.disabled = true;
+    if (audioPanelToggle) audioPanelToggle.disabled = true;
+    if (audioPlayback) audioPlayback.disabled = true;
+    if (headphoneMode) headphoneMode.disabled = true;
+    if (muteMicWhileSpeaking) muteMicWhileSpeaking.disabled = true;
+    if (micProfile) micProfile.disabled = true;
+    if (interruptSensitivity) interruptSensitivity.disabled = true;
+    if (audioPlayback) audioPlayback.checked = true;
+    if (headphoneMode) headphoneMode.checked = false;
+    if (muteMicWhileSpeaking) muteMicWhileSpeaking.checked = false;
+    if (micProfile) micProfile.value = 'default';
+    if (interruptSensitivity) interruptSensitivity.value = 'default';
+    if (audioPanelBody) {
+      audioPanelBody.classList.remove('is-hidden');
+      audioPanelBody.hidden = false;
+    }
+    if (audioPanelToggle) {
+      audioPanelToggle.setAttribute('aria-expanded', 'true');
+    }
     if (newCtxInput) newCtxInput.value = '';
     if (newCtxPanel) {
       newCtxPanel.classList.add('is-hidden');
@@ -991,6 +1268,7 @@ if (openAgentModal && agentModal) {
       backToExistingLink.hidden = true;
     }
     if (agentModal) agentModal.dataset.contextMode = 'existing';
+    if (submitBtn) submitBtn.disabled = true;
     agentModal.classList.add('open');
     agentModal.setAttribute('aria-hidden', 'false');
     if (typeof hubRefreshCustomSelects === 'function') hubRefreshCustomSelects();
@@ -1019,11 +1297,25 @@ if (openAgentModal && agentModal) {
   const newCtxNameInput = document.getElementById('agentModalNewContextName');
   const ctxWrap = ctxSel?.closest('.hub-select-wrap');
   const nameInput = document.getElementById('agentModalName');
+  const nameCounter = document.getElementById('agentModalNameCounter');
   const descInput = document.getElementById('agentModalDescription');
+  const descCounter = document.getElementById('agentModalDescriptionCounter');
   const promptInput = document.getElementById('agentModalSystemPrompt');
+  const promptCounter = document.getElementById('agentModalPromptCounter');
   const promptEnhanceBtn = document.getElementById('agentModalPromptEnhance');
+  const voiceEnabledInput = document.getElementById('agentModalVoiceEnabled');
+  const voiceOptions = document.getElementById('agentModalVoiceOptions');
+  const voiceLocaleSelect = document.getElementById('agentModalVoiceLocale');
+  const voiceSelect = document.getElementById('agentModalVoice');
+  const voicePreviewButton = document.getElementById('agentModalVoicePreview');
+  const audioToggle = document.getElementById('agentModalAudioToggle');
+  const audioPanelBody = document.getElementById('agentModalAudioPanelBody');
+  const audioPlaybackInput = document.getElementById('agentModalAudioPlayback');
+  const headphoneModeInput = document.getElementById('agentModalHeadphoneMode');
+  const muteMicWhileSpeakingInput = document.getElementById('agentModalMuteMicWhileSpeaking');
+  const micProfileSelect = document.getElementById('agentModalMicProfile');
+  const interruptSensitivitySelect = document.getElementById('agentModalInterruptSensitivity');
   const ragInput = document.getElementById('agentModalUseRag');
-  const ragLabel = document.getElementById('agentModalRagLabel');
   const submitBtn = document.getElementById('agentModalSubmit');
   if (!modal || !form || !environmentSel || !projectSel || !nameInput || !promptInput || !submitBtn) return;
 
@@ -1044,24 +1336,29 @@ if (openAgentModal && agentModal) {
     }
   }
 
-  function syncRagLabel() {
-    if (ragLabel && ragInput) {
-      ragLabel.textContent = ragInput.checked ? 'Sim' : 'Não';
-    }
+  function updateCounter(input, counter, maxLength) {
+    if (!input || !counter) return;
+    const current = String(input.value || '').length;
+    counter.textContent = `${current}/${maxLength}`;
   }
 
-  function improveAgentSystemPrompt(rawText) {
+  function improveAgentSystemPrompt(rawText, context = {}) {
     const normalized = String(rawText || '')
       .replace(/\s+/g, ' ')
       .replace(/\s*([,.;:!?])/g, '$1')
       .trim();
-    if (!normalized) return '';
+    const fallbackObjective = [
+      String(context.name || '').trim(),
+      String(context.description || '').trim(),
+    ].filter(Boolean).join(' - ');
+    const baseText = normalized || fallbackObjective || 'Atender solicitações de forma clara, objetiva e útil';
     const objective = /[.!?]$/.test(normalized) ? normalized : `${normalized}.`;
+
     return [
       'Você é um agente especializado nas instruções abaixo.',
       '',
       'Objetivo principal:',
-      `- ${objective}`,
+      `- ${/[.!?]$/.test(baseText) ? baseText : `${baseText}.`}`,
       '',
       'Como agir:',
       '- Responda sempre em português do Brasil.',
@@ -1072,9 +1369,34 @@ if (openAgentModal && agentModal) {
     ].join('\n');
   }
 
-  function syncAgentPromptEnhanceVisibility() {
-    if (!promptEnhanceBtn || !promptInput) return;
-    promptEnhanceBtn.hidden = !promptInput.value.trim();
+  function syncAgentSubmitState() {
+    const hasName = Boolean(nameInput.value.trim());
+    const hasPrompt = Boolean(promptInput.value.trim());
+    const hasEnvironment = Boolean(String(environmentSel.value || '').trim());
+    submitBtn.disabled = !(hasName && hasPrompt && hasEnvironment) || submitBtn.classList.contains('is-loading');
+  }
+
+  function syncVoiceOptionsVisibility() {
+    if (!voiceEnabledInput || !voiceOptions) return;
+    const isEnabled = voiceEnabledInput.checked;
+    voiceOptions.classList.toggle('is-hidden', !isEnabled);
+    voiceOptions.hidden = !isEnabled;
+    if (voiceLocaleSelect) voiceLocaleSelect.disabled = !isEnabled;
+    if (voiceSelect) voiceSelect.disabled = !isEnabled;
+    if (voicePreviewButton) voicePreviewButton.disabled = !isEnabled;
+    if (audioToggle) audioToggle.disabled = !isEnabled;
+    if (audioPlaybackInput) audioPlaybackInput.disabled = !isEnabled;
+    if (headphoneModeInput) headphoneModeInput.disabled = !isEnabled;
+    if (muteMicWhileSpeakingInput) muteMicWhileSpeakingInput.disabled = !isEnabled;
+    if (micProfileSelect) micProfileSelect.disabled = !isEnabled;
+    if (interruptSensitivitySelect) interruptSensitivitySelect.disabled = !isEnabled;
+  }
+
+  function syncAudioPanelState(isExpanded) {
+    if (!audioToggle || !audioPanelBody) return;
+    audioToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+    audioPanelBody.classList.toggle('is-hidden', !isExpanded);
+    audioPanelBody.hidden = !isExpanded;
   }
 
   function setAgentModalNewContextMode(isNew) {
@@ -1102,8 +1424,6 @@ if (openAgentModal && agentModal) {
     }
   }
 
-  ragInput?.addEventListener('change', syncRagLabel);
-  syncRagLabel();
   setAgentModalNewContextMode(false);
   projectSel.addEventListener('change', () => {
     fillAgentModalContextOptions(projectSel.value, '');
@@ -1119,18 +1439,56 @@ if (openAgentModal && agentModal) {
     hubRefreshCustomSelects();
     ctxSel?.focus();
   });
-  promptInput?.addEventListener('input', syncAgentPromptEnhanceVisibility);
+
+  nameInput?.addEventListener('input', () => {
+    updateCounter(nameInput, nameCounter, 200);
+    syncAgentSubmitState();
+  });
+  descInput?.addEventListener('input', () => {
+    updateCounter(descInput, descCounter, 4000);
+  });
+  promptInput?.addEventListener('input', () => {
+    updateCounter(promptInput, promptCounter, 20000);
+    syncAgentSubmitState();
+  });
+  environmentSel?.addEventListener('change', syncAgentSubmitState);
+  voiceEnabledInput?.addEventListener('change', syncVoiceOptionsVisibility);
+  audioToggle?.addEventListener('click', () => {
+    const isExpanded = audioToggle.getAttribute('aria-expanded') !== 'true';
+    syncAudioPanelState(isExpanded);
+  });
   promptEnhanceBtn?.addEventListener('click', () => {
     const currentPrompt = promptInput.value.trim();
-    if (!currentPrompt) {
-      promptInput.focus();
-      return;
-    }
-    promptInput.value = improveAgentSystemPrompt(currentPrompt);
-    syncAgentPromptEnhanceVisibility();
+    promptInput.value = improveAgentSystemPrompt(currentPrompt, {
+      name: nameInput.value.trim(),
+      description: descInput?.value?.trim() || '',
+    });
+    updateCounter(promptInput, promptCounter, 20000);
+    syncAgentSubmitState();
     promptInput.focus();
   });
-  syncAgentPromptEnhanceVisibility();
+  voicePreviewButton?.addEventListener('click', () => {
+    if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance === 'undefined') return;
+    const utterance = new window.SpeechSynthesisUtterance('Olá. Esta é uma prévia da voz configurada para o agente.');
+    const selectedLocale = String(voiceLocaleSelect?.value || 'pt-BR').toLowerCase();
+    const selectedVoiceName = String(voiceSelect?.value || '').trim().toLowerCase();
+    const voices = window.speechSynthesis.getVoices?.() || [];
+    utterance.lang = String(voiceLocaleSelect?.value || 'pt-BR');
+    utterance.voice =
+      voices.find((voice) => String(voice.name || '').toLowerCase().includes(selectedVoiceName) && String(voice.lang || '').toLowerCase() === selectedLocale) ||
+      voices.find((voice) => String(voice.lang || '').toLowerCase() === selectedLocale) ||
+      voices.find((voice) => String(voice.lang || '').toLowerCase().startsWith(selectedLocale.split('-')[0])) ||
+      null;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
+  });
+
+  updateCounter(nameInput, nameCounter, 200);
+  updateCounter(descInput, descCounter, 4000);
+  updateCounter(promptInput, promptCounter, 20000);
+  syncAudioPanelState(true);
+  syncVoiceOptionsVisibility();
+  syncAgentSubmitState();
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -1147,15 +1505,15 @@ if (openAgentModal && agentModal) {
       nameInput.focus();
       return;
     }
+    if (!selectedEnvironmentId) {
+      environmentSel.focus();
+      return;
+    }
     if (!systemPrompt) {
       promptInput.focus();
       return;
     }
     const description = descInput?.value?.trim() || '';
-    if (!description) {
-      descInput?.focus();
-      return;
-    }
     submitBtn.disabled = true;
     submitBtn.classList.add('is-loading');
     try {
@@ -1199,8 +1557,12 @@ if (openAgentModal && agentModal) {
       form.reset();
       setAgentModalNewContextMode(false);
       syncAgentModalScope();
-      syncRagLabel();
-      syncAgentPromptEnhanceVisibility();
+      updateCounter(nameInput, nameCounter, 200);
+      updateCounter(descInput, descCounter, 4000);
+      updateCounter(promptInput, promptCounter, 20000);
+      syncAudioPanelState(true);
+      syncVoiceOptionsVisibility();
+      syncAgentSubmitState();
       if (typeof refreshAgentsTableFromApi === 'function') {
         void refreshAgentsTableFromApi();
       }
@@ -1208,8 +1570,8 @@ if (openAgentModal && agentModal) {
       const msg = err instanceof Error ? err.message : String(err);
       setError(msg);
     } finally {
-      submitBtn.disabled = false;
       submitBtn.classList.remove('is-loading');
+      syncAgentSubmitState();
     }
   });
 })();
@@ -2067,6 +2429,271 @@ if (telegramIntegrationStatus) {
   telegramIntegrationStatus.addEventListener('change', syncTelegramIntegrationStatus);
   syncTelegramIntegrationStatus();
 }
+
+if (automationStatusSwitches.length) {
+  automationStatusSwitches.forEach((input) => {
+    input.addEventListener('change', () => {
+      syncAutomationStatusSwitch(input);
+    });
+    syncAutomationStatusSwitch(input);
+  });
+}
+
+(function wireAutomationModal() {
+  if (
+    !openAutomationModal ||
+    !automationModal ||
+    !automationModalForm ||
+    !automationModalTitle ||
+    !automationModalName ||
+    !automationModalPriority ||
+    !automationModalDescription ||
+    !automationModalPackageSearch ||
+    !automationModalPackage ||
+    !automationModalPackageHint ||
+    !automationModalVersion ||
+    !automationModalParams ||
+    !automationModalSubmit ||
+    !automationsTable
+  ) {
+    return;
+  }
+
+  let activeAutomationRow = null;
+
+  function setAutomationModalError(message) {
+    if (!automationModalError) return;
+    if (message) {
+      automationModalError.textContent = message;
+      automationModalError.hidden = false;
+      const modalBody = automationModal.querySelector('.modal-body');
+      if (modalBody && typeof modalBody.scrollTo === 'function') {
+        modalBody.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    automationModalError.textContent = '';
+    automationModalError.hidden = true;
+  }
+
+  function renderAutomationVersionOptions(packageId, selectedVersion = '') {
+    const pkg = getAutomationPackageById(packageId);
+    automationModalVersion.innerHTML = '';
+
+    if (!pkg) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Selecione o pacote primeiro';
+      automationModalVersion.appendChild(option);
+      automationModalVersion.value = '';
+      automationModalVersion.disabled = true;
+      return;
+    }
+
+    pkg.versions.forEach((version) => {
+      const option = document.createElement('option');
+      option.value = version;
+      option.textContent = version;
+      automationModalVersion.appendChild(option);
+    });
+
+    automationModalVersion.disabled = false;
+    if (selectedVersion && pkg.versions.includes(selectedVersion)) {
+      automationModalVersion.value = selectedVersion;
+    } else {
+      automationModalVersion.value = pkg.versions[0] || '';
+    }
+  }
+
+  function renderAutomationPackageOptions(searchText = '', selectedPackageId = '', selectedVersion = '') {
+    const matches = filterAutomationPackages(searchText);
+    const hasSelectedOutsideFilter =
+      selectedPackageId &&
+      !matches.some((item) => item.id === selectedPackageId) &&
+      getAutomationPackageById(selectedPackageId);
+    const packagesToRender = hasSelectedOutsideFilter
+      ? [getAutomationPackageById(selectedPackageId), ...matches]
+      : matches;
+
+    automationModalPackage.innerHTML = '';
+
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = packagesToRender.length ? 'Selecione o pacote' : 'Nenhum pacote encontrado';
+    automationModalPackage.appendChild(placeholder);
+
+    packagesToRender.forEach((pkg) => {
+      if (!pkg) return;
+      const option = document.createElement('option');
+      option.value = pkg.id;
+      option.textContent = `${pkg.label} • ${pkg.description}`;
+      automationModalPackage.appendChild(option);
+    });
+
+    automationModalPackage.disabled = packagesToRender.length === 0;
+    automationModalPackageHint.textContent = `${matches.length} pacote${matches.length === 1 ? '' : 's'} disponível${matches.length === 1 ? '' : 'is'}.`;
+
+    if (selectedPackageId && packagesToRender.some((item) => item?.id === selectedPackageId)) {
+      automationModalPackage.value = selectedPackageId;
+    } else {
+      automationModalPackage.value = '';
+    }
+
+    renderAutomationVersionOptions(automationModalPackage.value, selectedVersion);
+  }
+
+  function openAutomationModalPanel(mode, row = null) {
+    activeAutomationRow = row;
+    const isEdit = mode === 'edit' && row;
+    const currentData = isEdit ? readAutomationRowData(row) : null;
+
+    automationModal.dataset.mode = isEdit ? 'edit' : 'create';
+    automationModalTitle.textContent = isEdit ? 'Editar automação' : 'Criar automação';
+    automationModalSubmit.textContent = isEdit ? 'Atualizar automação' : 'Criar automação';
+
+    automationModalForm.reset();
+    setAutomationModalError('');
+
+    automationModalPriority.value = currentData?.priority || 'medium';
+    automationModalName.value = currentData?.name || '';
+    automationModalDescription.value = currentData?.description || '';
+    automationModalPackageSearch.value = '';
+    automationModalParams.value = currentData?.params || '{}';
+
+    renderAutomationPackageOptions('', currentData?.packageId || '', currentData?.version || '');
+
+    automationModal.classList.add('open');
+    automationModal.setAttribute('aria-hidden', 'false');
+    automationModalName.focus();
+  }
+
+  function closeAutomationModalPanel() {
+    activeAutomationRow = null;
+    automationModal.classList.remove('open');
+    automationModal.setAttribute('aria-hidden', 'true');
+    setAutomationModalError('');
+  }
+
+  openAutomationModal.addEventListener('click', () => {
+    openAutomationModalPanel('create');
+  });
+
+  automationModalPackageSearch.addEventListener('input', () => {
+    renderAutomationPackageOptions(
+      automationModalPackageSearch.value,
+      automationModalPackage.value,
+      automationModalVersion.value,
+    );
+  });
+
+  automationModalPackage.addEventListener('change', () => {
+    renderAutomationVersionOptions(automationModalPackage.value);
+  });
+
+  automationModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) {
+      closeAutomationModalPanel();
+    }
+  });
+
+  automationsTable.addEventListener('click', (event) => {
+    const editButton = event.target.closest('.automation-edit-trigger');
+    if (editButton) {
+      const row = editButton.closest('.automation-row');
+      if (row) openAutomationModalPanel('edit', row);
+      return;
+    }
+
+    const deleteButton = event.target.closest('.automation-delete-trigger');
+    if (deleteButton) {
+      const row = deleteButton.closest('.automation-row');
+      if (!row) return;
+      row.remove();
+      showAppToast('Automação excluída');
+    }
+  });
+
+  automationsTable.addEventListener('change', (event) => {
+    const input = event.target.closest('.automation-status-switch input');
+    if (!input) return;
+    syncAutomationStatusSwitch(input);
+    const row = input.closest('.automation-row');
+    if (row) {
+      row.dataset.automationStatus = input.checked ? 'active' : 'inactive';
+    }
+  });
+
+  automationModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    setAutomationModalError('');
+
+    const name = String(automationModalName.value || '').trim();
+    const priority = String(automationModalPriority.value || '').trim() || 'medium';
+    const description = String(automationModalDescription.value || '').trim();
+    const packageId = String(automationModalPackage.value || '').trim();
+    const version = String(automationModalVersion.value || '').trim();
+    const paramsSource = String(automationModalParams.value || '').trim() || '{}';
+
+    if (!name) {
+      setAutomationModalError('Informe o nome da automação.');
+      automationModalName.focus();
+      return;
+    }
+
+    if (!packageId) {
+      setAutomationModalError('Selecione um pacote para a automação.');
+      automationModalPackage.focus();
+      return;
+    }
+
+    if (!version) {
+      setAutomationModalError('Selecione uma versão para o pacote.');
+      automationModalVersion.focus();
+      return;
+    }
+
+    let paramsObject;
+    try {
+      paramsObject = JSON.parse(paramsSource);
+    } catch {
+      setAutomationModalError('Os parâmetros precisam estar em JSON válido.');
+      automationModalParams.focus();
+      return;
+    }
+
+    const currentRowData = activeAutomationRow ? readAutomationRowData(activeAutomationRow) : null;
+    const rowData = {
+      id:
+        currentRowData?.id ||
+        `${slugifyAutomationName(name) || 'automacao'}-${Date.now().toString(36).slice(-4)}`,
+      name,
+      description,
+      packageId,
+      version,
+      priority,
+      paramsObject,
+      lastExecution: currentRowData?.lastExecution || 'Ainda não executada',
+      status: currentRowData?.status || 'active',
+    };
+
+    const nextRow = createAutomationRow(rowData);
+    if (activeAutomationRow) {
+      activeAutomationRow.replaceWith(nextRow);
+      showAppToast('Automação atualizada com sucesso');
+    } else {
+      const headerRow = automationsTable.querySelector('.data-row.header');
+      if (headerRow?.nextSibling) {
+        automationsTable.insertBefore(nextRow, headerRow.nextSibling);
+      } else {
+        automationsTable.appendChild(nextRow);
+      }
+      showAppToast('Automação criada com sucesso');
+    }
+
+    closeAutomationModalPanel();
+  });
+})();
 
 if (periodFilterBtn && periodFilterMenu) {
   periodFilterBtn.addEventListener('click', (event) => {
@@ -4059,6 +4686,9 @@ hubSyncFromState();
   const agentsList = document.getElementById('projectModalAgentsList');
   const promptBlock = document.getElementById('projectModalPromptBlock');
   const promptInput = document.getElementById('projectModalPrompt');
+  const dangerZone = document.getElementById('projectModalDangerZone');
+  const deleteConfirm = document.getElementById('projectModalDeleteConfirm');
+  const deleteBtn = document.getElementById('projectModalDeleteBtn');
   const submitBtn = document.getElementById('projectModalSubmit');
   if (!btn || !modal || !form || !orgSel || !environmentSel || !nameInput || !descriptionInput || !availableAgentSelect || !agentsList || !submitBtn) return;
   let projectModalInitialState = null;
@@ -4082,6 +4712,11 @@ hubSyncFromState();
     if (promptBlock) {
       promptBlock.hidden = !isEdit;
     }
+    if (dangerZone) {
+      dangerZone.hidden = !isEdit;
+    }
+    if (deleteConfirm) deleteConfirm.checked = false;
+    if (deleteBtn) deleteBtn.disabled = true;
   }
 
   function serializeProjectModalState() {
@@ -4205,6 +4840,50 @@ hubSyncFromState();
     if (e.target.closest('[data-modal-close]')) {
       closeModal();
       resetProjectModalState();
+    }
+  });
+
+  deleteConfirm?.addEventListener('change', () => {
+    if (deleteBtn) deleteBtn.disabled = !deleteConfirm.checked;
+  });
+
+  deleteBtn?.addEventListener('click', async () => {
+    if (modal.dataset.mode !== 'edit') return;
+    if (!deleteConfirm?.checked) return;
+    const projectId = String(modal.dataset.projectId || '').trim();
+    const projectTitle = String(nameInput.value || 'este projeto').trim() || 'este projeto';
+    if (!projectId || typeof window.wesApiFetch !== 'function' || !window.WesDashboardAuth?.isAuthenticated()) return;
+    const confirmed = window.confirm(
+      `Tem certeza que quer fazer isso? Essa ação não poderá ser desfeita.\n\nProjeto: ${projectTitle}`
+    );
+    if (!confirmed) return;
+    try {
+      const res = await window.wesApiFetch(`/projects/${encodeURIComponent(projectId)}`, {
+        method: 'DELETE',
+      });
+      const raw = await res.text();
+      let body = null;
+      try {
+        body = raw ? JSON.parse(raw) : null;
+      } catch {
+        body = null;
+      }
+      if (!res.ok) {
+        const detail =
+          typeof body?.detail === 'string'
+            ? body.detail
+            : Array.isArray(body?.detail)
+              ? body.detail.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join('; ')
+              : raw || res.statusText;
+        throw new Error(detail);
+      }
+      closeModal();
+      resetProjectModalState();
+      window.location.hash = '#/dashboard/agents';
+      if (typeof refreshHubScopeFromApi === 'function') await refreshHubScopeFromApi();
+      if (typeof refreshAgentsTableFromApi === 'function') await refreshAgentsTableFromApi();
+    } catch (error) {
+      window.alert(`Não foi possível excluir o projeto. ${error?.message || ''}`.trim());
     }
   });
 
@@ -4492,7 +5171,9 @@ const routeMap = {
   'dashboard/automations': 'page-automations',
   'dashboard/schedules': 'page-schedules',
   'dashboard/agents': 'page-agents',
-  'dashboard/queues': 'page-queues',
+  'dashboard/voice-messaging': 'page-voice-messaging',
+  'dashboard/campaigns': 'page-campaigns',
+  'dashboard/hybrid-flows': 'page-hybrid-flows',
   'dashboard/executors': 'page-executors',
   'dashboard/packages': 'page-packages',
   'dashboard/channels': 'page-channels',
@@ -4515,7 +5196,9 @@ const sectionMap = {
   'dashboard/automations': 'Automa\u00e7\u00e3o',
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
   'dashboard/agents': 'Automa\u00e7\u00e3o',
-  'dashboard/queues': 'Automa\u00e7\u00e3o',
+  'dashboard/voice-messaging': 'Automa\u00e7\u00e3o',
+  'dashboard/campaigns': 'Automa\u00e7\u00e3o',
+  'dashboard/hybrid-flows': 'Automa\u00e7\u00e3o',
   'dashboard/executors': 'Infraestrutura',
   'dashboard/packages': 'Infraestrutura',
   'dashboard/channels': 'Integrações',
@@ -4586,7 +5269,13 @@ const updateActivePage = () => {
   pages.forEach((pageEl) => pageEl.classList.remove('is-active'));
   if (page) {
     page.classList.add('is-active');
+    page.tabIndex = -1;
   }
+  forceRouteScrollTop(routeKey);
+  window.requestAnimationFrame(() => forceRouteScrollTop(routeKey));
+  window.setTimeout(() => forceRouteScrollTop(routeKey), 0);
+  window.setTimeout(() => forceRouteScrollTop(routeKey), 50);
+  window.setTimeout(() => forceRouteScrollTop(routeKey), 250);
 
   const navRouteKey = routeKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
@@ -4598,7 +5287,9 @@ const updateActivePage = () => {
     const hideHubScopeRoutes = [
       'dashboard/automations',
       'dashboard/schedules',
-      'dashboard/queues',
+      'dashboard/voice-messaging',
+      'dashboard/campaigns',
+      'dashboard/hybrid-flows',
       'dashboard/agents',
       'dashboard/environments'
     ];
@@ -4611,7 +5302,14 @@ const updateActivePage = () => {
   if (dashboardToggle) {
     const sectionTitle = sectionMap[navRouteKey] || sectionMap[routeKey] || 'Painel';
     dashboardToggle.textContent = sectionTitle;
-    if (navRouteKey === 'dashboard/automations' || navRouteKey === 'dashboard/schedules' || navRouteKey === 'dashboard/agents' || navRouteKey === 'dashboard/queues') {
+    if (
+      navRouteKey === 'dashboard/automations' ||
+      navRouteKey === 'dashboard/schedules' ||
+      navRouteKey === 'dashboard/agents' ||
+      navRouteKey === 'dashboard/voice-messaging' ||
+      navRouteKey === 'dashboard/campaigns' ||
+      navRouteKey === 'dashboard/hybrid-flows'
+    ) {
       dashboardToggle.textContent = 'Automação';
     }
   }
@@ -4657,6 +5355,14 @@ const updateActivePage = () => {
   if (navRouteKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/')) {
     void refreshAgentsTableFromApi();
   }
+  if (directChatFab) {
+    const hideDirectChatFab = routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/');
+    directChatFab.hidden = hideDirectChatFab;
+    directChatFab.setAttribute('aria-hidden', hideDirectChatFab ? 'true' : 'false');
+  }
+  document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
+  document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
+  document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
   if (typeof window.ensureAgentsAutoRefresh === 'function') {
     window.ensureAgentsAutoRefresh();
   }

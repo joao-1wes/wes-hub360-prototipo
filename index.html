@@ -110,6 +110,52 @@
             Painel
           </button>
           <div class="topbar-actions">
+            <div class="language-switcher" data-language-switcher>
+              <button
+                class="language-toggle"
+                type="button"
+                aria-label="Selecionar idioma"
+                aria-expanded="false"
+                aria-controls="language-menu"
+                data-language-toggle
+              >
+                <span class="language-current">
+                  <img src="./assets/flag-pt-br.svg" alt="" width="20" height="14" data-language-flag />
+                  <span data-language-label>PT-BR</span>
+                </span>
+                <i data-lucide="chevron-down"></i>
+              </button>
+              <div
+                class="language-menu"
+                id="language-menu"
+                aria-label="Selecionar idioma"
+                data-language-menu
+                hidden
+              >
+                <button class="language-option is-active" type="button" data-language-option="pt-BR" aria-pressed="true">
+                  <img src="./assets/flag-pt-br.svg" alt="" width="20" height="14" />
+                  <span>PT-BR</span>
+                </button>
+                <button class="language-option" type="button" data-language-option="en" aria-pressed="false">
+                  <img src="./assets/flag-en.svg" alt="" width="20" height="14" />
+                  <span>EN</span>
+                </button>
+                <button class="language-option" type="button" data-language-option="es" aria-pressed="false">
+                  <img src="./assets/flag-es.svg" alt="" width="20" height="14" />
+                  <span>ES</span>
+                </button>
+              </div>
+            </div>
+            <div class="theme-switcher" aria-label="Alternar tema">
+              <button type="button" class="theme-option is-active" aria-pressed="true">
+                <i data-lucide="sun"></i>
+                <span data-theme-light-label>Claro</span>
+              </button>
+              <button type="button" class="theme-option" aria-pressed="false">
+                <i data-lucide="moon"></i>
+                <span data-theme-dark-label>Escuro</span>
+              </button>
+            </div>
             <div class="notifications" id="notificationsMenu">
               <button class="icon-btn" id="notificationsToggle" aria-label="Notificações">
                 <span class="material-symbols-rounded">notifications</span>
@@ -937,6 +983,26 @@
                       <span class="material-symbols-rounded">search</span>
                       <input type="search" id="agentsSearchInput" placeholder="Buscar agente pelo nome" autocomplete="off" aria-label="Buscar agente pelo nome" />
                     </div>
+                    <button class="btn filter-btn agents-filter-btn" id="agentsFilterBtn" type="button">
+                      <i data-lucide="sliders-horizontal"></i>Filtros
+                    </button>
+                    <div class="menu filter-menu two-col agents-filter-menu" id="agentsFilterMenu">
+                      <div class="filter-footer">
+                        <button class="filter-clear" type="button">Limpar filtros</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>RAG</span>
+                        <button class="filter-option active" data-filter="rag" data-value="">Todos</button>
+                        <button class="filter-option" data-filter="rag" data-value="sim">Sim</button>
+                        <button class="filter-option" data-filter="rag" data-value="nao">Não</button>
+                      </div>
+                      <div class="filter-group">
+                        <span>Visibilidade</span>
+                        <button class="filter-option active" data-filter="visibility" data-value="">Todos</button>
+                        <button class="filter-option" data-filter="visibility" data-value="publico">Público</button>
+                        <button class="filter-option" data-filter="visibility" data-value="privado">Privado</button>
+                      </div>
+                    </div>
                   </div>
                   <div class="agents-environment-toolbar-controls" id="agentsScopeControls">
                     <div class="hub-select-wrap agents-environment-select-wrap">
@@ -960,19 +1026,23 @@
                 <div class="agents-table agents-all-agents-table" id="agentsAllAgentsTable" aria-label="Lista de agentes da organização">
                   <div class="agents-row header">
                     <span>Nome do agente</span>
-                    <span>ID</span>
-                    <span>Conhecimento interno</span>
-                    <span>Ambiente</span>
                     <span>Descrição</span>
+                    <span>ID</span>
+                    <span class="agents-header-tooltip" data-tooltip="Conhecimento interno">RAG</span>
+                    <span>Ambiente</span>
+                    <span>Visibilidade</span>
                     <span>Ações</span>
                   </div>
-                  <div class="agents-row" data-hub-org="avas" data-hub-context="backoffice" data-agents-environment="operacoes">
+                  <div class="agents-row" data-hub-org="avas" data-hub-context="backoffice" data-agents-environment="operacoes" data-voice-enabled="true">
                     <span><strong>Atlas Core</strong><span class="agent-context-chip">Backoffice</span></span>
-                    <span>AGT-1024</span>
-                    <span class="link">Sim</span>
-                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                     <span class="agents-row-description">Orquestra pipelines de dados e relatórios.</span>
+                    <span>AGT-1024</span>
+                    <span><span class="agents-rag-badge agents-rag-badge--yes">Sim</span></span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                     <span class="row-actions">
+                      <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-1024" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -986,8 +1056,8 @@
                           <span>Adicionar texto</span>
                         </button>
                       </div>
-                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
-                        <span class="material-symbols-rounded">chat</span>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar por voz">
+                        <i data-lucide="audio-lines"></i>
                       </button>
                       <button class="icon-btn action-icon danger" aria-label="Excluir">
                         <span class="material-symbols-rounded">delete</span>
@@ -996,11 +1066,14 @@
                   </div>
                   <div class="agents-row" data-hub-org="avas" data-hub-context="backoffice" data-agents-environment="operacoes">
                     <span><strong>Nimbus Ops</strong><span class="agent-context-chip">Backoffice</span></span>
-                    <span>AGT-2077</span>
-                    <span class="link">Não</span>
-                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                     <span class="agents-row-description">Monitoramento de filas e indicadores críticos.</span>
+                    <span>AGT-2077</span>
+                    <span><span class="agents-rag-badge">Não</span></span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-visibility"><span class="agents-visibility-badge">Privado</span></span>
                     <span class="row-actions">
+                      <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn muted-icon" aria-label="Compartilhar agente" disabled><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon muted-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1024,11 +1097,14 @@
                   </div>
                   <div class="agents-row" data-hub-org="avas" data-hub-context="financeiro" data-agents-environment="financeiro">
                     <span><strong>Pulse Finance</strong><span class="agent-context-chip">Financeiro</span></span>
-                    <span>AGT-3310</span>
-                    <span class="link">Sim</span>
-                    <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
                     <span class="agents-row-description">Conciliação automática e análises financeiras.</span>
+                    <span>AGT-3310</span>
+                    <span><span class="agents-rag-badge agents-rag-badge--yes">Sim</span></span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
+                    <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                     <span class="row-actions">
+                      <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-3310" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1052,11 +1128,14 @@
                   </div>
                   <div class="agents-row" data-hub-org="techcorp" data-hub-context="api" data-agents-environment="operacoes">
                     <span><strong>Sentinel API</strong><span class="agent-context-chip">API</span></span>
-                    <span>AGT-8841</span>
-                    <span class="link">Sim</span>
-                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                     <span class="agents-row-description">Diagnóstico de filas e contratos de integração.</span>
+                    <span>AGT-8841</span>
+                    <span><span class="agents-rag-badge agents-rag-badge--yes">Sim</span></span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                     <span class="row-actions">
+                      <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-8841" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1080,11 +1159,14 @@
                   </div>
                   <div class="agents-row" data-hub-org="techcorp" data-hub-context="pipeline" data-agents-environment="operacoes">
                     <span><strong>Stream ETL</strong><span class="agent-context-chip">Pipeline</span></span>
-                    <span>AGT-9902</span>
-                    <span class="link">Não</span>
-                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                     <span class="agents-row-description">Migração de esquemas e validação de cargas.</span>
+                    <span>AGT-9902</span>
+                    <span><span class="agents-rag-badge">Não</span></span>
+                    <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                    <span class="agents-row-visibility"><span class="agents-visibility-badge">Privado</span></span>
                     <span class="row-actions">
+                      <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn muted-icon" aria-label="Compartilhar agente" disabled><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1130,19 +1212,22 @@
                     <div class="agents-table">
                       <div class="agents-row header">
                         <span>Agente</span>
+                        <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
                         <span>Ambiente</span>
-                        <span>Descrição</span>
+                        <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
                       <div class="agents-row" data-agents-environment="operacoes">
                         <span><strong>Atlas Core</strong><span class="agent-context-chip">Backoffice</span></span>
-                        <span>AGT-1024</span>
-                        <span class="link">Sim</span>
-                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                         <span class="agents-row-description">Orquestra pipelines de dados e relatórios.</span>
+                        <span>AGT-1024</span>
+                        <span><span class="agents-rag-badge agents-rag-badge--yes">Sim</span></span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                         <span class="row-actions">
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-1024" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1166,11 +1251,13 @@
                       </div>
                       <div class="agents-row" data-agents-environment="operacoes">
                         <span><strong>Nimbus Ops</strong><span class="agent-context-chip">Backoffice</span></span>
-                        <span>AGT-2077</span>
-                        <span class="link">Não</span>
-                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                         <span class="agents-row-description">Monitoramento de filas e indicadores críticos.</span>
+                        <span>AGT-2077</span>
+                        <span><span class="agents-rag-badge">Não</span></span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-visibility"><span class="agents-visibility-badge">Privado</span></span>
                         <span class="row-actions">
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn muted-icon" aria-label="Compartilhar agente" disabled><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon muted-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1216,19 +1303,22 @@
                     <div class="agents-table">
                       <div class="agents-row header">
                         <span>Agente</span>
+                        <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
                         <span>Ambiente</span>
-                        <span>Descrição</span>
+                        <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
                       <div class="agents-row" data-agents-environment="financeiro">
                         <span><strong>Pulse Finance</strong><span class="agent-context-chip">Financeiro</span></span>
-                        <span>AGT-3310</span>
-                        <span class="link">Sim</span>
-                        <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
                         <span class="agents-row-description">Conciliação automática e análises financeiras.</span>
+                        <span>AGT-3310</span>
+                        <span><span class="agents-rag-badge agents-rag-badge--yes">Sim</span></span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
+                        <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                         <span class="row-actions">
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-3310" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1277,19 +1367,22 @@
                     <div class="agents-table">
                       <div class="agents-row header">
                         <span>Agente</span>
+                        <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
                         <span>Ambiente</span>
-                        <span>Descrição</span>
+                        <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
                       <div class="agents-row" data-agents-environment="operacoes">
                         <span><strong>Sentinel API</strong><span class="agent-context-chip">API</span></span>
-                        <span>AGT-8841</span>
-                        <span class="link">Sim</span>
-                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                         <span class="agents-row-description">Diagnóstico de filas e contratos de integração.</span>
+                        <span>AGT-8841</span>
+                        <span><span class="agents-rag-badge agents-rag-badge--yes">Sim</span></span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                         <span class="row-actions">
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-8841" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1335,19 +1428,22 @@
                     <div class="agents-table">
                       <div class="agents-row header">
                         <span>Agente</span>
+                        <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
                         <span>Ambiente</span>
-                        <span>Descrição</span>
+                        <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
                       <div class="agents-row" data-agents-environment="operacoes">
                         <span><strong>Stream ETL</strong><span class="agent-context-chip">Pipeline</span></span>
-                        <span>AGT-9902</span>
-                        <span class="link">Não</span>
-                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                         <span class="agents-row-description">Migração de esquemas e validação de cargas.</span>
+                        <span>AGT-9902</span>
+                        <span><span class="agents-rag-badge">Não</span></span>
+                        <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
+                        <span class="agents-row-visibility"><span class="agents-visibility-badge">Privado</span></span>
                         <span class="row-actions">
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn muted-icon" aria-label="Compartilhar agente" disabled><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1452,6 +1548,18 @@
                     <span class="agent-create-counter" id="agentModalPromptCounter">0/20000</span>
                   </div>
 
+                  <div class="agent-capability-switch-row">
+                    <div class="agent-capability-simple-toggle agent-capability-simple-toggle--rag">
+                      <strong>Conhecimento interno (RAG)</strong>
+                      <div class="agent-capability-simple-toggle-control">
+                        <label class="switch">
+                          <input type="checkbox" id="agentModalUseRag" name="use_rag" />
+                          <span class="switch-track"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
                   <div class="modal-row">
                     <div>
                       <label class="modal-label modal-label--required" for="agentModalEnvironment">Ambiente</label>
@@ -1478,14 +1586,6 @@
                   </div>
 
                   <div class="agent-capability-switch-row">
-                    <div class="agent-capability-simple-toggle agent-capability-simple-toggle--rag">
-                      <strong>Conhecimento interno (RAG)</strong>
-                      <label class="switch">
-                        <input type="checkbox" id="agentModalUseRag" name="use_rag" />
-                        <span class="switch-track"></span>
-                      </label>
-                    </div>
-
                     <div class="agent-capability-card agent-capability-card--voice">
                       <div class="agent-capability-card-top">
                         <div class="agent-capability-card-copy">
@@ -1502,112 +1602,94 @@
                         <div class="modal-row">
                           <div>
                             <label class="modal-label" for="agentModalVoiceLocale">Idioma / região</label>
-                          <div class="hub-select-wrap hub-select-wrap--block">
-                            <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">language</span>
-                            <select class="hub-select" id="agentModalVoiceLocale" aria-label="Idioma ou região da voz">
-                              <option value="pt-BR">pt-BR</option>
-                              <option value="pt-PT">pt-PT</option>
-                              <option value="en-US">en-US</option>
-                            </select>
-                            <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                          </div>
-                        </div>
-                        <div>
-                          <label class="modal-label" for="agentModalVoice">Voz</label>
-                          <div class="agent-create-voice-row">
                             <div class="hub-select-wrap hub-select-wrap--block">
-                              <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">record_voice_over</span>
-                              <select class="hub-select" id="agentModalVoice" aria-label="Voz do agente">
-                                <option value="Antonio">Antonio</option>
-                                <option value="Clara">Clara</option>
-                                <option value="Marina">Marina</option>
+                              <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">language</span>
+                              <select class="hub-select" id="agentModalVoiceLocale" aria-label="Idioma ou região da voz">
+                                <option value="pt-BR">PT-BR (Português brasileiro)</option>
+                                <option value="en">EN (Inglês)</option>
+                                <option value="es">ES (Espanhol)</option>
                               </select>
                               <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                             </div>
-                            <button class="icon-btn agent-create-voice-preview" id="agentModalVoicePreview" type="button" aria-label="Ouvir prévia da voz">
-                              <span class="material-symbols-rounded" aria-hidden="true">volume_up</span>
-                            </button>
+                          </div>
+                          <div>
+                            <label class="modal-label" for="agentModalVoice">Voz</label>
+                            <div class="agent-create-voice-row">
+                              <div class="hub-select-wrap hub-select-wrap--block">
+                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">record_voice_over</span>
+                                <select class="hub-select" id="agentModalVoice" aria-label="Voz do agente">
+                                  <option value="Antonio">Antonio</option>
+                                  <option value="Clara">Clara</option>
+                                  <option value="Marina">Marina</option>
+                                </select>
+                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                              </div>
+                              <button class="icon-btn agent-create-voice-preview" id="agentModalVoicePreview" type="button" aria-label="Ouvir prévia da voz">
+                                <span class="material-symbols-rounded" aria-hidden="true">volume_up</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <p class="modal-field-hint">Esses ajustes são salvos com o agente e valem em todas as ligações de voz.</p>
-
-                      <div class="agent-audio-panel">
-                        <button class="agent-audio-panel-toggle" id="agentModalAudioToggle" type="button" aria-expanded="true" aria-controls="agentModalAudioPanelBody">
-                          <div class="agent-audio-panel-heading">
-                            <span class="agent-create-section-icon" aria-hidden="true">
-                              <span class="material-symbols-rounded">tune</span>
-                            </span>
-                            <div>
-                              <strong>Áudio e captura</strong>
-                              <p>Opcional, ajuste se tiver problemas de eco, microfone ou de ouvir o assistente.</p>
-                            </div>
+                        <p class="modal-field-hint">Esses ajustes são salvos com o agente e valem em todas as ligações de voz.</p>
+                        <div class="agent-capability-inline-toggle">
+                          <div>
+                            <strong>Reproduzir áudio do assistente</strong>
+                            <p>Desligue para usar apenas o microfone sem ouvir as respostas em voz.</p>
                           </div>
-                          <span class="material-symbols-rounded agent-audio-panel-caret" aria-hidden="true">expand_less</span>
-                        </button>
-                        <div class="agent-audio-panel-body" id="agentModalAudioPanelBody">
-                          <p class="modal-field-hint">Algumas opções só passam a valer na próxima ligação.</p>
+                          <label class="switch">
+                            <input type="checkbox" id="agentModalAudioPlayback" name="audio_playback" checked />
+                            <span class="switch-track"></span>
+                          </label>
+                        </div>
 
-                          <div class="agent-capability-inline-toggle">
-                            <div>
-                              <strong>Reproduzir áudio do assistente</strong>
-                              <p>Desligue para usar apenas o microfone sem ouvir as respostas em voz.</p>
-                            </div>
-                            <label class="switch">
-                              <input type="checkbox" id="agentModalAudioPlayback" name="audio_playback" checked />
-                              <span class="switch-track"></span>
-                            </label>
+                        <div class="agent-capability-inline-toggle">
+                          <div>
+                            <strong>Modo fone de ouvido</strong>
+                            <p>Reduz o cancelamento de eco do navegador para deixar a sua voz mais natural quando estiver com fone fechado.</p>
                           </div>
+                          <label class="switch">
+                            <input type="checkbox" id="agentModalHeadphoneMode" name="headphone_mode" />
+                            <span class="switch-track"></span>
+                          </label>
+                        </div>
 
-                          <div class="agent-capability-inline-toggle">
-                            <div>
-                              <strong>Modo fone de ouvido</strong>
-                              <p>Reduz o cancelamento de eco do navegador para deixar a sua voz mais natural quando estiver com fone fechado.</p>
-                            </div>
-                            <label class="switch">
-                              <input type="checkbox" id="agentModalHeadphoneMode" name="headphone_mode" />
-                              <span class="switch-track"></span>
-                            </label>
+                        <div class="agent-capability-inline-toggle">
+                          <div>
+                            <strong>Não capturar microfone enquanto o assistente fala</strong>
+                            <p>Evita que o microfone pegue a voz do assistente e reduz interrupções indesejadas.</p>
                           </div>
+                          <label class="switch">
+                            <input type="checkbox" id="agentModalMuteMicWhileSpeaking" name="mute_mic_while_speaking" />
+                            <span class="switch-track"></span>
+                          </label>
+                        </div>
 
-                          <div class="agent-capability-inline-toggle">
-                            <div>
-                              <strong>Não capturar microfone enquanto o assistente fala</strong>
-                              <p>Evita que o microfone pegue a voz do assistente e reduz interrupções indesejadas.</p>
+                        <div class="modal-row">
+                          <div>
+                            <label class="modal-label" for="agentModalMicProfile">Perfil do microfone</label>
+                            <div class="hub-select-wrap hub-select-wrap--block">
+                              <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">mic</span>
+                              <select class="hub-select" id="agentModalMicProfile" aria-label="Perfil do microfone">
+                                <option value="default">Padrão</option>
+                                <option value="speech">Focado em fala</option>
+                                <option value="noisy">Ambiente ruidoso</option>
+                              </select>
+                              <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                             </div>
-                            <label class="switch">
-                              <input type="checkbox" id="agentModalMuteMicWhileSpeaking" name="mute_mic_while_speaking" />
-                              <span class="switch-track"></span>
-                            </label>
+                            <p class="modal-field-hint">Define como o navegador trata eco, ruído e ganho.</p>
                           </div>
-
-                          <div class="modal-row">
-                            <div>
-                              <label class="modal-label" for="agentModalMicProfile">Perfil do microfone</label>
-                              <div class="hub-select-wrap hub-select-wrap--block">
-                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">mic</span>
-                                <select class="hub-select" id="agentModalMicProfile" aria-label="Perfil do microfone">
-                                  <option value="default">Padrão</option>
-                                  <option value="speech">Focado em fala</option>
-                                  <option value="noisy">Ambiente ruidoso</option>
-                                </select>
-                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                              </div>
-                              <p class="modal-field-hint">Define como o navegador trata eco, ruído e ganho.</p>
+                          <div>
+                            <label class="modal-label" for="agentModalInterruptSensitivity">Sensibilidade da interrupção por voz</label>
+                            <div class="hub-select-wrap hub-select-wrap--block">
+                              <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">equalizer</span>
+                              <select class="hub-select" id="agentModalInterruptSensitivity" aria-label="Sensibilidade da interrupção por voz">
+                                <option value="default">Padrão</option>
+                                <option value="low">Baixa</option>
+                                <option value="high">Alta</option>
+                              </select>
+                              <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                             </div>
-                            <div>
-                              <label class="modal-label" for="agentModalInterruptSensitivity">Sensibilidade da interrupção por voz</label>
-                              <div class="hub-select-wrap hub-select-wrap--block">
-                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">equalizer</span>
-                                <select class="hub-select" id="agentModalInterruptSensitivity" aria-label="Sensibilidade da interrupção por voz">
-                                  <option value="default">Padrão</option>
-                                  <option value="low">Baixa</option>
-                                  <option value="high">Alta</option>
-                                </select>
-                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                              </div>
-                              <p class="modal-field-hint">Ajusta o quanto a fala do usuário interrompe respostas em andamento.</p>
-                            </div>
+                            <p class="modal-field-hint">Ajusta o quanto a fala do usuário interrompe respostas em andamento.</p>
                           </div>
                         </div>
                       </div>
@@ -1619,6 +1701,54 @@
                   <button class="btn primary" type="submit" id="agentModalSubmit" disabled>Criar agente</button>
                 </div>
               </form>
+            </div>
+          </div>
+
+          <div class="modal" id="agentShareModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog agent-share-dialog" role="dialog" aria-modal="true" aria-labelledby="agentShareTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="agentShareTitle">Publicar agente</h3>
+                  <p class="modal-subtitle">Compartilhe o agente e controle quem pode acessar.</p>
+                </div>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body agent-share-body">
+                <p id="agentShareError" class="modal-form-error" role="alert" hidden></p>
+                <div class="agent-share-summary">
+                  <div>
+                    <span class="agent-share-kicker">Agente</span>
+                    <strong id="agentShareAgentName">-</strong>
+                  </div>
+                  <span class="agents-visibility-badge agents-visibility-badge--public" id="agentShareStatusChip">Público</span>
+                </div>
+                <div class="agent-share-privacy">
+                  <div class="switch-row">
+                    <span>Deixar agente privado</span>
+                    <label class="switch">
+                      <input type="checkbox" id="agentSharePrivateToggle" />
+                      <span class="switch-track"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="agent-share-link-card">
+                  <label class="modal-label" for="agentShareLink">Link para compartilhar</label>
+                  <div class="modal-input-action-wrap">
+                    <input class="modal-input modal-input--with-action" id="agentShareLink" type="text" readonly />
+                    <button class="icon-btn modal-input-action" id="agentShareCopyBtn" type="button" aria-label="Copiar link">
+                      <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                  </div>
+                  <p class="modal-field-hint">Copie o link ou ajuste os acessos abaixo.</p>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" data-modal-close type="button">Cancelar</button>
+                <button class="btn primary" type="button" id="agentShareSaveBtn">Salvar</button>
+              </div>
             </div>
           </div>
 
@@ -1691,19 +1821,17 @@
                     placeholder="Digite um prompt de apoio para orientar os agentes deste projeto"
                   ></textarea>
                 </div>
-                <div class="project-modal-danger" id="projectModalDangerZone" hidden>
+                <section id="projectModalDangerZone" class="project-modal-danger" hidden>
                   <div class="project-modal-danger-title">Zona de perigo</div>
-                  <p class="project-modal-danger-text">
-                    Tem certeza que quer fazer isso? Essa ação não poderá ser desfeita.
-                  </p>
-                  <label class="project-modal-danger-confirm">
-                    <input type="checkbox" id="projectModalDeleteConfirm" />
+                  <p class="project-modal-danger-text">Tem certeza que quer fazer isso? Essa ação não poderá ser desfeita.</p>
+                  <label class="project-modal-danger-confirm" for="projectModalDeleteConfirm">
+                    <input id="projectModalDeleteConfirm" type="checkbox" />
                     <span>Entendo que essa ação é irreversível e quero continuar.</span>
                   </label>
-                  <button type="button" class="btn danger project-modal-delete-btn" id="projectModalDeleteBtn" disabled>
+                  <button type="button" class="btn danger outline project-modal-delete-btn" id="projectModalDeleteBtn" disabled>
                     Excluir projeto
                   </button>
-                </div>
+                </section>
               </form>
               <div class="modal-footer">
                 <button type="button" class="btn outline" data-modal-close>Cancelar</button>
@@ -1805,6 +1933,31 @@
                     </button>
                   </div>
                   <div class="chat-body">
+                    <div class="chat-voice-stage" id="chatVoiceStage">
+                      <div class="chat-voice-orb" id="chatVoiceOrb" aria-hidden="true"></div>
+                      <p class="chat-voice-status" id="chatVoiceStatus">Pronto para começar</p>
+                      <p class="chat-voice-hint" id="chatVoiceHint">Esc encerra · Espaço silencia microfone</p>
+                      <div class="chat-voice-transcript" id="chatVoiceTranscript">
+                        <div class="chat-voice-msg chat-voice-msg--user">
+                          <div class="chat-voice-bubble chat-voice-bubble--user" id="chatVoiceUserLine">...</div>
+                        </div>
+                        <div class="chat-voice-msg chat-voice-msg--agent">
+                          <div class="chat-voice-bubble chat-voice-bubble--agent" id="chatVoiceAgentLine">...</div>
+                        </div>
+                      </div>
+                      <div class="chat-voice-controls">
+                        <button class="icon-btn chat-voice-control" type="button" id="chatVoiceMuteBtn" aria-label="Silenciar microfone">
+                          <i data-lucide="mic-off"></i>
+                        </button>
+                        <button class="btn primary chat-voice-start" type="button" id="chatVoiceStartBtn">
+                          <i data-lucide="play"></i>
+                          <span>Iniciar conversa</span>
+                        </button>
+                        <button class="icon-btn chat-voice-control" type="button" id="chatVoiceHistoryBtn" aria-label="Abrir histórico">
+                          <i data-lucide="sliders-horizontal"></i>
+                        </button>
+                      </div>
+                    </div>
                     <div class="chat-empty is-hidden" id="chatEmpty">
                       <div class="chat-empty-card">
                         <div class="chat-empty-title">Comece por aqui</div>
@@ -1876,7 +2029,7 @@
                           </div>
                         </div>
 	                      </div>
-	                      <input class="chat-input" type="text" placeholder="Digite sua mensagem" />
+		                      <input class="chat-input" type="text" placeholder="Digite sua mensagem" />
 	                      <button class="btn outline small chat-mic icon-only has-tooltip" type="button" aria-label="Ditar mensagem" data-tooltip="Ditar mensagem">
 	                        <i data-lucide="mic"></i>
 	                      </button>
@@ -2205,73 +2358,8 @@
                       </div>
                     </div>
                   </div>
-
-                          <div class="agent-capability-inline-toggle">
-                            <div>
-                              <strong>Reproduzir áudio do assistente</strong>
-                              <p>Desligue para usar apenas o microfone sem ouvir as respostas em voz.</p>
-                            </div>
-                            <label class="switch">
-                              <input type="checkbox" id="agentModalAudioPlayback" name="audio_playback" checked />
-                              <span class="switch-track"></span>
-                            </label>
-                          </div>
-
-                          <div class="agent-capability-inline-toggle">
-                            <div>
-                              <strong>Modo fone de ouvido</strong>
-                              <p>Reduz o cancelamento de eco do navegador para deixar a sua voz mais natural quando estiver com fone fechado.</p>
-                            </div>
-                            <label class="switch">
-                              <input type="checkbox" id="agentModalHeadphoneMode" name="headphone_mode" />
-                              <span class="switch-track"></span>
-                            </label>
-                          </div>
-
-                          <div class="agent-capability-inline-toggle">
-                            <div>
-                              <strong>Não capturar microfone enquanto o assistente fala</strong>
-                              <p>Evita que o microfone pegue a voz do assistente e reduz interrupções indesejadas.</p>
-                            </div>
-                            <label class="switch">
-                              <input type="checkbox" id="agentModalMuteMicWhileSpeaking" name="mute_mic_while_speaking" />
-                              <span class="switch-track"></span>
-                            </label>
-                          </div>
-
-                          <div class="modal-row">
-                            <div>
-                              <label class="modal-label" for="agentModalMicProfile">Perfil do microfone</label>
-                              <div class="hub-select-wrap hub-select-wrap--block">
-                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">mic</span>
-                                <select class="hub-select" id="agentModalMicProfile" aria-label="Perfil do microfone">
-                                  <option value="default">Padrão</option>
-                                  <option value="speech">Focado em fala</option>
-                                  <option value="noisy">Ambiente ruidoso</option>
-                                </select>
-                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                              </div>
-                              <p class="modal-field-hint">Define como o navegador trata eco, ruído e ganho.</p>
-                            </div>
-                            <div>
-                              <label class="modal-label" for="agentModalInterruptSensitivity">Sensibilidade da interrupção por voz</label>
-                              <div class="hub-select-wrap hub-select-wrap--block">
-                                <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">equalizer</span>
-                                <select class="hub-select" id="agentModalInterruptSensitivity" aria-label="Sensibilidade da interrupção por voz">
-                                  <option value="default">Padrão</option>
-                                  <option value="low">Baixa</option>
-                                  <option value="high">Alta</option>
-                                </select>
-                                <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                              </div>
-                              <p class="modal-field-hint">Ajusta o quanto a fala do usuário interrompe respostas em andamento.</p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
+
                 <div class="data-table executors-table">
                   <div class="data-row header">
                     <span>Executor</span>

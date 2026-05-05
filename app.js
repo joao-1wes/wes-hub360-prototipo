@@ -17,6 +17,16 @@ const dashboardViewDefault = document.getElementById('dashboardViewDefault');
 const dashboardViewDetail = document.getElementById('dashboardViewDetail');
 const filterBtnAlt = document.getElementById('alertFilterBtnAlt');
 const filterMenuAlt = document.getElementById('alertFilterMenuAlt');
+const agentsFilterBtn = document.getElementById('agentsFilterBtn');
+const agentsFilterMenu = document.getElementById('agentsFilterMenu');
+const languageSwitcher = document.querySelector('[data-language-switcher]');
+const languageToggle = document.querySelector('[data-language-toggle]');
+const languageMenu = document.querySelector('[data-language-menu]');
+const languageOptions = Array.from(document.querySelectorAll('[data-language-option]'));
+const currentLanguageFlag = document.querySelector('[data-language-flag]');
+const currentLanguageLabel = document.querySelector('[data-language-label]');
+const themeLightLabel = document.querySelector('[data-theme-light-label]');
+const themeDarkLabel = document.querySelector('[data-theme-dark-label]');
 const notificationsToggle = document.getElementById('notificationsToggle');
 const notificationsDropdown = document.getElementById('notificationsDropdown');
 const automationFilterBtn = document.getElementById('automationFilterBtn');
@@ -65,6 +75,12 @@ const chatHistoryTitles = document.querySelectorAll('.chat-history-title');
 const chatDictationButton = document.querySelector('.chat-mic');
 const chatSendButton = document.querySelector('.chat-send');
 const chatInput = document.querySelector('.chat-input');
+const chatVoiceStartButton = document.getElementById('chatVoiceStartBtn');
+const chatVoiceMuteButton = document.getElementById('chatVoiceMuteBtn');
+const chatVoiceHistoryButton = document.getElementById('chatVoiceHistoryBtn');
+const chatVoiceStatus = document.getElementById('chatVoiceStatus');
+const chatVoiceUserLine = document.getElementById('chatVoiceUserLine');
+const chatVoiceAgentLine = document.getElementById('chatVoiceAgentLine');
 const openBillingModal = document.getElementById('openBillingModal');
 const billingModal = document.getElementById('billingModal');
 const openChannelModal = document.getElementById('openChannelModal');
@@ -145,6 +161,25 @@ const AGENT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesAgentEnvironmentOverrides';
 const PROJECT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesProjectEnvironmentOverrides';
 const PROJECT_PROMPT_OVERRIDES_STORAGE_KEY = 'wesProjectPromptOverrides';
 const TELEGRAM_HELP_CARD_DISMISSED_STORAGE_KEY = 'wesTelegramHelpCardDismissed';
+const DEFAULT_LANGUAGE = 'pt-BR';
+const LANGUAGE_STORAGE_KEY = 'wes-language';
+const LANGUAGE_QUERY_KEY = 'lang';
+const LANGUAGE_PATHS = {
+  'pt-BR': '/',
+  en: '/en/',
+  es: '/es/',
+};
+const SECTION_ANCHORS = {
+  'pt-BR': { where: 'onde-atuamos', about: 'sobre', solutions: 'solucoes' },
+  en: { where: 'where-we-operate', about: 'about', solutions: 'solutions' },
+  es: { where: 'donde-operamos', about: 'sobre', solutions: 'soluciones' },
+};
+const SUPPORTED_LANGUAGES = {
+  'pt-BR': { label: 'PT-BR', flag: './assets/flag-pt-br.svg', documentLang: 'pt-BR' },
+  en: { label: 'EN', flag: './assets/flag-en.svg', documentLang: 'en' },
+  es: { label: 'ES', flag: './assets/flag-es.svg', documentLang: 'es' },
+};
+let currentLanguage = DEFAULT_LANGUAGE;
 const AUTOMATION_PACKAGE_OPTIONS = Object.freeze([
   {
     id: 'teste_wiki',
@@ -184,6 +219,8 @@ const AGENTS_PAGE_SIZE = 5;
 const AGENTS_AUTO_REFRESH_MS = 15000;
 const AGENTS_AUTO_REFRESH_ENABLED = false;
 let agentsCurrentPage = 1;
+let agentsRagFilter = '';
+let agentsVisibilityFilter = '';
 let agentsAutoRefreshTimer = null;
 let lucideRefreshQueued = false;
 let activeChatSpeechButton = null;
@@ -685,7 +722,30 @@ function setChatDictationState(isActive) {
   chatDictationButton.setAttribute('aria-label', nextTooltip);
   chatDictationButton.dataset.tooltip = nextTooltip;
   chatDictationButton.innerHTML = `<i data-lucide="${isActive ? 'circle-stop' : 'mic'}"></i>`;
+  if (chatVoiceStatus) {
+    chatVoiceStatus.textContent = isActive ? 'Ouvindo...' : 'Pronto para começar';
+  }
+  if (agentChatModal?.classList.contains('voice-mode')) {
+    agentChatModal.dataset.voiceStage = isActive ? 'listening' : 'idle';
+  }
+  if (chatVoiceStartButton) {
+    chatVoiceStartButton.innerHTML = isActive
+      ? '<i data-lucide="square"></i><span>Encerrar conversa</span>'
+      : '<i data-lucide="play"></i><span>Iniciar conversa</span>';
+  }
   scheduleLucideRefresh();
+}
+
+function setVoiceStageSpeaking() {
+  if (!agentChatModal?.classList.contains('voice-mode')) return;
+  agentChatModal.dataset.voiceStage = 'speaking';
+  if (chatVoiceStatus) chatVoiceStatus.textContent = 'Falando...';
+}
+
+function setVoiceStageIdle() {
+  if (!agentChatModal?.classList.contains('voice-mode')) return;
+  agentChatModal.dataset.voiceStage = 'idle';
+  if (chatVoiceStatus) chatVoiceStatus.textContent = 'Pronto para começar';
 }
 
 function isValidAgentsPageEnvironmentId(environmentId) {
@@ -862,7 +922,7 @@ function getVisibleAgentsRows() {
   const table = document.getElementById('agentsAllAgentsTable');
   if (!table) return [];
   return Array.from(table.querySelectorAll('.agents-row:not(.header)')).filter((row) => {
-    return !row.classList.contains('agents-row--scope-hide') && !row.classList.contains('agents-row--search-hide');
+    return !row.classList.contains('agents-row--scope-hide') && !row.classList.contains('agents-row--search-hide') && !row.classList.contains('agents-row--filter-hide');
   });
 }
 
@@ -1317,7 +1377,13 @@ if (openAgentModal && agentModal) {
   const interruptSensitivitySelect = document.getElementById('agentModalInterruptSensitivity');
   const ragInput = document.getElementById('agentModalUseRag');
   const submitBtn = document.getElementById('agentModalSubmit');
+  const titleEl = document.getElementById('agentModalTitle');
   if (!modal || !form || !environmentSel || !projectSel || !nameInput || !promptInput || !submitBtn) return;
+  const state = {
+    mode: 'create',
+    agentId: '',
+    sourceAgent: null,
+  };
 
   function setError(msg) {
     if (!errEl) return;
@@ -1374,6 +1440,72 @@ if (openAgentModal && agentModal) {
     const hasPrompt = Boolean(promptInput.value.trim());
     const hasEnvironment = Boolean(String(environmentSel.value || '').trim());
     submitBtn.disabled = !(hasName && hasPrompt && hasEnvironment) || submitBtn.classList.contains('is-loading');
+  }
+
+  function setAgentModalMode(mode, agent = null) {
+    state.mode = mode;
+    state.sourceAgent = agent;
+    state.agentId = String(agent?.id || '').trim();
+    if (titleEl) titleEl.textContent = mode === 'edit' ? 'Editar agente' : 'Criação de agentes';
+    submitBtn.textContent = mode === 'edit' ? 'Salvar alterações' : 'Criar agente';
+    modal.dataset.mode = mode;
+    modal.dataset.agentId = state.agentId;
+  }
+
+  function populateAgentModal(agent) {
+    if (!agent) return;
+    syncAgentModalScope(agent.environment_slug || '');
+    nameInput.value = agent.name || '';
+    descInput && (descInput.value = agent.description || '');
+    promptInput.value = agent.system_prompt || '';
+    if (ragInput) ragInput.checked = Boolean(agent.use_rag);
+    if (voiceEnabledInput) voiceEnabledInput.checked = Boolean(agent.voice_enabled);
+    if (voiceLocaleSelect) voiceLocaleSelect.value = agent.voice_locale || 'pt-BR';
+    if (voiceSelect) voiceSelect.value = agent.voice_name || 'Antonio';
+    if (audioPlaybackInput) audioPlaybackInput.checked = agent.audio_playback !== false;
+    if (headphoneModeInput) headphoneModeInput.checked = Boolean(agent.headphone_mode);
+    if (muteMicWhileSpeakingInput) muteMicWhileSpeakingInput.checked = Boolean(agent.mute_mic_while_speaking);
+    if (micProfileSelect) micProfileSelect.value = agent.mic_profile || 'default';
+    if (interruptSensitivitySelect) interruptSensitivitySelect.value = agent.interrupt_sensitivity || 'default';
+    if (environmentSel) environmentSel.value = agent.environment_slug || '';
+    if (projectSel) projectSel.value = fillAgentModalProjectOptions(agent.project_slug || '', agent.project_id || '');
+    setAgentModalNewContextMode(false);
+    syncVoiceOptionsVisibility();
+    syncAudioPanelState(true);
+    updateCounter(nameInput, nameCounter, 200);
+    updateCounter(descInput, descCounter, 4000);
+    updateCounter(promptInput, promptCounter, 20000);
+    syncAgentSubmitState();
+  }
+
+  function buildAgentFromRow(row) {
+    if (!row) return null;
+    const name = String(row.querySelector('strong')?.textContent || '').trim();
+    const description = String(row.querySelector('.agents-row-description')?.textContent || '').replace(/\s*•\s*Sem projeto\s*$/i, '').trim();
+    const agentId = String(row.dataset.agentUuid || row.dataset.agentId || row.children?.[2]?.textContent || '').replace(/\.\.\.$/, '').trim();
+    const environmentSlug = String(row.dataset.hubOrg || row.dataset.agentsEnvironment || '').trim();
+    const useRag = row.querySelector('.agents-rag-badge--yes') != null;
+    const isPublic = row.querySelector('.agents-visibility-badge--public') != null;
+    return {
+      id: agentId,
+      name,
+      description,
+      system_prompt: description ? `Agente ${name}. ${description}` : `Agente ${name}.`,
+      environment_slug: environmentSlug,
+      project_id: String(row.dataset.projectId || '').trim() || null,
+      project_slug: '',
+      use_rag: useRag,
+      voice_enabled: row.dataset.voiceEnabled === 'true',
+      voice_locale: 'pt-BR',
+      voice_name: 'Antonio',
+      audio_playback: true,
+      headphone_mode: false,
+      mute_mic_while_speaking: false,
+      mic_profile: 'default',
+      interrupt_sensitivity: 'default',
+      share_permission: isPublic ? 'viewer' : 'private',
+      public_permission: isPublic ? 'viewer' : 'private',
+    };
   }
 
   function syncVoiceOptionsVisibility() {
@@ -1483,11 +1615,32 @@ if (openAgentModal && agentModal) {
     window.speechSynthesis.speak(utterance);
   });
 
+  document.addEventListener('click', (event) => {
+    const editBtn = event.target.closest('.agent-edit-toggle');
+    if (!editBtn) return;
+    const row = editBtn.closest('.agents-row');
+    if (!row) return;
+    const agentId = String(row.dataset.agentUuid || '').trim();
+    const agent =
+      window.__wesAgentsCache?.find((item) => String(item.id || '').trim() === agentId) ||
+      buildAgentFromRow(row);
+    if (!agent) return;
+    setError('');
+    form.reset();
+    populateAgentModal(agent);
+    setAgentModalMode('edit', agent);
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    if (typeof hubRefreshCustomSelects === 'function') hubRefreshCustomSelects();
+    nameInput.focus();
+  });
+
   updateCounter(nameInput, nameCounter, 200);
   updateCounter(descInput, descCounter, 4000);
   updateCounter(promptInput, promptCounter, 20000);
   syncAudioPanelState(true);
   syncVoiceOptionsVisibility();
+  setAgentModalMode('create');
   syncAgentSubmitState();
 
   form.addEventListener('submit', async (e) => {
@@ -1519,19 +1672,33 @@ if (openAgentModal && agentModal) {
     try {
       const org = HUB_SCOPE[hubOrgId];
       const project = projectSlug ? org?.projects?.find((item) => item.slug === projectSlug) : null;
-
-      const res = await window.wesApiFetch('/agents', {
-        method: 'POST',
+      const payload = {
+        name,
+        description,
+        system_prompt: systemPrompt,
+        environment_slug: selectedEnvironmentId,
+        project_id: project?.id || null,
+        use_rag: Boolean(ragInput?.checked),
+        voice_enabled: Boolean(voiceEnabledInput?.checked),
+        voice_locale: voiceLocaleSelect?.value || 'pt-BR',
+        voice_name: voiceSelect?.value || 'Antonio',
+        audio_playback: Boolean(audioPlaybackInput?.checked),
+        headphone_mode: Boolean(headphoneModeInput?.checked),
+        mute_mic_while_speaking: Boolean(muteMicWhileSpeakingInput?.checked),
+        mic_profile: micProfileSelect?.value || 'default',
+        interrupt_sensitivity: interruptSensitivitySelect?.value || 'default',
+      };
+      const endpoint = state.mode === 'edit' && state.agentId ? `/agents/${encodeURIComponent(state.agentId)}` : '/agents';
+      const method = state.mode === 'edit' ? 'PATCH' : 'POST';
+      const requestInit = {
+        method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          description,
-          system_prompt: systemPrompt,
-          environment_slug: hubOrgId,
-          project_id: project?.id || null,
-          use_rag: Boolean(ragInput?.checked),
-        }),
-      });
+        body: JSON.stringify(payload),
+      };
+      let res = await window.wesApiFetch(endpoint, requestInit);
+      if (state.mode === 'edit' && res.status === 405) {
+        res = await window.wesApiFetch(endpoint, { ...requestInit, method: 'PUT' });
+      }
       const rawText = await res.text();
       let body = null;
       try {
@@ -1546,7 +1713,7 @@ if (openAgentModal && agentModal) {
             : Array.isArray(body?.detail)
               ? body.detail.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join('; ')
               : rawText || res.statusText;
-        setError(`Não foi possível criar (${res.status}): ${detail}`);
+      setError(`Não foi possível ${state.mode === 'edit' ? 'salvar' : 'criar'} (${res.status}): ${detail}`);
         return;
       }
       if (body?.id) {
@@ -1562,6 +1729,7 @@ if (openAgentModal && agentModal) {
       updateCounter(promptInput, promptCounter, 20000);
       syncAudioPanelState(true);
       syncVoiceOptionsVisibility();
+      setAgentModalMode('create');
       syncAgentSubmitState();
       if (typeof refreshAgentsTableFromApi === 'function') {
         void refreshAgentsTableFromApi();
@@ -1574,6 +1742,51 @@ if (openAgentModal && agentModal) {
       syncAgentSubmitState();
     }
   });
+})();
+
+(function initAgentsHeaderTooltips() {
+  const active = { el: null, tip: null };
+
+  function removeTip() {
+    if (active.tip) active.tip.remove();
+    active.el = null;
+    active.tip = null;
+  }
+
+  function showTip(el) {
+    const text = String(el?.dataset?.tooltip || '').trim();
+    if (!text) return;
+    removeTip();
+    const tip = document.createElement('div');
+    tip.className = 'agents-tooltip-float';
+    tip.textContent = text;
+    document.body.appendChild(tip);
+    const rect = el.getBoundingClientRect();
+    const tipRect = tip.getBoundingClientRect();
+    let top = rect.top - tipRect.height - 10;
+    let left = rect.left + rect.width / 2 - tipRect.width / 2;
+    left = Math.max(8, Math.min(left, window.innerWidth - tipRect.width - 8));
+    if (top < 8) top = rect.bottom + 10;
+    tip.style.left = `${Math.round(left)}px`;
+    tip.style.top = `${Math.round(top)}px`;
+    active.el = el;
+    active.tip = tip;
+  }
+
+  document.addEventListener('mouseover', (event) => {
+    const el = event.target.closest('.agents-header-tooltip');
+    if (!el) return;
+    showTip(el);
+  });
+
+  document.addEventListener('mouseout', (event) => {
+    if (!active.el) return;
+    if (event.target === active.el || event.relatedTarget === active.el || active.el.contains(event.relatedTarget)) return;
+    if (!event.target.closest('.agents-header-tooltip')) removeTip();
+  });
+
+  document.addEventListener('scroll', removeTip, true);
+  window.addEventListener('resize', removeTip);
 })();
 
 function getProjectById(org, projectId) {
@@ -1600,6 +1813,7 @@ function buildAgentChatPayloadFromButton(button) {
   let rowCtxId = '';
   const environmentSlug = String(row?.dataset.hubOrg || hubOrgId || '').trim();
   const projectId = String(row?.dataset.projectId || '').trim();
+  const voiceEnabled = String(row?.dataset.voiceEnabled || '').trim() === 'true';
 
   if (row) {
     const nameStrong = row.querySelector('span strong');
@@ -1627,9 +1841,24 @@ function buildAgentChatPayloadFromButton(button) {
     rowCtxId,
     environmentSlug,
     projectId,
+    voiceEnabled,
     projectSlug: project?.slug || '',
     projectTitle: project?.title || ''
   };
+}
+
+function applyAgentConversationMode(payload = {}) {
+  if (!agentChatModal) return;
+  const voiceMode = Boolean(payload.voiceEnabled);
+  agentChatModal.classList.toggle('voice-mode', voiceMode);
+  if (!voiceMode) agentChatModal.classList.remove('voice-history-open');
+  agentChatModal.dataset.voiceMode = voiceMode ? 'true' : 'false';
+  agentChatModal.dataset.voiceStage = 'idle';
+  if (voiceMode) {
+    if (chatVoiceUserLine) chatVoiceUserLine.textContent = '...';
+    if (chatVoiceAgentLine) chatVoiceAgentLine.textContent = '...';
+    if (chatVoiceStatus) chatVoiceStatus.textContent = 'Pronto para começar';
+  }
 }
 
 function openAgentChatModalWithPayload(payload) {
@@ -1666,6 +1895,12 @@ function openAgentChatModalWithPayload(payload) {
   const projectSlug = String(payload.projectSlug || getCurrentAgentsProjectSlugFromRoute() || '').trim();
   if (agentChatModal) {
     agentChatModal.dataset.projectSlug = projectSlug;
+    applyAgentConversationMode(payload);
+  }
+  if (agentChatTitle && payload.agentName) {
+    agentChatTitle.textContent = payload.voiceEnabled
+      ? `Conversa por voz com ${payload.agentName}`
+      : `Chat com ${payload.agentName}`;
   }
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
   syncAgentChatHistoryScope();
@@ -1680,11 +1915,13 @@ function openAgentChatModalFromToggle(button) {
   let agentName = 'Agente';
   let agentId = '';
   let rowCtxId = '';
+  let voiceEnabled = false;
 
   if (row) {
     const nameStrong = row.querySelector('span strong');
     if (nameStrong) agentName = nameStrong.textContent.trim();
     const uuid = row.dataset.agentUuid;
+    voiceEnabled = String(row.dataset.voiceEnabled || '').trim() === 'true';
     rowCtxId = String(row.dataset.hubContext || '').trim();
     if (!rowCtxId) {
       rowCtxId = String(row.closest('.agents-context-block')?.dataset.hubContext || '').trim();
@@ -1700,8 +1937,9 @@ function openAgentChatModalFromToggle(button) {
   }
 
   if (agentChatTitle) {
-    agentChatTitle.textContent = `Chat com ${agentName}`;
+    agentChatTitle.textContent = voiceEnabled ? `Conversa por voz com ${agentName}` : `Chat com ${agentName}`;
   }
+  applyAgentConversationMode({ voiceEnabled });
   agentChatModal.dataset.agentId = agentId;
   agentChatModal.dataset.contextId = rowCtxId || String(hubContextId || '').trim();
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
@@ -1711,10 +1949,12 @@ function openAgentChatModalFromToggle(button) {
     if (activeHistory) {
       const historyTitle = activeHistory.querySelector('.chat-history-title')?.value || 'Conversa';
       const historyDate = activeHistory.querySelector('.chat-history-date')?.textContent?.trim() || 'Hoje';
-      agentChatSubtitle.textContent = `${historyTitle} • Última conversa ${historyDate}`;
-    } else {
-      agentChatSubtitle.textContent = agentId ? `${agentId} • Online agora` : 'Online agora';
-    }
+      agentChatSubtitle.textContent = voiceEnabled
+        ? `${historyTitle} • Última conversa por voz ${historyDate}`
+        : `${historyTitle} • Última conversa ${historyDate}`;
+	    } else {
+	      agentChatSubtitle.textContent = agentId ? `${agentId} • Online agora` : 'Online agora';
+	    }
   }
 
   agentChatModal.classList.add('open');
@@ -1740,6 +1980,71 @@ if (agentChatModal && agentsPageForChat) {
     if (!deleteBtn || !agentsPageForChat.contains(deleteBtn)) return;
     event.stopPropagation();
     void deleteAgentWithConfirmation(deleteBtn.closest('.agents-row'));
+  });
+  agentsPageForChat.addEventListener('click', async (event) => {
+    const copyBtn = event.target.closest('.agents-copy-link-btn');
+    if (!copyBtn || !agentsPageForChat.contains(copyBtn)) return;
+    if (copyBtn.disabled || copyBtn.getAttribute('disabled') !== null) return;
+    event.stopPropagation();
+    const row = copyBtn.closest('.agents-row');
+    if (!row) return;
+    const agent = {
+      id: row.dataset.agentUuid || '',
+      name: row.querySelector('strong')?.textContent?.trim() || '',
+      public_url: copyBtn.dataset.agentPublicLink || '',
+      use_rag: row.querySelector('.agents-rag-badge--yes') != null,
+      voice_enabled: row.dataset.voiceEnabled === 'true',
+    };
+    openAgentShareModal(agent, copyBtn);
+  });
+}
+
+const agentShareModalEl = document.getElementById('agentShareModal');
+const agentShareCopyBtnEl = document.getElementById('agentShareCopyBtn');
+const agentShareSaveBtnEl = document.getElementById('agentShareSaveBtn');
+const agentSharePrivateToggleEl = document.getElementById('agentSharePrivateToggle');
+if (agentShareCopyBtnEl) {
+  agentShareCopyBtnEl.addEventListener('click', async () => {
+    const link = String(document.getElementById('agentShareLink')?.value || '').trim();
+    if (!link) return;
+    const copied = await copyTextToClipboard(link);
+    if (copied) {
+      agentShareCopyBtnEl.classList.add('is-copied');
+      window.setTimeout(() => agentShareCopyBtnEl.classList.remove('is-copied'), 1200);
+    }
+  });
+}
+  if (agentShareSaveBtnEl && agentShareModalEl) {
+    agentShareSaveBtnEl.addEventListener('click', () => {
+      agentShareModalEl.classList.remove('open');
+      agentShareModalEl.setAttribute('aria-hidden', 'true');
+    });
+  }
+if (agentShareModalEl) {
+  if (agentSharePrivateToggleEl) {
+    agentSharePrivateToggleEl.addEventListener('change', () => {
+      const isPrivate = agentSharePrivateToggleEl.checked;
+      const linkInput = document.getElementById('agentShareLink');
+      const statusChip = document.getElementById('agentShareStatusChip');
+      const linkCard = agentShareModalEl.querySelector('.agent-share-link-card');
+      if (linkInput) linkInput.disabled = isPrivate;
+      if (statusChip) {
+        statusChip.textContent = isPrivate ? 'Privado' : 'Público';
+        statusChip.classList.toggle('agents-visibility-badge--public', !isPrivate);
+        statusChip.classList.toggle('agents-visibility-badge--private', isPrivate);
+      }
+      if (agentShareCopyBtnEl) {
+        const linkValue = String(document.getElementById('agentShareLink')?.value || '').trim();
+        agentShareCopyBtnEl.disabled = isPrivate || !linkValue;
+      }
+      linkCard?.classList.toggle('is-disabled', isPrivate);
+    });
+  }
+  agentShareModalEl.addEventListener('click', (event) => {
+    const closeTarget = event.target.closest('[data-modal-close]');
+    if (!closeTarget) return;
+    agentShareModalEl.classList.remove('open');
+    agentShareModalEl.setAttribute('aria-hidden', 'true');
   });
 }
 
@@ -1806,6 +2111,7 @@ if (agentChatModal) {
     const closeTarget = event.target.closest('[data-modal-close]');
     if (closeTarget) {
       agentChatModal.classList.remove('open');
+      agentChatModal.classList.remove('voice-history-open');
       agentChatModal.setAttribute('aria-hidden', 'true');
       const scopeLine = document.getElementById('agentChatScopeLine');
       if (scopeLine) scopeLine.hidden = true;
@@ -2118,6 +2424,31 @@ if (chatDictationButton) {
   });
 }
 
+if (chatVoiceStartButton && chatDictationButton) {
+  chatVoiceStartButton.addEventListener('click', () => {
+    chatDictationButton.click();
+    chatInput?.focus();
+  });
+}
+
+if (chatVoiceMuteButton) {
+  chatVoiceMuteButton.addEventListener('click', () => {
+    const isMuted = chatVoiceMuteButton.dataset.muted === 'true';
+    const nextMuted = !isMuted;
+    chatVoiceMuteButton.dataset.muted = nextMuted ? 'true' : 'false';
+    chatVoiceMuteButton.setAttribute('aria-label', nextMuted ? 'Ativar microfone' : 'Silenciar microfone');
+    chatVoiceMuteButton.innerHTML = `<i data-lucide="${nextMuted ? 'mic' : 'mic-off'}"></i>`;
+    scheduleLucideRefresh();
+  });
+}
+
+if (chatVoiceHistoryButton && agentChatModal) {
+  chatVoiceHistoryButton.addEventListener('click', () => {
+    const historyList = agentChatModal.querySelector('.chat-history');
+    historyList?.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
 if (chatSendButton) {
   chatSendButton.addEventListener('click', () => {
     if (chatSendButton.disabled) return;
@@ -2129,6 +2460,17 @@ if (chatSendButton) {
     const dateEl = activeHistory.querySelector('.chat-history-date');
     if (dateEl) {
       dateEl.textContent = formatted;
+    }
+    if (agentChatModal?.classList.contains('voice-mode')) {
+      const userText = String(chatInput?.value || '').trim();
+      if (userText && chatVoiceUserLine) chatVoiceUserLine.textContent = userText;
+      setVoiceStageSpeaking();
+      const activeBubble = chatThread?.querySelector('.chat-message.agent:last-child .chat-bubble');
+      const agentText = String(activeBubble?.textContent || 'Entendi. Vou te ajudar com isso agora.').trim();
+      window.setTimeout(() => {
+        if (chatVoiceAgentLine) chatVoiceAgentLine.textContent = agentText;
+        setVoiceStageIdle();
+      }, 1200);
     }
     updateSubtitleFromItem(activeHistory);
     updateChatEmptyState();
@@ -2732,6 +3074,165 @@ if (notificationsToggle && notificationsDropdown) {
   });
 }
 
+function normalizeLanguage(language) {
+  const value = String(language || '').trim().toLowerCase();
+  if (!value) return null;
+  if (value === 'pt' || value === 'pt-br' || value === 'pt_br') return 'pt-BR';
+  if (value.startsWith('en')) return 'en';
+  if (value.startsWith('es')) return 'es';
+  return Object.prototype.hasOwnProperty.call(SUPPORTED_LANGUAGES, language) ? language : null;
+}
+
+function isSupportedLanguage(language) {
+  const normalized = normalizeLanguage(language);
+  return Boolean(normalized && Object.prototype.hasOwnProperty.call(SUPPORTED_LANGUAGES, normalized));
+}
+
+function getLanguagePath(language = currentLanguage) {
+  const normalizedLanguage = normalizeLanguage(language) || DEFAULT_LANGUAGE;
+  return LANGUAGE_PATHS[normalizedLanguage] || LANGUAGE_PATHS[DEFAULT_LANGUAGE];
+}
+
+function resolveLanguageFromPath(pathname) {
+  const value = String(pathname || '/').toLowerCase();
+  if (/^\/en(?:\/|$)/.test(value)) return 'en';
+  if (/^\/es(?:\/|$)/.test(value)) return 'es';
+  return null;
+}
+
+function getSectionAnchor(sectionKey, language = currentLanguage) {
+  const normalizedLanguage = normalizeLanguage(language) || DEFAULT_LANGUAGE;
+  const anchors = SECTION_ANCHORS[normalizedLanguage] || SECTION_ANCHORS[DEFAULT_LANGUAGE];
+  return anchors?.[sectionKey] || null;
+}
+
+function resolveSectionKeyFromHash(hash) {
+  const value = decodeURIComponent(String(hash || ''))
+    .replace(/^#/, '')
+    .trim()
+    .toLowerCase();
+  if (!value) return null;
+  for (const anchors of Object.values(SECTION_ANCHORS)) {
+    const match = Object.entries(anchors).find(([, slug]) => slug === value);
+    if (match) return match[0];
+  }
+  return null;
+}
+
+function getLocalizedHash(hash = window.location.hash, language = currentLanguage) {
+  const sectionKey = resolveSectionKeyFromHash(hash);
+  if (!sectionKey) return hash;
+  const localizedAnchor = getSectionAnchor(sectionKey, language);
+  return localizedAnchor ? `#${localizedAnchor}` : hash;
+}
+
+function syncLanguageUrl({ restoreHashTarget = false } = {}) {
+  if (!window.history?.replaceState) return;
+  const url = new URL(window.location.href);
+  const localizedHash = getLocalizedHash(url.hash, currentLanguage);
+  if (!window.location.hash.startsWith('#/')) {
+    url.pathname = getLanguagePath(currentLanguage);
+    url.searchParams.delete(LANGUAGE_QUERY_KEY);
+  } else {
+    url.searchParams.set(LANGUAGE_QUERY_KEY, currentLanguage);
+  }
+  url.hash = localizedHash;
+  window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  if (!restoreHashTarget || !localizedHash || localizedHash.startsWith('#/')) return;
+  window.requestAnimationFrame(() => {
+    const target = document.getElementById(localizedHash.slice(1));
+    target?.scrollIntoView();
+  });
+}
+
+function syncLanguageUI() {
+  const languageConfig = SUPPORTED_LANGUAGES[currentLanguage];
+  if (!languageConfig) return;
+  document.documentElement.lang = languageConfig.documentLang;
+  if (currentLanguageFlag) currentLanguageFlag.setAttribute('src', languageConfig.flag);
+  if (currentLanguageLabel) currentLanguageLabel.textContent = languageConfig.label;
+  if (themeLightLabel && themeDarkLabel) {
+    const isEnglish = currentLanguage === 'en';
+    themeLightLabel.textContent = isEnglish ? 'Light' : 'Claro';
+    themeDarkLabel.textContent = isEnglish ? 'Dark' : 'Escuro';
+  }
+  languageOptions.forEach((option) => {
+    const isActive = option.dataset.languageOption === currentLanguage;
+    option.classList.toggle('is-active', isActive);
+    option.setAttribute('aria-pressed', String(isActive));
+  });
+}
+
+function setLanguageMenuState(isOpen) {
+  if (!languageSwitcher || !languageToggle || !languageMenu) return;
+  languageSwitcher.classList.toggle('is-open', isOpen);
+  languageToggle.setAttribute('aria-expanded', String(isOpen));
+  languageMenu.hidden = !isOpen;
+}
+
+function persistLanguage(language) {
+  try {
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
+  } catch {
+    // ignore storage failures
+  }
+}
+
+function resolveInitialLanguage() {
+  const pathLanguage = resolveLanguageFromPath(window.location.pathname);
+  if (pathLanguage) return pathLanguage;
+  const urlLanguage = normalizeLanguage(new URL(window.location.href).searchParams.get(LANGUAGE_QUERY_KEY));
+  if (urlLanguage) return urlLanguage;
+  const pageLanguage = normalizeLanguage(document.documentElement.dataset.pageLanguage);
+  if (pageLanguage && isSupportedLanguage(pageLanguage)) return pageLanguage;
+  try {
+    const storedLanguage = normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY));
+    if (storedLanguage && isSupportedLanguage(storedLanguage)) return storedLanguage;
+  } catch {
+    // ignore storage failures
+  }
+  return DEFAULT_LANGUAGE;
+}
+
+function setLanguage(language, { persist = true, restoreHashTarget = false } = {}) {
+  currentLanguage = normalizeLanguage(language) || DEFAULT_LANGUAGE;
+  syncLanguageUI();
+  syncLanguageUrl({ restoreHashTarget });
+  if (persist) persistLanguage(currentLanguage);
+}
+
+if (languageToggle && languageSwitcher && languageMenu) {
+  currentLanguage = resolveInitialLanguage();
+  syncLanguageUI();
+  syncLanguageUrl();
+  languageToggle.addEventListener('click', () => {
+    const isOpen = !languageSwitcher.classList.contains('is-open');
+    setLanguageMenuState(isOpen);
+  });
+
+  languageOptions.forEach((option) => {
+    option.addEventListener('click', () => {
+      const language = option.dataset.languageOption;
+      if (!language) return;
+      setLanguage(language);
+      setLanguageMenuState(false);
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    const target = event.target;
+    if (!(target instanceof Node)) return;
+    if (languageSwitcher.contains(target)) return;
+    setLanguageMenuState(false);
+  });
+}
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') {
+    setLanguageMenuState(false);
+  }
+});
+
 if (detailsToggles.length) {
   detailsToggles.forEach((toggle) => {
     toggle.addEventListener('click', (event) => {
@@ -3005,6 +3506,18 @@ function ensureHubScopeFromStaticMarkup() {
   rebuildHubOrgMenu();
 }
 
+function hubCustomSelectResetMenuPosition(menu) {
+  if (!menu) return;
+  menu.style.position = '';
+  menu.style.left = '';
+  menu.style.right = '';
+  menu.style.top = '';
+  menu.style.bottom = '';
+  menu.style.width = '';
+  menu.style.maxHeight = '';
+  menu.style.zIndex = '';
+}
+
 function hubCustomSelectCloseAll() {
   document.querySelectorAll('.hub-custom-select.is-open').forEach((wrap) => {
     wrap.classList.remove('is-open');
@@ -3012,7 +3525,10 @@ function hubCustomSelectCloseAll() {
     const menu = wrap.querySelector('.hub-custom-menu');
     const tr = wrap.querySelector('.hub-custom-trigger');
     const chev = wrap.querySelector('.hub-select-chevron');
-    if (menu) menu.hidden = true;
+    if (menu) {
+      menu.hidden = true;
+      hubCustomSelectResetMenuPosition(menu);
+    }
     if (tr) tr.setAttribute('aria-expanded', 'false');
     chev?.classList.remove('is-open');
   });
@@ -3024,19 +3540,49 @@ function hubCustomSelectCloseAll() {
 function hubSyncModalSelectOverflow(wrap) {
   const dialog = wrap?.closest('.modal-dialog');
   if (!dialog) return;
-  const hasOpenSelect = Boolean(dialog.querySelector('.hub-custom-select.is-open'));
-  dialog.classList.toggle('has-open-select', hasOpenSelect);
+  dialog.classList.remove('has-open-select');
 }
 
 function hubPositionCustomMenu(wrap, menu) {
   if (!wrap || !menu) return;
+  hubCustomSelectResetMenuPosition(menu);
   wrap.classList.remove('open-up');
   const wrapRect = wrap.getBoundingClientRect();
+  const viewportPadding = 12;
+  const maxMenuHeight = 260;
+  const estimatedMenuHeight = Math.min(menu.scrollHeight || maxMenuHeight, maxMenuHeight);
+
+  if (wrap.closest('.modal-dialog')) {
+    const menuWidth = Math.max(wrapRect.width, 200);
+    const left = Math.max(
+      viewportPadding,
+      Math.min(wrapRect.left, window.innerWidth - menuWidth - viewportPadding)
+    );
+    const spaceBelow = window.innerHeight - wrapRect.bottom - viewportPadding;
+    const spaceAbove = wrapRect.top - viewportPadding;
+    const openUp = spaceBelow < Math.max(estimatedMenuHeight, 180) && spaceAbove > spaceBelow;
+    const availableSpace = Math.max(120, (openUp ? spaceAbove : spaceBelow) - 6);
+    const menuHeight = Math.min(estimatedMenuHeight, availableSpace, maxMenuHeight);
+    const top = openUp
+      ? Math.max(viewportPadding, wrapRect.top - menuHeight - 6)
+      : Math.min(window.innerHeight - viewportPadding - menuHeight, wrapRect.bottom + 6);
+
+    if (openUp) wrap.classList.add('open-up');
+    menu.style.position = 'fixed';
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.right = 'auto';
+    menu.style.top = `${Math.round(top)}px`;
+    menu.style.bottom = 'auto';
+    menu.style.width = `${Math.round(menuWidth)}px`;
+    menu.style.maxHeight = `${Math.round(menuHeight)}px`;
+    menu.style.zIndex = '10000';
+    return;
+  }
+
   const boundsRect = wrap.closest('.modal-dialog')?.getBoundingClientRect() || {
     top: 0,
     bottom: window.innerHeight,
   };
-  const estimatedMenuHeight = Math.min(menu.scrollHeight || 0, 260);
   const requiredSpace = Math.max(estimatedMenuHeight, 180);
   const spaceBelow = boundsRect.bottom - wrapRect.bottom - 20;
   const spaceAbove = wrapRect.top - boundsRect.top - 20;
@@ -3076,6 +3622,9 @@ function hubCustomSelectRefresh(wrap) {
     li.appendChild(btn);
     menu.appendChild(li);
   });
+  if (wrap.classList.contains('is-open') && !menu.hidden) {
+    hubPositionCustomMenu(wrap, menu);
+  }
 }
 
 function hubEnhanceSelectWrap(wrap) {
@@ -3307,7 +3856,7 @@ function syncAgentsScopeStatus() {
   el.innerHTML = `<span>Organização:</span> <strong>${escapeHtmlWes(orgName)}</strong><span>/</span><span>Projeto:</span> <strong>${escapeHtmlWes(projectName)}</strong>`;
 }
 
-function fillAgentModalProjectOptions(preferredProjectSlug = '') {
+function fillAgentModalProjectOptions(preferredProjectSlug = '', preferredProjectId = '') {
   if (!agentModalProject) return '';
   const selectedOrgId = hubOrgId || Object.keys(HUB_SCOPE || {})[0] || '';
   const org = HUB_SCOPE[selectedOrgId];
@@ -3332,9 +3881,11 @@ function fillAgentModalProjectOptions(preferredProjectSlug = '') {
   const selected =
     preferredProjectSlug && org.projects.some((project) => project.slug === preferredProjectSlug)
       ? preferredProjectSlug
-      : routeProjectSlug && org.projects.some((project) => project.slug === routeProjectSlug)
-        ? routeProjectSlug
-        : '';
+      : preferredProjectId && org.projects.some((project) => String(project.id || '').trim() === String(preferredProjectId || '').trim())
+        ? org.projects.find((project) => String(project.id || '').trim() === String(preferredProjectId || '').trim())?.slug || ''
+        : routeProjectSlug && org.projects.some((project) => project.slug === routeProjectSlug)
+          ? routeProjectSlug
+          : '';
   agentModalProject.value = selected;
   return selected;
 }
@@ -3962,6 +4513,123 @@ function setAgentsApiStatus(message, isError) {
   el.classList.toggle('agents-api-status--error', Boolean(isError));
 }
 
+function getAgentVisibilityInfo(agent = {}) {
+  const rawVisibility = String(
+    agent.visibility || agent.access || agent.scope || agent.is_public || agent.public || ''
+  )
+    .trim()
+    .toLowerCase();
+  const isPublic =
+    Boolean(agent.public_url || agent.share_url || agent.public_link || agent.public_link_url) ||
+    ['public', 'público', 'publico', 'shared', 'open', 'true', '1', 'yes'].includes(rawVisibility) ||
+    Boolean(agent.is_public === true || agent.public === true);
+  return {
+    label: isPublic ? 'Público' : 'Privado',
+    isPublic,
+  };
+}
+
+function getAgentPublicLink(agent = {}) {
+  const explicitLink = String(
+    agent.public_url || agent.share_url || agent.public_link || agent.public_link_url || ''
+  ).trim();
+  if (explicitLink) return explicitLink;
+  const agentId = String(agent.id || agent.agent_id || '').trim();
+  if (!agentId || !getAgentVisibilityInfo(agent).isPublic) return '';
+  const url = new URL(window.location.href);
+  url.hash = `#/dashboard/agents?agent=${encodeURIComponent(agentId)}`;
+  return url.toString();
+}
+
+function getAgentActionIcon(agent = {}) {
+  return agent.voice_enabled ? 'audio-lines' : 'message-circle';
+}
+
+function getAgentActionLabel(agent = {}) {
+  return agent.voice_enabled ? 'Conversar por voz' : 'Conversar';
+}
+
+async function copyTextToClipboard(text) {
+  const value = String(text || '').trim();
+  if (!value) return false;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+      return true;
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = value;
+    textarea.setAttribute('readonly', 'readonly');
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    const copied = document.execCommand('copy');
+    textarea.remove();
+    return copied;
+  } catch {
+    return false;
+  }
+}
+
+function getAgentSharePermission(agent = {}) {
+  return String(agent.share_permission || agent.public_permission || 'viewer').trim() || 'viewer';
+}
+
+function getAgentShareSettings(agent = {}) {
+  return {
+    public: getAgentVisibilityInfo(agent).isPublic,
+    permission: getAgentSharePermission(agent),
+    canCopy: agent.share_allow_copy !== false,
+    canChat: agent.share_allow_chat !== false,
+    canEdit: agent.share_allow_edit === true,
+    canComment: agent.share_allow_comment !== false,
+  };
+}
+
+function setAgentShareModal(agent = {}) {
+  const modal = document.getElementById('agentShareModal');
+  const nameEl = document.getElementById('agentShareAgentName');
+  const linkEl = document.getElementById('agentShareLink');
+  const statusEl = document.getElementById('agentShareStatusChip');
+  const privateToggleEl = document.getElementById('agentSharePrivateToggle');
+  const linkCardEl = document.querySelector('#agentShareModal .agent-share-link-card');
+  const copyBtn = document.getElementById('agentShareCopyBtn');
+  if (!modal || !nameEl || !linkEl || !statusEl) return;
+
+  const settings = getAgentShareSettings(agent);
+  const name = String(agent.name || agent.id || 'Agente').trim();
+  const link = getAgentPublicLink(agent);
+  const isPrivate = !settings.public;
+
+  nameEl.textContent = name;
+  linkEl.value = link;
+  if (privateToggleEl) privateToggleEl.checked = isPrivate;
+  statusEl.textContent = isPrivate ? 'Privado' : 'Público';
+  statusEl.classList.toggle('agents-visibility-badge--public', !isPrivate);
+  statusEl.classList.toggle('agents-visibility-badge--private', isPrivate);
+  linkEl.disabled = isPrivate;
+  if (copyBtn) copyBtn.disabled = isPrivate || !link;
+  linkCardEl?.classList.toggle('is-disabled', isPrivate);
+  modal.dataset.agentId = String(agent.id || '');
+}
+
+function openAgentShareModal(agent, triggerButton) {
+  const modal = document.getElementById('agentShareModal');
+  if (!modal || !agent) return;
+  setAgentShareModal(agent);
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  modal.dataset.triggerButtonId = triggerButton?.id || '';
+  window.setTimeout(() => document.getElementById('agentShareLink')?.focus(), 0);
+}
+
+async function copyAgentLinkToClipboard(agent) {
+  const link = getAgentPublicLink(agent);
+  if (!link) return false;
+  return copyTextToClipboard(link);
+}
+
 function buildAgentRowElement(agent) {
   const row = document.createElement('div');
   row.className = 'agents-row';
@@ -3969,14 +4637,20 @@ function buildAgentRowElement(agent) {
   row.dataset.agentUuid = agent.id;
   row.dataset.projectId = agent.project_id || '';
   row.dataset.hubOrg = agent.environment_slug || '';
+  row.dataset.voiceEnabled = agent.voice_enabled ? 'true' : 'false';
   row.dataset.agentsEnvironment = resolveAgentsPageEnvironmentIdForAgent(agent);
   const environmentLabel = getAgentsPageEnvironmentLabel(row.dataset.agentsEnvironment);
   const name = escapeHtmlWes(agent.name || '');
   const idCell = escapeHtmlWes(`${String(agent.id).slice(0, 8)}...`);
   const rag = agent.use_rag ? 'Sim' : 'Não';
+  const ragClass = agent.use_rag ? 'agents-rag-badge agents-rag-badge--yes' : 'agents-rag-badge';
+  const visibility = getAgentVisibilityInfo(agent);
+  const publicLink = visibility.isPublic ? getAgentPublicLink(agent) : '';
   const hasProject = Boolean(agent.project_id);
   const desc = escapeHtmlWes(`${(agent.description || '').trim()}${hasProject ? '' : ' • Sem projeto'}`.trim());
-  row.innerHTML = `<span><strong>${name}</strong></span><span title="${escapeHtmlWes(agent.id)}">${idCell}</span><span class="link">${rag}</span><span class="agents-row-environment"><span class="agents-environment-badge">${escapeHtmlWes(environmentLabel)}</span></span><span class="agents-row-description">${desc}</span><span class="row-actions"><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar"><span class="material-symbols-rounded">chat</span></button></span>`;
+  const actionIcon = getAgentActionIcon(agent);
+  const actionLabel = getAgentActionLabel(agent);
+  row.innerHTML = `<span><strong>${name}</strong></span><span class="agents-row-description">${desc}</span><span title="${escapeHtmlWes(agent.id)}">${idCell}</span><span><span class="${ragClass}">${rag}</span></span><span class="agents-row-environment"><span class="agents-environment-badge">${escapeHtmlWes(environmentLabel)}</span></span><span class="agents-row-visibility"><span class="agents-visibility-badge${visibility.isPublic ? ' agents-visibility-badge--public' : ''}">${escapeHtmlWes(visibility.label)}</span></span><span class="row-actions"><button type="button" class="icon-btn action-icon agent-edit-toggle" data-agent-id="${escapeHtmlWes(agent.id)}" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button><button type="button" class="icon-btn action-icon ${visibility.isPublic && publicLink ? 'agents-copy-link-btn' : 'muted-icon'}" data-agent-public-link="${escapeHtmlWes(publicLink)}" aria-label="Compartilhar agente"${visibility.isPublic && publicLink ? '' : ' disabled'}><i data-lucide="share"></i></button><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="${escapeHtmlWes(actionLabel)}"><i data-lucide="${escapeHtmlWes(actionIcon)}"></i></button></span>`;
   return row;
 }
 
@@ -4089,6 +4763,7 @@ async function refreshAgentsTableFromApi() {
       setAgentsApiStatus('Resposta invalida da API (esperado um array de agentes).', true);
       return;
     }
+    window.__wesAgentsCache = agents;
     ensureHubScopeFromAgents(agents);
     if (hubOrgId) {
       hubSyncFromState();
@@ -4100,6 +4775,7 @@ async function refreshAgentsTableFromApi() {
     scheduleLucideRefresh();
     syncAgentsAllListScope();
     renderAgentsProjectDetailsFromApi(agents);
+    applyAgentsAdvancedFilters();
     if (agents.length === 0) {
       setAgentsApiStatus(
         'Nenhum agente para este usuário na organização selecionada.',
@@ -4300,9 +4976,9 @@ function rebuildAgentsByOrgFromScope(environments) {
             <div class="agents-table" aria-label="Agentes do projeto ${escapeHtmlWes(p.title)}">
               <div class="agents-row header">
                 <span>Nome do agente</span>
+                <span>Descrição</span>
                 <span>ID</span>
                 <span>RAG</span>
-                <span>Descrição</span>
                 <span>Ações</span>
               </div>
             </div>
@@ -4524,6 +5200,66 @@ function applyAgentsProjectRoute() {
   input.addEventListener('search', run);
 })();
 
+function applyAgentsRowFilters(row) {
+  if (!row || row.classList.contains('header')) return;
+  const ragText = String(row.querySelector('.agents-rag-badge')?.textContent || '').trim().toLowerCase();
+  const visibilityText = String(row.querySelector('.agents-visibility-badge')?.textContent || '').trim().toLowerCase();
+  const ragOk = !agentsRagFilter || ragText === agentsRagFilter;
+  const visibilityOk = !agentsVisibilityFilter || visibilityText === agentsVisibilityFilter;
+  row.classList.toggle('agents-row--filter-hide', !(ragOk && visibilityOk));
+}
+
+function applyAgentsAdvancedFilters() {
+  if (!agentsByOrg) return;
+  agentsByOrg.querySelectorAll('.agents-table').forEach((table) => {
+    table.querySelectorAll('.agents-row').forEach((row) => applyAgentsRowFilters(row));
+  });
+  const allTable = document.getElementById('agentsAllAgentsTable');
+  if (allTable) {
+    allTable.querySelectorAll('.agents-row').forEach((row) => applyAgentsRowFilters(row));
+  }
+  resetAgentsPagination();
+}
+window.applyAgentsAdvancedFilters = applyAgentsAdvancedFilters;
+
+if (agentsFilterBtn && agentsFilterMenu) {
+  const filterOptions = agentsFilterMenu.querySelectorAll('.filter-option');
+  const clearButton = agentsFilterMenu.querySelector('.filter-clear');
+
+  agentsFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    agentsFilterMenu.classList.toggle('open');
+  });
+
+  filterOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const group = button.dataset.filter;
+      agentsFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((option) => option.classList.remove('active'));
+      button.classList.add('active');
+
+      if (group === 'rag') agentsRagFilter = String(button.dataset.value || '').trim().toLowerCase();
+      if (group === 'visibility') agentsVisibilityFilter = String(button.dataset.value || '').trim().toLowerCase();
+      applyAgentsAdvancedFilters();
+    });
+  });
+
+  clearButton?.addEventListener('click', () => {
+    agentsRagFilter = '';
+    agentsVisibilityFilter = '';
+    agentsFilterMenu.querySelectorAll('.filter-option').forEach((option) => option.classList.remove('active'));
+    agentsFilterMenu.querySelectorAll('.filter-option[data-value=""]').forEach((option) => option.classList.add('active'));
+    applyAgentsAdvancedFilters();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!agentsFilterMenu.contains(event.target) && !agentsFilterBtn.contains(event.target)) {
+      agentsFilterMenu.classList.remove('open');
+    }
+  });
+}
+
 if (hubOrgTrigger && hubOrgMenu) {
   hubOrgTrigger.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -4715,8 +5451,13 @@ hubSyncFromState();
     if (dangerZone) {
       dangerZone.hidden = !isEdit;
     }
-    if (deleteConfirm) deleteConfirm.checked = false;
-    if (deleteBtn) deleteBtn.disabled = true;
+    if (deleteConfirm) {
+      deleteConfirm.checked = false;
+    }
+    if (deleteBtn) {
+      deleteBtn.disabled = true;
+      deleteBtn.classList.remove('is-loading');
+    }
   }
 
   function serializeProjectModalState() {
@@ -4843,50 +5584,6 @@ hubSyncFromState();
     }
   });
 
-  deleteConfirm?.addEventListener('change', () => {
-    if (deleteBtn) deleteBtn.disabled = !deleteConfirm.checked;
-  });
-
-  deleteBtn?.addEventListener('click', async () => {
-    if (modal.dataset.mode !== 'edit') return;
-    if (!deleteConfirm?.checked) return;
-    const projectId = String(modal.dataset.projectId || '').trim();
-    const projectTitle = String(nameInput.value || 'este projeto').trim() || 'este projeto';
-    if (!projectId || typeof window.wesApiFetch !== 'function' || !window.WesDashboardAuth?.isAuthenticated()) return;
-    const confirmed = window.confirm(
-      `Tem certeza que quer fazer isso? Essa ação não poderá ser desfeita.\n\nProjeto: ${projectTitle}`
-    );
-    if (!confirmed) return;
-    try {
-      const res = await window.wesApiFetch(`/projects/${encodeURIComponent(projectId)}`, {
-        method: 'DELETE',
-      });
-      const raw = await res.text();
-      let body = null;
-      try {
-        body = raw ? JSON.parse(raw) : null;
-      } catch {
-        body = null;
-      }
-      if (!res.ok) {
-        const detail =
-          typeof body?.detail === 'string'
-            ? body.detail
-            : Array.isArray(body?.detail)
-              ? body.detail.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join('; ')
-              : raw || res.statusText;
-        throw new Error(detail);
-      }
-      closeModal();
-      resetProjectModalState();
-      window.location.hash = '#/dashboard/agents';
-      if (typeof refreshHubScopeFromApi === 'function') await refreshHubScopeFromApi();
-      if (typeof refreshAgentsTableFromApi === 'function') await refreshAgentsTableFromApi();
-    } catch (error) {
-      window.alert(`Não foi possível excluir o projeto. ${error?.message || ''}`.trim());
-    }
-  });
-
   environmentSel.addEventListener('change', async () => {
     hubCustomSelectCloseAll();
     await fillProjectModalAgentOptions(getProjectModalSelectedAgentIds());
@@ -4917,6 +5614,64 @@ hubSyncFromState();
 
   form.addEventListener('input', syncProjectModalSubmitState);
   form.addEventListener('change', syncProjectModalSubmitState);
+
+  deleteConfirm?.addEventListener('change', () => {
+    if (!deleteBtn) return;
+    deleteBtn.disabled = !deleteConfirm.checked;
+  });
+
+  deleteBtn?.addEventListener('click', async () => {
+    if (modal.dataset.mode !== 'edit') return;
+    const projectId = String(modal.dataset.projectId || '').trim();
+    if (!projectId) {
+      setProjectModalError('Projeto inválido para exclusão.');
+      return;
+    }
+    if (!deleteConfirm?.checked) return;
+    if (typeof window.wesApiFetch !== 'function' || !window.WesDashboardAuth?.isAuthenticated()) {
+      setProjectModalError('Recurso indisponível sem configuração de API para excluir projeto.');
+      return;
+    }
+    const confirmed = window.confirm('Tem certeza que deseja excluir este projeto? Essa ação não poderá ser desfeita.');
+    if (!confirmed) return;
+    setProjectModalError('');
+    deleteBtn.disabled = true;
+    deleteBtn.classList.add('is-loading');
+    try {
+      const res = await window.wesApiFetch(`/projects/${encodeURIComponent(projectId)}`, { method: 'DELETE' });
+      const rawText = await res.text();
+      let data = null;
+      try {
+        data = rawText ? JSON.parse(rawText) : null;
+      } catch {
+        data = null;
+      }
+      if (!res.ok) {
+        const detail =
+          typeof data?.detail === 'string'
+            ? data.detail
+            : Array.isArray(data?.detail)
+              ? data.detail.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join('; ')
+              : rawText || res.statusText;
+        setProjectModalError(`Não foi possível excluir (${res.status}): ${detail}`);
+        return;
+      }
+      closeModal();
+      resetProjectModalState();
+      if (typeof refreshHubScopeFromApi === 'function') {
+        await refreshHubScopeFromApi();
+      }
+      hubRefreshCustomSelects();
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setProjectModalError(msg);
+    } finally {
+      if (deleteBtn) {
+        deleteBtn.classList.remove('is-loading');
+        deleteBtn.disabled = !deleteConfirm?.checked;
+      }
+    }
+  });
 
   form.addEventListener('submit', async (e) => {
     e.preventDefault();

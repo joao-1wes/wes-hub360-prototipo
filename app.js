@@ -3677,7 +3677,7 @@ function hubRefreshCustomSelects() {
   scheduleLucideRefresh();
 }
 
-/** Markup do ÃÂ­cone de pasta (Lucide `folder`) para projetos Ã¢â¬â usar ao criar cards/detalhes via JS; depois chame `lucide.createIcons()`. */
+/** Markup do icone de pasta (Lucide `folder`) para projetos - usar ao criar cards/detalhes via JS; depois chame `lucide.createIcons()`. */
 window.wesLucideProjectFolderIconHtml = function wesLucideProjectFolderIconHtml(role) {
   const inner = '<i data-lucide="folder"></i>';
   if (role === 'detail') {
@@ -4727,7 +4727,7 @@ async function deleteAgentWithConfirmation(row) {
   }
 }
 
-/** Substitui linhas demo pela lista filtrada por usuÃÂ¡rio (GET /agents + X-User-Id). */
+/** Substitui linhas demo pela lista filtrada por usuario (GET /agents + X-User-Id). */
 async function refreshAgentsTableFromApi() {
   const table = document.getElementById('agentsAllAgentsTable');
   if (!table || typeof window.wesApiFetch !== 'function') {
@@ -5897,7 +5897,7 @@ if (insightsGrid) {
       listItems.forEach((item) => {
         item.setAttribute('title', item.textContent.trim());
       });
-      list.setAttribute('title', items.join(' ÃÂ· '));
+      list.setAttribute('title', items.join(' · '));
     }
   });
 }
@@ -6132,7 +6132,7 @@ window.addEventListener('resize', syncAgentsFolderStripScroller);
 
 scheduleLucideRefresh();
 
-/** Painel lateral Ã¢â¬â chat direto (POST /chat, sem agente) */
+/** Painel lateral - chat direto (POST /chat, sem agente) */
 (function initDirectChatDrawer() {
   const drawer = document.getElementById('directChatDrawer');
   const fab = document.getElementById('directChatFab');

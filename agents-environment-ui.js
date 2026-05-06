@@ -369,13 +369,23 @@
       } else {
         const hasProject = Boolean(agent?.project_id);
         const desc = `${agent.description || ''}${hasProject ? '' : ' • Sem projeto'}`.trim();
+        const visibility = String(agent?.visibility || agent?.access || agent?.scope || '').trim().toLowerCase();
+        const isPublic =
+          Boolean(agent?.public_url || agent?.share_url || agent?.public_link) ||
+          ['public', 'público', 'publico', 'shared', 'open', 'true', '1', 'yes'].includes(visibility) ||
+          Boolean(agent?.is_public === true || agent?.public === true);
+        const publicLink = isPublic ? (String(agent?.public_url || agent?.share_url || agent?.public_link || '').trim() || `#/dashboard/agents?agent=${encodeURIComponent(String(agent?.id || '').trim())}`) : '';
         row = document.createElement('div');
         row.className = 'agents-row';
         row.dataset.fromApi = 'true';
         row.dataset.agentUuid = agent.id;
         row.dataset.projectId = agent.project_id || '';
         row.dataset.hubOrg = agent.environment_slug || '';
-        row.innerHTML = `<span><strong>${agent.name || ''}</strong></span><span>${String(agent.id || '').slice(0, 8)}...</span><span class="link">${agent.use_rag ? 'Sim' : 'Nao'}</span><span>${desc}</span><span class="row-actions"><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar"><span class="material-symbols-rounded">chat</span></button></span>`;
+        row.dataset.agentsEnvironment = agent.environment_slug || '';
+        row.dataset.voiceEnabled = agent.voice_enabled ? 'true' : 'false';
+        const actionIcon = agent?.voice_enabled ? 'audio-lines' : 'message-circle';
+        const actionLabel = agent?.voice_enabled ? 'Conversar por voz' : 'Conversar';
+        row.innerHTML = `<span><strong>${agent.name || ''}</strong></span><span>${desc}</span><span>${String(agent.id || '').slice(0, 8)}...</span><span><span class="agents-rag-badge${agent.use_rag ? ' agents-rag-badge--yes' : ''}">${agent.use_rag ? 'Sim' : 'Não'}</span></span><span class="agents-row-environment"><span class="agents-environment-badge">${agent.environment_slug || ''}</span></span><span class="agents-row-visibility"><span class="agents-visibility-badge${isPublic ? ' agents-visibility-badge--public' : ''}">${isPublic ? 'Público' : 'Privado'}</span></span><span class="row-actions"><button type="button" class="icon-btn action-icon ${isPublic && publicLink ? 'agents-copy-link-btn' : 'muted-icon'}" data-agent-public-link="${publicLink.replace(/"/g, '&quot;')}" aria-label="Compartilhar agente"${isPublic && publicLink ? '' : ' disabled'}><i data-lucide="share"></i></button><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="${actionLabel}"><i data-lucide="${actionIcon}"></i></button></span>`;
       }
       const orgSlug = agent.environment_slug || '';
       if (orgSlug) row.dataset.hubOrg = orgSlug;
@@ -384,6 +394,7 @@
     table.appendChild(frag);
     if (typeof renderAgentsProjectDetailsFromApi === 'function') renderAgentsProjectDetailsFromApi(agents);
     if (typeof window.lucide !== 'undefined') window.lucide.createIcons();
+    if (typeof window.applyAgentsAdvancedFilters === 'function') window.applyAgentsAdvancedFilters();
     applyEnvironmentFilterToDom();
   }
 
@@ -734,7 +745,7 @@
             <label class="modal-label" for="wesProjectNewAgentPrompt">Prompt do sistema</label>
             <textarea class="modal-textarea" id="wesProjectNewAgentPrompt" rows="5" maxlength="12000" placeholder="Defina como o agente deve responder e se comportar"></textarea>
             <label class="switch-row" for="wesProjectNewAgentUseRag">
-              <span>Conhecimento interno</span>
+              <span class="agents-header-tooltip" data-tooltip="Conhecimento interno">RAG</span>
               <span class="switch">
                 <input id="wesProjectNewAgentUseRag" type="checkbox" checked />
                 <span class="slider"></span>

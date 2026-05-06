@@ -131,6 +131,13 @@ const automationModalPackageHint = document.getElementById('automationModalPacka
 const automationModalVersion = document.getElementById('automationModalVersion');
 const automationModalParams = document.getElementById('automationModalParams');
 const automationModalSubmit = document.getElementById('automationModalSubmit');
+const executionDetailsModal = document.getElementById('executionDetailsModal');
+const executionDetailsId = document.getElementById('executionDetailsId');
+const executionDetailsStart = document.getElementById('executionDetailsStart');
+const executionDetailsEnd = document.getElementById('executionDetailsEnd');
+const executionDetailsDuration = document.getElementById('executionDetailsDuration');
+const executionDetailsStatus = document.getElementById('executionDetailsStatus');
+const executionDetailsRecording = document.getElementById('executionDetailsRecording');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
 const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
@@ -142,6 +149,7 @@ const automationStatusSwitches = document.querySelectorAll('.automation-status-s
 const automationTabs = document.querySelectorAll('#page-automations .tab');
 const automationPanels = document.querySelectorAll('#page-automations .tab-panel');
 const automationsTable = document.querySelector('#page-automations .automations-table');
+const executionsTable = document.querySelector('#page-automations .executions-table');
 const executorTabs = document.querySelectorAll('#page-executors .tab');
 const executorPanels = document.querySelectorAll('#page-executors .tab-panel');
 const usersTabs = document.querySelectorAll('#page-users .tab');
@@ -3045,6 +3053,43 @@ if (periodFilterBtn && periodFilterMenu) {
 
   document.addEventListener('click', () => {
     periodFilterMenu.classList.remove('open');
+  });
+}
+
+if (executionsTable && executionDetailsModal) {
+  const fillExecutionDetailsModal = (row) => {
+    if (!row) return;
+    executionDetailsId.textContent = row.dataset.executionId || '-';
+    executionDetailsStart.textContent = row.dataset.executionStart || '-';
+    executionDetailsEnd.textContent = row.dataset.executionEnd || '-';
+    executionDetailsDuration.textContent = row.dataset.executionDuration || '-';
+    executionDetailsStatus.textContent = row.dataset.executionStatus || '-';
+    executionDetailsRecording.textContent = row.dataset.executionRecording || '-';
+  };
+
+  const openExecutionDetailsModal = () => {
+    executionDetailsModal.classList.add('open');
+    executionDetailsModal.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeExecutionDetailsModal = () => {
+    executionDetailsModal.classList.remove('open');
+    executionDetailsModal.setAttribute('aria-hidden', 'true');
+  };
+
+  executionsTable.addEventListener('click', (event) => {
+    const detailsButton = event.target.closest('.execution-details-trigger');
+    if (!detailsButton) return;
+    const row = detailsButton.closest('.execution-row');
+    if (!row) return;
+    fillExecutionDetailsModal(row);
+    openExecutionDetailsModal();
+  });
+
+  executionDetailsModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) {
+      closeExecutionDetailsModal();
+    }
   });
 }
 

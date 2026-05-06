@@ -747,22 +747,46 @@
                     <span>Status</span>
                     <span>Ações</span>
                   </div>
-                  <div class="data-row">
+                  <div
+                    class="data-row execution-row"
+                    data-execution-id="4c100b8b-534a-4b0c-bf9d-5c8f39d9b5a1"
+                    data-execution-automation="Relatório diário"
+                    data-execution-start="12/03/2025 • 08:00"
+                    data-execution-end="12/03/2025 • 08:30"
+                    data-execution-duration="30 min"
+                    data-execution-status="Completa"
+                    data-execution-recording="Sim"
+                  >
                     <span>Relatório diário</span>
                     <span>12/03/2025 • 08:00</span>
                     <span>12/03/2025 • 08:30</span>
                     <span>30 min</span>
                     <span class="chip success">Completa</span>
                     <span class="row-actions">
+                      <button class="icon-btn action-icon execution-details-trigger" aria-label="Ver detalhes" type="button">
+                        <span class="material-symbols-rounded">info</span>
+                      </button>
                     </span>
                   </div>
-                  <div class="data-row">
+                  <div
+                    class="data-row execution-row"
+                    data-execution-id="8d85fcb9-3ab1-46d0-ae22-44248814d90c"
+                    data-execution-automation="Monitoramento de filas"
+                    data-execution-start="11/03/2025 • 18:00"
+                    data-execution-end="11/03/2025 • 18:10"
+                    data-execution-duration="10 min"
+                    data-execution-status="Interrompida"
+                    data-execution-recording="Não"
+                  >
                     <span>Monitoramento de filas</span>
                     <span>11/03/2025 • 18:00</span>
                     <span>11/03/2025 • 18:10</span>
                     <span>10 min</span>
                     <span class="chip warning">Interrompida</span>
                     <span class="row-actions">
+                      <button class="icon-btn action-icon execution-details-trigger" aria-label="Ver detalhes" type="button">
+                        <span class="material-symbols-rounded">info</span>
+                      </button>
                     </span>
                   </div>
                 </div>
@@ -2176,6 +2200,69 @@
                   <button class="btn primary" type="submit" id="automationModalSubmit">Criar automação</button>
                 </div>
               </form>
+            </div>
+          </div>
+
+          <div class="modal" id="executionDetailsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog execution-details-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="executionDetailsModalTitle">
+              <div class="modal-header">
+                <h3 id="executionDetailsModalTitle">Detalhes da execução</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body execution-details-modal-body">
+                <section class="execution-details-grid">
+                  <div class="execution-details-item execution-details-item--wide">
+                    <span class="execution-details-label">ID da execução</span>
+                    <strong id="executionDetailsId">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Início</span>
+                    <strong id="executionDetailsStart">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Conclusão</span>
+                    <strong id="executionDetailsEnd">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Duração</span>
+                    <strong id="executionDetailsDuration">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Estado</span>
+                    <strong id="executionDetailsStatus">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Gravação</span>
+                    <strong id="executionDetailsRecording">-</strong>
+                  </div>
+                </section>
+
+                <section class="execution-logs-section">
+                  <h4 class="execution-logs-title">Registos (0 de 0)</h4>
+                  <div class="execution-logs-filters">
+                    <div class="hub-select-wrap hub-select-wrap--block">
+                      <select class="hub-select" aria-label="Filtrar nível">
+                        <option>Nível</option>
+                      </select>
+                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                    </div>
+                    <input class="modal-input" type="text" placeholder="Pesquisar mensagem" aria-label="Pesquisar mensagem" />
+                    <button class="btn outline" type="button" disabled>Limpar</button>
+                  </div>
+                  <div class="execution-logs-table">
+                    <div class="execution-logs-row execution-logs-row--head">
+                      <span>Data/Hora</span>
+                      <span>Nível</span>
+                      <span>Mensagem</span>
+                      <span>Runtime (s)</span>
+                    </div>
+                    <div class="execution-logs-empty">Sem registos disponíveis</div>
+                  </div>
+                </section>
+              </div>
             </div>
           </div>
 

@@ -3056,6 +3056,130 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   background: rgba(220, 38, 38, 0.08);
 }
 
+.users-table .row-actions .action-icon[disabled] {
+  color: #cbd5e1 !important;
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+.users-table .row-actions .action-icon[disabled]:hover {
+  background: transparent !important;
+}
+
+.audit-filters-grid {
+  grid-template-columns: minmax(320px, 1.7fr) repeat(2, minmax(142px, max-content));
+  align-items: center;
+  column-gap: 8px;
+  margin-bottom: 16px;
+}
+
+.audit-search-field-wrap {
+  min-width: 0;
+}
+
+.audit-filters-grid .form-field {
+  position: relative;
+}
+
+.audit-filters-grid .menu {
+  top: calc(100% + 8px);
+  right: auto;
+  left: 0;
+  min-width: 220px;
+}
+
+.audit-period-menu {
+  width: 300px;
+  left: auto !important;
+  right: 0 !important;
+}
+
+#auditPeriodMenu {
+  left: auto !important;
+  right: 0 !important;
+}
+
+.audit-period-toggle {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.audit-period-option {
+  flex: 1;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.audit-period-option.active {
+  background: #eef6ff;
+  border-color: #cfe3ff;
+  color: #016ff4;
+}
+
+.audit-period-fields {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+}
+
+.audit-period-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.audit-period-field label {
+  font-weight: 600;
+  font-size: var(--md-body-small);
+  color: #111827;
+}
+
+.audit-period-field input {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: var(--md-body-medium);
+}
+
+.audit-period-footer .btn.filter-btn {
+  width: 100%;
+}
+
+.audit-table {
+  gap: 8px;
+}
+
+.audit-table .data-row {
+  grid-template-columns:
+    minmax(175px, 1.25fr)
+    minmax(190px, 1.35fr)
+    minmax(100px, 0.75fr)
+    minmax(170px, 1.1fr)
+    minmax(72px, 0.45fr);
+}
+
+.audit-action-chip {
+  font-weight: 600;
+}
+
+.audit-table .row-actions {
+  justify-content: center;
+}
+
+.audit-view-btn .material-symbols-rounded {
+  font-size: 22px;
+}
+
+.audit-details-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .automations-table .data-row {
   grid-template-columns:
     minmax(0, 1.95fr)
@@ -3085,7 +3209,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .automation-status-switch-label {
-  min-width: 52px;
+  width: 7ch;
+  text-align: center;
 }
 
 .automation-status-switch.is-active .automation-status-switch-label {
@@ -4413,6 +4538,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .agent-share-dialog {
+  --agent-share-inline-padding: 28px;
   width: min(760px, 94vw);
   padding: 0;
   gap: 0;
@@ -4423,11 +4549,9 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .agent-share-dialog .agent-share-body {
   display: grid;
   gap: 18px;
-  padding: 24px 28px 20px;
+  padding: 24px var(--agent-share-inline-padding) 20px;
   overflow-y: auto;
   min-height: 0;
-  padding-right: 28px;
-  padding-left: 28px;
 }
 
 .agent-share-summary {
@@ -4514,8 +4638,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .agent-share-dialog .modal-header,
 .agent-share-dialog .modal-footer {
   flex-shrink: 0;
-  padding-left: 28px;
-  padding-right: 28px;
+  padding-left: var(--agent-share-inline-padding);
+  padding-right: var(--agent-share-inline-padding);
 }
 
 .agent-share-dialog .modal-header {
@@ -4529,16 +4653,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 @media (max-width: 760px) {
+  .agent-share-dialog {
+    --agent-share-inline-padding: 16px;
+  }
+
   .agent-share-dialog .agent-share-body {
-    padding: 18px 16px 16px;
-    padding-right: 16px;
-    padding-left: 16px;
+    padding: 18px var(--agent-share-inline-padding) 16px;
   }
-  .agent-share-dialog .modal-header,
-  .agent-share-dialog .modal-footer {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
+
   .agent-share-permissions {
     grid-template-columns: 1fr;
   }
@@ -4584,6 +4706,207 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .project-modal-delete-btn {
   justify-self: start;
+}
+
+.manage-roles-dialog,
+.create-user-dialog {
+  width: min(1040px, 94vw);
+  padding: 0;
+  gap: 0;
+  max-height: min(90vh, calc(100dvh - 28px));
+  overflow: hidden;
+}
+
+.manage-roles-dialog .modal-header,
+.manage-roles-dialog .modal-footer,
+.create-user-dialog .modal-header,
+.create-user-dialog .modal-footer {
+  padding: 20px 24px;
+}
+
+.modal-dialog.manage-roles-dialog:not(.chat-dialog) .modal-header,
+.modal-dialog.create-user-dialog:not(.chat-dialog) .modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.modal-dialog.manage-roles-dialog:not(.chat-dialog) .modal-footer,
+.modal-dialog.create-user-dialog:not(.chat-dialog) .modal-footer {
+  padding: 20px 24px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.modal-dialog.manage-roles-dialog:not(.chat-dialog) .manage-roles-body,
+.modal-dialog.create-user-dialog:not(.chat-dialog) .create-user-body {
+  display: grid;
+  gap: 0;
+  padding: 0 24px 20px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.users-modal-section {
+  display: grid;
+  gap: 12px;
+  padding: 12px 0;
+}
+
+.users-modal-section:first-of-type {
+  padding-top: 4px;
+}
+
+.users-modal-section--last {
+  padding-bottom: 4px;
+}
+
+.users-modal-section-title {
+  margin: 0;
+  color: rgba(12, 13, 14, 0.78);
+  font-size: var(--md-title-medium);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.users-modal-section .modal-field-hint {
+  margin: 0;
+}
+
+.manage-roles-description {
+  min-height: 160px;
+}
+
+.manage-roles-permissions-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-height: 320px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.manage-roles-permission-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 48px;
+  padding: 10px 14px;
+  color: #111827;
+  font-size: var(--md-body-medium);
+  font-weight: 600;
+  line-height: 1.4;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.manage-roles-permission-item:hover {
+  border-color: rgba(1, 111, 244, 0.32);
+  background: rgba(1, 111, 244, 0.04);
+}
+
+.manage-roles-permission-item input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: #016ff4;
+}
+
+.manage-roles-dialog .modal-input,
+.manage-roles-dialog .modal-textarea,
+.create-user-dialog .modal-input,
+.create-user-dialog .modal-textarea {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  box-shadow: none;
+}
+
+.manage-roles-dialog .modal-input::placeholder,
+.manage-roles-dialog .modal-textarea::placeholder,
+.create-user-dialog .modal-input::placeholder,
+.create-user-dialog .modal-textarea::placeholder {
+  color: #9ca3af;
+}
+
+.manage-roles-dialog .modal-input:focus,
+.manage-roles-dialog .modal-textarea:focus,
+.create-user-dialog .modal-input:focus,
+.create-user-dialog .modal-textarea:focus {
+  outline: none;
+  border-color: #016ff4;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.14);
+}
+
+.manage-roles-dialog .modal-body .hub-select-wrap,
+.create-user-dialog .modal-body .hub-select-wrap {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: none;
+}
+
+.manage-roles-dialog .modal-body .hub-select-wrap:focus-within,
+.create-user-dialog .modal-body .hub-select-wrap:focus-within {
+  border-color: #016ff4;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.14);
+}
+
+.manage-roles-dialog .hub-select-wrap:not(.hub-custom-select) .hub-select,
+.create-user-dialog .hub-select-wrap:not(.hub-custom-select) .hub-select {
+  color: #111827;
+  font-weight: 500;
+}
+
+.create-user-dialog .hub-select-icon,
+.manage-roles-dialog .hub-select-chevron,
+.create-user-dialog .hub-select-chevron {
+  color: #2563eb !important;
+}
+
+.create-user-dialog .modal-field-hint {
+  margin: 0;
+}
+
+.manage-roles-dialog .modal-header .icon-btn,
+.create-user-dialog .modal-header .icon-btn {
+  color: #016ff4;
+}
+
+.manage-roles-dialog .modal-header .icon-btn:hover,
+.create-user-dialog .modal-header .icon-btn:hover {
+  color: #0b5fe3;
+}
+
+@media (max-width: 760px) {
+  .modal-dialog.create-user-dialog:not(.chat-dialog) .modal-header,
+  .modal-dialog.create-user-dialog:not(.chat-dialog) .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .modal-dialog.create-user-dialog:not(.chat-dialog) .create-user-body {
+    padding: 16px;
+  }
+
+  .modal-dialog.manage-roles-dialog:not(.chat-dialog) .modal-header,
+  .modal-dialog.manage-roles-dialog:not(.chat-dialog) .modal-footer {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .modal-dialog.manage-roles-dialog:not(.chat-dialog) .manage-roles-body {
+    padding: 16px;
+  }
+
+  .manage-roles-permissions-list {
+    grid-template-columns: 1fr;
+  }
+
+  .manage-roles-permission-item {
+    font-size: 16px;
+  }
 }
 
 .agent-capability-switch-row {
@@ -5531,12 +5854,24 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .chat-voice-stage {
   display: none;
   flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 24px 24px 22px;
+  text-align: center;
+  gap: 18px;
+}
+
+.chat-voice-content {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  padding: 16px 24px 20px;
-  text-align: center;
   gap: 8px;
+  padding: 8px 0 0;
 }
 
 .chat-voice-orb {
@@ -5563,11 +5898,22 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .chat-voice-transcript {
-  width: min(700px, 100%);
-  margin-top: 6px;
+  width: min(640px, 100%);
+  min-height: 104px;
+  margin-top: 14px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
+}
+
+#agentChatModal.has-voice-transcript .chat-voice-transcript {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
 }
 
 .chat-voice-msg {
@@ -5604,14 +5950,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .chat-voice-controls {
-  margin-top: 4px;
   width: 100%;
   border-top: 1px solid var(--border);
-  padding-top: 14px;
+  padding-top: 18px;
   display: grid;
   grid-template-columns: 44px 1fr 44px;
   align-items: center;
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .chat-voice-start {
@@ -6403,6 +6749,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .chip.warning {
   background: #fff4e5;
   color: #a05a00;
+}
+
+#page-schedules .data-table .data-row > .chip {
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
 }
 
 .chip.priority-high {
@@ -7640,6 +7992,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
   .data-row {
     min-width: 760px;
+  }
+
+  .audit-filters-grid {
+    min-width: 760px;
+  }
+
+  .audit-table .data-row {
+    min-width: 980px;
   }
 }
 

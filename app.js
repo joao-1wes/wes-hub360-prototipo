@@ -37,8 +37,34 @@ const packagesFilterBtn = document.getElementById('packagesFilterBtn');
 const packagesFilterMenu = document.getElementById('packagesFilterMenu');
 const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
+const openManageRolesModal = document.getElementById('openManageRolesModal');
+const manageRolesModal = document.getElementById('manageRolesModal');
+const manageRolesModalForm = document.getElementById('manageRolesModalForm');
+const manageRolesName = document.getElementById('manageRolesName');
+const manageRolesSubmit = document.getElementById('manageRolesSubmit');
+const openCreateUserModal = document.getElementById('openCreateUserModal');
+const createUserModal = document.getElementById('createUserModal');
+const createUserModalForm = document.getElementById('createUserModalForm');
+const createUserName = document.getElementById('createUserName');
+const createUserEmail = document.getElementById('createUserEmail');
+const createUserPassword = document.getElementById('createUserPassword');
+const createUserRole = document.getElementById('createUserRole');
+const createUserSubmit = document.getElementById('createUserSubmit');
 const auditFilterBtn = document.getElementById('auditFilterBtn');
 const auditFilterMenu = document.getElementById('auditFilterMenu');
+const auditPeriodBtn = document.getElementById('auditPeriodBtn');
+const auditPeriodMenu = document.getElementById('auditPeriodMenu');
+const auditSearchInput = document.getElementById('auditSearchInput');
+const auditTableRows = Array.from(document.querySelectorAll('#page-audit .audit-table .data-row:not(.header)'));
+const auditPagePagination = document.getElementById('auditPagePagination');
+const auditPageNumbers = document.getElementById('auditPageNumbers');
+const auditPeriodOptions = Array.from(document.querySelectorAll('#auditPeriodMenu .audit-period-option'));
+const auditRangeFields = Array.from(document.querySelectorAll('#auditPeriodMenu .audit-range-only'));
+const auditSingleField = document.querySelector('#auditPeriodMenu .audit-single-only');
+const auditStartDateInput = document.getElementById('auditStartDate');
+const auditEndDateInput = document.getElementById('auditEndDate');
+const auditSingleDateInput = document.getElementById('auditSingleDate');
+const auditApplyPeriodBtn = document.getElementById('auditApplyPeriodBtn');
 const directChatFab = document.getElementById('directChatFab');
 const agentsCreateMenu = document.getElementById('agentsCreateMenu');
 const agentsCreateMenuToggle = document.getElementById('agentsCreateMenuToggle');
@@ -138,6 +164,14 @@ const executionDetailsEnd = document.getElementById('executionDetailsEnd');
 const executionDetailsDuration = document.getElementById('executionDetailsDuration');
 const executionDetailsStatus = document.getElementById('executionDetailsStatus');
 const executionDetailsRecording = document.getElementById('executionDetailsRecording');
+const auditDetailsModal = document.getElementById('auditDetailsModal');
+const auditDetailsDate = document.getElementById('auditDetailsDate');
+const auditDetailsUser = document.getElementById('auditDetailsUser');
+const auditDetailsAction = document.getElementById('auditDetailsAction');
+const auditDetailsIp = document.getElementById('auditDetailsIp');
+const auditDetailsTarget = document.getElementById('auditDetailsTarget');
+const auditDetailsChange = document.getElementById('auditDetailsChange');
+const auditDetailsSummary = document.getElementById('auditDetailsSummary');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
 const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
@@ -224,9 +258,11 @@ const firstTimeBanner = document.getElementById('firstTimeBanner');
 const settingsSaveBtn = document.getElementById('settingsSaveBtn');
 const settingsPage = document.getElementById('page-settings');
 const AGENTS_PAGE_SIZE = 5;
+const AUDIT_PAGE_SIZE = 6;
 const AGENTS_AUTO_REFRESH_MS = 15000;
 const AGENTS_AUTO_REFRESH_ENABLED = false;
 let agentsCurrentPage = 1;
+let auditCurrentPage = 1;
 let agentsRagFilter = '';
 let agentsVisibilityFilter = '';
 let agentsAutoRefreshTimer = null;
@@ -1166,9 +1202,173 @@ if (usersFilterBtn && usersFilterMenu) {
   }
 }
 
+if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
+  const closeManageRolesModal = () => {
+    manageRolesModal.classList.remove('open');
+    manageRolesModal.setAttribute('aria-hidden', 'true');
+  };
+
+  const syncManageRolesSubmit = () => {
+    const hasName = Boolean(String(manageRolesName?.value || '').trim());
+    if (manageRolesSubmit) manageRolesSubmit.disabled = !hasName;
+  };
+
+  openManageRolesModal.addEventListener('click', () => {
+    manageRolesModalForm.reset();
+    syncManageRolesSubmit();
+    manageRolesModal.classList.add('open');
+    manageRolesModal.setAttribute('aria-hidden', 'false');
+    manageRolesName?.focus();
+  });
+
+  manageRolesName?.addEventListener('input', syncManageRolesSubmit);
+
+  manageRolesModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeManageRolesModal();
+  });
+
+  manageRolesModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    closeManageRolesModal();
+  });
+}
+
+if (openCreateUserModal && createUserModal && createUserModalForm) {
+  const closeCreateUserModal = () => {
+    createUserModal.classList.remove('open');
+    createUserModal.setAttribute('aria-hidden', 'true');
+  };
+
+  const syncCreateUserSubmit = () => {
+    const hasName = Boolean(String(createUserName?.value || '').trim());
+    const hasEmail = Boolean(String(createUserEmail?.value || '').trim());
+    const hasPassword = String(createUserPassword?.value || '').length >= 8;
+    const hasRole = Boolean(String(createUserRole?.value || '').trim());
+    if (createUserSubmit) createUserSubmit.disabled = !(hasName && hasEmail && hasPassword && hasRole);
+  };
+
+  openCreateUserModal.addEventListener('click', () => {
+    createUserModalForm.reset();
+    syncCreateUserSubmit();
+    createUserModal.classList.add('open');
+    createUserModal.setAttribute('aria-hidden', 'false');
+    createUserName?.focus();
+  });
+
+  [createUserName, createUserEmail, createUserPassword, createUserRole].forEach((field) => {
+    field?.addEventListener('input', syncCreateUserSubmit);
+    field?.addEventListener('change', syncCreateUserSubmit);
+  });
+
+  createUserModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeCreateUserModal();
+  });
+
+  createUserModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    closeCreateUserModal();
+  });
+}
+
+const parseAuditDate = (value) => {
+  const match = String(value || '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (!match) return null;
+  const [, day, month, year] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day));
+};
+
+const getActiveAuditFilterValue = (menuEl, filterName) =>
+  menuEl?.querySelector(`.filter-option.active[data-filter="${filterName}"]`)?.dataset.value || '';
+
+const renderAuditPagination = () => {
+  if (!auditPagePagination || !auditPageNumbers) return;
+  const matchedRows = auditTableRows.filter((row) => row.dataset.auditFilterMatch === '1');
+  const totalPages = Math.max(1, Math.ceil(matchedRows.length / AUDIT_PAGE_SIZE));
+  auditCurrentPage = Math.min(Math.max(auditCurrentPage, 1), totalPages);
+
+  auditTableRows.forEach((row) => {
+    row.hidden = row.dataset.auditFilterMatch !== '1';
+  });
+
+  const start = (auditCurrentPage - 1) * AUDIT_PAGE_SIZE;
+  const end = start + AUDIT_PAGE_SIZE;
+  matchedRows.forEach((row, index) => {
+    row.hidden = index < start || index >= end;
+  });
+
+  auditPageNumbers.innerHTML = '';
+  for (let page = 1; page <= totalPages; page += 1) {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'page-number';
+    button.textContent = String(page);
+    if (page === auditCurrentPage) {
+      button.classList.add('active');
+      button.setAttribute('aria-current', 'page');
+      button.disabled = true;
+    }
+    button.addEventListener('click', () => {
+      auditCurrentPage = page;
+      renderAuditPagination();
+    });
+    auditPageNumbers.appendChild(button);
+  }
+
+  const navButtons = auditPagePagination.querySelectorAll('.icon-btn');
+  const prevBtn = navButtons[0];
+  const nextBtn = navButtons[1];
+  if (prevBtn) prevBtn.disabled = auditCurrentPage <= 1;
+  if (nextBtn) nextBtn.disabled = auditCurrentPage >= totalPages;
+  auditPagePagination.hidden = matchedRows.length === 0;
+  auditPagePagination.classList.toggle('is-hidden', matchedRows.length === 0);
+};
+
+const applyAuditTableFilters = () => {
+  if (!auditTableRows.length) return;
+  const typeValue = getActiveAuditFilterValue(auditFilterMenu, 'type');
+  const query = String(auditSearchInput?.value || '').trim().toLowerCase();
+  const activePeriodMode = auditPeriodMenu?.dataset.mode === 'single' ? 'single' : 'range';
+  const startDateValue = String(auditStartDateInput?.value || '').trim();
+  const endDateValue = String(auditEndDateInput?.value || '').trim();
+  const singleDateValue = String(auditSingleDateInput?.value || '').trim();
+  const startDate = startDateValue ? new Date(`${startDateValue}T00:00:00`) : null;
+  const endDate = endDateValue ? new Date(`${endDateValue}T23:59:59`) : null;
+  const singleDate = singleDateValue ? new Date(`${singleDateValue}T00:00:00`) : null;
+  auditTableRows.forEach((row) => {
+    const cells = row.querySelectorAll('span');
+    const dateText = cells[0]?.textContent || '';
+    const userText = (cells[1]?.textContent || '').trim().toLowerCase();
+    const ipText = (cells[3]?.textContent || '').trim().toLowerCase();
+    const typeText = String(row.dataset.auditType || '').trim().toLowerCase();
+    const rowDate = parseAuditDate(dateText);
+
+    const matchesType = !typeValue || typeValue === typeText;
+
+    let matchesPeriod = true;
+    if (rowDate) {
+      if (activePeriodMode === 'single' && singleDate) {
+        matchesPeriod = rowDate.getTime() === singleDate.getTime();
+      } else if (activePeriodMode === 'range') {
+        if (startDate && endDate) matchesPeriod = rowDate >= startDate && rowDate <= endDate;
+        else if (startDate) matchesPeriod = rowDate >= startDate;
+        else if (endDate) matchesPeriod = rowDate <= endDate;
+      }
+    } else if (activePeriodMode === 'single' && singleDate) {
+      matchesPeriod = false;
+    } else if ((activePeriodMode === 'range' && startDate) || (activePeriodMode === 'range' && endDate)) {
+      matchesPeriod = false;
+    }
+
+    const matchesSearch = !query || userText.includes(query) || ipText.includes(query);
+    row.dataset.auditFilterMatch = matchesType && matchesPeriod && matchesSearch ? '1' : '0';
+  });
+  renderAuditPagination();
+};
+
 if (auditFilterBtn && auditFilterMenu) {
   auditFilterBtn.addEventListener('click', (event) => {
     event.stopPropagation();
+    auditPeriodMenu?.classList.remove('open');
     auditFilterMenu.classList.toggle('open');
   });
 
@@ -1187,6 +1387,8 @@ if (auditFilterBtn && auditFilterMenu) {
         .forEach((item) => item.classList.remove('active'));
       button.classList.add('active');
       auditFilterMenu.classList.remove('open');
+      auditCurrentPage = 1;
+      applyAuditTableFilters();
     });
   });
 
@@ -1199,8 +1401,94 @@ if (auditFilterBtn && auditFilterMenu) {
         .querySelectorAll('.filter-option[data-value=\"\"]')
         .forEach((item) => item.classList.add('active'));
       auditFilterMenu.classList.remove('open');
+      auditCurrentPage = 1;
+      applyAuditTableFilters();
     });
   }
+}
+
+if (auditPeriodBtn && auditPeriodMenu) {
+  if (!auditPeriodMenu.dataset.mode) auditPeriodMenu.dataset.mode = 'range';
+
+  const syncAuditPeriodMode = () => {
+    const isSingle = auditPeriodMenu.dataset.mode === 'single';
+    auditRangeFields.forEach((field) => field.classList.toggle('is-hidden', isSingle));
+    if (auditSingleField) auditSingleField.classList.toggle('is-hidden', !isSingle);
+  };
+
+  auditPeriodBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    auditFilterMenu?.classList.remove('open');
+    auditPeriodMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    auditPeriodMenu.classList.remove('open');
+  });
+
+  const clearButton = auditPeriodMenu.querySelector('.filter-clear');
+
+  auditPeriodOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      auditPeriodOptions.forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      auditPeriodMenu.dataset.mode = button.dataset.mode === 'single' ? 'single' : 'range';
+      syncAuditPeriodMode();
+      auditCurrentPage = 1;
+      applyAuditTableFilters();
+    });
+  });
+
+  [auditStartDateInput, auditEndDateInput, auditSingleDateInput].forEach((input) => {
+    input?.addEventListener('change', () => {
+      auditCurrentPage = 1;
+      applyAuditTableFilters();
+    });
+  });
+
+  auditApplyPeriodBtn?.addEventListener('click', () => {
+    auditCurrentPage = 1;
+    applyAuditTableFilters();
+    auditPeriodMenu.classList.remove('open');
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      auditStartDateInput.value = '';
+      auditEndDateInput.value = '';
+      auditSingleDateInput.value = '';
+      auditPeriodMenu.dataset.mode = 'range';
+      auditPeriodOptions.forEach((item) => item.classList.remove('active'));
+      const defaultOption = auditPeriodOptions.find((item) => item.dataset.mode === 'range');
+      if (defaultOption) defaultOption.classList.add('active');
+      syncAuditPeriodMode();
+      auditCurrentPage = 1;
+      applyAuditTableFilters();
+    });
+  }
+
+  syncAuditPeriodMode();
+}
+
+if (auditSearchInput) {
+  auditSearchInput.addEventListener('input', () => {
+    auditCurrentPage = 1;
+    applyAuditTableFilters();
+  });
+}
+
+applyAuditTableFilters();
+if (auditPagePagination) {
+  const navButtons = auditPagePagination.querySelectorAll('.icon-btn');
+  navButtons[0]?.addEventListener('click', () => {
+    if (auditCurrentPage <= 1) return;
+    auditCurrentPage -= 1;
+    renderAuditPagination();
+  });
+  navButtons[1]?.addEventListener('click', () => {
+    auditCurrentPage += 1;
+    renderAuditPagination();
+  });
 }
 
 if (keysFilterBtn && keysFilterMenu) {
@@ -1860,6 +2148,7 @@ function applyAgentConversationMode(payload = {}) {
   const voiceMode = Boolean(payload.voiceEnabled);
   agentChatModal.classList.toggle('voice-mode', voiceMode);
   if (!voiceMode) agentChatModal.classList.remove('voice-history-open');
+  agentChatModal.classList.remove('has-voice-transcript');
   agentChatModal.dataset.voiceMode = voiceMode ? 'true' : 'false';
   agentChatModal.dataset.voiceStage = 'idle';
   if (voiceMode) {
@@ -2471,12 +2760,18 @@ if (chatSendButton) {
     }
     if (agentChatModal?.classList.contains('voice-mode')) {
       const userText = String(chatInput?.value || '').trim();
-      if (userText && chatVoiceUserLine) chatVoiceUserLine.textContent = userText;
+      if (userText && chatVoiceUserLine) {
+        chatVoiceUserLine.textContent = userText;
+        agentChatModal.classList.add('has-voice-transcript');
+      }
       setVoiceStageSpeaking();
       const activeBubble = chatThread?.querySelector('.chat-message.agent:last-child .chat-bubble');
       const agentText = String(activeBubble?.textContent || 'Entendi. Vou te ajudar com isso agora.').trim();
       window.setTimeout(() => {
-        if (chatVoiceAgentLine) chatVoiceAgentLine.textContent = agentText;
+        if (chatVoiceAgentLine) {
+          chatVoiceAgentLine.textContent = agentText;
+          agentChatModal.classList.add('has-voice-transcript');
+        }
         setVoiceStageIdle();
       }, 1200);
     }
@@ -3089,6 +3384,63 @@ if (executionsTable && executionDetailsModal) {
   executionDetailsModal.addEventListener('click', (event) => {
     if (event.target.closest('[data-modal-close]')) {
       closeExecutionDetailsModal();
+    }
+  });
+}
+
+if (auditTableRows.length && auditDetailsModal) {
+  const fillAuditDetailsModal = (row) => {
+    if (!row) return;
+    const cells = row.querySelectorAll('span');
+    auditDetailsDate.textContent = cells[0]?.textContent?.trim() || '-';
+    auditDetailsUser.textContent = cells[1]?.textContent?.trim() || '-';
+    auditDetailsAction.textContent = cells[2]?.textContent?.trim() || '-';
+    auditDetailsIp.textContent = cells[3]?.textContent?.trim() || '-';
+    const kind = String(row.dataset.auditTargetKind || '').trim();
+    const targetName = String(row.dataset.auditTargetName || '').trim();
+    const field = String(row.dataset.auditField || '').trim();
+    const from = String(row.dataset.auditFrom || '').trim();
+    const to = String(row.dataset.auditTo || '').trim();
+    const summary = String(row.dataset.auditSummary || '').trim();
+    const type = String(row.dataset.auditType || '').trim().toLowerCase();
+
+    auditDetailsTarget.textContent = kind && targetName ? `${kind}: ${targetName}` : targetName || kind || '-';
+
+    let changeText = '-';
+    if (type === 'create') {
+      changeText = `Criado: ${targetName || 'item'}${kind ? ` (${kind})` : ''}`;
+    } else if (type === 'delete') {
+      changeText = `Apagado: ${targetName || 'item'}${kind ? ` (${kind})` : ''}`;
+    } else if (type === 'edit') {
+      if (field && (from || to)) changeText = `${field}: ${from || '-'} -> ${to || '-'}`;
+      else if (from || to) changeText = `${from || '-'} -> ${to || '-'}`;
+      else changeText = `Editado: ${targetName || 'item'}${kind ? ` (${kind})` : ''}`;
+    }
+    auditDetailsChange.textContent = changeText;
+    auditDetailsSummary.textContent = summary || '-';
+  };
+
+  const openAuditDetailsModal = () => {
+    auditDetailsModal.classList.add('open');
+    auditDetailsModal.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeAuditDetailsModal = () => {
+    auditDetailsModal.classList.remove('open');
+    auditDetailsModal.setAttribute('aria-hidden', 'true');
+  };
+
+  auditTableRows.forEach((row) => {
+    const detailsButton = row.querySelector('.audit-view-btn');
+    detailsButton?.addEventListener('click', () => {
+      fillAuditDetailsModal(row);
+      openAuditDetailsModal();
+    });
+  });
+
+  auditDetailsModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) {
+      closeAuditDetailsModal();
     }
   });
 }
@@ -6008,8 +6360,8 @@ const sectionMap = {
   'dashboard/input-files': 'Armazenamento',
   'dashboard/users': 'Administração',
   'dashboard/audit': 'Administração',
-  'dashboard/organization': 'Administração',
   'dashboard/environments': 'Administração',
+  'dashboard/organization': 'Organização',
   'dashboard/bpmn': 'Processos',
   'dashboard/fluxos': 'Processos',
   'dashboard/history': 'Painel de histórico',
@@ -6030,7 +6382,7 @@ const normalizeVisiblePortugueseLabels = () => {
   const replacements = [
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
-    ['#submenu-administration a[href="#/dashboard/organization"] .submenu-label', 'Organiza\u00e7\u00e3o'],
+    ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
     ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Ambientes'],
     ['#wesProjectDescription', null],
   ];

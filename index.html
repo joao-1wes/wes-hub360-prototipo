@@ -82,8 +82,7 @@
             </button>
             <div class="submenu" id="submenu-administration">
               <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
-              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Logs de auditoria</span></a>
-              <a class="submenu-item" href="#/dashboard/organization"><span class="submenu-label">Organização</span></a>
+              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Ambientes</span></a>
             </div>
           </div>
@@ -193,6 +192,10 @@
                   <span class="material-symbols-rounded">person</span>
                   Perfil
                 </button>
+                <a href="#/dashboard/organization">
+                  <span class="material-symbols-rounded">business</span>
+                  Trocar de empresa
+                </a>
                 <a href="#/dashboard/settings">
                   <span class="material-symbols-rounded">settings</span>
                   Configurações
@@ -898,21 +901,6 @@
                     </div>
                   </span>
                 </div>
-              </div>
-              <div class="table-pagination">
-                <button class="icon-btn" aria-label="Anterior">
-                  <span class="material-symbols-rounded">chevron_left</span>
-                </button>
-                <button class="page-number active" type="button">1</button>
-                <button class="page-number" type="button">2</button>
-                <button class="page-number" type="button">3</button>
-                <span class="page-ellipsis">…</span>
-                <button class="page-number" type="button">10</button>
-                <button class="page-number" type="button">11</button>
-                <button class="page-number" type="button">12</button>
-                <button class="icon-btn" aria-label="Próximo">
-                  <span class="material-symbols-rounded">chevron_right</span>
-                </button>
               </div>
             </div>
           </div>
@@ -1863,6 +1851,118 @@
               </div>
             </div>
           </div>
+          <div class="modal" id="manageRolesModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog manage-roles-dialog" role="dialog" aria-modal="true" aria-labelledby="manageRolesTitle">
+              <div class="modal-header">
+                <h3 id="manageRolesTitle">Criar nova função</h3>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <form id="manageRolesModalForm" class="modal-body manage-roles-body">
+                <section class="users-modal-section">
+                  <label class="modal-label modal-label--required" for="manageRolesName">Nome da função</label>
+                  <input class="modal-input" id="manageRolesName" name="name" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Operador de atendimento" />
+                  <p class="modal-field-hint">Introduza um nome descritivo para a função.</p>
+                  <label class="modal-label" for="manageRolesDescription">Descrição</label>
+                  <textarea class="modal-textarea manage-roles-description" id="manageRolesDescription" name="description" rows="5" maxlength="4000" placeholder="Descreva brevemente o que esta função pode acessar"></textarea>
+                  <p class="modal-field-hint">Descreva brevemente o que esta função pode acessar.</p>
+                </section>
+                <section class="users-modal-section users-modal-section--last">
+                  <h4 class="users-modal-section-title">Permissões</h4>
+                  <div class="manage-roles-permissions-list" role="group" aria-label="Permissões da função">
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="dashboard:view" /><span>Visualizar painel geral</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="automation:create" /><span>Criar automações</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="automation:edit" /><span>Editar automações</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="automation:delete" /><span>Excluir automações</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="schedule:create" /><span>Criar agendamentos</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="schedule:edit" /><span>Editar agendamentos</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="schedule:pause" /><span>Pausar e retomar agendamentos</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="agent:create" /><span>Criar agentes</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="agent:edit" /><span>Editar agentes</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="agent:delete" /><span>Excluir agentes</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="agent:publish" /><span>Publicar agente para compartilhamento</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="executor:manage" /><span>Gerenciar executores</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="package:upload" /><span>Enviar pacotes</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="package:deploy" /><span>Publicar pacotes em ambiente</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="channel:manage" /><span>Gerenciar canais de integração</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="credential:manage" /><span>Gerenciar credenciais</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="files:manage" /><span>Gerenciar arquivos de entrada</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="user:manage" /><span>Gerenciar usuários</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="roles:manage" /><span>Gerenciar funções e permissões</span></label>
+                    <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="audit:read" /><span>Visualizar logs de auditoria</span></label>
+                  </div>
+                </section>
+              </form>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="submit" form="manageRolesModalForm" class="btn primary" id="manageRolesSubmit" disabled>Criar função</button>
+              </div>
+            </div>
+          </div>
+          <div class="modal" id="createUserModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog create-user-dialog" role="dialog" aria-modal="true" aria-labelledby="createUserTitle">
+              <div class="modal-header">
+                <h3 id="createUserTitle">Criar novo usuário</h3>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <form id="createUserModalForm" class="modal-body create-user-body">
+                <section class="users-modal-section">
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label modal-label--required" for="createUserName">Nome completo</label>
+                      <input class="modal-input" id="createUserName" name="name" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Ana Silva" />
+                      <p class="modal-field-hint">Introduza o nome completo do usuário.</p>
+                    </div>
+                    <div>
+                      <label class="modal-label modal-label--required" for="createUserEmail">E-mail</label>
+                      <input class="modal-input" id="createUserEmail" name="email" type="email" maxlength="160" autocomplete="off" placeholder="admin@1wes.com" />
+                      <p class="modal-field-hint">Use o e-mail de acesso ao painel.</p>
+                    </div>
+                  </div>
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label modal-label--required" for="createUserPassword">Senha</label>
+                      <input class="modal-input" id="createUserPassword" name="password" type="password" minlength="8" maxlength="120" placeholder="Mínimo 8 caracteres" />
+                      <p class="modal-field-hint">Mínimo 8 caracteres.</p>
+                    </div>
+                    <div>
+                      <label class="modal-label modal-label--required" for="createUserStatus">Status</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">verified_user</span>
+                        <select id="createUserStatus" class="hub-select" name="status" aria-label="Status do usuário" required>
+                          <option value="active">Ativo</option>
+                          <option value="inactive">Inativo</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+                  <label class="modal-label modal-label--required" for="createUserRole">Função</label>
+                  <div class="hub-select-wrap hub-select-wrap--block">
+                    <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">admin_panel_settings</span>
+                    <select id="createUserRole" class="hub-select" name="role" aria-label="Função do usuário" required>
+                      <option value="">Selecione a função</option>
+                      <option value="admin">Administrador</option>
+                      <option value="superuser">Superusuário</option>
+                      <option value="user">Usuário</option>
+                      <option value="viewer">Visualizador</option>
+                    </select>
+                    <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                  </div>
+                  <p class="modal-field-hint">Defina a função que controla permissões e acessos.</p>
+                </section>
+              </form>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="submit" form="createUserModalForm" class="btn primary" id="createUserSubmit" disabled>Criar usuário</button>
+              </div>
+            </div>
+          </div>
           <div class="modal" id="agentChatModal" aria-hidden="true">
             <div class="modal-backdrop" data-modal-close></div>
             <div class="modal-dialog chat-dialog" role="dialog" aria-modal="true" aria-labelledby="agentChatTitle">
@@ -1958,15 +2058,17 @@
                   </div>
                   <div class="chat-body">
                     <div class="chat-voice-stage" id="chatVoiceStage">
-                      <div class="chat-voice-orb" id="chatVoiceOrb" aria-hidden="true"></div>
-                      <p class="chat-voice-status" id="chatVoiceStatus">Pronto para começar</p>
-                      <p class="chat-voice-hint" id="chatVoiceHint">Esc encerra · Espaço silencia microfone</p>
-                      <div class="chat-voice-transcript" id="chatVoiceTranscript">
-                        <div class="chat-voice-msg chat-voice-msg--user">
-                          <div class="chat-voice-bubble chat-voice-bubble--user" id="chatVoiceUserLine">...</div>
-                        </div>
-                        <div class="chat-voice-msg chat-voice-msg--agent">
-                          <div class="chat-voice-bubble chat-voice-bubble--agent" id="chatVoiceAgentLine">...</div>
+                      <div class="chat-voice-content">
+                        <div class="chat-voice-orb" id="chatVoiceOrb" aria-hidden="true"></div>
+                        <p class="chat-voice-status" id="chatVoiceStatus">Pronto para começar</p>
+                        <p class="chat-voice-hint" id="chatVoiceHint">Esc encerra · Espaço silencia microfone</p>
+                        <div class="chat-voice-transcript" id="chatVoiceTranscript">
+                          <div class="chat-voice-msg chat-voice-msg--user">
+                            <div class="chat-voice-bubble chat-voice-bubble--user" id="chatVoiceUserLine">...</div>
+                          </div>
+                          <div class="chat-voice-msg chat-voice-msg--agent">
+                            <div class="chat-voice-bubble chat-voice-bubble--agent" id="chatVoiceAgentLine">...</div>
+                          </div>
                         </div>
                       </div>
                       <div class="chat-voice-controls">
@@ -2891,21 +2993,6 @@
                   </span>
                 </div>
               </div>
-              <div class="table-pagination">
-                <button class="icon-btn" aria-label="Anterior">
-                  <span class="material-symbols-rounded">chevron_left</span>
-                </button>
-                <button class="page-number active" type="button">1</button>
-                <button class="page-number" type="button">2</button>
-                <button class="page-number" type="button">3</button>
-                <span class="page-ellipsis">…</span>
-                <button class="page-number" type="button">10</button>
-                <button class="page-number" type="button">11</button>
-                <button class="page-number" type="button">12</button>
-                <button class="icon-btn" aria-label="Próximo">
-                  <span class="material-symbols-rounded">chevron_right</span>
-                </button>
-              </div>
             </div>
           </div>
 
@@ -3419,11 +3506,11 @@
                   <p class="page-subtitle">Controle de acesso, papéis e permissões.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn outline">
-                    <span class="material-symbols-rounded">group</span>
-                    Gerenciar funções
+                  <button class="btn outline" id="openManageRolesModal" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Criar nova função
                   </button>
-                  <button class="btn primary">
+                  <button class="btn primary" id="openCreateUserModal" type="button">
                     <span class="material-symbols-rounded">person_add</span>
                     Adicionar usuário
                   </button>
@@ -3437,7 +3524,7 @@
                 <div class="form-field">
                   <div class="search-field">
                     <span class="material-symbols-rounded">search</span>
-                    <input type="text" placeholder="Buscar usuários" />
+                    <input type="text" placeholder="Buscar por nome ou e-mail" />
                   </div>
                 </div>
                 <div class="form-field">
@@ -3457,10 +3544,10 @@
                     <div class="filter-group">
                       <span>Função</span>
                       <button class="filter-option active" data-filter="role" data-value="">Todas</button>
-                      <button class="filter-option" data-filter="role" data-value="admin">administrador</button>
-                      <button class="filter-option" data-filter="role" data-value="superuser">superusuário</button>
-                      <button class="filter-option" data-filter="role" data-value="user">usuário</button>
-                      <button class="filter-option" data-filter="role" data-value="viewer">visualizador</button>
+                      <button class="filter-option" data-filter="role" data-value="admin">Administrador</button>
+                      <button class="filter-option" data-filter="role" data-value="superuser">Superusuário</button>
+                      <button class="filter-option" data-filter="role" data-value="user">Usuário</button>
+                      <button class="filter-option" data-filter="role" data-value="viewer">Visualizador</button>
                     </div>
                   </div>
                 </div>
@@ -3484,16 +3571,29 @@
                       </span>
                     </span>
                     <span>admin@wes.com</span>
-                    <span class="chip">administrador</span>
-                    <span class="chip success">ativo</span>
+                    <span class="chip">Administrador</span>
+                    <span class="chip success">Ativo</span>
                     <span>22/01/2026</span>
-                    <span class="row-actions">
-                      <button class="icon-btn action-icon" aria-label="Editar">
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon muted-icon" aria-label="Editar" disabled>
                         <span class="material-symbols-rounded">edit</span>
                       </button>
-                      <button class="icon-btn action-icon" aria-label="Detalhes">
+                      <button class="icon-btn action-icon danger muted-icon" aria-label="Excluir" disabled>
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
                         <span class="material-symbols-rounded">more_vert</span>
                       </button>
+                      <div class="details-card">
+                        <div class="details-title">Permissões do WES ADMIN</div>
+                        <div class="details-item"><span>Gestão de usuários</span><strong>Permitido</strong></div>
+                        <div class="details-item"><span>Gestão de funções</span><strong>Permitido</strong></div>
+                        <div class="details-item"><span>Gestão da organização</span><strong>Permitido</strong></div>
+                        <div class="details-item"><span>Gestão de ambientes</span><strong>Permitido</strong></div>
+                        <div class="details-item"><span>Gestão de credenciais</span><strong>Permitido</strong></div>
+                        <div class="details-item"><span>Logs de auditoria</span><strong>Permitido</strong></div>
+                        <div class="details-item"><span>Excluir / editar WES ADMIN</span><strong>Bloqueado</strong></div>
+                      </div>
                     </span>
                   </div>
                   <div class="data-row">
@@ -3505,16 +3605,25 @@
                       </span>
                     </span>
                     <span>viniciusaires@hotmail.com</span>
-                    <span class="chip">administrador</span>
-                    <span class="chip success">ativo</span>
+                    <span class="chip">Administrador</span>
+                    <span class="chip success">Ativo</span>
                     <span>24/08/2025</span>
-                    <span class="row-actions">
+                    <span class="row-actions has-details">
                       <button class="icon-btn action-icon" aria-label="Editar">
                         <span class="material-symbols-rounded">edit</span>
                       </button>
-                      <button class="icon-btn action-icon" aria-label="Detalhes">
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
                         <span class="material-symbols-rounded">more_vert</span>
                       </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes do usuário</div>
+                        <div class="details-item"><span>Função</span><strong>Administrador</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
+                        <div class="details-item"><span>Acesso ao tenant</span><strong>AVAS</strong></div>
+                      </div>
                     </span>
                   </div>
                 </div>
@@ -3546,7 +3655,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">admin_panel_settings</span>
-                      administrador
+                      Administrador
                     </span>
                     <span class="muted">Administrador com permissões de gestão do tenant.</span>
                     <span>36</span>
@@ -3563,7 +3672,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">person</span>
-                      superusuário
+                      Superusuário
                     </span>
                     <span class="muted">Super administrador com todas as permissões.</span>
                     <span>0</span>
@@ -3580,7 +3689,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">person</span>
-                      usuário
+                      Usuário
                     </span>
                     <span class="muted">Usuário padrão com permissões básicas.</span>
                     <span>0</span>
@@ -3597,7 +3706,7 @@
                   <div class="data-row">
                     <span class="role-cell">
                       <span class="material-symbols-rounded">visibility</span>
-                      visualizador
+                      Visualizador
                     </span>
                     <span class="muted">Acesso somente leitura.</span>
                     <span>0</span>
@@ -3769,44 +3878,25 @@
             </div>
           </div>
 
-          <div class="page" id="page-audit" data-title="Logs de auditoria">
+          <div class="page" id="page-audit" data-title="Histórico de ações">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>Logs de auditoria</h2>
-                  <p class="page-subtitle">Histórico de eventos e alterações no sistema.</p>
-                </div>
-                <div class="page-actions">
+                  <h2>Histórico de ações</h2>
+                  <p class="page-subtitle">Por padrão, o histórico abre com os registos do dia no topo. Para ver anteriores, navegue nas páginas ou use o filtro de período.</p>
                 </div>
               </div>
-              <div class="stats-cards">
-                <div class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded">check_circle</span></div>
-                  <div>
-                    <div class="stat-value">320</div>
-                    <div class="stat-label">Eventos</div>
-                    <div class="stat-sub">Últimos 7 dias</div>
-                  </div>
-                </div>
-                <div class="stat-card warning">
-                  <div class="stat-icon"><span class="material-symbols-rounded">warning</span></div>
-                  <div>
-                    <div class="stat-value">12</div>
-                    <div class="stat-label">Alertas</div>
-                    <div class="stat-sub">Críticos</div>
-                  </div>
-                </div>
-              </div>
-              <div class="filters-grid">
-                <div class="form-field">
+              <div class="filters-grid audit-filters-grid">
+                <div class="form-field audit-search-field-wrap">
                   <div class="search-field">
-                    <span class="material-symbols-rounded">search</span>
-                    <input type="text" placeholder="Buscar logs" />
+                    <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                    <input id="auditSearchInput" type="search" placeholder="Buscar por e-mail do usuário ou endereço IP" autocomplete="off" />
                   </div>
                 </div>
                 <div class="form-field">
-                  <button class="btn filter-btn" id="auditFilterBtn">
-                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  <button class="btn filter-btn" id="auditFilterBtn" type="button">
+                    <span class="material-symbols-rounded" aria-hidden="true">filter_list</span>
+                    <span>Filtros</span>
                   </button>
                   <div class="menu" id="auditFilterMenu">
                     <div class="filter-footer">
@@ -3815,64 +3905,238 @@
                     <div class="filter-group">
                       <span>Tipo</span>
                       <button class="filter-option active" data-filter="type" data-value="">Todos</button>
-                      <button class="filter-option" data-filter="type" data-value="login">Login</button>
-                      <button class="filter-option" data-filter="type" data-value="update">Atualização</button>
-                      <button class="filter-option" data-filter="type" data-value="delete">Exclusão</button>
+                      <button class="filter-option" data-filter="type" data-value="create">Criar</button>
+                      <button class="filter-option" data-filter="type" data-value="edit">Editar</button>
+                      <button class="filter-option" data-filter="type" data-value="delete">Apagar</button>
                     </div>
-                    <div class="filter-group">
-                      <span>Período</span>
-                      <button class="filter-option active" data-filter="period" data-value="">Últimos 7 dias</button>
-                      <button class="filter-option" data-filter="period" data-value="30d">Últimos 30 dias</button>
-                      <button class="filter-option" data-filter="period" data-value="all">Todo período</button>
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="auditPeriodBtn" type="button">
+                    <span class="material-symbols-rounded" aria-hidden="true">date_range</span>
+                    <span>Período</span>
+                  </button>
+                  <div class="menu audit-period-menu" id="auditPeriodMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="audit-period-toggle">
+                      <button class="audit-period-option active" type="button" data-mode="range">Período</button>
+                      <button class="audit-period-option" type="button" data-mode="single">Data específica</button>
+                    </div>
+                    <div class="audit-period-fields">
+                      <div class="audit-period-field audit-range-only">
+                        <label for="auditStartDate">Início</label>
+                        <input id="auditStartDate" type="date" />
+                      </div>
+                      <div class="audit-period-field audit-range-only">
+                        <label for="auditEndDate">Fim</label>
+                        <input id="auditEndDate" type="date" />
+                      </div>
+                      <div class="audit-period-field audit-single-only is-hidden">
+                        <label for="auditSingleDate">Data</label>
+                        <input id="auditSingleDate" type="date" />
+                      </div>
+                    </div>
+                    <div class="period-footer audit-period-footer">
+                      <button class="btn filter-btn" id="auditApplyPeriodBtn" type="button">Aplicar período</button>
                     </div>
                   </div>
                 </div>
               </div>
-              <div class="data-table">
-                <div class="data-row header cols-5">
+              <div class="data-table audit-table">
+                <div class="data-row header">
+                  <span>Data e hora</span>
                   <span>Usuário</span>
                   <span>Ação</span>
-                  <span>Recurso</span>
-                  <span>Data</span>
+                  <span>Endereço IP</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row cols-5">
-                  <span>Test User</span>
-                  <span class="chip">atualização</span>
-                  <span>Executores</span>
-                  <span>Hoje • 09:40</span>
+                <div class="data-row" data-audit-type="create" data-audit-target-kind="Agente" data-audit-target-name="Atlas Core" data-audit-summary="Agente criado com sucesso no projeto Operações integradas.">
+                  <span>13/05/2026, 17:42:09</span>
+                  <span>bi.5@cedae.com.br</span>
+                  <span><span class="chip audit-action-chip">Criar</span></span>
+                  <span>189.44.32.10</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
                       <span class="material-symbols-rounded">more_vert</span>
                     </button>
                   </span>
                 </div>
-                <div class="data-row cols-5">
-                  <span>Administrador</span>
-                  <span class="chip">login</span>
-                  <span>Conta</span>
-                  <span>Ontem • 20:15</span>
+                <div class="data-row" data-audit-type="delete" data-audit-target-kind="Pacote" data-audit-target-name="queues v1.3.0" data-audit-summary="Pacote removido da biblioteca de execução.">
+                  <span>13/05/2026, 16:27:54</span>
+                  <span>alfeu@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Apagar</span></span>
+                  <span>177.92.118.54</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="edit" data-audit-target-kind="Arquivo" data-audit-target-name="prompt-operacoes.md" data-audit-field="Nome do arquivo" data-audit-from="prompt-operacoes-v1.md" data-audit-to="prompt-operacoes.md" data-audit-summary="Arquivo atualizado e republicado no projeto.">
+                  <span>13/05/2026, 15:58:12</span>
+                  <span>alfeu@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Editar</span></span>
+                  <span>200.147.67.201</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="create" data-audit-target-kind="Automação" data-audit-target-name="Relatório diário" data-audit-summary="Automação criada com agendamento diário às 08:30.">
+                  <span>13/05/2026, 14:33:41</span>
+                  <span>admin@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Criar</span></span>
+                  <span>45.183.210.77</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="delete" data-audit-target-kind="Agente" data-audit-target-name="Sentinel API (AGT-8841)" data-audit-summary="Agente apagado do contexto API.">
+                  <span>13/05/2026, 12:49:26</span>
+                  <span>admin@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Apagar</span></span>
+                  <span>2804:14d:7c82:aa10::42</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="create" data-audit-target-kind="Arquivo" data-audit-target-name="contrato_cliente_x.pdf" data-audit-summary="Arquivo anexado ao contexto de integrações.">
+                  <span>13/05/2026, 09:11:03</span>
+                  <span>admin@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Criar</span></span>
+                  <span>201.33.90.145</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="edit" data-audit-target-kind="Pacote" data-audit-target-name="reports" data-audit-field="Versão" data-audit-from="v2.0.0" data-audit-to="v2.1.0" data-audit-summary="Pacote atualizado para versão estável.">
+                  <span>12/05/2026, 20:44:58</span>
+                  <span>suporte@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Editar</span></span>
+                  <span>186.222.13.88</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="create" data-audit-target-kind="Projeto" data-audit-target-name="Controladoria e fechamento" data-audit-summary="Projeto criado e vinculado ao ambiente Financeiro.">
+                  <span>12/05/2026, 18:09:22</span>
+                  <span>financeiro@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Criar</span></span>
+                  <span>170.84.55.203</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="delete" data-audit-target-kind="Arquivo" data-audit-target-name="tmp-relatorio-2026-05.csv" data-audit-summary="Arquivo temporário excluído após processamento.">
+                  <span>11/05/2026, 11:37:10</span>
+                  <span>ops@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Apagar</span></span>
+                  <span>179.97.44.61</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="edit" data-audit-target-kind="Agente" data-audit-target-name="Pulse Finance (AGT-3310)" data-audit-field="Visibilidade" data-audit-from="Privado" data-audit-to="Público" data-audit-summary="Configuração de acesso alterada para compartilhamento.">
+                  <span>10/05/2026, 08:22:49</span>
+                  <span>rh@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Editar</span></span>
+                  <span>2804:18:9072:1300::17</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="create" data-audit-target-kind="Chave de API" data-audit-target-name="WES_API_KEY_PROD" data-audit-summary="Nova chave criada para integração de produção.">
+                  <span>09/05/2026, 19:05:33</span>
+                  <span>admin@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Criar</span></span>
+                  <span>191.14.200.90</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-audit-type="delete" data-audit-target-kind="Automação" data-audit-target-name="Monitoramento de filas" data-audit-summary="Automação desativada e removida da lista ativa.">
+                  <span>08/05/2026, 07:18:14</span>
+                  <span>ti@1wes.com</span>
+                  <span><span class="chip audit-action-chip">Apagar</span></span>
+                  <span>200.160.2.3</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon audit-view-btn" aria-label="Ver detalhes">
                       <span class="material-symbols-rounded">more_vert</span>
                     </button>
                   </span>
                 </div>
               </div>
-              <div class="table-pagination">
-                <button class="icon-btn" aria-label="Anterior">
+              <div class="table-pagination" id="auditPagePagination">
+                <button class="icon-btn" type="button" aria-label="Anterior">
                   <span class="material-symbols-rounded">chevron_left</span>
                 </button>
-                <button class="page-number active" type="button">1</button>
-                <button class="page-number" type="button">2</button>
-                <button class="page-number" type="button">3</button>
-                <span class="page-ellipsis">…</span>
-                <button class="page-number" type="button">10</button>
-                <button class="page-number" type="button">11</button>
-                <button class="page-number" type="button">12</button>
-                <button class="icon-btn" aria-label="Próximo">
+                <div id="auditPageNumbers"></div>
+                <button class="icon-btn" type="button" aria-label="Próximo">
                   <span class="material-symbols-rounded">chevron_right</span>
                 </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="auditDetailsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog execution-details-modal-dialog audit-details-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="auditDetailsModalTitle">
+              <div class="modal-header">
+                <h3 id="auditDetailsModalTitle">Detalhes da ação</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body execution-details-modal-body">
+                <section class="execution-details-grid audit-details-grid">
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Data e hora</span>
+                    <strong id="auditDetailsDate">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Usuário</span>
+                    <strong id="auditDetailsUser">-</strong>
+                  </div>
+                  <div class="execution-details-item">
+                    <span class="execution-details-label">Ação</span>
+                    <strong id="auditDetailsAction">-</strong>
+                  </div>
+                  <div class="execution-details-item execution-details-item--wide">
+                    <span class="execution-details-label">Endereço IP</span>
+                    <strong id="auditDetailsIp">-</strong>
+                  </div>
+                  <div class="execution-details-item execution-details-item--wide">
+                    <span class="execution-details-label">Item afetado</span>
+                    <strong id="auditDetailsTarget">-</strong>
+                  </div>
+                  <div class="execution-details-item execution-details-item--wide">
+                    <span class="execution-details-label">O que mudou</span>
+                    <strong id="auditDetailsChange">-</strong>
+                  </div>
+                  <div class="execution-details-item execution-details-item--wide">
+                    <span class="execution-details-label">Resumo</span>
+                    <strong id="auditDetailsSummary">-</strong>
+                  </div>
+                </section>
               </div>
             </div>
           </div>

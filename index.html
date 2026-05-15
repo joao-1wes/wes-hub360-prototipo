@@ -4051,16 +4051,19 @@
             </div>
           </div>
 
-          <div class="page" id="page-environments" data-title="Ambientes">
+          <div class="page" id="page-environments" data-title="Setores">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>Ambientes</h2>
+                  <h2>Setores</h2>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" id="openCreateEnvironmentModal" type="button">Criar setor</button>
                 </div>
               </div>
               <div class="data-table environments-table">
                 <div class="data-row header">
-                  <span>Ambiente</span>
+                  <span>Setor</span>
                   <span>Descrição</span>
                   <span>Responsável</span>
                   <span>Projetos</span>
@@ -4080,10 +4083,10 @@
                   <span class="environment-projects-cell">6</span>
                   <span class="environment-agents-cell">14</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
-                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
                   </span>
@@ -4101,10 +4104,10 @@
                   <span class="environment-projects-cell">4</span>
                   <span class="environment-agents-cell">8</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
-                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
                   </span>
@@ -4122,10 +4125,10 @@
                   <span class="environment-projects-cell">3</span>
                   <span class="environment-agents-cell">5</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
-                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
                   </span>
@@ -4143,10 +4146,10 @@
                   <span class="environment-projects-cell">2</span>
                   <span class="environment-agents-cell">4</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
-                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
                   </span>
@@ -4159,7 +4162,7 @@
             <div class="modal-backdrop" data-modal-close></div>
             <div class="modal-dialog environment-dialog" role="dialog" aria-modal="true" aria-labelledby="environmentModalTitle">
               <div class="modal-header">
-                <h3 id="environmentModalTitle">Editar ambiente</h3>
+                <h3 id="environmentModalTitle">Editar setor</h3>
                 <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
                   <span class="material-symbols-rounded">close</span>
                 </button>
@@ -4168,14 +4171,14 @@
                 <section class="users-modal-section">
                   <div class="modal-row">
                     <div>
-                      <label class="modal-label modal-label--required" for="environmentName">Nome do ambiente</label>
+                      <label class="modal-label modal-label--required" for="environmentName">Nome do setor</label>
                       <input class="modal-input" id="environmentName" name="name" type="text" maxlength="80" autocomplete="off" />
                       <p class="modal-field-hint">Nome exibido nas listas e filtros do painel.</p>
                     </div>
                     <div>
                       <label class="modal-label modal-label--required" for="environmentOwner">Responsável</label>
                       <input class="modal-input" id="environmentOwner" name="owner" type="email" maxlength="160" autocomplete="off" />
-                      <p class="modal-field-hint">E-mail do responsável pela governança do ambiente.</p>
+                      <p class="modal-field-hint">E-mail do responsável pela governança do setor.</p>
                     </div>
                   </div>
                   <label class="modal-label" for="environmentDescription">Descrição</label>
@@ -4188,7 +4191,7 @@
                       <div class="environment-relation-head">
                         <span class="material-symbols-rounded" aria-hidden="true">folder</span>
                         <div>
-                          <h4>Projetos neste ambiente</h4>
+                          <h4>Projetos neste setor</h4>
                           <p id="environmentProjectsSummary">0 projetos vinculados</p>
                         </div>
                       </div>
@@ -4198,7 +4201,7 @@
                       <div class="environment-relation-head">
                         <span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>
                         <div>
-                          <h4>Agentes neste ambiente</h4>
+                          <h4>Agentes neste setor</h4>
                           <p id="environmentAgentsSummary">0 agentes vinculados</p>
                         </div>
                       </div>

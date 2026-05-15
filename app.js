@@ -172,6 +172,18 @@ const auditDetailsIp = document.getElementById('auditDetailsIp');
 const auditDetailsTarget = document.getElementById('auditDetailsTarget');
 const auditDetailsChange = document.getElementById('auditDetailsChange');
 const auditDetailsSummary = document.getElementById('auditDetailsSummary');
+const environmentsTable = document.querySelector('#page-environments .environments-table');
+const openCreateEnvironmentModal = document.getElementById('openCreateEnvironmentModal');
+const environmentModal = document.getElementById('environmentModal');
+const environmentModalForm = document.getElementById('environmentModalForm');
+const environmentName = document.getElementById('environmentName');
+const environmentOwner = document.getElementById('environmentOwner');
+const environmentDescription = document.getElementById('environmentDescription');
+const environmentModalSubmit = document.getElementById('environmentModalSubmit');
+const environmentProjectsSummary = document.getElementById('environmentProjectsSummary');
+const environmentAgentsSummary = document.getElementById('environmentAgentsSummary');
+const environmentProjectsList = document.getElementById('environmentProjectsList');
+const environmentAgentsList = document.getElementById('environmentAgentsList');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
 const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
@@ -1270,6 +1282,232 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
   });
 }
 
+if (environmentsTable && environmentModal && environmentModalForm) {
+  let activeEnvironmentRow = null;
+  let isCreatingEnvironment = false;
+
+  const environmentRelations = {
+    'env-operacoes': {
+      projects: [
+        'Operações integradas',
+        'Backoffice comercial',
+        'Atendimento multicanal',
+        'Controle de filas',
+        'Qualidade operacional',
+        'SLA e escalonamento',
+      ],
+      agents: [
+        'Atlas Core',
+        'Nimbus Ops',
+        'Queue Watch',
+        'SLA Sentinel',
+        'Triagem Assistida',
+        'Orquestrador de Tarefas',
+        'Backoffice Helper',
+        'Monitor de Incidentes',
+        'Qualidade de Atendimento',
+        'Resumo de Plantão',
+        'Classificador de Chamados',
+        'Roteador de Prioridade',
+        'Validador de Evidências',
+        'Auditor Operacional',
+      ],
+    },
+    'env-financeiro': {
+      projects: [
+        'Controladoria e fechamento',
+        'Conciliação bancária',
+        'Contas a pagar',
+        'Relatórios financeiros',
+      ],
+      agents: [
+        'Pulse Finance',
+        'Ledger Check',
+        'Conciliação Express',
+        'Fechamento Mensal',
+        'Analista de Despesas',
+        'Previsor de Caixa',
+        'Validador Fiscal',
+        'Resumo Financeiro',
+      ],
+    },
+    'env-marketing': {
+      projects: [
+        'Campanhas digitais',
+        'Segmentação de clientes',
+        'Performance e mídia',
+      ],
+      agents: [
+        'Campaign Copilot',
+        'Segment Builder',
+        'Mídia Performance',
+        'Copy Review',
+        'Lead Scoring',
+      ],
+    },
+    'env-rh': {
+      projects: [
+        'Admissões e onboarding',
+        'Comunicação interna',
+      ],
+      agents: [
+        'People Assist',
+        'Onboarding Guide',
+        'Comunicados RH',
+        'Trilhas de Desenvolvimento',
+      ],
+    },
+  };
+
+  const renderEnvironmentRelationList = (listEl, items, icon) => {
+    if (!listEl) return;
+    listEl.replaceChildren();
+
+    items.forEach((item) => {
+      const li = document.createElement('li');
+      const iconEl = document.createElement('span');
+      const labelEl = document.createElement('span');
+
+      iconEl.className = 'material-symbols-rounded';
+      iconEl.setAttribute('aria-hidden', 'true');
+      iconEl.textContent = icon;
+      labelEl.textContent = item;
+
+      li.append(iconEl, labelEl);
+      listEl.appendChild(li);
+    });
+  };
+
+  const renderEnvironmentRelations = (row) => {
+    const relation = environmentRelations[row.dataset.environmentCode] || { projects: [], agents: [] };
+    const projectCount = relation.projects.length;
+    const agentCount = relation.agents.length;
+
+    if (environmentProjectsSummary) {
+      environmentProjectsSummary.textContent = `${projectCount} projeto${projectCount === 1 ? '' : 's'} vinculado${projectCount === 1 ? '' : 's'}`;
+    }
+
+    if (environmentAgentsSummary) {
+      environmentAgentsSummary.textContent = `${agentCount} agente${agentCount === 1 ? '' : 's'} vinculado${agentCount === 1 ? '' : 's'}`;
+    }
+
+    renderEnvironmentRelationList(environmentProjectsList, relation.projects, 'folder');
+    renderEnvironmentRelationList(environmentAgentsList, relation.agents, 'smart_toy');
+  };
+
+  const closeEnvironmentModal = () => {
+    activeEnvironmentRow = null;
+    isCreatingEnvironment = false;
+    environmentModal.classList.remove('open');
+    environmentModal.setAttribute('aria-hidden', 'true');
+  };
+
+  const syncEnvironmentSubmit = () => {
+    const hasName = Boolean(String(environmentName?.value || '').trim());
+    const hasOwner = Boolean(String(environmentOwner?.value || '').trim());
+    if (environmentModalSubmit) environmentModalSubmit.disabled = !(hasName && hasOwner);
+  };
+
+  const openEnvironmentModal = (row) => {
+    isCreatingEnvironment = false;
+    activeEnvironmentRow = row;
+    environmentModalForm.reset();
+    const modalTitle = document.getElementById('environmentModalTitle');
+    if (modalTitle) modalTitle.textContent = 'Editar setor';
+    if (environmentModalSubmit) environmentModalSubmit.textContent = 'Salvar alterações';
+    if (environmentName) environmentName.value = row.dataset.environmentName || '';
+    if (environmentOwner) environmentOwner.value = row.dataset.environmentOwner || '';
+    if (environmentDescription) environmentDescription.value = row.dataset.environmentDescription || '';
+    renderEnvironmentRelations(row);
+    syncEnvironmentSubmit();
+    environmentModal.classList.add('open');
+    environmentModal.setAttribute('aria-hidden', 'false');
+    environmentName?.focus();
+  };
+
+  const openCreateEnvironmentDialog = () => {
+    isCreatingEnvironment = true;
+    activeEnvironmentRow = null;
+    environmentModalForm.reset();
+    const modalTitle = document.getElementById('environmentModalTitle');
+    if (modalTitle) modalTitle.textContent = 'Criar setor';
+    if (environmentProjectsSummary) environmentProjectsSummary.textContent = '0 projetos vinculados';
+    if (environmentAgentsSummary) environmentAgentsSummary.textContent = '0 agentes vinculados';
+    renderEnvironmentRelationList(environmentProjectsList, [], 'folder');
+    renderEnvironmentRelationList(environmentAgentsList, [], 'smart_toy');
+    if (environmentModalSubmit) environmentModalSubmit.textContent = 'Criar setor';
+    syncEnvironmentSubmit();
+    environmentModal.classList.add('open');
+    environmentModal.setAttribute('aria-hidden', 'false');
+    environmentName?.focus();
+  };
+
+  openCreateEnvironmentModal?.addEventListener('click', openCreateEnvironmentDialog);
+
+  environmentsTable.addEventListener('click', (event) => {
+    const editButton = event.target.closest('.environment-edit-trigger');
+    if (editButton) {
+      const row = editButton.closest('.environment-row');
+      if (row) openEnvironmentModal(row);
+      return;
+    }
+
+    const deleteButton = event.target.closest('.environment-delete-trigger');
+    if (!deleteButton) return;
+
+    const row = deleteButton.closest('.environment-row');
+    if (!row) return;
+
+    const name = row.dataset.environmentName || 'setor';
+    const confirmed = window.confirm(`Tem certeza que deseja excluir o setor "${name}"?`);
+    if (!confirmed) return;
+
+    row.remove();
+    showAppToast('Setor excluído');
+  });
+
+  [environmentName, environmentOwner].forEach((field) => {
+    field?.addEventListener('input', syncEnvironmentSubmit);
+    field?.addEventListener('change', syncEnvironmentSubmit);
+  });
+
+  environmentModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeEnvironmentModal();
+  });
+
+  environmentModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = String(environmentName?.value || '').trim();
+    const owner = String(environmentOwner?.value || '').trim();
+    const description = String(environmentDescription?.value || '').trim();
+    if (!name || !owner) return;
+
+    if (isCreatingEnvironment) {
+      createEnvironmentRow({ name, owner, description });
+      closeEnvironmentModal();
+      showAppToast('Setor criado com sucesso');
+      return;
+    }
+
+    if (!activeEnvironmentRow) return;
+
+    activeEnvironmentRow.dataset.environmentName = name;
+    activeEnvironmentRow.dataset.environmentOwner = owner;
+    activeEnvironmentRow.dataset.environmentDescription = description;
+
+    const nameCell = activeEnvironmentRow.querySelector('.environment-name-cell strong');
+    const ownerCell = activeEnvironmentRow.querySelector('.environment-owner-cell');
+    const descriptionCell = activeEnvironmentRow.querySelector('.environment-description-cell');
+
+    if (nameCell) nameCell.textContent = name;
+    if (ownerCell) ownerCell.textContent = owner;
+    if (descriptionCell) descriptionCell.textContent = description || '-';
+
+    closeEnvironmentModal();
+    showAppToast('Setor atualizado com sucesso');
+  });
+}
+
 const parseAuditDate = (value) => {
   const match = String(value || '').trim().match(/^(\d{2})\/(\d{2})\/(\d{4})/);
   if (!match) return null;
@@ -1734,8 +1972,7 @@ if (openAgentModal && agentModal) {
   function syncAgentSubmitState() {
     const hasName = Boolean(nameInput.value.trim());
     const hasPrompt = Boolean(promptInput.value.trim());
-    const hasEnvironment = Boolean(String(environmentSel.value || '').trim());
-    submitBtn.disabled = !(hasName && hasPrompt && hasEnvironment) || submitBtn.classList.contains('is-loading');
+    submitBtn.disabled = !(hasName && hasPrompt) || submitBtn.classList.contains('is-loading');
   }
 
   function setAgentModalMode(mode, agent = null) {
@@ -1954,10 +2191,6 @@ if (openAgentModal && agentModal) {
       nameInput.focus();
       return;
     }
-    if (!selectedEnvironmentId) {
-      environmentSel.focus();
-      return;
-    }
     if (!systemPrompt) {
       promptInput.focus();
       return;
@@ -1972,7 +2205,7 @@ if (openAgentModal && agentModal) {
         name,
         description,
         system_prompt: systemPrompt,
-        environment_slug: selectedEnvironmentId,
+        environment_slug: selectedEnvironmentId || null,
         project_id: project?.id || null,
         use_rag: Boolean(ragInput?.checked),
         voice_enabled: Boolean(voiceEnabledInput?.checked),
@@ -2013,7 +2246,11 @@ if (openAgentModal && agentModal) {
         return;
       }
       if (body?.id) {
-        setAgentEnvironmentOverride(body.id, selectedEnvironmentId);
+        if (selectedEnvironmentId) {
+          setAgentEnvironmentOverride(body.id, selectedEnvironmentId);
+        } else {
+          clearAgentEnvironmentOverride(body.id);
+        }
       }
       modal.classList.remove('open');
       modal.setAttribute('aria-hidden', 'true');
@@ -4748,7 +4985,7 @@ function syncAgentModalEnvironmentSelect(preferredEnvironmentId = '') {
 
   const emptyOpt = document.createElement('option');
   emptyOpt.value = '';
-  emptyOpt.textContent = 'Selecione o ambiente';
+  emptyOpt.textContent = 'Sem ambiente';
   modalEnvironment.appendChild(emptyOpt);
 
   AGENTS_PAGE_ENVIRONMENTS.forEach((item) => {
@@ -5646,7 +5883,6 @@ if (agentsFilterBtn && agentsFilterMenu) {
     agentsRagFilter = '';
     agentsVisibilityFilter = '';
     agentsFilterMenu.querySelectorAll('.filter-option').forEach((option) => option.classList.remove('active'));
-    agentsFilterMenu.querySelectorAll('.filter-option[data-value=""]').forEach((option) => option.classList.add('active'));
     applyAgentsAdvancedFilters();
   });
 
@@ -6383,7 +6619,7 @@ const normalizeVisiblePortugueseLabels = () => {
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
-    ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Ambientes'],
+    ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
     ['#wesProjectDescription', null],
   ];
 
@@ -6679,3 +6915,59 @@ scheduleLucideRefresh();
     }
   });
 })();
+  const slugifyEnvironmentName = (value) =>
+    String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+
+  const getUniqueEnvironmentCode = (name) => {
+    const base = `env-${slugifyEnvironmentName(name) || 'novo-setor'}`;
+    const rows = Array.from(environmentsTable.querySelectorAll('.environment-row'));
+    const used = new Set(rows.map((row) => String(row.dataset.environmentCode || '').trim().toLowerCase()));
+    if (!used.has(base)) return base;
+    let suffix = 2;
+    while (used.has(`${base}-${suffix}`)) suffix += 1;
+    return `${base}-${suffix}`;
+  };
+
+  const createEnvironmentRow = ({ name, owner, description }) => {
+    const row = document.createElement('div');
+    row.className = 'data-row environment-row';
+
+    const code = getUniqueEnvironmentCode(name);
+    row.dataset.environmentName = name;
+    row.dataset.environmentCode = code;
+    row.dataset.environmentDescription = description;
+    row.dataset.environmentOwner = owner;
+    row.dataset.environmentProjects = '0';
+    row.dataset.environmentAgents = '0';
+
+    row.innerHTML = `
+      <span class="environment-name-cell">
+        <span class="material-symbols-rounded">business_center</span>
+        <span>
+          <strong>${escapeHtmlWes(name)}</strong>
+          <span class="muted">${escapeHtmlWes(code)}</span>
+        </span>
+      </span>
+      <span class="environment-description-cell">${escapeHtmlWes(description || '-')}</span>
+      <span class="environment-owner-cell">${escapeHtmlWes(owner)}</span>
+      <span class="environment-projects-cell">0</span>
+      <span class="environment-agents-cell">0</span>
+      <span class="row-actions">
+        <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
+          <span class="material-symbols-rounded">edit</span>
+        </button>
+        <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
+          <span class="material-symbols-rounded">delete</span>
+        </button>
+      </span>
+    `;
+
+    environmentsTable.appendChild(row);
+    return row;
+  };

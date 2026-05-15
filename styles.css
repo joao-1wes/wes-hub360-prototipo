@@ -3194,6 +3194,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   justify-content: flex-start;
 }
 
+.environments-table .data-row > span:nth-child(4),
+.environments-table .data-row > span:nth-child(5) {
+  text-align: center;
+  justify-self: center;
+}
+
 .environment-name-cell {
   display: inline-flex;
   align-items: center;

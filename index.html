@@ -53,12 +53,24 @@
           <a class="public-back-link" href="#/" aria-label="Voltar para a landing page">
             <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
           </a>
-          <div class="public-language login-language">
-            <button class="public-language-toggle" type="button" aria-label="Idioma atual">
-              <img src="./assets/flag-pt-br.svg" alt="" width="22" height="16" />
-              <span>PT-BR</span>
-              <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-            </button>
+          <div class="login-header-actions">
+            <div class="theme-switcher login-theme-switcher" aria-label="Alternar tema">
+              <button type="button" class="theme-option is-active" aria-pressed="true">
+                <i data-lucide="sun"></i>
+                <span>Claro</span>
+              </button>
+              <button type="button" class="theme-option" aria-pressed="false">
+                <i data-lucide="moon"></i>
+                <span>Escuro</span>
+              </button>
+            </div>
+            <div class="public-language login-language">
+              <button class="public-language-toggle" type="button" aria-label="Idioma atual">
+                <img src="./assets/flag-pt-br.svg" alt="" width="22" height="16" />
+                <span>PT-BR</span>
+                <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+              </button>
+            </div>
           </div>
 
           <form class="login-card" id="publicLoginForm">
@@ -83,12 +95,8 @@
                 </button>
               </span>
             </label>
-            <button class="public-primary-btn login-submit" type="submit">Entrar</button>
             <a class="auth-link" href="#/login">Esqueceu a senha?</a>
-            <div class="login-register">
-              <span>Não tem uma conta?</span>
-              <a href="#/select-organization">Criar empresa →</a>
-            </div>
+            <button class="public-primary-btn login-submit" type="submit">Entrar</button>
           </form>
         </div>
       </section>

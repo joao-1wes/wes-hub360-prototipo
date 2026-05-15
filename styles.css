@@ -8638,9 +8638,7 @@ body.route-agents #directChatFab {
 .login-screen {
   display: none;
   grid-template-columns: minmax(360px, 47.8vw) 1fr;
-  background:
-    radial-gradient(circle at 88% 20%, rgba(44, 113, 232, 0.14), transparent 24%),
-    #f8fafc;
+  background: #f8fafc;
 }
 
 .login-screen.is-active {
@@ -8713,10 +8711,34 @@ body.route-agents #directChatFab {
   font-size: 32px;
 }
 
-.login-language {
+.login-header-actions {
   position: absolute;
   top: 54px;
   right: clamp(36px, 8vw, 132px);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.login-language {
+  position: static;
+}
+
+.login-theme-switcher {
+  flex-shrink: 0;
+  background: #e9edf4;
+  border: 1px solid #dbe2ec;
+}
+
+.login-theme-switcher .theme-option {
+  cursor: pointer;
+  color: #4b5563;
+}
+
+.login-theme-switcher .theme-option.is-active {
+  background: #f8fafc;
+  color: #1f2937;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .login-card {
@@ -8827,9 +8849,15 @@ body.route-agents #directChatFab {
   font-size: 17px;
   line-height: 1.2;
   font-weight: 700;
-  text-align: center;
   text-decoration: none;
   letter-spacing: 0;
+}
+
+.auth-link {
+  display: block;
+  width: max-content;
+  margin-left: auto;
+  text-align: right;
 }
 
 .login-register {
@@ -9220,7 +9248,7 @@ body.public-modal-open {
     left: 28px;
   }
 
-  .login-language {
+  .login-header-actions {
     top: 38px;
     right: 28px;
   }

@@ -43,11 +43,14 @@ const manageRolesModalForm = document.getElementById('manageRolesModalForm');
 const manageRolesName = document.getElementById('manageRolesName');
 const manageRolesSubmit = document.getElementById('manageRolesSubmit');
 const openCreateUserModal = document.getElementById('openCreateUserModal');
+const usersTable = document.querySelector('#page-users .users-table');
 const createUserModal = document.getElementById('createUserModal');
 const createUserModalForm = document.getElementById('createUserModalForm');
+const createUserTitle = document.getElementById('createUserTitle');
 const createUserName = document.getElementById('createUserName');
 const createUserEmail = document.getElementById('createUserEmail');
 const createUserPassword = document.getElementById('createUserPassword');
+const createUserStatus = document.getElementById('createUserStatus');
 const createUserRole = document.getElementById('createUserRole');
 const createUserSubmit = document.getElementById('createUserSubmit');
 const auditFilterBtn = document.getElementById('auditFilterBtn');
@@ -182,8 +185,10 @@ const environmentDescription = document.getElementById('environmentDescription')
 const environmentModalSubmit = document.getElementById('environmentModalSubmit');
 const environmentProjectsSummary = document.getElementById('environmentProjectsSummary');
 const environmentAgentsSummary = document.getElementById('environmentAgentsSummary');
+const environmentUsersSummary = document.getElementById('environmentUsersSummary');
 const environmentProjectsList = document.getElementById('environmentProjectsList');
 const environmentAgentsList = document.getElementById('environmentAgentsList');
+const environmentUsersList = document.getElementById('environmentUsersList');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
 const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
@@ -1246,7 +1251,24 @@ if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
 }
 
 if (openCreateUserModal && createUserModal && createUserModalForm) {
+  let editingUserRow = null;
+
+  const roleTextToValue = (value) => {
+    const normalized = String(value || '').trim().toLowerCase();
+    if (normalized.includes('super')) return 'superuser';
+    if (normalized.includes('admin')) return 'admin';
+    if (normalized.includes('visual')) return 'viewer';
+    if (normalized.includes('usu')) return 'user';
+    return '';
+  };
+
+  const statusTextToValue = (value) => {
+    const normalized = String(value || '').trim().toLowerCase();
+    return normalized.includes('inativo') ? 'inactive' : 'active';
+  };
+
   const closeCreateUserModal = () => {
+    editingUserRow = null;
     createUserModal.classList.remove('open');
     createUserModal.setAttribute('aria-hidden', 'true');
   };
@@ -1254,13 +1276,16 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
   const syncCreateUserSubmit = () => {
     const hasName = Boolean(String(createUserName?.value || '').trim());
     const hasEmail = Boolean(String(createUserEmail?.value || '').trim());
-    const hasPassword = String(createUserPassword?.value || '').length >= 8;
+    const hasPassword = editingUserRow ? true : String(createUserPassword?.value || '').length >= 8;
     const hasRole = Boolean(String(createUserRole?.value || '').trim());
     if (createUserSubmit) createUserSubmit.disabled = !(hasName && hasEmail && hasPassword && hasRole);
   };
 
   openCreateUserModal.addEventListener('click', () => {
+    editingUserRow = null;
     createUserModalForm.reset();
+    if (createUserTitle) createUserTitle.textContent = 'Criar novo usuário';
+    if (createUserSubmit) createUserSubmit.textContent = 'Criar usuário';
     syncCreateUserSubmit();
     createUserModal.classList.add('open');
     createUserModal.setAttribute('aria-hidden', 'false');
@@ -1278,13 +1303,65 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
 
   createUserModalForm.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (editingUserRow) {
+      const name = String(createUserName?.value || '').trim();
+      const email = String(createUserEmail?.value || '').trim();
+      const roleLabel = createUserRole?.selectedOptions?.[0]?.textContent?.trim() || '';
+      const statusLabel = createUserStatus?.selectedOptions?.[0]?.textContent?.trim() || '';
+      const nameCell = editingUserRow.querySelector('.user-cell strong');
+      const emailCell = editingUserRow.children[1];
+      const roleCell = editingUserRow.children[2];
+      const statusCell = editingUserRow.children[3];
+
+      if (nameCell) nameCell.textContent = name;
+      if (emailCell) emailCell.textContent = email;
+      if (roleCell) roleCell.textContent = roleLabel;
+      if (statusCell) {
+        statusCell.textContent = statusLabel;
+        statusCell.classList.toggle('success', String(createUserStatus?.value || '') === 'active');
+      }
+
+      closeCreateUserModal();
+      showAppToast('Usuário atualizado com sucesso');
+      return;
+    }
+
     closeCreateUserModal();
+  });
+
+  usersTable?.addEventListener('click', (event) => {
+    const editButton = event.target.closest('.icon-btn.action-icon[aria-label="Editar"]');
+    if (!editButton || editButton.disabled || editButton.classList.contains('muted-icon')) return;
+
+    const row = editButton.closest('.data-row');
+    if (!row || row.classList.contains('header')) return;
+
+    const name = row.querySelector('.user-cell strong')?.textContent?.trim() || '';
+    const email = row.children[1]?.textContent?.trim() || '';
+    const roleText = row.children[2]?.textContent?.trim() || '';
+    const statusText = row.children[3]?.textContent?.trim() || '';
+
+    editingUserRow = row;
+    createUserModalForm.reset();
+    if (createUserTitle) createUserTitle.textContent = 'Editar usuário';
+    if (createUserSubmit) createUserSubmit.textContent = 'Salvar alterações';
+    if (createUserName) createUserName.value = name;
+    if (createUserEmail) createUserEmail.value = email;
+    if (createUserStatus) createUserStatus.value = statusTextToValue(statusText);
+    if (createUserRole) createUserRole.value = roleTextToValue(roleText);
+    if (createUserPassword) createUserPassword.value = '';
+
+    syncCreateUserSubmit();
+    createUserModal.classList.add('open');
+    createUserModal.setAttribute('aria-hidden', 'false');
+    createUserName?.focus();
   });
 }
 
 if (environmentsTable && environmentModal && environmentModalForm) {
   let activeEnvironmentRow = null;
   let isCreatingEnvironment = false;
+  let activeEnvironmentCode = '';
 
   const environmentRelations = {
     'env-operacoes': {
@@ -1312,6 +1389,11 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         'Validador de Evidências',
         'Auditor Operacional',
       ],
+      users: [
+        'Alfeu Vinicius Souza',
+        'Mariana Costa',
+        'Lucas Almeida',
+      ],
     },
     'env-financeiro': {
       projects: [
@@ -1330,6 +1412,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         'Validador Fiscal',
         'Resumo Financeiro',
       ],
+      users: [
+        'Paula Ribeiro',
+        'Rafael Moura',
+      ],
     },
     'env-marketing': {
       projects: [
@@ -1344,6 +1430,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         'Copy Review',
         'Lead Scoring',
       ],
+      users: [
+        'Camila Rocha',
+        'Bruno Martins',
+      ],
     },
     'env-rh': {
       projects: [
@@ -1356,48 +1446,94 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         'Comunicados RH',
         'Trilhas de Desenvolvimento',
       ],
+      users: [
+        'Fernanda Lima',
+        'Renato Pires',
+      ],
     },
   };
 
-  const renderEnvironmentRelationList = (listEl, items, icon) => {
+  const renderEnvironmentRelationList = (listEl, items, icon, type) => {
     if (!listEl) return;
     listEl.replaceChildren();
 
-    items.forEach((item) => {
+    items.forEach((item, index) => {
       const li = document.createElement('li');
       const iconEl = document.createElement('span');
       const labelEl = document.createElement('span');
+      const removeBtn = document.createElement('button');
+      const removeIcon = document.createElement('span');
 
       iconEl.className = 'material-symbols-rounded';
       iconEl.setAttribute('aria-hidden', 'true');
       iconEl.textContent = icon;
+      labelEl.className = 'environment-relation-label';
       labelEl.textContent = item;
+      removeBtn.className = 'icon-btn action-icon danger environment-relation-remove';
+      removeBtn.type = 'button';
+      removeBtn.dataset.relationType = type;
+      removeBtn.dataset.relationIndex = String(index);
+      removeBtn.setAttribute('aria-label', `Remover ${item}`);
+      removeIcon.className = 'material-symbols-rounded';
+      removeIcon.setAttribute('aria-hidden', 'true');
+      removeIcon.textContent = 'delete';
+      removeBtn.appendChild(removeIcon);
 
-      li.append(iconEl, labelEl);
+      li.append(iconEl, labelEl, removeBtn);
       listEl.appendChild(li);
     });
   };
 
+  const summarizeRelationCount = (count, singular) => `${count} ${singular}${count === 1 ? '' : 's'} vinculado${count === 1 ? '' : 's'}`;
+
+  const setEnvironmentRelationExpanded = (listId, expanded) => {
+    const listEl = document.getElementById(listId);
+    const toggleEl = environmentModal.querySelector(`.environment-relation-toggle[data-relation-target="${listId}"]`);
+    if (!listEl || !toggleEl) return;
+    toggleEl.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    listEl.classList.toggle('is-hidden', !expanded);
+    listEl.hidden = !expanded;
+  };
+
+  const ensureEnvironmentRelationRecord = (code) => {
+    if (!code) return { projects: [], agents: [], users: [] };
+    if (!environmentRelations[code]) {
+      environmentRelations[code] = { projects: [], agents: [], users: [] };
+    }
+    if (!Array.isArray(environmentRelations[code].projects)) environmentRelations[code].projects = [];
+    if (!Array.isArray(environmentRelations[code].agents)) environmentRelations[code].agents = [];
+    if (!Array.isArray(environmentRelations[code].users)) environmentRelations[code].users = [];
+    return environmentRelations[code];
+  };
+
   const renderEnvironmentRelations = (row) => {
-    const relation = environmentRelations[row.dataset.environmentCode] || { projects: [], agents: [] };
+    activeEnvironmentCode = String(row?.dataset?.environmentCode || '').trim();
+    const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
     const projectCount = relation.projects.length;
     const agentCount = relation.agents.length;
+    const userCount = relation.users.length;
 
     if (environmentProjectsSummary) {
-      environmentProjectsSummary.textContent = `${projectCount} projeto${projectCount === 1 ? '' : 's'} vinculado${projectCount === 1 ? '' : 's'}`;
+      environmentProjectsSummary.textContent = summarizeRelationCount(projectCount, 'projeto');
     }
 
     if (environmentAgentsSummary) {
-      environmentAgentsSummary.textContent = `${agentCount} agente${agentCount === 1 ? '' : 's'} vinculado${agentCount === 1 ? '' : 's'}`;
+      environmentAgentsSummary.textContent = summarizeRelationCount(agentCount, 'agente');
     }
 
-    renderEnvironmentRelationList(environmentProjectsList, relation.projects, 'folder');
-    renderEnvironmentRelationList(environmentAgentsList, relation.agents, 'smart_toy');
+    if (environmentUsersSummary) {
+      environmentUsersSummary.textContent = summarizeRelationCount(userCount, 'usuário');
+    }
+
+    renderEnvironmentRelationList(environmentProjectsList, relation.projects, 'folder', 'projects');
+    renderEnvironmentRelationList(environmentAgentsList, relation.agents, 'smart_toy', 'agents');
+    renderEnvironmentRelationList(environmentUsersList, relation.users, 'person', 'users');
   };
 
   const closeEnvironmentModal = () => {
     activeEnvironmentRow = null;
     isCreatingEnvironment = false;
+    activeEnvironmentCode = '';
     environmentModal.classList.remove('open');
     environmentModal.setAttribute('aria-hidden', 'true');
   };
@@ -1433,8 +1569,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (modalTitle) modalTitle.textContent = 'Criar setor';
     if (environmentProjectsSummary) environmentProjectsSummary.textContent = '0 projetos vinculados';
     if (environmentAgentsSummary) environmentAgentsSummary.textContent = '0 agentes vinculados';
-    renderEnvironmentRelationList(environmentProjectsList, [], 'folder');
-    renderEnvironmentRelationList(environmentAgentsList, [], 'smart_toy');
+    if (environmentUsersSummary) environmentUsersSummary.textContent = '0 usuários vinculados';
+    renderEnvironmentRelationList(environmentProjectsList, [], 'folder', 'projects');
+    renderEnvironmentRelationList(environmentAgentsList, [], 'smart_toy', 'agents');
+    renderEnvironmentRelationList(environmentUsersList, [], 'person', 'users');
     if (environmentModalSubmit) environmentModalSubmit.textContent = 'Criar setor';
     syncEnvironmentSubmit();
     environmentModal.classList.add('open');
@@ -1472,6 +1610,62 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   });
 
   environmentModal.addEventListener('click', (event) => {
+    const relationToggle = event.target.closest('.environment-relation-toggle');
+    if (relationToggle) {
+      const listId = relationToggle.dataset.relationTarget;
+      if (!listId) return;
+      const isExpanded = relationToggle.getAttribute('aria-expanded') === 'true';
+      setEnvironmentRelationExpanded(listId, !isExpanded);
+      return;
+    }
+
+    const addButton = event.target.closest('.environment-relation-add');
+    if (addButton) {
+      const relationType = addButton.dataset.relationType;
+      if (!relationType || !activeEnvironmentCode) return;
+      const labelMap = {
+        projects: 'projeto',
+        agents: 'agente',
+        users: 'usuário',
+      };
+      const label = labelMap[relationType] || 'item';
+      const value = window.prompt(`Digite o nome do ${label}:`, '');
+      const nextValue = String(value || '').trim();
+      if (!nextValue) return;
+
+      const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
+      const targetList = Array.isArray(relation[relationType]) ? relation[relationType] : [];
+      relation[relationType] = targetList;
+      targetList.push(nextValue);
+
+      if (activeEnvironmentRow) renderEnvironmentRelations(activeEnvironmentRow);
+      setEnvironmentRelationExpanded(
+        relationType === 'projects'
+          ? 'environmentProjectsList'
+          : relationType === 'agents'
+            ? 'environmentAgentsList'
+            : 'environmentUsersList',
+        true
+      );
+      showAppToast(`${label.charAt(0).toUpperCase()}${label.slice(1)} adicionado com sucesso`);
+      return;
+    }
+
+    const removeButton = event.target.closest('.environment-relation-remove');
+    if (removeButton) {
+      const relationType = removeButton.dataset.relationType;
+      const relationIndex = Number.parseInt(removeButton.dataset.relationIndex || '-1', 10);
+      if (!relationType || relationIndex < 0 || !activeEnvironmentCode) return;
+
+      const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
+      if (!Array.isArray(relation[relationType]) || relationIndex >= relation[relationType].length) return;
+      relation[relationType].splice(relationIndex, 1);
+
+      if (activeEnvironmentRow) renderEnvironmentRelations(activeEnvironmentRow);
+      showAppToast('Item removido do setor');
+      return;
+    }
+
     if (event.target.closest('[data-modal-close]')) closeEnvironmentModal();
   });
 
@@ -1505,6 +1699,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
     closeEnvironmentModal();
     showAppToast('Setor atualizado com sucesso');
+  });
+
+  ['environmentProjectsList', 'environmentAgentsList', 'environmentUsersList'].forEach((listId) => {
+    setEnvironmentRelationExpanded(listId, false);
   });
 }
 
@@ -6948,7 +7146,6 @@ scheduleLucideRefresh();
 
     row.innerHTML = `
       <span class="environment-name-cell">
-        <span class="material-symbols-rounded">business_center</span>
         <span>
           <strong>${escapeHtmlWes(name)}</strong>
           <span class="muted">${escapeHtmlWes(code)}</span>

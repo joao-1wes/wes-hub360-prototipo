@@ -3067,7 +3067,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .audit-filters-grid {
-  grid-template-columns: minmax(320px, 1.7fr) repeat(2, minmax(142px, max-content));
+  grid-template-columns: minmax(320px, 1.7fr) repeat(2, minmax(112px, max-content));
   align-items: center;
   column-gap: 8px;
   margin-bottom: 16px;
@@ -3190,6 +3190,16 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
     minmax(82px, 0.55fr);
 }
 
+.environments-table .data-row > span:nth-child(2),
+.environments-table .data-row > span:nth-child(3) {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .environments-table .row-actions {
   justify-content: flex-start;
 }
@@ -3285,8 +3295,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .environment-relations-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
+}
+
+.environment-dialog .environment-relations-grid {
+  grid-template-columns: 1fr !important;
 }
 
 .environment-relation-panel {
@@ -3303,6 +3317,18 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+}
+
+.environment-relation-head .environment-relation-add {
+  margin-left: auto;
+}
+
+.environment-relation-toggle .environment-relation-caret {
+  transition: transform 0.2s ease;
+}
+
+.environment-relation-toggle[aria-expanded="true"] .environment-relation-caret {
+  transform: rotate(180deg);
 }
 
 .environment-relation-head > .material-symbols-rounded {
@@ -3362,6 +3388,19 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   flex: 0 0 auto;
   color: #64748b;
   font-size: 18px;
+}
+
+.environment-relation-list li .environment-relation-label {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.environment-relation-remove {
+  margin-left: auto;
+  color: #dc2626;
 }
 
 .environment-relation-list li span:last-child {

@@ -9,7 +9,174 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
   <body>
-    <div class="app-shell" id="appShell">
+    <div class="public-flow" id="publicFlow">
+      <section class="public-screen landing-screen is-active" id="landingScreen" data-public-route="home" aria-label="Landing page">
+        <header class="landing-header">
+          <a class="landing-brand" href="#/" aria-label="WES HUB 360">
+            <img src="./assets/logo_big.svg" alt="WES HUB 360" />
+          </a>
+          <div class="public-header-actions">
+            <div class="public-language">
+              <button class="public-language-toggle" type="button" aria-label="Idioma atual">
+                <img src="./assets/flag-pt-br.svg" alt="" width="22" height="16" />
+                <span>PT-BR</span>
+                <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+              </button>
+            </div>
+            <a class="public-primary-btn landing-login-btn" href="#/login">Entrar</a>
+          </div>
+        </header>
+
+        <main class="landing-main">
+          <div class="landing-copy">
+            <h1>Automação <span>Simplificada</span></h1>
+            <p>Implante, agende e monitore scripts Python em escala. Deixe os agentes de IA cuidarem da complexidade enquanto você foca em construir.</p>
+          </div>
+        </main>
+
+        <footer class="landing-footer">
+          <img src="./assets/logo_big.svg" alt="WES HUB 360" />
+          <p>© 2025 WES HUB 360 Technologies, Inc. Todos os direitos reservados.</p>
+        </footer>
+      </section>
+
+      <section class="public-screen login-screen" id="loginScreen" data-public-route="login" aria-label="Login">
+        <div class="login-brand-panel">
+          <div class="login-brand-content">
+            <img src="./assets/logo_big.svg" alt="WES HUB 360" />
+            <h1>Bem-vindo de Volta</h1>
+            <p>Continue sua jornada de automação com WES 360</p>
+          </div>
+        </div>
+
+        <div class="login-form-panel">
+          <a class="public-back-link" href="#/" aria-label="Voltar para a landing page">
+            <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+          </a>
+          <div class="public-language login-language">
+            <button class="public-language-toggle" type="button" aria-label="Idioma atual">
+              <img src="./assets/flag-pt-br.svg" alt="" width="22" height="16" />
+              <span>PT-BR</span>
+              <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+            </button>
+          </div>
+
+          <form class="login-card" id="publicLoginForm">
+            <div class="login-card-heading">
+              <h2>Entrar</h2>
+              <p>Acesse seu painel de automação</p>
+            </div>
+            <label class="auth-field">
+              <span>Endereço de E-mail *</span>
+              <span class="auth-input-wrap">
+                <span class="material-symbols-rounded" aria-hidden="true">mail</span>
+                <input type="email" value="admin@1wes.com" autocomplete="email" />
+              </span>
+            </label>
+            <label class="auth-field">
+              <span>Senha *</span>
+              <span class="auth-input-wrap">
+                <span class="material-symbols-rounded" aria-hidden="true">lock</span>
+                <input type="password" value="12345678" autocomplete="current-password" />
+                <button class="auth-ghost-icon" type="button" aria-label="Mostrar senha">
+                  <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                </button>
+              </span>
+            </label>
+            <button class="public-primary-btn login-submit" type="submit">Entrar</button>
+            <a class="auth-link" href="#/login">Esqueceu a senha?</a>
+            <div class="login-register">
+              <span>Não tem uma conta?</span>
+              <a href="#/select-organization">Criar empresa →</a>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <section class="public-screen org-select-screen" id="organizationSelectScreen" data-public-route="select-organization" aria-label="Seleção de empresa">
+        <main class="org-select-main">
+          <div class="org-select-brand" aria-label="WES HUB 360">
+            <img src="./assets/WES_LOGO_8.svg" alt="WES HUB 360" />
+          </div>
+          <div class="org-select-heading">
+            <h1>Selecione uma empresa</h1>
+            <p>Escolha qual empresa deseja acessar</p>
+          </div>
+          <div class="org-select-grid">
+            <a class="org-choice-card" href="#/dashboard">
+              <span class="org-avatar org-avatar-purple">C</span>
+              <strong>CEDAE</strong>
+              <span class="org-tags">
+                <span>Padrão</span>
+                <span>admin</span>
+              </span>
+              <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+            </a>
+            <a class="org-choice-card" href="#/dashboard">
+              <span class="org-avatar org-avatar-red">NA</span>
+              <strong>&nbsp;</strong>
+              <span class="org-tags">
+                <span>Padrão</span>
+                <span>Membro</span>
+              </span>
+              <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+            </a>
+            <a class="org-choice-card" href="#/dashboard">
+              <span class="org-avatar org-avatar-blue">W</span>
+              <strong>WES</strong>
+              <span class="org-tags">
+                <span>Padrão</span>
+                <span>admin</span>
+              </span>
+              <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+            </a>
+            <button class="org-choice-card org-create-card" id="openCreateCompanyModal" type="button">
+              <span class="org-create-icon">
+                <span class="material-symbols-rounded" aria-hidden="true">add_business</span>
+              </span>
+              <strong>Criar empresa</strong>
+              <span class="org-create-copy">Cadastre uma nova empresa para acessar no HUB 360.</span>
+              <span class="org-access">Criar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+            </button>
+          </div>
+          <a class="org-logout" href="#/login">
+            <span class="material-symbols-rounded" aria-hidden="true">logout</span>
+            Sair
+          </a>
+        </main>
+      </section>
+
+      <div class="public-modal" id="createCompanyModal" aria-hidden="true">
+        <div class="public-modal-backdrop" data-create-company-close></div>
+        <div class="public-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="createCompanyModalTitle">
+          <div class="public-modal-header">
+            <div>
+              <h2 id="createCompanyModalTitle">Criar empresa</h2>
+              <p>Informe os dados iniciais da empresa.</p>
+            </div>
+            <button class="public-modal-close" type="button" aria-label="Fechar" data-create-company-close>
+              <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            </button>
+          </div>
+          <form class="public-modal-form" id="createCompanyForm">
+            <label class="public-modal-field" for="companyName">
+              <span>Nome da empresa</span>
+              <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
+            </label>
+            <label class="public-modal-field" for="companyAdminEmail">
+              <span>E-mail do ADM da empresa</span>
+              <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
+            </label>
+            <div class="public-modal-footer">
+              <button class="btn outline" type="button" data-create-company-close>Cancelar</button>
+              <button class="btn primary" type="submit">Salvar</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="app-shell" id="appShell" hidden>
       <aside class="sidebar">
         <div class="sidebar-top">
           <button class="icon-btn menu-btn" id="menuToggle" aria-label="Menu">
@@ -1004,13 +1171,11 @@
                       </div>
                       <div class="filter-group">
                         <span>RAG</span>
-                        <button class="filter-option active" data-filter="rag" data-value="">Todos</button>
                         <button class="filter-option" data-filter="rag" data-value="sim">Sim</button>
                         <button class="filter-option" data-filter="rag" data-value="nao">Não</button>
                       </div>
                       <div class="filter-group">
                         <span>Visibilidade</span>
-                        <button class="filter-option active" data-filter="visibility" data-value="">Todos</button>
                         <button class="filter-option" data-filter="visibility" data-value="publico">Público</button>
                         <button class="filter-option" data-filter="visibility" data-value="privado">Privado</button>
                       </div>
@@ -1574,15 +1739,15 @@
 
                   <div class="modal-row">
                     <div>
-                      <label class="modal-label modal-label--required" for="agentModalEnvironment">Ambiente</label>
+                      <label class="modal-label" for="agentModalEnvironment">Ambiente</label>
                       <div class="hub-select-wrap hub-select-wrap--block">
                         <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
                         <select class="hub-select" id="agentModalEnvironment" aria-label="Ambiente do agente">
-                          <option value="">Selecione o ambiente</option>
+                          <option value="">Sem ambiente</option>
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
-                      <p class="modal-field-hint">Define o ambiente principal em que esse agente vai operar.</p>
+                      <p class="modal-field-hint">Opcional, defina o ambiente principal em que esse agente vai operar.</p>
                     </div>
                     <div>
                       <label class="modal-label" for="agentModalProject">Projeto</label>
@@ -3878,6 +4043,169 @@
             </div>
           </div>
 
+          <div class="page" id="page-environments" data-title="Ambientes">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Ambientes</h2>
+                </div>
+              </div>
+              <div class="data-table environments-table">
+                <div class="data-row header">
+                  <span>Ambiente</span>
+                  <span>Descrição</span>
+                  <span>Responsável</span>
+                  <span>Projetos</span>
+                  <span>Agentes</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row environment-row" data-environment-name="Operações" data-environment-code="env-operacoes" data-environment-description="Rotinas de atendimento, backoffice e acompanhamento de filas." data-environment-owner="ops@1wes.com" data-environment-projects="6" data-environment-agents="14">
+                  <span class="environment-name-cell">
+                    <span class="material-symbols-rounded">business_center</span>
+                    <span>
+                      <strong>Operações</strong>
+                      <span class="muted">env-operacoes</span>
+                    </span>
+                  </span>
+                  <span class="environment-description-cell">Rotinas de atendimento, backoffice e acompanhamento de filas.</span>
+                  <span class="environment-owner-cell">ops@1wes.com</span>
+                  <span class="environment-projects-cell">6</span>
+                  <span class="environment-agents-cell">14</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row environment-row" data-environment-name="Financeiro" data-environment-code="env-financeiro" data-environment-description="Conciliação, fechamento mensal e relatórios financeiros." data-environment-owner="financeiro@1wes.com" data-environment-projects="4" data-environment-agents="8">
+                  <span class="environment-name-cell">
+                    <span class="material-symbols-rounded">account_balance</span>
+                    <span>
+                      <strong>Financeiro</strong>
+                      <span class="muted">env-financeiro</span>
+                    </span>
+                  </span>
+                  <span class="environment-description-cell">Conciliação, fechamento mensal e relatórios financeiros.</span>
+                  <span class="environment-owner-cell">financeiro@1wes.com</span>
+                  <span class="environment-projects-cell">4</span>
+                  <span class="environment-agents-cell">8</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row environment-row" data-environment-name="Marketing" data-environment-code="env-marketing" data-environment-description="Campanhas, segmentações e análise de performance." data-environment-owner="marketing@1wes.com" data-environment-projects="3" data-environment-agents="5">
+                  <span class="environment-name-cell">
+                    <span class="material-symbols-rounded">campaign</span>
+                    <span>
+                      <strong>Marketing</strong>
+                      <span class="muted">env-marketing</span>
+                    </span>
+                  </span>
+                  <span class="environment-description-cell">Campanhas, segmentações e análise de performance.</span>
+                  <span class="environment-owner-cell">marketing@1wes.com</span>
+                  <span class="environment-projects-cell">3</span>
+                  <span class="environment-agents-cell">5</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row environment-row" data-environment-name="RH" data-environment-code="env-rh" data-environment-description="Admissões, comunicações internas e trilhas de pessoas." data-environment-owner="rh@1wes.com" data-environment-projects="2" data-environment-agents="4">
+                  <span class="environment-name-cell">
+                    <span class="material-symbols-rounded">groups</span>
+                    <span>
+                      <strong>RH</strong>
+                      <span class="muted">env-rh</span>
+                    </span>
+                  </span>
+                  <span class="environment-description-cell">Admissões, comunicações internas e trilhas de pessoas.</span>
+                  <span class="environment-owner-cell">rh@1wes.com</span>
+                  <span class="environment-projects-cell">2</span>
+                  <span class="environment-agents-cell">4</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar ambiente" type="button">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir ambiente" type="button">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="environmentModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog environment-dialog" role="dialog" aria-modal="true" aria-labelledby="environmentModalTitle">
+              <div class="modal-header">
+                <h3 id="environmentModalTitle">Editar ambiente</h3>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <form id="environmentModalForm" class="modal-body environment-body">
+                <section class="users-modal-section">
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label modal-label--required" for="environmentName">Nome do ambiente</label>
+                      <input class="modal-input" id="environmentName" name="name" type="text" maxlength="80" autocomplete="off" />
+                      <p class="modal-field-hint">Nome exibido nas listas e filtros do painel.</p>
+                    </div>
+                    <div>
+                      <label class="modal-label modal-label--required" for="environmentOwner">Responsável</label>
+                      <input class="modal-input" id="environmentOwner" name="owner" type="email" maxlength="160" autocomplete="off" />
+                      <p class="modal-field-hint">E-mail do responsável pela governança do ambiente.</p>
+                    </div>
+                  </div>
+                  <label class="modal-label" for="environmentDescription">Descrição</label>
+                  <textarea class="modal-textarea environment-description-input" id="environmentDescription" name="description" rows="4" maxlength="280"></textarea>
+                  <p class="modal-field-hint">Resumo curto para orientar administradores.</p>
+                </section>
+                <section class="users-modal-section environment-relations-section">
+                  <div class="environment-relations-grid">
+                    <div class="environment-relation-panel">
+                      <div class="environment-relation-head">
+                        <span class="material-symbols-rounded" aria-hidden="true">folder</span>
+                        <div>
+                          <h4>Projetos neste ambiente</h4>
+                          <p id="environmentProjectsSummary">0 projetos vinculados</p>
+                        </div>
+                      </div>
+                      <ul class="environment-relation-list" id="environmentProjectsList"></ul>
+                    </div>
+                    <div class="environment-relation-panel">
+                      <div class="environment-relation-head">
+                        <span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>
+                        <div>
+                          <h4>Agentes neste ambiente</h4>
+                          <p id="environmentAgentsSummary">0 agentes vinculados</p>
+                        </div>
+                      </div>
+                      <ul class="environment-relation-list" id="environmentAgentsList"></ul>
+                    </div>
+                  </div>
+                </section>
+              </form>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="submit" form="environmentModalForm" class="btn primary" id="environmentModalSubmit">Salvar alterações</button>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-audit" data-title="Histórico de ações">
             <div class="section">
               <div class="page-header">
@@ -4450,43 +4778,6 @@
                     <button class="btn outline" data-modal-close>Cancelar</button>
                     <button class="btn primary">Salvar pagamento</button>
                   </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="page" id="page-environments" data-title="Ambientes">
-            <div class="section">
-              <div class="page-header">
-                <div>
-                  <h2>Ambientes</h2>
-                  <p class="page-subtitle">Gerencie ambientes e limites de recursos.</p>
-                </div>
-                <div class="page-actions">
-                  <button class="btn primary">Criar ambiente</button>
-                </div>
-              </div>
-              <div class="data-table">
-                <div class="data-row header">
-                  <span>Ambiente</span>
-                  <span>Tipo</span>
-                  <span>Executores</span>
-                  <span>Limites</span>
-                  <span>Status</span>
-                </div>
-                <div class="data-row">
-                  <span>Produção</span>
-                  <span>Produção</span>
-                  <span>12/20</span>
-                  <span>CPU 8 • Memória 32GB</span>
-                  <span class="chip success">Ativo</span>
-                </div>
-                <div class="data-row">
-                  <span>Homologação</span>
-                  <span>Homologação</span>
-                  <span>5/10</span>
-                  <span>CPU 4 • Memória 16GB</span>
-                  <span class="chip warning">Ativo</span>
                 </div>
               </div>
             </div>

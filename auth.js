@@ -1,11 +1,16 @@
 /**
- * Bootstrap mínimo de sessão.
- * A tela de login foi removida, mas as credenciais salvas continuam compatíveis
- * para os trechos do painel que ainda falam com a API.
+ * Bootstrap mínimo de sessão e fluxo público.
+ * As telas de entrada são estáticas; ao acessar o painel, uma sessão local
+ * compatível com os trechos que ainda falam com a API é criada.
  */
 (function () {
   const STORAGE_KEY = 'wes_dashboard_auth';
   const LAST_BASE_KEY = 'wes_dashboard_api_base_last';
+  const PUBLIC_ROUTE_SCREENS = {
+    '': 'landingScreen',
+    login: 'loginScreen',
+    'select-organization': 'organizationSelectScreen',
+  };
 
   function getDefaultApiBase() {
     const { protocol, origin, hostname, port } = window.location;
@@ -32,13 +37,66 @@
     }
   }
 
+  function getRouteKey() {
+    return decodeURIComponent(String(window.location.hash || '').replace(/^#\/?/, '').split('?')[0]);
+  }
+
+  function isPublicRoute(routeKey = getRouteKey()) {
+    return Object.prototype.hasOwnProperty.call(PUBLIC_ROUTE_SCREENS, routeKey);
+  }
+
   function ensureAppVisible() {
     const shell = document.getElementById('appShell');
-    const login = document.getElementById('loginScreen');
+    const publicFlow = document.getElementById('publicFlow');
     if (shell) shell.hidden = false;
-    if (login) {
-      login.hidden = true;
-      login.remove();
+    if (publicFlow) publicFlow.hidden = true;
+    document.body.classList.remove('public-route');
+  }
+
+  function ensurePublicVisible(routeKey = getRouteKey()) {
+    const shell = document.getElementById('appShell');
+    const publicFlow = document.getElementById('publicFlow');
+    if (shell) shell.hidden = true;
+    if (publicFlow) publicFlow.hidden = false;
+    document.body.classList.add('public-route');
+
+    document.querySelectorAll('[data-public-route]').forEach((screen) => {
+      const isActive = screen.id === PUBLIC_ROUTE_SCREENS[routeKey];
+      screen.classList.toggle('is-active', isActive);
+      screen.toggleAttribute('hidden', !isActive);
+    });
+  }
+
+  function ensureDemoSession() {
+    if (WesDashboardAuth.isAuthenticated()) return;
+    WesDashboardAuth.write({
+      apiBase: getDefaultApiBase(),
+      apiKey: '',
+      userId: 'admin@1wes.com',
+      displayName: 'Alfeu Vinicius Souza',
+    });
+  }
+
+  function syncPublicRoute() {
+    const routeKey = getRouteKey();
+    if (isPublicRoute(routeKey)) {
+      ensurePublicVisible(routeKey);
+      if (routeKey !== '') {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      }
+    } else {
+      ensureDemoSession();
+      ensureAppVisible();
+      WesDashboardAuth.applyUserToUI();
+    }
+
+    if (typeof window.updateActivePage === 'function') {
+      window.updateActivePage();
+    }
+    if (typeof window.scheduleLucideRefresh === 'function') {
+      window.scheduleLucideRefresh();
+    } else if (window.lucide?.createIcons) {
+      window.lucide.createIcons();
     }
   }
 
@@ -119,7 +177,7 @@
 
     logout() {
       this.clear();
-      ensureAppVisible();
+      window.location.hash = '#/login';
     },
   };
 
@@ -141,16 +199,60 @@
   window.WesDashboardAuth = WesDashboardAuth;
 
   function initAuthUi() {
-    ensureAppVisible();
-    WesDashboardAuth.applyUserToUI();
-    if (window.location.hash === '#/login') {
-      window.location.hash = '#/dashboard';
-    }
-    if (typeof window.scheduleLucideRefresh === 'function') {
-      window.scheduleLucideRefresh();
-    } else if (window.lucide?.createIcons) {
-      window.lucide.createIcons();
-    }
+    const loginForm = document.getElementById('publicLoginForm');
+    const openCreateCompanyModal = document.getElementById('openCreateCompanyModal');
+    const createCompanyModal = document.getElementById('createCompanyModal');
+    const createCompanyForm = document.getElementById('createCompanyForm');
+    const companyName = document.getElementById('companyName');
+    loginForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      window.location.hash = '#/select-organization';
+    });
+
+    const closeCreateCompanyModal = () => {
+      if (!createCompanyModal) return;
+      createCompanyModal.classList.remove('is-open');
+      createCompanyModal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('public-modal-open');
+    };
+
+    const showCreateCompanyModal = () => {
+      if (!createCompanyModal) return;
+      createCompanyModal.classList.add('is-open');
+      createCompanyModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('public-modal-open');
+      window.setTimeout(() => companyName?.focus(), 50);
+    };
+
+    openCreateCompanyModal?.addEventListener('click', showCreateCompanyModal);
+    document.querySelectorAll('[data-create-company-close]').forEach((button) => {
+      button.addEventListener('click', closeCreateCompanyModal);
+    });
+    createCompanyForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      createCompanyForm.reset();
+      closeCreateCompanyModal();
+      window.location.hash = '#/select-organization';
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && createCompanyModal?.classList.contains('is-open')) {
+        closeCreateCompanyModal();
+      }
+    });
+
+    document.querySelectorAll('.auth-ghost-icon').forEach((button) => {
+      button.addEventListener('click', () => {
+        const input = button.closest('.auth-input-wrap')?.querySelector('input');
+        if (!input) return;
+        const visible = input.type === 'text';
+        input.type = visible ? 'password' : 'text';
+        button.setAttribute('aria-label', visible ? 'Mostrar senha' : 'Ocultar senha');
+        const icon = button.querySelector('.material-symbols-rounded');
+        if (icon) icon.textContent = visible ? 'visibility' : 'visibility_off';
+      });
+    });
+
+    syncPublicRoute();
   }
 
   if (document.readyState === 'loading') {
@@ -158,4 +260,5 @@
   } else {
     initAuthUi();
   }
+  window.addEventListener('hashchange', syncPublicRoute);
 })();

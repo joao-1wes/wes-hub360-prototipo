@@ -1362,6 +1362,9 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   let activeEnvironmentRow = null;
   let isCreatingEnvironment = false;
   let activeEnvironmentCode = '';
+  let draftEnvironmentCode = '';
+  let activeRelationPickerType = '';
+  let activeRelationPickerButton = null;
 
   const environmentRelations = {
     'env-operacoes': {
@@ -1486,10 +1489,268 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
   const summarizeRelationCount = (count, singular) => `${count} ${singular}${count === 1 ? '' : 's'} vinculado${count === 1 ? '' : 's'}`;
 
+  const environmentRelationPickerMenu = document.createElement('div');
+  environmentRelationPickerMenu.id = 'environmentRelationPickerMenu';
+  environmentRelationPickerMenu.className = 'menu filter-menu two-col environment-relation-picker-menu';
+  environmentRelationPickerMenu.innerHTML = `
+    <div class="search-field environment-relation-picker-search">
+      <span class="material-symbols-rounded" aria-hidden="true">search</span>
+      <input id="environmentRelationPickerSearch" type="search" autocomplete="off" placeholder="Buscar ou adicionar" aria-label="Buscar item para vincular" />
+    </div>
+    <div class="environment-relation-picker-list" id="environmentRelationPickerList"></div>
+  `;
+  const environmentRelationPickerSearch = environmentRelationPickerMenu.querySelector('#environmentRelationPickerSearch');
+  const environmentRelationPickerList = environmentRelationPickerMenu.querySelector('#environmentRelationPickerList');
+
+  const closeEnvironmentRelationPicker = () => {
+    environmentRelationPickerMenu.classList.remove('open');
+    activeRelationPickerType = '';
+    activeRelationPickerButton = null;
+    if (environmentRelationPickerSearch) environmentRelationPickerSearch.value = '';
+  };
+
+  const getEnvironmentRelationRecentItems = (relationType, limit = 4) => {
+    const entries = [];
+    Object.values(environmentRelations).forEach((relation) => {
+      const items = Array.isArray(relation?.[relationType]) ? relation[relationType] : [];
+      for (let index = items.length - 1; index >= 0; index -= 1) {
+        entries.push(String(items[index] || '').trim());
+      }
+    });
+
+    const seen = new Set();
+    const unique = [];
+    entries.forEach((item) => {
+      if (!item) return;
+      const key = item.toLowerCase();
+      if (seen.has(key)) return;
+      seen.add(key);
+      unique.push(item);
+    });
+    return unique.slice(0, limit);
+  };
+
+  const environmentRelationSuggestionPool = {
+    projects: [
+      'Operações integradas',
+      'Backoffice comercial',
+      'Atendimento multicanal',
+      'Controle de filas',
+      'Qualidade operacional',
+      'SLA e escalonamento',
+      'Controladoria e fechamento',
+      'Conciliação bancária',
+      'Campanhas digitais',
+      'Segmentação de clientes',
+      'Admissões e onboarding',
+      'Comunicação interna',
+    ],
+    agents: [
+      'Atlas Core',
+      'Nimbus Ops',
+      'Queue Watch',
+      'SLA Sentinel',
+      'Pulse Finance',
+      'Ledger Check',
+      'Campaign Copilot',
+      'Segment Builder',
+      'People Assist',
+      'Onboarding Guide',
+    ],
+    users: [
+      'Alfeu Vinicius Souza',
+      'Mariana Costa',
+      'Lucas Almeida',
+      'Paula Ribeiro',
+      'Rafael Moura',
+      'Camila Rocha',
+      'Bruno Martins',
+      'Fernanda Lima',
+      'Renato Pires',
+    ],
+  };
+  const defaultProjectExamples = [
+    'Operações integradas',
+    'Backoffice comercial',
+    'Atendimento multicanal',
+    'Controle de filas',
+  ];
+  const defaultAgentExamples = [
+    'Atlas Core',
+    'Nimbus Ops',
+    'Queue Watch',
+    'SLA Sentinel',
+  ];
+  const defaultUserExamples = [
+    'Alfeu Vinicius Souza',
+    'Mariana Costa',
+    'Lucas Almeida',
+    'Paula Ribeiro',
+  ];
+
+  const defaultExamplesByType = {
+    projects: defaultProjectExamples,
+    agents: defaultAgentExamples,
+    users: defaultUserExamples,
+  };
+
+  const normalizeRelationPickerValue = (value) => String(value || '').trim().toLowerCase();
+
+  const getEnvironmentRelationPickerOptions = (relationType, limit = null) => {
+    const defaults = Array.isArray(defaultExamplesByType[relationType]) ? defaultExamplesByType[relationType] : [];
+    const recents = getEnvironmentRelationRecentItems(relationType, 8);
+    const pool = Array.isArray(environmentRelationSuggestionPool[relationType]) ? environmentRelationSuggestionPool[relationType] : [];
+    const seen = new Set();
+    const options = [];
+
+    [...defaults, ...recents, ...pool].forEach((item) => {
+      const value = String(item || '').trim();
+      const key = normalizeRelationPickerValue(value);
+      if (!value || seen.has(key)) return;
+      seen.add(key);
+      options.push(value);
+    });
+
+    return Number.isInteger(limit) ? options.slice(0, limit) : options;
+  };
+
+  const addItemToActiveEnvironmentRelation = (relationType, rawValue) => {
+    const nextValue = String(rawValue || '').trim();
+    if (!relationType || !activeEnvironmentCode || !nextValue) return false;
+    const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
+    const targetList = Array.isArray(relation[relationType]) ? relation[relationType] : [];
+    relation[relationType] = targetList;
+    const alreadyExists = targetList.some((item) => String(item || '').trim().toLowerCase() === nextValue.toLowerCase());
+    if (alreadyExists) return false;
+    targetList.push(nextValue);
+    renderEnvironmentRelations(activeEnvironmentRow);
+    const listId = environmentRelationListIdByType[relationType];
+    if (listId) setEnvironmentRelationExpanded(listId, true);
+    return true;
+  };
+
+  const renderEnvironmentRelationPickerItems = () => {
+    if (!environmentRelationPickerList || !activeRelationPickerType) return;
+    const query = String(environmentRelationPickerSearch?.value || '').trim().toLowerCase();
+    const rawQuery = String(environmentRelationPickerSearch?.value || '').trim();
+    const allOptions = getEnvironmentRelationPickerOptions(activeRelationPickerType);
+    const baseItems = getEnvironmentRelationPickerOptions(activeRelationPickerType, 4);
+    const visibleItems = query
+      ? allOptions.filter((item) => normalizeRelationPickerValue(item).includes(query))
+      : baseItems;
+    const hasExactMatch = allOptions.some((item) => normalizeRelationPickerValue(item) === query);
+    environmentRelationPickerList.replaceChildren();
+
+    const createPickerOption = (value, iconName, label) => {
+      const option = document.createElement('button');
+      option.type = 'button';
+      option.className = 'ui-menu-item';
+      option.dataset.relationAddValue = value;
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-rounded';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = iconName;
+      const text = document.createElement('span');
+      text.textContent = label;
+      option.append(icon, text);
+      return option;
+    };
+
+    if (query && !hasExactMatch) {
+      environmentRelationPickerList.appendChild(
+        createPickerOption(rawQuery, 'add', `Adicionar "${environmentRelationPickerSearch.value.trim()}"`)
+      );
+    }
+
+    visibleItems.forEach((item) => {
+      environmentRelationPickerList.appendChild(createPickerOption(item, 'history', item));
+    });
+
+    if (!environmentRelationPickerList.childElementCount && !query) {
+      baseItems.forEach((item) => {
+        environmentRelationPickerList.appendChild(createPickerOption(item, 'history', item));
+      });
+    }
+
+    if (!environmentRelationPickerList.childElementCount) {
+      const empty = document.createElement('div');
+      empty.className = 'environment-relation-picker-empty';
+      empty.textContent = 'Nenhum item encontrado';
+      environmentRelationPickerList.appendChild(empty);
+    }
+  };
+
+  const positionEnvironmentRelationPicker = () => {
+    if (!activeRelationPickerButton || !environmentRelationPickerMenu.parentElement) return;
+    const panelRect = environmentRelationPickerMenu.parentElement.getBoundingClientRect();
+    const buttonRect = activeRelationPickerButton.getBoundingClientRect();
+    const left = Math.max(8, buttonRect.left - panelRect.left);
+    const maxLeft = Math.max(8, panelRect.width - environmentRelationPickerMenu.offsetWidth - 8);
+
+    environmentRelationPickerMenu.style.top = `${buttonRect.bottom - panelRect.top + 8}px`;
+    environmentRelationPickerMenu.style.left = `${Math.min(left, maxLeft)}px`;
+    environmentRelationPickerMenu.style.right = 'auto';
+  };
+
+  const scrollEnvironmentRelationPickerIntoView = () => {
+    if (!environmentRelationPickerMenu.classList.contains('open')) return;
+    const scrollContainer = environmentModal.querySelector('.environment-body') || environmentModal.querySelector('.modal-dialog');
+    if (!scrollContainer) return;
+
+    const menuRect = environmentRelationPickerMenu.getBoundingClientRect();
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const bottomOverflow = menuRect.bottom - containerRect.bottom + 12;
+    const topOverflow = containerRect.top - menuRect.top + 12;
+
+    if (bottomOverflow > 0) {
+      scrollContainer.scrollBy({ top: bottomOverflow, behavior: 'smooth' });
+    } else if (topOverflow > 0) {
+      scrollContainer.scrollBy({ top: -topOverflow, behavior: 'smooth' });
+    }
+  };
+
+  const openEnvironmentRelationPicker = (button, relationType) => {
+    if (activeRelationPickerButton === button && environmentRelationPickerMenu.classList.contains('open')) {
+      closeEnvironmentRelationPicker();
+      return;
+    }
+    activeRelationPickerType = relationType;
+    activeRelationPickerButton = button;
+    const panel = button.closest('.environment-relation-panel');
+    if (panel && environmentRelationPickerMenu.parentElement !== panel) panel.appendChild(environmentRelationPickerMenu);
+    if (environmentRelationPickerSearch) environmentRelationPickerSearch.value = '';
+    renderEnvironmentRelationPickerItems();
+    environmentRelationPickerMenu.classList.add('open');
+    positionEnvironmentRelationPicker();
+    window.requestAnimationFrame(scrollEnvironmentRelationPickerIntoView);
+    environmentRelationPickerSearch?.focus();
+  };
+
+  const environmentRelationListIdByType = {
+    projects: 'environmentProjectsList',
+    agents: 'environmentAgentsList',
+    users: 'environmentUsersList',
+  };
+
+  const setEnvironmentRelationToggleAvailability = (listId, hasItems) => {
+    const listEl = document.getElementById(listId);
+    const toggleEl = environmentModal.querySelector(`.environment-relation-toggle[data-relation-target="${listId}"]`);
+    if (!toggleEl) return;
+    toggleEl.hidden = !hasItems;
+    toggleEl.disabled = !hasItems;
+    if (!hasItems) {
+      toggleEl.setAttribute('aria-expanded', 'false');
+      if (listEl) {
+        listEl.classList.add('is-hidden');
+        listEl.hidden = true;
+      }
+    }
+  };
+
   const setEnvironmentRelationExpanded = (listId, expanded) => {
     const listEl = document.getElementById(listId);
     const toggleEl = environmentModal.querySelector(`.environment-relation-toggle[data-relation-target="${listId}"]`);
-    if (!listEl || !toggleEl) return;
+    if (!listEl || !toggleEl || toggleEl.hidden || toggleEl.disabled) return;
     toggleEl.setAttribute('aria-expanded', expanded ? 'true' : 'false');
     listEl.classList.toggle('is-hidden', !expanded);
     listEl.hidden = !expanded;
@@ -1506,8 +1767,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     return environmentRelations[code];
   };
 
-  const renderEnvironmentRelations = (row) => {
-    activeEnvironmentCode = String(row?.dataset?.environmentCode || '').trim();
+  const renderEnvironmentRelations = (row = null) => {
+    if (row) {
+      activeEnvironmentCode = String(row?.dataset?.environmentCode || '').trim();
+    }
     const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
     const projectCount = relation.projects.length;
     const agentCount = relation.agents.length;
@@ -1528,12 +1791,21 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     renderEnvironmentRelationList(environmentProjectsList, relation.projects, 'folder', 'projects');
     renderEnvironmentRelationList(environmentAgentsList, relation.agents, 'smart_toy', 'agents');
     renderEnvironmentRelationList(environmentUsersList, relation.users, 'person', 'users');
+
+    setEnvironmentRelationToggleAvailability('environmentProjectsList', projectCount > 0);
+    setEnvironmentRelationToggleAvailability('environmentAgentsList', agentCount > 0);
+    setEnvironmentRelationToggleAvailability('environmentUsersList', userCount > 0);
   };
 
   const closeEnvironmentModal = () => {
+    closeEnvironmentRelationPicker();
     activeEnvironmentRow = null;
     isCreatingEnvironment = false;
     activeEnvironmentCode = '';
+    if (draftEnvironmentCode) {
+      delete environmentRelations[draftEnvironmentCode];
+      draftEnvironmentCode = '';
+    }
     environmentModal.classList.remove('open');
     environmentModal.setAttribute('aria-hidden', 'true');
   };
@@ -1564,15 +1836,13 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   const openCreateEnvironmentDialog = () => {
     isCreatingEnvironment = true;
     activeEnvironmentRow = null;
+    draftEnvironmentCode = `env-draft-${Date.now()}`;
+    activeEnvironmentCode = draftEnvironmentCode;
     environmentModalForm.reset();
     const modalTitle = document.getElementById('environmentModalTitle');
     if (modalTitle) modalTitle.textContent = 'Criar setor';
-    if (environmentProjectsSummary) environmentProjectsSummary.textContent = '0 projetos vinculados';
-    if (environmentAgentsSummary) environmentAgentsSummary.textContent = '0 agentes vinculados';
-    if (environmentUsersSummary) environmentUsersSummary.textContent = '0 usuários vinculados';
-    renderEnvironmentRelationList(environmentProjectsList, [], 'folder', 'projects');
-    renderEnvironmentRelationList(environmentAgentsList, [], 'smart_toy', 'agents');
-    renderEnvironmentRelationList(environmentUsersList, [], 'person', 'users');
+    environmentRelations[draftEnvironmentCode] = { projects: [], agents: [], users: [] };
+    renderEnvironmentRelations();
     if (environmentModalSubmit) environmentModalSubmit.textContent = 'Criar setor';
     syncEnvironmentSubmit();
     environmentModal.classList.add('open');
@@ -1623,31 +1893,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (addButton) {
       const relationType = addButton.dataset.relationType;
       if (!relationType || !activeEnvironmentCode) return;
-      const labelMap = {
-        projects: 'projeto',
-        agents: 'agente',
-        users: 'usuário',
-      };
-      const label = labelMap[relationType] || 'item';
-      const value = window.prompt(`Digite o nome do ${label}:`, '');
-      const nextValue = String(value || '').trim();
-      if (!nextValue) return;
-
-      const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
-      const targetList = Array.isArray(relation[relationType]) ? relation[relationType] : [];
-      relation[relationType] = targetList;
-      targetList.push(nextValue);
-
-      if (activeEnvironmentRow) renderEnvironmentRelations(activeEnvironmentRow);
-      setEnvironmentRelationExpanded(
-        relationType === 'projects'
-          ? 'environmentProjectsList'
-          : relationType === 'agents'
-            ? 'environmentAgentsList'
-            : 'environmentUsersList',
-        true
-      );
-      showAppToast(`${label.charAt(0).toUpperCase()}${label.slice(1)} adicionado com sucesso`);
+      openEnvironmentRelationPicker(addButton, relationType);
       return;
     }
 
@@ -1661,7 +1907,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       if (!Array.isArray(relation[relationType]) || relationIndex >= relation[relationType].length) return;
       relation[relationType].splice(relationIndex, 1);
 
-      if (activeEnvironmentRow) renderEnvironmentRelations(activeEnvironmentRow);
+      renderEnvironmentRelations(activeEnvironmentRow);
       showAppToast('Item removido do setor');
       return;
     }
@@ -1677,7 +1923,17 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (!name || !owner) return;
 
     if (isCreatingEnvironment) {
-      createEnvironmentRow({ name, owner, description });
+      const sourceCode = activeEnvironmentCode;
+      const createdRow = createEnvironmentRow({ name, owner, description });
+      const nextCode = String(createdRow?.dataset?.environmentCode || '').trim();
+      if (sourceCode && nextCode && sourceCode !== nextCode && environmentRelations[sourceCode]) {
+        environmentRelations[nextCode] = {
+          projects: [...(environmentRelations[sourceCode].projects || [])],
+          agents: [...(environmentRelations[sourceCode].agents || [])],
+          users: [...(environmentRelations[sourceCode].users || [])],
+        };
+        delete environmentRelations[sourceCode];
+      }
       closeEnvironmentModal();
       showAppToast('Setor criado com sucesso');
       return;
@@ -1704,6 +1960,49 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   ['environmentProjectsList', 'environmentAgentsList', 'environmentUsersList'].forEach((listId) => {
     setEnvironmentRelationExpanded(listId, false);
   });
+
+  environmentRelationPickerSearch?.addEventListener('input', renderEnvironmentRelationPickerItems);
+  window.addEventListener('resize', positionEnvironmentRelationPicker);
+  environmentRelationPickerSearch?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeEnvironmentRelationPicker();
+      return;
+    }
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    const value = String(environmentRelationPickerSearch.value || '').trim();
+    if (!value || !activeRelationPickerType) return;
+    const added = addItemToActiveEnvironmentRelation(activeRelationPickerType, value);
+    if (added) {
+      showAppToast('Item adicionado com sucesso');
+      closeEnvironmentRelationPicker();
+    } else {
+      showAppToast('Item já está vinculado');
+    }
+  });
+
+  environmentRelationPickerList?.addEventListener('click', (event) => {
+    const option = event.target.closest('[data-relation-add-value]');
+    if (!option || !activeRelationPickerType) return;
+    const value = String(option.dataset.relationAddValue || '').trim();
+    if (!value) return;
+    const added = addItemToActiveEnvironmentRelation(activeRelationPickerType, value);
+    if (added) {
+      showAppToast('Item adicionado com sucesso');
+      closeEnvironmentRelationPicker();
+      return;
+    }
+    showAppToast('Item já está vinculado');
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!environmentRelationPickerMenu.classList.contains('open')) return;
+    const clickedOnAdd = event.target.closest('.environment-relation-add');
+    if (clickedOnAdd) return;
+    if (environmentRelationPickerMenu.contains(event.target)) return;
+    closeEnvironmentRelationPicker();
+  });
+
 }
 
 const parseAuditDate = (value) => {
@@ -6782,9 +7081,9 @@ const sectionMap = {
   'dashboard/automations': 'Automa\u00e7\u00e3o',
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
   'dashboard/agents': 'Automa\u00e7\u00e3o',
-  'dashboard/voice-messaging': 'Automa\u00e7\u00e3o',
-  'dashboard/campaigns': 'Automa\u00e7\u00e3o',
-  'dashboard/hybrid-flows': 'Automa\u00e7\u00e3o',
+  'dashboard/voice-messaging': 'Integrações',
+  'dashboard/campaigns': 'Integrações',
+  'dashboard/hybrid-flows': 'Integrações',
   'dashboard/executors': 'Infraestrutura',
   'dashboard/packages': 'Infraestrutura',
   'dashboard/channels': 'Integrações',
@@ -6891,10 +7190,7 @@ const updateActivePage = () => {
     if (
       navRouteKey === 'dashboard/automations' ||
       navRouteKey === 'dashboard/schedules' ||
-      navRouteKey === 'dashboard/agents' ||
-      navRouteKey === 'dashboard/voice-messaging' ||
-      navRouteKey === 'dashboard/campaigns' ||
-      navRouteKey === 'dashboard/hybrid-flows'
+      navRouteKey === 'dashboard/agents'
     ) {
       dashboardToggle.textContent = 'Automação';
     }

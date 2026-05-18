@@ -3311,16 +3311,81 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   border: 1px solid var(--border);
   border-radius: 10px;
   background: #f8fafc;
+  position: relative;
+  overflow: visible;
 }
 
 .environment-relation-head {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  position: relative;
 }
 
 .environment-relation-head .environment-relation-add {
   margin-left: auto;
+}
+
+.environment-relation-picker-menu {
+  top: 44px;
+  right: 0;
+  width: 280px;
+  max-width: calc(100% - 16px);
+  max-height: 300px;
+  padding: 8px;
+  z-index: 1200;
+  gap: 8px;
+  flex-direction: column !important;
+  flex-wrap: nowrap !important;
+}
+
+.environment-relation-picker-menu .environment-relation-picker-search {
+  min-height: 40px;
+  padding: 6px 10px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.environment-relation-picker-menu .environment-relation-picker-search input {
+  font-size: var(--md-body-small);
+}
+
+.environment-relation-picker-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  width: 100%;
+  flex: 0 0 auto;
+  min-height: 144px;
+}
+
+.environment-relation-picker-list .ui-menu-item {
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: #111827;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  justify-content: flex-start;
+  min-height: 36px;
+}
+
+.environment-relation-picker-list .ui-menu-item:hover {
+  background: #eef6ff;
+  border-color: #cfe3ff;
+  color: #016ff4;
+}
+
+.environment-relation-picker-list .ui-menu-item .material-symbols-rounded {
+  color: #64748b;
+  font-size: 18px;
+}
+
+.environment-relation-picker-empty {
+  padding: 8px 10px;
+  font-size: var(--md-body-small);
+  color: #64748b;
 }
 
 .environment-relation-toggle .environment-relation-caret {
@@ -8903,6 +8968,47 @@ body.route-agents #directChatFab {
   width: max-content;
   margin-left: auto;
   text-align: right;
+}
+
+.public-modal-admin-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: -6px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.public-modal-admin-link:hover {
+  text-decoration: underline;
+}
+
+.public-modal-admin-link.is-loading {
+  color: #64748b;
+  cursor: wait;
+  text-decoration: none;
+}
+
+.public-modal-admin-link.is-loading::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(52, 120, 246, 0.22);
+  border-top-color: #3478f6;
+  border-radius: 50%;
+  animation: auth-link-spin 0.75s linear infinite;
+}
+
+@keyframes auth-link-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .login-register {

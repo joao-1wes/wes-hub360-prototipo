@@ -204,6 +204,7 @@
     const createCompanyModal = document.getElementById('createCompanyModal');
     const createCompanyForm = document.getElementById('createCompanyForm');
     const companyName = document.getElementById('companyName');
+    const createCompanyAdminUserLink = document.getElementById('createCompanyAdminUserLink');
     loginForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       window.location.hash = '#/select-organization';
@@ -227,6 +228,29 @@
     openCreateCompanyModal?.addEventListener('click', showCreateCompanyModal);
     document.querySelectorAll('[data-create-company-close]').forEach((button) => {
       button.addEventListener('click', closeCreateCompanyModal);
+    });
+    createCompanyAdminUserLink?.addEventListener('click', () => {
+      if (createCompanyAdminUserLink.classList.contains('is-loading')) return;
+      createCompanyAdminUserLink.classList.add('is-loading');
+      createCompanyAdminUserLink.disabled = true;
+      createCompanyAdminUserLink.setAttribute('aria-busy', 'true');
+
+      window.setTimeout(() => {
+        closeCreateCompanyModal();
+        ensureDemoSession();
+        ensureAppVisible();
+        WesDashboardAuth.applyUserToUI();
+        window.location.hash = '#/dashboard/users';
+        window.setTimeout(() => {
+          if (typeof window.updateActivePage === 'function') {
+            window.updateActivePage();
+          }
+          createCompanyAdminUserLink.classList.remove('is-loading');
+          createCompanyAdminUserLink.disabled = false;
+          createCompanyAdminUserLink.removeAttribute('aria-busy');
+          document.getElementById('openCreateUserModal')?.click();
+        }, 120);
+      }, 5000);
     });
     createCompanyForm?.addEventListener('submit', (event) => {
       event.preventDefault();

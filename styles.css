@@ -3184,6 +3184,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   grid-template-columns:
     minmax(180px, 1.2fr)
     minmax(220px, 1.45fr)
+    minmax(130px, 0.85fr)
     minmax(150px, 1fr)
     minmax(70px, 0.45fr)
     minmax(70px, 0.45fr)
@@ -3192,7 +3193,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .environments-table .data-row > span:nth-child(2),
-.environments-table .data-row > span:nth-child(3) {
+.environments-table .data-row > span:nth-child(3),
+.environments-table .data-row > span:nth-child(4) {
   display: block;
   width: 100%;
   min-width: 0;
@@ -3205,9 +3207,9 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   justify-content: flex-start;
 }
 
-.environments-table .data-row > span:nth-child(4),
 .environments-table .data-row > span:nth-child(5),
-.environments-table .data-row > span:nth-child(6) {
+.environments-table .data-row > span:nth-child(6),
+.environments-table .data-row > span:nth-child(7) {
   text-align: center;
   justify-self: center;
 }
@@ -3239,6 +3241,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .environment-name-cell strong,
 .environment-name-cell .muted,
 .environment-description-cell,
+.environment-company-cell,
 .environment-owner-cell {
   display: block;
   min-width: 0;

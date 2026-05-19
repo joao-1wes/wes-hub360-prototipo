@@ -89,10 +89,6 @@ const agentsFolderAccordionPanel = document.getElementById('agentsFolderAccordio
 const openAgentModal = document.getElementById('openAgentModal');
 const agentModal = document.getElementById('agentModal');
 const agentChatModal = document.getElementById('agentChatModal');
-const agentHistoryScopeModal = document.getElementById('agentHistoryScopeModal');
-const agentHistoryScopeProject = document.getElementById('agentHistoryScopeProject');
-const agentHistoryScopeError = document.getElementById('agentHistoryScopeError');
-const agentHistoryScopeConfirm = document.getElementById('agentHistoryScopeConfirm');
 const agentChatTitle = document.getElementById('agentChatTitle');
 const agentChatSubtitle = document.getElementById('agentChatSubtitle');
 const chatAttachToggle = document.querySelector('.chat-attach-toggle');
@@ -120,6 +116,9 @@ const chatVoiceUserLine = document.getElementById('chatVoiceUserLine');
 const chatVoiceAgentLine = document.getElementById('chatVoiceAgentLine');
 const openBillingModal = document.getElementById('openBillingModal');
 const billingModal = document.getElementById('billingModal');
+const confirmActionModal = document.getElementById('confirmActionModal');
+const confirmActionModalMessage = document.getElementById('confirmActionModalMessage');
+const confirmActionModalConfirm = document.getElementById('confirmActionModalConfirm');
 const openChannelModal = document.getElementById('openChannelModal');
 const channelModal = document.getElementById('channelModal');
 const openTelegramConfigModal = document.getElementById('openTelegramConfigModal');
@@ -185,6 +184,7 @@ const auditDetailsChange = document.getElementById('auditDetailsChange');
 const auditDetailsSummary = document.getElementById('auditDetailsSummary');
 const environmentsTable = document.querySelector('#page-environments .environments-table');
 const environmentsCompanySelect = document.getElementById('environmentsCompanySelect');
+const environmentsCompanySelectWrap = document.getElementById('environmentsCompanySelectWrap');
 const openCreateEnvironmentModal = document.getElementById('openCreateEnvironmentModal');
 const environmentModal = document.getElementById('environmentModal');
 const environmentModalForm = document.getElementById('environmentModalForm');
@@ -544,6 +544,41 @@ function showAppToast(message) {
       if (!appToast.classList.contains('is-visible')) appToast.hidden = true;
     }, 220);
   }, 2200);
+}
+
+function confirmDeletionAction(targetLabel = 'este item') {
+  const message =
+    `Você tem certeza que deseja excluir ${targetLabel}? ` +
+    'Se você excluir ficará registrado que seu usuário fez isso e a ação não poderá ser desfeita.';
+  if (!confirmActionModal || !confirmActionModalMessage || !confirmActionModalConfirm) {
+    return Promise.resolve(window.confirm(message));
+  }
+
+  confirmActionModalMessage.textContent = message;
+  confirmActionModal.classList.add('open');
+  confirmActionModal.setAttribute('aria-hidden', 'false');
+
+  return new Promise((resolve) => {
+    const close = (confirmed) => {
+      confirmActionModal.classList.remove('open');
+      confirmActionModal.setAttribute('aria-hidden', 'true');
+      confirmActionModalConfirm.removeEventListener('click', onConfirm);
+      confirmActionModal.removeEventListener('click', onCancelClick);
+      document.removeEventListener('keydown', onEsc);
+      resolve(confirmed);
+    };
+    const onConfirm = () => close(true);
+    const onCancelClick = (event) => {
+      if (event.target.closest('[data-confirm-action-cancel]')) close(false);
+    };
+    const onEsc = (event) => {
+      if (event.key === 'Escape') close(false);
+    };
+
+    confirmActionModalConfirm.addEventListener('click', onConfirm);
+    confirmActionModal.addEventListener('click', onCancelClick);
+    document.addEventListener('keydown', onEsc);
+  });
 }
 
 async function copyTelegramPublicLinkValue() {
@@ -1554,11 +1589,12 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     if (label) label.textContent = input.checked ? 'Ativo' : 'Inativo';
   });
 
-  companyUsersList.addEventListener('click', (event) => {
+  companyUsersList.addEventListener('click', async (event) => {
     const removeButton = event.target.closest('[data-company-user-remove]');
     if (!removeButton) return;
     const row = removeButton.closest('[data-company-user-id]');
     const userId = normalizeCompanyUserId(row?.dataset.companyUserId);
+    if (!(await confirmDeletionAction('este usuário da empresa'))) return;
     draftCompanyUsers = draftCompanyUsers.filter((item) => normalizeCompanyUserId(item.userId) !== userId);
     renderCompanyUsers();
   });
@@ -2003,7 +2039,15 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   };
 
   const applyEnvironmentCompanyFilter = () => {
-    const selectedCompany = environmentsCompanySelect?.value || 'all';
+    const accessId = String(document.body.dataset.organizationAccess || 'adm-wes').trim();
+    const selectorVisible = Boolean(
+      environmentsCompanySelectWrap
+      && !environmentsCompanySelectWrap.hidden
+      && !environmentsCompanySelectWrap.classList.contains('is-hidden')
+    );
+    const selectedCompany = selectorVisible
+      ? (environmentsCompanySelect?.value || 'all')
+      : ((accessId === 'cedae' || accessId === 'user-cedae') ? accessId : 'all');
     environmentsTable.querySelectorAll('.environment-row').forEach((row) => {
       const showRow = selectedCompany === 'all' || row.dataset.environmentCompany === selectedCompany;
       row.hidden = !showRow;
@@ -2097,7 +2141,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   openCreateEnvironmentModal?.addEventListener('click', openCreateEnvironmentDialog);
   environmentsCompanySelect?.addEventListener('change', applyEnvironmentCompanyFilter);
 
-  environmentsTable.addEventListener('click', (event) => {
+  environmentsTable.addEventListener('click', async (event) => {
     const editButton = event.target.closest('.environment-edit-trigger');
     if (editButton) {
       const row = editButton.closest('.environment-row');
@@ -2112,7 +2156,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (!row) return;
 
     const name = row.dataset.environmentName || 'setor';
-    const confirmed = window.confirm(`Tem certeza que deseja excluir o setor "${name}"?`);
+    const confirmed = await confirmDeletionAction(`o setor "${name}"`);
     if (!confirmed) return;
 
     row.remove();
@@ -2124,7 +2168,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     field?.addEventListener('change', syncEnvironmentSubmit);
   });
 
-  environmentModal.addEventListener('click', (event) => {
+  environmentModal.addEventListener('click', async (event) => {
     const relationToggle = event.target.closest('.environment-relation-toggle');
     if (relationToggle) {
       const listId = relationToggle.dataset.relationTarget;
@@ -2147,6 +2191,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       const relationType = removeButton.dataset.relationType;
       const relationIndex = Number.parseInt(removeButton.dataset.relationIndex || '-1', 10);
       if (!relationType || relationIndex < 0 || !activeEnvironmentCode) return;
+      if (!(await confirmDeletionAction('este item do setor'))) return;
 
       const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
       if (!Array.isArray(relation[relationType]) || relationIndex >= relation[relationType].length) return;
@@ -2175,7 +2220,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         description,
         company: environmentsCompanySelect?.value && environmentsCompanySelect.value !== 'all'
           ? environmentsCompanySelect.value
-          : 'adm-wes',
+          : (String(document.body.dataset.organizationAccess || '').trim() || 'adm-wes'),
       });
       const nextCode = String(createdRow?.dataset?.environmentCode || '').trim();
       if (sourceCode && nextCode && sourceCode !== nextCode && environmentRelations[sourceCode]) {
@@ -3194,10 +3239,6 @@ function openAgentChatModalWithPayload(payload) {
   syncAgentChatHistoryScope();
 }
 
-function openAgentHistoryScopeModalForPayload(payload) {
-  openAgentChatModalWithPayload(payload);
-}
-
 function openAgentChatModalFromToggle(button) {
   const row = button.closest('.agents-row');
   let agentName = 'Agente';
@@ -3261,10 +3302,10 @@ if (agentChatModal && agentsPageForChat) {
     const chatBtn = event.target.closest('.agent-chat-toggle');
     if (!chatBtn || !agentsPageForChat.contains(chatBtn)) return;
     event.stopPropagation();
-    openAgentHistoryScopeModalForPayload(buildAgentChatPayloadFromButton(chatBtn));
+    openAgentChatModalWithPayload(buildAgentChatPayloadFromButton(chatBtn));
   });
   agentsPageForChat.addEventListener('click', (event) => {
-    const deleteBtn = event.target.closest('.agent-delete-toggle');
+    const deleteBtn = event.target.closest('.agent-delete-toggle, .agents-row .row-actions .action-icon.danger[aria-label="Excluir"]');
     if (!deleteBtn || !agentsPageForChat.contains(deleteBtn)) return;
     event.stopPropagation();
     void deleteAgentWithConfirmation(deleteBtn.closest('.agents-row'));
@@ -3333,64 +3374,6 @@ if (agentShareModalEl) {
     if (!closeTarget) return;
     agentShareModalEl.classList.remove('open');
     agentShareModalEl.setAttribute('aria-hidden', 'true');
-  });
-}
-
-if (agentHistoryScopeModal) {
-  agentHistoryScopeModal.addEventListener('click', (event) => {
-    const closeTarget = event.target.closest('[data-modal-close]');
-    if (!closeTarget) return;
-    agentHistoryScopeModal.classList.remove('open');
-    agentHistoryScopeModal.setAttribute('aria-hidden', 'true');
-  });
-}
-
-if (agentHistoryScopeConfirm && agentHistoryScopeProject) {
-  agentHistoryScopeConfirm.addEventListener('click', () => {
-    const projectSlug = String(agentHistoryScopeProject.value || '').trim();
-    if (!projectSlug) {
-      if (agentHistoryScopeError) {
-        agentHistoryScopeError.hidden = false;
-        agentHistoryScopeError.textContent = 'Selecione uma pasta para continuar.';
-      }
-      return;
-    }
-
-    let payload = null;
-    try {
-      payload = JSON.parse(agentHistoryScopeModal?.dataset.pendingChat || '{}');
-    } catch {
-      payload = null;
-    }
-    if (!payload) return;
-
-    const org = HUB_SCOPE?.[payload.environmentSlug || hubOrgId] || null;
-    const project = org?.projects?.find((item) => item.slug === projectSlug) || null;
-    const originalAgentProjectId = String(payload.projectId || '').trim();
-    if (payload.environmentSlug) {
-      hubOrgId = payload.environmentSlug;
-    }
-    if (typeof hubSyncFromState === 'function') hubSyncFromState();
-    const selectedHash = `#/dashboard/agents/project/${encodeURIComponent(projectSlug)}`;
-    if (window.location.hash !== selectedHash) {
-      window.location.hash = selectedHash;
-    } else {
-      applyAgentsProjectRoute();
-    }
-
-    agentHistoryScopeModal.classList.remove('open');
-    agentHistoryScopeModal.setAttribute('aria-hidden', 'true');
-
-    if (project) {
-      payload.projectSlug = project.slug;
-      payload.projectTitle = project.title;
-      payload.projectId = String(project.id || '');
-    }
-
-    const agentMatchesProject = Boolean(originalAgentProjectId) && originalAgentProjectId === String(project?.id || '').trim();
-    if (agentMatchesProject) {
-      requestAnimationFrame(() => openAgentChatModalWithPayload(payload));
-    }
   });
 }
 
@@ -3625,7 +3608,7 @@ const createHistoryItem = (title, date) => {
 };
 
 if (chatHistoryList) {
-  chatHistoryList.addEventListener('click', (event) => {
+  chatHistoryList.addEventListener('click', async (event) => {
     const menuToggle = event.target.closest('.chat-history-menu-toggle');
     const renameAction = event.target.closest('.chat-history-rename');
     const deleteAction = event.target.closest('.chat-history-delete');
@@ -3655,6 +3638,7 @@ if (chatHistoryList) {
     if (deleteAction && item) {
       event.stopPropagation();
       closeHistoryMenus();
+      if (!(await confirmDeletionAction('este histórico de chat'))) return;
       const wasActive = item.classList.contains('active');
       const nextItem = item.nextElementSibling?.classList.contains('chat-history-item')
         ? item.nextElementSibling
@@ -4233,7 +4217,7 @@ if (automationStatusSwitches.length) {
     }
   });
 
-  automationsTable.addEventListener('click', (event) => {
+  automationsTable.addEventListener('click', async (event) => {
     const editButton = event.target.closest('.automation-edit-trigger');
     if (editButton) {
       const row = editButton.closest('.automation-row');
@@ -4245,6 +4229,7 @@ if (automationStatusSwitches.length) {
     if (deleteButton) {
       const row = deleteButton.closest('.automation-row');
       if (!row) return;
+      if (!(await confirmDeletionAction('esta automação'))) return;
       row.remove();
       showAppToast('Automação excluída');
     }
@@ -6067,9 +6052,16 @@ function renderAgentsProjectDetailsFromApi(agents) {
 }
 
 async function deleteAgentWithConfirmation(row) {
-  if (!row || typeof window.wesApiFetch !== 'function' || !window.WesDashboardAuth?.isAuthenticated()) return;
-  const agentId = String(row.dataset.agentUuid || '').trim();
+  if (!row) return;
+  const fallbackIdCell = String(row.querySelector('span[title]')?.getAttribute('title') || row.children[2]?.textContent || '').trim();
+  const agentId = String(row.dataset.agentUuid || fallbackIdCell).trim();
   const agentName = row.querySelector('strong')?.textContent?.trim() || 'este agente';
+  if (!(await confirmDeletionAction(`o agente "${agentName}"`))) return;
+  if (typeof window.wesApiFetch !== 'function' || !window.WesDashboardAuth?.isAuthenticated()) {
+    row.remove();
+    showAppToast('Agente excluído');
+    return;
+  }
   if (!agentId) return;
 
   const performDelete = async (params = '') => {
@@ -6098,7 +6090,7 @@ async function deleteAgentWithConfirmation(row) {
           : count === 1
             ? `O agente "${agentName}" será excluído definitivamente.${namesText}\n\nDeseja continuar?`
             : `O agente "${agentName}" está sem projeto e será excluído definitivamente.\n\nDeseja continuar?`;
-      if (!window.confirm(message)) return;
+      if (!(await confirmDeletionAction(`o agente "${agentName}"`))) return;
       const confirmed = await performDelete('?confirm=true');
       if (!confirmed.res.ok) {
         throw new Error(confirmed.body?.detail || confirmed.raw || confirmed.res.statusText);
@@ -6119,7 +6111,7 @@ async function deleteAgentWithConfirmation(row) {
 async function refreshAgentsTableFromApi() {
   const table = document.getElementById('agentsAllAgentsTable');
   if (!table || typeof window.wesApiFetch !== 'function') {
-    setAgentsApiStatus('Carregamento da API indisponivel (auth.js nao carregou).', true);
+    setAgentsApiStatus('', false);
     return;
   }
   if (!window.WesDashboardAuth || !window.WesDashboardAuth.isAuthenticated()) {
@@ -6143,7 +6135,8 @@ async function refreshAgentsTableFromApi() {
           : Array.isArray(body?.detail)
             ? body.detail.map((x) => (x.msg ? x.msg : JSON.stringify(x))).join('; ')
             : rawText || res.statusText;
-      setAgentsApiStatus(`Não foi possível listar agentes (${res.status}): ${detail}`, true);
+      console.warn(`Não foi possível listar agentes (${res.status}): ${detail}`);
+      setAgentsApiStatus('', false);
       return;
     }
     const agents = body;
@@ -6174,10 +6167,8 @@ async function refreshAgentsTableFromApi() {
     }
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    setAgentsApiStatus(
-      `Falha de rede ou CORS ao chamar GET /agents. Abra o painel pelo mesmo host da API ou defina WESAI_CORS_ORIGINS no wes-ai. Detalhe: ${msg}`,
-      true
-    );
+    console.warn(`Falha ao chamar GET /agents no modo mock: ${msg}`);
+    setAgentsApiStatus('', false);
   }
 }
 
@@ -7019,7 +7010,7 @@ hubSyncFromState();
       setProjectModalError('Recurso indisponível sem configuração de API para excluir projeto.');
       return;
     }
-    const confirmed = window.confirm('Tem certeza que deseja excluir este projeto? Essa ação não poderá ser desfeita.');
+    const confirmed = await confirmDeletionAction('este projeto');
     if (!confirmed) return;
     setProjectModalError('');
     deleteBtn.disabled = true;
@@ -7416,6 +7407,11 @@ const applyOrganizationAccessControls = (routeKey) => {
   setAccessVisibility(administrationGroup, access.showAdministration);
   setAccessVisibility(companiesLink, access.showAdministration && access.canManageCompanies);
   setAccessVisibility(switchOrganizationLink, access.canSwitchOrganization);
+  setAccessVisibility(environmentsCompanySelectWrap, access.id === 'adm-wes');
+  if (environmentsCompanySelect) {
+    environmentsCompanySelect.value = access.id === 'adm-wes' ? 'all' : access.id;
+    environmentsCompanySelect.dispatchEvent(new Event('change'));
+  }
 
   const isAdministrationRoute = sectionMap[routeKey] === 'Administração';
   const isCompaniesRoute = routeKey === 'dashboard/companies';
@@ -7760,6 +7756,13 @@ scheduleLucideRefresh();
     return `${base}-${suffix}`;
   };
 
+  const getEnvironmentCompanyLabel = (companyValue) => {
+    const value = String(companyValue || '').trim();
+    if (!value) return '-';
+    const option = environmentsCompanySelect?.querySelector(`option[value="${CSS.escape(value)}"]`);
+    return option ? option.textContent.trim() : value.toUpperCase();
+  };
+
   const createEnvironmentRow = ({ name, owner, description, company = 'adm-wes', users = 0 }) => {
     const row = document.createElement('div');
     row.className = 'data-row environment-row';
@@ -7778,10 +7781,10 @@ scheduleLucideRefresh();
       <span class="environment-name-cell">
         <span>
           <strong>${escapeHtmlWes(name)}</strong>
-          <span class="muted">${escapeHtmlWes(code)}</span>
         </span>
       </span>
       <span class="environment-description-cell">${escapeHtmlWes(description || '-')}</span>
+      <span class="environment-company-cell">${escapeHtmlWes(getEnvironmentCompanyLabel(company))}</span>
       <span class="environment-owner-cell">${escapeHtmlWes(owner)}</span>
       <span class="environment-projects-cell">0</span>
       <span class="environment-agents-cell">0</span>

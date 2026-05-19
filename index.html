@@ -2349,32 +2349,6 @@
               </div>
             </div>
           </div>
-          <div class="modal" id="agentHistoryScopeModal" aria-hidden="true">
-            <div class="modal-backdrop" data-modal-close></div>
-            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="agentHistoryScopeTitle">
-              <div class="modal-header">
-                <h3 id="agentHistoryScopeTitle">Escolher pasta do histórico</h3>
-                <button class="icon-btn" aria-label="Fechar" data-modal-close>
-                  <i data-lucide="x"></i>
-                </button>
-              </div>
-              <div class="modal-body">
-                <p class="modal-field-hint">Selecione o projeto para isolar o histórico e mostrar os agentes dessa pasta.</p>
-                <label class="modal-label" for="agentHistoryScopeProject">Pasta</label>
-                <div class="hub-select-wrap hub-select-wrap--block">
-                  <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
-                  <select id="agentHistoryScopeProject" class="hub-select" aria-label="Pasta do histórico"></select>
-                  <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                </div>
-                <p class="modal-form-error" id="agentHistoryScopeError" hidden></p>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
-                <button type="button" class="btn primary" id="agentHistoryScopeConfirm">Continuar</button>
-              </div>
-            </div>
-          </div>
-
           <div class="modal" id="automationModal" aria-hidden="true">
             <div class="modal-backdrop" data-modal-close></div>
             <div class="modal-dialog automation-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="automationModalTitle">
@@ -4066,7 +4040,7 @@
                   <h2>Setores</h2>
                 </div>
                 <div class="page-actions">
-                  <div class="hub-select-wrap environments-company-select-wrap">
+                  <div class="hub-select-wrap environments-company-select-wrap" id="environmentsCompanySelectWrap">
                     <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">business</span>
                     <select id="environmentsCompanySelect" class="hub-select" aria-label="Selecionar empresa dos setores">
                       <option value="all">Todas as empresas</option>
@@ -4083,6 +4057,7 @@
                 <div class="data-row header">
                   <span>Setor</span>
                   <span>Descrição</span>
+                  <span>Empresa</span>
                   <span>Responsável</span>
                   <span>Projetos</span>
                   <span>Agentes</span>
@@ -4093,10 +4068,10 @@
                   <span class="environment-name-cell">
                     <span>
                       <strong>Operações</strong>
-                      <span class="muted">env-operacoes</span>
                     </span>
                   </span>
                   <span class="environment-description-cell">Rotinas de atendimento, backoffice e acompanhamento de filas.</span>
+                  <span class="environment-company-cell">ADM WES</span>
                   <span class="environment-owner-cell">ops@1wes.com</span>
                   <span class="environment-projects-cell">6</span>
                   <span class="environment-agents-cell">14</span>
@@ -4114,10 +4089,10 @@
                   <span class="environment-name-cell">
                     <span>
                       <strong>Financeiro</strong>
-                      <span class="muted">env-financeiro</span>
                     </span>
                   </span>
                   <span class="environment-description-cell">Conciliação, fechamento mensal e relatórios financeiros.</span>
+                  <span class="environment-company-cell">ADM WES</span>
                   <span class="environment-owner-cell">financeiro@1wes.com</span>
                   <span class="environment-projects-cell">4</span>
                   <span class="environment-agents-cell">8</span>
@@ -4135,10 +4110,10 @@
                   <span class="environment-name-cell">
                     <span>
                       <strong>Marketing</strong>
-                      <span class="muted">env-marketing</span>
                     </span>
                   </span>
                   <span class="environment-description-cell">Campanhas, segmentações e análise de performance.</span>
+                  <span class="environment-company-cell">CEDAE</span>
                   <span class="environment-owner-cell">marketing@1wes.com</span>
                   <span class="environment-projects-cell">3</span>
                   <span class="environment-agents-cell">5</span>
@@ -4156,10 +4131,10 @@
                   <span class="environment-name-cell">
                     <span>
                       <strong>RH</strong>
-                      <span class="muted">env-rh</span>
                     </span>
                   </span>
                   <span class="environment-description-cell">Admissões, comunicações internas e trilhas de pessoas.</span>
+                  <span class="environment-company-cell">USER CEDAE</span>
                   <span class="environment-owner-cell">rh@1wes.com</span>
                   <span class="environment-projects-cell">2</span>
                   <span class="environment-agents-cell">4</span>
@@ -4553,13 +4528,13 @@
                   <p class="page-subtitle">Gerencie empresas cadastradas e o acesso administrativo de cada tenant.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary" type="button">
-                    Criar empresa
-                  </button>
                   <a class="btn outline" href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization">
                     <span class="material-symbols-rounded">business</span>
                     Trocar de empresa
                   </a>
+                  <button class="btn primary" type="button">
+                    Criar empresa
+                  </button>
                 </div>
               </div>
               <div class="data-table companies-table">
@@ -4929,7 +4904,7 @@
                   </div>
                 </div>
               </div>
-              <div class="modal" id="billingModal" aria-hidden="true">
+          <div class="modal" id="billingModal" aria-hidden="true">
                 <div class="modal-backdrop" data-modal-close></div>
                 <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="billingModalTitle">
                   <div class="modal-header">
@@ -4961,6 +4936,27 @@
                     <button class="btn primary">Salvar pagamento</button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="confirmActionModal" aria-hidden="true">
+            <div class="modal-backdrop" data-confirm-action-cancel></div>
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="confirmActionModalTitle">
+              <div class="modal-header">
+                <h3 id="confirmActionModalTitle">Confirmar exclusão</h3>
+                <button class="icon-btn" aria-label="Fechar" data-confirm-action-cancel type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p id="confirmActionModalMessage">
+                  Você tem certeza que deseja excluir este item? Se você excluir ficará registrado que seu usuário fez isso e a ação não poderá ser desfeita.
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-confirm-action-cancel>Cancelar</button>
+                <button class="btn danger" type="button" id="confirmActionModalConfirm">Excluir</button>
               </div>
             </div>
           </div>

@@ -111,30 +111,30 @@
             <p>Escolha qual empresa deseja acessar</p>
           </div>
           <div class="org-select-grid">
-            <a class="org-choice-card" href="#/dashboard">
-              <span class="org-avatar org-avatar-purple">C</span>
-              <strong>CEDAE</strong>
+            <a class="org-choice-card" href="#/dashboard" data-org-choice="adm-wes" data-org-name="ADM WES">
+              <span class="org-avatar org-avatar-purple">AW</span>
+              <strong>ADM WES</strong>
               <span class="org-tags">
                 <span>Padrão</span>
                 <span>admin</span>
               </span>
               <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
-            <a class="org-choice-card" href="#/dashboard">
-              <span class="org-avatar org-avatar-red">NA</span>
-              <strong>&nbsp;</strong>
+            <a class="org-choice-card" href="#/dashboard" data-org-choice="cedae" data-org-name="CEDAE">
+              <span class="org-avatar org-avatar-red">C</span>
+              <strong>CEDAE</strong>
               <span class="org-tags">
                 <span>Padrão</span>
                 <span>Membro</span>
               </span>
               <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
-            <a class="org-choice-card" href="#/dashboard">
-              <span class="org-avatar org-avatar-blue">W</span>
-              <strong>WES</strong>
+            <a class="org-choice-card" href="#/dashboard" data-org-choice="user-cedae" data-org-name="USER CEDAE">
+              <span class="org-avatar org-avatar-blue">UC</span>
+              <strong>USER CEDAE</strong>
               <span class="org-tags">
                 <span>Padrão</span>
-                <span>admin</span>
+                <span>Membro</span>
               </span>
               <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
@@ -252,7 +252,7 @@
             </div>
           </div>
 
-          <div class="nav-group">
+          <div class="nav-group" data-access-section="administration">
             <button class="nav-item nav-trigger" data-menu="administration" type="button">
               <span class="material-symbols-rounded">admin_panel_settings</span>
               <span class="nav-label">Administração</span>
@@ -261,6 +261,7 @@
             <div class="submenu" id="submenu-administration">
               <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
               <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
+              <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
             </div>
           </div>
@@ -370,7 +371,7 @@
                   <span class="material-symbols-rounded">person</span>
                   Perfil
                 </button>
-                <a href="#/dashboard/organization">
+                <a href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization" data-access-item="switch-organization">
                   <span class="material-symbols-rounded">business</span>
                   Trocar de empresa
                 </a>
@@ -4065,6 +4066,16 @@
                   <h2>Setores</h2>
                 </div>
                 <div class="page-actions">
+                  <div class="hub-select-wrap environments-company-select-wrap">
+                    <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">business</span>
+                    <select id="environmentsCompanySelect" class="hub-select" aria-label="Selecionar empresa dos setores">
+                      <option value="all">Todas as empresas</option>
+                      <option value="adm-wes">ADM WES</option>
+                      <option value="cedae">CEDAE</option>
+                      <option value="user-cedae">USER CEDAE</option>
+                    </select>
+                    <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                  </div>
                   <button class="btn primary" id="openCreateEnvironmentModal" type="button">Criar setor</button>
                 </div>
               </div>
@@ -4075,9 +4086,10 @@
                   <span>Responsável</span>
                   <span>Projetos</span>
                   <span>Agentes</span>
+                  <span>Usuários</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row environment-row" data-environment-name="Operações" data-environment-code="env-operacoes" data-environment-description="Rotinas de atendimento, backoffice e acompanhamento de filas." data-environment-owner="ops@1wes.com" data-environment-projects="6" data-environment-agents="14">
+                <div class="data-row environment-row" data-environment-company="adm-wes" data-environment-name="Operações" data-environment-code="env-operacoes" data-environment-description="Rotinas de atendimento, backoffice e acompanhamento de filas." data-environment-owner="ops@1wes.com" data-environment-projects="6" data-environment-agents="14" data-environment-users="3">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Operações</strong>
@@ -4088,6 +4100,7 @@
                   <span class="environment-owner-cell">ops@1wes.com</span>
                   <span class="environment-projects-cell">6</span>
                   <span class="environment-agents-cell">14</span>
+                  <span class="environment-users-cell">3</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
@@ -4097,7 +4110,7 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row environment-row" data-environment-name="Financeiro" data-environment-code="env-financeiro" data-environment-description="Conciliação, fechamento mensal e relatórios financeiros." data-environment-owner="financeiro@1wes.com" data-environment-projects="4" data-environment-agents="8">
+                <div class="data-row environment-row" data-environment-company="adm-wes" data-environment-name="Financeiro" data-environment-code="env-financeiro" data-environment-description="Conciliação, fechamento mensal e relatórios financeiros." data-environment-owner="financeiro@1wes.com" data-environment-projects="4" data-environment-agents="8" data-environment-users="2">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Financeiro</strong>
@@ -4108,6 +4121,7 @@
                   <span class="environment-owner-cell">financeiro@1wes.com</span>
                   <span class="environment-projects-cell">4</span>
                   <span class="environment-agents-cell">8</span>
+                  <span class="environment-users-cell">2</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
@@ -4117,7 +4131,7 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row environment-row" data-environment-name="Marketing" data-environment-code="env-marketing" data-environment-description="Campanhas, segmentações e análise de performance." data-environment-owner="marketing@1wes.com" data-environment-projects="3" data-environment-agents="5">
+                <div class="data-row environment-row" data-environment-company="cedae" data-environment-name="Marketing" data-environment-code="env-marketing" data-environment-description="Campanhas, segmentações e análise de performance." data-environment-owner="marketing@1wes.com" data-environment-projects="3" data-environment-agents="5" data-environment-users="2">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Marketing</strong>
@@ -4128,6 +4142,7 @@
                   <span class="environment-owner-cell">marketing@1wes.com</span>
                   <span class="environment-projects-cell">3</span>
                   <span class="environment-agents-cell">5</span>
+                  <span class="environment-users-cell">2</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
@@ -4137,7 +4152,7 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row environment-row" data-environment-name="RH" data-environment-code="env-rh" data-environment-description="Admissões, comunicações internas e trilhas de pessoas." data-environment-owner="rh@1wes.com" data-environment-projects="2" data-environment-agents="4">
+                <div class="data-row environment-row" data-environment-company="user-cedae" data-environment-name="RH" data-environment-code="env-rh" data-environment-description="Admissões, comunicações internas e trilhas de pessoas." data-environment-owner="rh@1wes.com" data-environment-projects="2" data-environment-agents="4" data-environment-users="2">
                   <span class="environment-name-cell">
                     <span>
                       <strong>RH</strong>
@@ -4148,6 +4163,7 @@
                   <span class="environment-owner-cell">rh@1wes.com</span>
                   <span class="environment-projects-cell">2</span>
                   <span class="environment-agents-cell">4</span>
+                  <span class="environment-users-cell">2</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
                       <span class="material-symbols-rounded">edit</span>
@@ -4525,6 +4541,112 @@
                     <strong id="auditDetailsSummary">-</strong>
                   </div>
                 </section>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-companies" data-title="Empresas">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Empresas</h2>
+                  <p class="page-subtitle">Gerencie empresas cadastradas e o acesso administrativo de cada tenant.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" type="button">
+                    Criar empresa
+                  </button>
+                  <a class="btn outline" href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization">
+                    <span class="material-symbols-rounded">business</span>
+                    Trocar de empresa
+                  </a>
+                </div>
+              </div>
+              <div class="data-table companies-table">
+                <div class="data-row header">
+                  <span>Empresa</span>
+                  <span>Administrador</span>
+                  <span>Status</span>
+                  <span>Usuários</span>
+                  <span>Criada em</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row" data-company-row data-company-id="avas" data-company-name="AVAS">
+                  <span class="environment-name-cell">
+                    <span>
+                      <strong>AVAS</strong>
+                    </span>
+                  </span>
+                  <span>admin@1wes.com</span>
+                  <span class="chip success">Ativa</span>
+                  <span data-company-user-count>42</span>
+                  <span>14/03/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar empresa" data-company-edit>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-company-row data-company-id="techcorp" data-company-name="TechCorp">
+                  <span class="environment-name-cell">
+                    <span>
+                      <strong>TechCorp</strong>
+                    </span>
+                  </span>
+                  <span>admin@techcorp.com</span>
+                  <span class="chip success">Ativa</span>
+                  <span data-company-user-count>18</span>
+                  <span>09/01/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar empresa" data-company-edit>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="companyUsersModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog company-users-dialog" role="dialog" aria-modal="true" aria-labelledby="companyUsersModalTitle">
+              <div class="modal-header">
+                <h3 id="companyUsersModalTitle">Editar empresa</h3>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body company-users-body">
+                <section class="users-modal-section">
+                  <div class="company-users-add-row">
+                    <div>
+                      <label class="modal-label" for="companyUserSelect">Adicionar usuário</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">person_add</span>
+                        <select id="companyUserSelect" class="hub-select" name="company_user" aria-label="Usuário para adicionar à empresa"></select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                    <button class="btn primary" id="companyAddUserButton" type="button">Adicionar</button>
+                  </div>
+                </section>
+                <section class="users-modal-section users-modal-section--last">
+                  <div class="company-users-section-head">
+                    <h4 class="users-modal-section-title">Usuários da empresa</h4>
+                    <span class="chip" id="companyUsersCount">0 usuários</span>
+                  </div>
+                  <div class="company-users-list" id="companyUsersList"></div>
+                </section>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="button" class="btn primary" id="companyUsersSaveButton">Salvar alterações</button>
               </div>
             </div>
           </div>

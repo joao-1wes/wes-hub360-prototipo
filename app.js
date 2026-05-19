@@ -44,6 +44,14 @@ const manageRolesName = document.getElementById('manageRolesName');
 const manageRolesSubmit = document.getElementById('manageRolesSubmit');
 const openCreateUserModal = document.getElementById('openCreateUserModal');
 const usersTable = document.querySelector('#page-users .users-table');
+const companiesTable = document.querySelector('#page-companies .companies-table');
+const companyUsersModal = document.getElementById('companyUsersModal');
+const companyUsersModalTitle = document.getElementById('companyUsersModalTitle');
+const companyUserSelect = document.getElementById('companyUserSelect');
+const companyAddUserButton = document.getElementById('companyAddUserButton');
+const companyUsersList = document.getElementById('companyUsersList');
+const companyUsersCount = document.getElementById('companyUsersCount');
+const companyUsersSaveButton = document.getElementById('companyUsersSaveButton');
 const createUserModal = document.getElementById('createUserModal');
 const createUserModalForm = document.getElementById('createUserModalForm');
 const createUserTitle = document.getElementById('createUserTitle');
@@ -176,6 +184,7 @@ const auditDetailsTarget = document.getElementById('auditDetailsTarget');
 const auditDetailsChange = document.getElementById('auditDetailsChange');
 const auditDetailsSummary = document.getElementById('auditDetailsSummary');
 const environmentsTable = document.querySelector('#page-environments .environments-table');
+const environmentsCompanySelect = document.getElementById('environmentsCompanySelect');
 const openCreateEnvironmentModal = document.getElementById('openCreateEnvironmentModal');
 const environmentModal = document.getElementById('environmentModal');
 const environmentModalForm = document.getElementById('environmentModalForm');
@@ -220,6 +229,7 @@ const AGENT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesAgentEnvironmentOverrides';
 const PROJECT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesProjectEnvironmentOverrides';
 const PROJECT_PROMPT_OVERRIDES_STORAGE_KEY = 'wesProjectPromptOverrides';
 const TELEGRAM_HELP_CARD_DISMISSED_STORAGE_KEY = 'wesTelegramHelpCardDismissed';
+const SELECTED_ORG_ACCESS_STORAGE_KEY = 'wes_selected_organization_access';
 const DEFAULT_LANGUAGE = 'pt-BR';
 const LANGUAGE_STORAGE_KEY = 'wes-language';
 const LANGUAGE_QUERY_KEY = 'lang';
@@ -1358,6 +1368,214 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
   });
 }
 
+if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect) {
+  let activeCompanyRow = null;
+  let activeCompanyId = '';
+  let draftCompanyUsers = [];
+
+  const fallbackCompanyUsers = [
+    { id: 'admin@wes.com', name: 'WES ADMIN', email: 'admin@wes.com', role: 'Administrador' },
+    { id: 'viniciusaires@hotmail.com', name: 'Alfeu Vinicius Souza', email: 'viniciusaires@hotmail.com', role: 'Administrador' },
+    { id: 'ana.silva@cedae.com', name: 'Ana Silva', email: 'ana.silva@cedae.com', role: 'Usuário' },
+    { id: 'carlos.santos@cedae.com', name: 'Carlos Santos', email: 'carlos.santos@cedae.com', role: 'Usuário' },
+  ];
+
+  const companyUsersByCompany = {
+    avas: [
+      { userId: 'admin@wes.com', active: true },
+      { userId: 'viniciusaires@hotmail.com', active: true },
+    ],
+    techcorp: [
+      { userId: 'admin@wes.com', active: false },
+      { userId: 'ana.silva@cedae.com', active: true },
+    ],
+  };
+
+  const normalizeCompanyUserId = (value) => String(value || '').trim().toLowerCase();
+
+  const getCompanyUserInitial = (user) => {
+    const source = String(user?.name || user?.email || '?').trim();
+    return (source[0] || '?').toUpperCase();
+  };
+
+  const getAllCompanyUsers = () => {
+    const byId = new Map();
+    fallbackCompanyUsers.forEach((user) => {
+      byId.set(normalizeCompanyUserId(user.id), { ...user, id: normalizeCompanyUserId(user.id) });
+    });
+
+    usersTable?.querySelectorAll('.data-row:not(.header)').forEach((row) => {
+      const name = row.querySelector('.user-cell strong')?.textContent?.trim() || '';
+      const email = row.children[1]?.textContent?.trim() || '';
+      const role = row.children[2]?.textContent?.trim() || 'Usuário';
+      const id = normalizeCompanyUserId(email);
+      if (!id) return;
+      byId.set(id, { id, name: name || email, email, role });
+    });
+
+    return Array.from(byId.values());
+  };
+
+  const findCompanyUser = (userId) => {
+    const normalizedId = normalizeCompanyUserId(userId);
+    return getAllCompanyUsers().find((user) => user.id === normalizedId) || {
+      id: normalizedId,
+      name: normalizedId,
+      email: normalizedId,
+      role: 'Usuário',
+    };
+  };
+
+  const updateCompanyUserCount = (companyId, count) => {
+    const row = companiesTable.querySelector(`[data-company-row][data-company-id="${companyId}"]`);
+    const countCell = row?.querySelector('[data-company-user-count]');
+    if (countCell) countCell.textContent = String(count);
+  };
+
+  const updateCompanyUserSelect = () => {
+    const linkedUserIds = new Set(draftCompanyUsers.map((item) => normalizeCompanyUserId(item.userId)));
+    const availableUsers = getAllCompanyUsers().filter((user) => !linkedUserIds.has(user.id));
+
+    companyUserSelect.innerHTML = '';
+    if (availableUsers.length === 0) {
+      const option = document.createElement('option');
+      option.value = '';
+      option.textContent = 'Todos os usuários já estão vinculados';
+      companyUserSelect.appendChild(option);
+      companyUserSelect.disabled = true;
+      if (companyAddUserButton) companyAddUserButton.disabled = true;
+      return;
+    }
+
+    const emptyOption = document.createElement('option');
+    emptyOption.value = '';
+    emptyOption.textContent = 'Selecione um usuário';
+    companyUserSelect.appendChild(emptyOption);
+    availableUsers.forEach((user) => {
+      const option = document.createElement('option');
+      option.value = user.id;
+      option.textContent = `${user.name} · ${user.email}`;
+      companyUserSelect.appendChild(option);
+    });
+    companyUserSelect.disabled = false;
+    if (companyAddUserButton) companyAddUserButton.disabled = true;
+  };
+
+  const renderCompanyUsers = () => {
+    companyUsersList.innerHTML = '';
+    draftCompanyUsers.forEach((membership) => {
+      const user = findCompanyUser(membership.userId);
+      const row = document.createElement('div');
+      const switchId = `companyUser${activeCompanyId}${user.id}`.replace(/[^a-zA-Z0-9]+/g, '');
+      row.className = 'company-user-row';
+      row.dataset.companyUserId = user.id;
+      row.innerHTML = `
+        <span class="company-user-identity">
+          <span class="user-avatar small">${escapeHtmlWes(getCompanyUserInitial(user))}</span>
+          <span>
+            <strong>${escapeHtmlWes(user.name)}</strong>
+            <span class="muted">${escapeHtmlWes(user.role)}</span>
+          </span>
+        </span>
+        <span class="company-user-email">${escapeHtmlWes(user.email)}</span>
+        <span class="company-user-status">
+          <label class="switch small" for="${escapeHtmlWes(switchId)}">
+            <input type="checkbox" id="${escapeHtmlWes(switchId)}" data-company-user-status ${membership.active ? 'checked' : ''} />
+            <span class="switch-track"></span>
+          </label>
+          <span class="switch-label">${membership.active ? 'Ativo' : 'Inativo'}</span>
+        </span>
+        <span class="row-actions">
+          <button class="icon-btn action-icon danger" type="button" data-company-user-remove aria-label="Remover usuário da empresa">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </span>
+      `;
+      companyUsersList.appendChild(row);
+    });
+
+    if (companyUsersCount) {
+      const count = draftCompanyUsers.length;
+      companyUsersCount.textContent = `${count} ${count === 1 ? 'usuário' : 'usuários'}`;
+    }
+    updateCompanyUserSelect();
+  };
+
+  const closeCompanyUsersModal = () => {
+    companyUsersModal.classList.remove('open');
+    companyUsersModal.setAttribute('aria-hidden', 'true');
+    activeCompanyRow = null;
+    activeCompanyId = '';
+    draftCompanyUsers = [];
+  };
+
+  const openCompanyUsersModal = (companyRow) => {
+    activeCompanyRow = companyRow;
+    activeCompanyId = companyRow.dataset.companyId || '';
+    const companyName = companyRow.dataset.companyName || companyRow.querySelector('strong')?.textContent?.trim() || 'Empresa';
+    const currentUsers = companyUsersByCompany[activeCompanyId] || [];
+    draftCompanyUsers = currentUsers.map((item) => ({ ...item, userId: normalizeCompanyUserId(item.userId) }));
+
+    if (companyUsersModalTitle) companyUsersModalTitle.textContent = `Editar empresa · ${companyName}`;
+    renderCompanyUsers();
+    companyUsersModal.classList.add('open');
+    companyUsersModal.setAttribute('aria-hidden', 'false');
+    companyUserSelect.focus();
+  };
+
+  companiesTable.addEventListener('click', (event) => {
+    const editButton = event.target.closest('[data-company-edit]');
+    if (!editButton) return;
+    const row = editButton.closest('[data-company-row]');
+    if (!row) return;
+    openCompanyUsersModal(row);
+  });
+
+  companyUserSelect.addEventListener('change', () => {
+    if (companyAddUserButton) companyAddUserButton.disabled = !companyUserSelect.value;
+  });
+
+  companyAddUserButton?.addEventListener('click', () => {
+    const userId = normalizeCompanyUserId(companyUserSelect.value);
+    if (!userId || draftCompanyUsers.some((item) => normalizeCompanyUserId(item.userId) === userId)) return;
+    draftCompanyUsers.push({ userId, active: true });
+    renderCompanyUsers();
+  });
+
+  companyUsersList.addEventListener('change', (event) => {
+    const input = event.target.closest('[data-company-user-status]');
+    if (!input) return;
+    const row = input.closest('[data-company-user-id]');
+    const userId = normalizeCompanyUserId(row?.dataset.companyUserId);
+    const membership = draftCompanyUsers.find((item) => normalizeCompanyUserId(item.userId) === userId);
+    if (!membership) return;
+    membership.active = input.checked;
+    const label = row.querySelector('.switch-label');
+    if (label) label.textContent = input.checked ? 'Ativo' : 'Inativo';
+  });
+
+  companyUsersList.addEventListener('click', (event) => {
+    const removeButton = event.target.closest('[data-company-user-remove]');
+    if (!removeButton) return;
+    const row = removeButton.closest('[data-company-user-id]');
+    const userId = normalizeCompanyUserId(row?.dataset.companyUserId);
+    draftCompanyUsers = draftCompanyUsers.filter((item) => normalizeCompanyUserId(item.userId) !== userId);
+    renderCompanyUsers();
+  });
+
+  companyUsersModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeCompanyUsersModal();
+  });
+
+  companyUsersSaveButton?.addEventListener('click', () => {
+    if (!activeCompanyId) return;
+    companyUsersByCompany[activeCompanyId] = draftCompanyUsers.map((item) => ({ ...item }));
+    updateCompanyUserCount(activeCompanyId, draftCompanyUsers.length);
+    closeCompanyUsersModal();
+    showAppToast('Usuários da empresa atualizados');
+  });
+}
+
 if (environmentsTable && environmentModal && environmentModalForm) {
   let activeEnvironmentRow = null;
   let isCreatingEnvironment = false;
@@ -1767,6 +1985,32 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     return environmentRelations[code];
   };
 
+  const syncEnvironmentRowMetrics = (row) => {
+    if (!row) return;
+    const relation = ensureEnvironmentRelationRecord(row.dataset.environmentCode || '');
+    const projectCount = relation.projects.length;
+    const agentCount = relation.agents.length;
+    const userCount = relation.users.length;
+    row.dataset.environmentProjects = String(projectCount);
+    row.dataset.environmentAgents = String(agentCount);
+    row.dataset.environmentUsers = String(userCount);
+    const projectsCell = row.querySelector('.environment-projects-cell');
+    const agentsCell = row.querySelector('.environment-agents-cell');
+    const usersCell = row.querySelector('.environment-users-cell');
+    if (projectsCell) projectsCell.textContent = String(projectCount);
+    if (agentsCell) agentsCell.textContent = String(agentCount);
+    if (usersCell) usersCell.textContent = String(userCount);
+  };
+
+  const applyEnvironmentCompanyFilter = () => {
+    const selectedCompany = environmentsCompanySelect?.value || 'all';
+    environmentsTable.querySelectorAll('.environment-row').forEach((row) => {
+      const showRow = selectedCompany === 'all' || row.dataset.environmentCompany === selectedCompany;
+      row.hidden = !showRow;
+      row.classList.toggle('is-hidden', !showRow);
+    });
+  };
+
   const renderEnvironmentRelations = (row = null) => {
     if (row) {
       activeEnvironmentCode = String(row?.dataset?.environmentCode || '').trim();
@@ -1851,6 +2095,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   };
 
   openCreateEnvironmentModal?.addEventListener('click', openCreateEnvironmentDialog);
+  environmentsCompanySelect?.addEventListener('change', applyEnvironmentCompanyFilter);
 
   environmentsTable.addEventListener('click', (event) => {
     const editButton = event.target.closest('.environment-edit-trigger');
@@ -1924,7 +2169,14 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
     if (isCreatingEnvironment) {
       const sourceCode = activeEnvironmentCode;
-      const createdRow = createEnvironmentRow({ name, owner, description });
+      const createdRow = createEnvironmentRow({
+        name,
+        owner,
+        description,
+        company: environmentsCompanySelect?.value && environmentsCompanySelect.value !== 'all'
+          ? environmentsCompanySelect.value
+          : 'adm-wes',
+      });
       const nextCode = String(createdRow?.dataset?.environmentCode || '').trim();
       if (sourceCode && nextCode && sourceCode !== nextCode && environmentRelations[sourceCode]) {
         environmentRelations[nextCode] = {
@@ -1934,6 +2186,8 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         };
         delete environmentRelations[sourceCode];
       }
+      syncEnvironmentRowMetrics(createdRow);
+      applyEnvironmentCompanyFilter();
       closeEnvironmentModal();
       showAppToast('Setor criado com sucesso');
       return;
@@ -1952,6 +2206,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (nameCell) nameCell.textContent = name;
     if (ownerCell) ownerCell.textContent = owner;
     if (descriptionCell) descriptionCell.textContent = description || '-';
+    syncEnvironmentRowMetrics(activeEnvironmentRow);
 
     closeEnvironmentModal();
     showAppToast('Setor atualizado com sucesso');
@@ -1962,6 +2217,8 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   });
 
   environmentRelationPickerSearch?.addEventListener('input', renderEnvironmentRelationPickerItems);
+  environmentsTable.querySelectorAll('.environment-row').forEach(syncEnvironmentRowMetrics);
+  applyEnvironmentCompanyFilter();
   window.addEventListener('resize', positionEnvironmentRelationPicker);
   environmentRelationPickerSearch?.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
@@ -7068,7 +7325,8 @@ const routeMap = {
   'dashboard/input-files': 'page-input-files',
   'dashboard/users': 'page-users',
   'dashboard/audit': 'page-audit',
-  'dashboard/organization': 'page-organization',
+  'dashboard/companies': 'page-companies',
+  // 'dashboard/organization': 'page-organization',
   'dashboard/environments': 'page-environments',
   'dashboard/bpmn': 'page-bpmn',
   'dashboard/fluxos': 'page-fluxos',
@@ -7093,12 +7351,84 @@ const sectionMap = {
   'dashboard/input-files': 'Armazenamento',
   'dashboard/users': 'Administração',
   'dashboard/audit': 'Administração',
+  'dashboard/companies': 'Administração',
   'dashboard/environments': 'Administração',
-  'dashboard/organization': 'Organização',
+  // 'dashboard/organization': 'Organização',
   'dashboard/bpmn': 'Processos',
   'dashboard/fluxos': 'Processos',
   'dashboard/history': 'Painel de histórico',
   'dashboard/settings': 'Configurações'
+};
+
+const organizationAccessProfiles = {
+  'adm-wes': {
+    id: 'adm-wes',
+    name: 'ADM WES',
+    showAdministration: true,
+    canManageCompanies: true,
+    canSwitchOrganization: true,
+  },
+  cedae: {
+    id: 'cedae',
+    name: 'CEDAE',
+    showAdministration: true,
+    canManageCompanies: false,
+    canSwitchOrganization: false,
+  },
+  'user-cedae': {
+    id: 'user-cedae',
+    name: 'USER CEDAE',
+    showAdministration: false,
+    canManageCompanies: false,
+    canSwitchOrganization: false,
+  },
+};
+
+const getSelectedOrganizationAccess = () => {
+  try {
+    const raw = sessionStorage.getItem(SELECTED_ORG_ACCESS_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    const profile = organizationAccessProfiles[parsed?.id];
+    if (profile) return profile;
+  } catch {
+    /* ignore */
+  }
+  return organizationAccessProfiles['adm-wes'];
+};
+
+const setAccessVisibility = (element, isVisible) => {
+  if (!element) return;
+  element.classList.toggle('is-hidden', !isVisible);
+  element.toggleAttribute('hidden', !isVisible);
+  element.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+};
+
+const applyOrganizationAccessControls = (routeKey) => {
+  const access = getSelectedOrganizationAccess();
+  const administrationGroup = document.querySelector('[data-access-section="administration"]');
+  const companiesLink = document.querySelector('[data-access-item="companies"]');
+  const switchOrganizationLink = document.querySelector('[data-access-item="switch-organization"]');
+  const tenantEl = document.querySelector('#userMenu .user-tenant');
+
+  document.body.dataset.organizationAccess = access.id;
+  if (tenantEl) tenantEl.textContent = access.name;
+
+  setAccessVisibility(administrationGroup, access.showAdministration);
+  setAccessVisibility(companiesLink, access.showAdministration && access.canManageCompanies);
+  setAccessVisibility(switchOrganizationLink, access.canSwitchOrganization);
+
+  const isAdministrationRoute = sectionMap[routeKey] === 'Administração';
+  const isCompaniesRoute = routeKey === 'dashboard/companies';
+  const blockedRoute =
+    (!access.showAdministration && isAdministrationRoute) ||
+    (!access.canManageCompanies && isCompaniesRoute);
+
+  if (blockedRoute) {
+    window.location.hash = '#/dashboard';
+    return false;
+  }
+
+  return true;
 };
 
 const normalizeAutomationLabels = () => {
@@ -7116,6 +7446,7 @@ const normalizeVisiblePortugueseLabels = () => {
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
+    ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
     ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
     ['#wesProjectDescription', null],
   ];
@@ -7144,6 +7475,7 @@ const updateActivePage = () => {
   normalizeVisiblePortugueseLabels();
   const hash = window.location.hash.replace('#/', '');
   const routeKey = hash || 'dashboard';
+  if (!applyOrganizationAccessControls(routeKey)) return;
   let pageId = routeMap[routeKey];
   if (!pageId && routeKey.startsWith('dashboard/agents/project/')) {
     pageId = 'page-agents';
@@ -7428,7 +7760,7 @@ scheduleLucideRefresh();
     return `${base}-${suffix}`;
   };
 
-  const createEnvironmentRow = ({ name, owner, description }) => {
+  const createEnvironmentRow = ({ name, owner, description, company = 'adm-wes', users = 0 }) => {
     const row = document.createElement('div');
     row.className = 'data-row environment-row';
 
@@ -7437,8 +7769,10 @@ scheduleLucideRefresh();
     row.dataset.environmentCode = code;
     row.dataset.environmentDescription = description;
     row.dataset.environmentOwner = owner;
+    row.dataset.environmentCompany = company;
     row.dataset.environmentProjects = '0';
     row.dataset.environmentAgents = '0';
+    row.dataset.environmentUsers = String(users);
 
     row.innerHTML = `
       <span class="environment-name-cell">
@@ -7451,6 +7785,7 @@ scheduleLucideRefresh();
       <span class="environment-owner-cell">${escapeHtmlWes(owner)}</span>
       <span class="environment-projects-cell">0</span>
       <span class="environment-agents-cell">0</span>
+      <span class="environment-users-cell">${escapeHtmlWes(users)}</span>
       <span class="row-actions">
         <button class="icon-btn action-icon environment-edit-trigger" aria-label="Editar setor" type="button">
           <span class="material-symbols-rounded">edit</span>

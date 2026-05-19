@@ -6,6 +6,7 @@
 (function () {
   const STORAGE_KEY = 'wes_dashboard_auth';
   const LAST_BASE_KEY = 'wes_dashboard_api_base_last';
+  const SELECTED_ORG_KEY = 'wes_selected_organization_access';
   const PUBLIC_ROUTE_SCREENS = {
     '': 'landingScreen',
     login: 'loginScreen',
@@ -205,9 +206,22 @@
     const createCompanyForm = document.getElementById('createCompanyForm');
     const companyName = document.getElementById('companyName');
     const createCompanyAdminUserLink = document.getElementById('createCompanyAdminUserLink');
+    const orgChoices = document.querySelectorAll('[data-org-choice]');
     loginForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       window.location.hash = '#/select-organization';
+    });
+
+    orgChoices.forEach((choice) => {
+      choice.addEventListener('click', () => {
+        const orgId = choice.getAttribute('data-org-choice') || 'adm-wes';
+        const orgName = choice.getAttribute('data-org-name') || choice.querySelector('strong')?.textContent?.trim() || 'ADM WES';
+        try {
+          sessionStorage.setItem(SELECTED_ORG_KEY, JSON.stringify({ id: orgId, name: orgName }));
+        } catch {
+          /* ignore */
+        }
+      });
     });
 
     const closeCreateCompanyModal = () => {

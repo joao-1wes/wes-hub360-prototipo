@@ -200,8 +200,9 @@
   window.WesDashboardAuth = WesDashboardAuth;
 
   function initAuthUi() {
+    const appShell = document.getElementById('appShell');
     const loginForm = document.getElementById('publicLoginForm');
-    const openCreateCompanyModal = document.getElementById('openCreateCompanyModal');
+    const openCreateCompanyModalButtons = Array.from(document.querySelectorAll('[data-open-create-company-modal], #openCreateCompanyModal'));
     const createCompanyModal = document.getElementById('createCompanyModal');
     const createCompanyForm = document.getElementById('createCompanyForm');
     const companyName = document.getElementById('companyName');
@@ -227,19 +228,26 @@
     const closeCreateCompanyModal = () => {
       if (!createCompanyModal) return;
       createCompanyModal.classList.remove('is-open');
+      createCompanyModal.classList.remove('public-modal--app');
       createCompanyModal.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('public-modal-open');
     };
 
     const showCreateCompanyModal = () => {
       if (!createCompanyModal) return;
+      if (createCompanyModal.parentElement !== document.body) {
+        document.body.appendChild(createCompanyModal);
+      }
+      createCompanyModal.classList.toggle('public-modal--app', Boolean(appShell && !appShell.hidden));
       createCompanyModal.classList.add('is-open');
       createCompanyModal.setAttribute('aria-hidden', 'false');
       document.body.classList.add('public-modal-open');
       window.setTimeout(() => companyName?.focus(), 50);
     };
 
-    openCreateCompanyModal?.addEventListener('click', showCreateCompanyModal);
+    openCreateCompanyModalButtons.forEach((button) => {
+      button.addEventListener('click', showCreateCompanyModal);
+    });
     document.querySelectorAll('[data-create-company-close]').forEach((button) => {
       button.addEventListener('click', closeCreateCompanyModal);
     });

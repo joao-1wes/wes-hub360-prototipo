@@ -208,9 +208,10 @@
               <span class="nav-caret">▾</span>
             </a>
             <div class="submenu" id="submenu-automation">
-              <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
               <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
               <a class="submenu-item" href="#/dashboard/agents"><span class="submenu-label">Agentes</span></a>
+              <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
+              <a class="submenu-item" href="#/dashboard/document-analysis"><span class="submenu-label">Análise de documentos</span></a>
             </div>
           </div>
 
@@ -233,10 +234,10 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-integrations">
-              <a class="submenu-item" href="#/dashboard/channels"><span class="submenu-label">Canais</span></a>
-              <a class="submenu-item" href="#/dashboard/voice-messaging"><span class="submenu-label">Mensageria por voz</span></a>
               <a class="submenu-item" href="#/dashboard/campaigns"><span class="submenu-label">Campanhas</span></a>
+              <a class="submenu-item" href="#/dashboard/channels"><span class="submenu-label">Canais</span></a>
               <a class="submenu-item" href="#/dashboard/hybrid-flows"><span class="submenu-label">Fluxos híbridos</span></a>
+              <a class="submenu-item" href="#/dashboard/voice-messaging"><span class="submenu-label">Mensageria por voz</span></a>
             </div>
           </div>
 
@@ -247,8 +248,8 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-storage">
-              <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a>
               <a class="submenu-item" href="#/dashboard/input-files"><span class="submenu-label">Arquivos de entrada</span></a>
+              <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a>
             </div>
           </div>
 
@@ -259,10 +260,10 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-administration">
-              <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
-              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
               <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
+              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
+              <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
             </div>
           </div>
 
@@ -274,7 +275,7 @@
             </button>
             <div class="submenu" id="submenu-processes">
               <a class="submenu-item" href="#/dashboard/bpmn"><span class="submenu-label">BPMN</span></a>
-              <a class="submenu-item" href="#/dashboard/fluxos"><span class="submenu-label">Fluxos</span></a>
+              <!-- <a class="submenu-item" href="#/dashboard/fluxos"><span class="submenu-label">Fluxos</span></a> -->
             </div>
           </div>
 
@@ -989,6 +990,123 @@
                   <button class="page-number" type="button">12</button>
                   <button class="icon-btn" aria-label="Próximo">
                     <span class="material-symbols-rounded">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-document-analysis" data-title="Análise de documentos">
+            <div class="section document-analysis-page">
+              <div class="page-header">
+                <div>
+                  <h2>Análise de documentos</h2>
+                  <p class="page-subtitle">Envie um documento para OCR, classificação automática e extração para JSON.</p>
+                </div>
+              </div>
+
+              <div class="document-analysis-grid">
+                <div class="document-analysis-card document-analysis-card--upload">
+                  <input id="docUploadInput" type="file" accept=".jpg,.jpeg,.png,.pdf,.bmp,.tif,.tiff" hidden />
+                  <div class="document-upload-dropzone document-upload-dropzone-square" role="button" tabindex="0" aria-label="Enviar documento">
+                    <div class="document-upload-head">
+                      <h3>Upload de arquivo</h3>
+                      <p>PDF ou imagem (JPEG, PNG, etc.) enviado ao servidor para OCR e extração.</p>
+                    </div>
+                    <div class="document-upload-body">
+                      <span class="material-symbols-rounded" aria-hidden="true">upload</span>
+                      <p>Arraste um arquivo para cá ou <a href="#" id="docUploadChooseLink">escolha um arquivo</a>.</p>
+                      <small>Formatos: JPEG, PNG, PDF, BMP, TIFF</small>
+                      <small id="docUploadFileName" hidden></small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="document-analysis-card">
+                  <h3>Configurações necessárias</h3>
+                  <label for="docExpectedClasses">Classes esperadas</label>
+                  <p class="input-help">Selecione pelo menos uma classe de documento.</p>
+                  <div class="doc-classes-multiselect" data-doc-classes-multiselect>
+                    <button
+                      id="docExpectedClasses"
+                      class="doc-classes-trigger"
+                      type="button"
+                      aria-haspopup="listbox"
+                      aria-expanded="false"
+                    >
+                      <span class="doc-classes-trigger-label" data-doc-classes-label>nota_fiscal</span>
+                      <span class="material-symbols-rounded doc-classes-trigger-chevron" aria-hidden="true">expand_more</span>
+                    </button>
+                    <div class="doc-classes-menu" data-doc-classes-menu role="listbox" aria-multiselectable="true" hidden>
+                      <label class="doc-classes-option">
+                        <input type="checkbox" value="nota_fiscal" checked data-doc-class-option />
+                        <span class="doc-classes-option-check material-symbols-rounded" aria-hidden="true">check</span>
+                        <span>nota_fiscal</span>
+                      </label>
+                      <label class="doc-classes-option">
+                        <input type="checkbox" value="recibo" data-doc-class-option />
+                        <span class="doc-classes-option-check material-symbols-rounded" aria-hidden="true">check</span>
+                        <span>recibo</span>
+                      </label>
+                      <label class="doc-classes-option">
+                        <input type="checkbox" value="contrato" data-doc-class-option />
+                        <span class="doc-classes-option-check material-symbols-rounded" aria-hidden="true">check</span>
+                        <span>contrato</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="doc-analysis-two-cols">
+                    <div class="doc-analysis-field">
+                      <label for="docClassificationThreshold">Limiar de classificação</label>
+                      <p class="input-help">Confiança mínima da classificação (0 a 1).</p>
+                      <input id="docClassificationThreshold" class="doc-analysis-input" type="text" inputmode="decimal" value="0,75" />
+                    </div>
+                    <div class="doc-analysis-field">
+                      <label for="docOcrLocale">Locale do OCR (WES AI)</label>
+                      <p class="input-help">Idioma do OCR.</p>
+                      <div class="hub-select-wrap doc-analysis-select-wrap">
+                        <select id="docOcrLocale" class="hub-select" aria-label="Locale do OCR">
+                          <option value="pt-BR" selected>pt-BR</option>
+                          <option value="en">en</option>
+                          <option value="es">es</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <label for="docPreprocessProfile">Perfil de pré-processamento</label>
+                  <p class="input-help">Intensidade do pré-processamento da imagem. Manuscrito = mais suave para não apagar traços.</p>
+                  <div class="hub-select-wrap doc-analysis-select-wrap">
+                    <select id="docPreprocessProfile" class="hub-select" aria-label="Perfil de pré-processamento">
+                      <option selected>Padrão</option>
+                      <option>Manuscrito (denoise mais leve)</option>
+                      <option>Impresso</option>
+                    </select>
+                    <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                  </div>
+                  <details class="doc-analysis-accordion">
+                    <summary class="doc-analysis-accordion-summary">Opções avançadas (opcional)</summary>
+                    <div class="doc-analysis-accordion-content">
+                      <p class="input-help">Idioma do OCR, opção de pular o tratamento da imagem/PDF antes do OCR, perfil de tratamento e dicas de manuscrito para o modelo.</p>
+
+                      <label class="doc-analysis-checkbox" for="docSkipPreprocessing">
+                        <input id="docSkipPreprocessing" type="checkbox" />
+                        <span>Pular pré-processamento</span>
+                      </label>
+                      <p class="input-help">Quando marcado, o arquivo segue direto para o OCR sem denoise, CLAHE ou reconstrução de PDF. O perfil de pré-processamento abaixo é ignorado.</p>
+
+                      <label class="doc-analysis-checkbox" for="docHandwritingHints">
+                        <input id="docHandwritingHints" type="checkbox" />
+                        <span>Enviar ao modelo os intervalos de manuscrito (JSON)</span>
+                      </label>
+                      <p class="input-help">Se marcado, o backend informa ao modelo quais trechos foram detectados como manuscrito.</p>
+                    </div>
+                  </details>
+
+                  <button class="btn primary document-analysis-submit" id="docProcessButton" type="button" disabled>
+                    Processar documento
                   </button>
                 </div>
               </div>

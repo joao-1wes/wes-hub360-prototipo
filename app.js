@@ -5050,6 +5050,162 @@ function hubRefreshCustomSelects() {
   scheduleLucideRefresh();
 }
 
+function initDocClassesMultiSelect() {
+  const root = document.querySelector('[data-doc-classes-multiselect]');
+  if (!root || root.dataset.bound === 'true') return;
+  root.dataset.bound = 'true';
+
+  const trigger = root.querySelector('.doc-classes-trigger');
+  const label = root.querySelector('[data-doc-classes-label]');
+  const menu = root.querySelector('[data-doc-classes-menu]');
+  const options = Array.from(root.querySelectorAll('[data-doc-class-option]'));
+  if (!trigger || !label || !menu || !options.length) return;
+
+  const updateLabel = () => {
+    const selected = options.filter((option) => option.checked).map((option) => option.value);
+    label.textContent = selected.length ? selected.join(', ') : 'Selecione ao menos uma classe';
+  };
+
+  const setOpen = (open) => {
+    root.classList.toggle('is-open', open);
+    menu.hidden = !open;
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+
+  trigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(!root.classList.contains('is-open'));
+  });
+
+  options.forEach((option) => {
+    option.addEventListener('change', () => {
+      const selected = options.filter((item) => item.checked);
+      if (!selected.length) option.checked = true;
+      updateLabel();
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!root.contains(event.target)) setOpen(false);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') setOpen(false);
+  });
+
+  updateLabel();
+}
+
+function initDocumentAnalysisValidation() {
+  const page = document.getElementById('page-document-analysis');
+  if (!page || page.dataset.validationBound === 'true') return;
+  page.dataset.validationBound = 'true';
+
+  const uploadInput = page.querySelector('#docUploadInput');
+  const chooseLink = page.querySelector('#docUploadChooseLink');
+  const uploadDropzone = page.querySelector('.document-upload-dropzone');
+  const fileNameEl = page.querySelector('#docUploadFileName');
+  const processBtn = page.querySelector('#docProcessButton');
+  const thresholdInput = page.querySelector('#docClassificationThreshold');
+  const localeSelect = page.querySelector('#docOcrLocale');
+  const preprocessSelect = page.querySelector('#docPreprocessProfile');
+  const classOptions = Array.from(page.querySelectorAll('[data-doc-class-option]'));
+  if (!uploadInput || !chooseLink || !uploadDropzone || !processBtn || !thresholdInput || !localeSelect || !preprocessSelect || !classOptions.length) return;
+
+  const allowedExt = new Set(['jpg', 'jpeg', 'png', 'pdf', 'bmp', 'tif', 'tiff']);
+  let selectedFile = null;
+
+  const getThresholdValue = () => {
+    const raw = String(thresholdInput.value || '').trim().replace(',', '.');
+    const parsed = Number(raw);
+    return Number.isFinite(parsed) ? parsed : NaN;
+  };
+
+  const hasRequiredFields = () => {
+    const hasClass = classOptions.some((option) => option.checked);
+    const threshold = getThresholdValue();
+    const validThreshold = threshold >= 0 && threshold <= 1;
+    const hasLocale = Boolean(String(localeSelect.value || '').trim());
+    const hasPreprocess = Boolean(String(preprocessSelect.value || '').trim());
+    return hasClass && validThreshold && hasLocale && hasPreprocess;
+  };
+
+  const isAllowedFile = (file) => {
+    if (!file || !file.name) return false;
+    const ext = String(file.name).toLowerCase().split('.').pop();
+    return allowedExt.has(ext || '');
+  };
+
+  const updateFileVisual = () => {
+    if (!fileNameEl) return;
+    if (!selectedFile) {
+      fileNameEl.hidden = true;
+      fileNameEl.textContent = '';
+      return;
+    }
+    fileNameEl.hidden = false;
+    fileNameEl.textContent = `Arquivo: ${selectedFile.name}`;
+  };
+
+  const updateButtonState = () => {
+    const valid = Boolean(selectedFile) && hasRequiredFields();
+    processBtn.disabled = !valid;
+  };
+
+  const assignFile = (file) => {
+    if (!isAllowedFile(file)) {
+      selectedFile = null;
+      uploadInput.value = '';
+      updateFileVisual();
+      updateButtonState();
+      return;
+    }
+    selectedFile = file;
+    updateFileVisual();
+    updateButtonState();
+  };
+
+  chooseLink.addEventListener('click', (event) => {
+    event.preventDefault();
+    uploadInput.click();
+  });
+
+  uploadDropzone.addEventListener('click', () => uploadInput.click());
+  uploadDropzone.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    uploadInput.click();
+  });
+
+  uploadInput.addEventListener('change', () => {
+    assignFile(uploadInput.files?.[0] || null);
+  });
+
+  uploadDropzone.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    uploadDropzone.classList.add('is-dragover');
+  });
+
+  uploadDropzone.addEventListener('dragleave', () => {
+    uploadDropzone.classList.remove('is-dragover');
+  });
+
+  uploadDropzone.addEventListener('drop', (event) => {
+    event.preventDefault();
+    uploadDropzone.classList.remove('is-dragover');
+    const droppedFile = event.dataTransfer?.files?.[0] || null;
+    assignFile(droppedFile);
+  });
+
+  thresholdInput.addEventListener('input', updateButtonState);
+  localeSelect.addEventListener('change', updateButtonState);
+  preprocessSelect.addEventListener('change', updateButtonState);
+  classOptions.forEach((option) => option.addEventListener('change', updateButtonState));
+
+  updateFileVisual();
+  updateButtonState();
+}
+
 /** Markup do icone de pasta (Lucide `folder`) para projetos - usar ao criar cards/detalhes via JS; depois chame `lucide.createIcons()`. */
 window.wesLucideProjectFolderIconHtml = function wesLucideProjectFolderIconHtml(role) {
   const inner = '<i data-lucide="folder"></i>';
@@ -5074,6 +5230,9 @@ function ensureProjectCardEditButtons(root = document) {
     card.insertAdjacentHTML('beforeend', actionHtml);
   });
 }
+
+initDocClassesMultiSelect();
+initDocumentAnalysisValidation();
 
 function hubCloseDropdowns() {
   if (hubOrgMenu) hubOrgMenu.hidden = true;
@@ -7302,6 +7461,7 @@ if (dashboardToggle && dashboardViewDefault && dashboardViewDetail) {
 const routeMap = {
   'dashboard': 'page-dashboard',
   'dashboard/automations': 'page-automations',
+  'dashboard/document-analysis': 'page-document-analysis',
   'dashboard/schedules': 'page-schedules',
   'dashboard/agents': 'page-agents',
   'dashboard/voice-messaging': 'page-voice-messaging',
@@ -7328,6 +7488,7 @@ const routeMap = {
 const sectionMap = {
   'dashboard': 'Painel',
   'dashboard/automations': 'Automa\u00e7\u00e3o',
+  'dashboard/document-analysis': 'Automa\u00e7\u00e3o',
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
   'dashboard/agents': 'Automa\u00e7\u00e3o',
   'dashboard/voice-messaging': 'Integrações',
@@ -7433,6 +7594,8 @@ const normalizeAutomationLabels = () => {
 
   const automationLink = document.querySelector('#submenu-automation a[href="#/dashboard/automations"] .submenu-label');
   if (automationLink) automationLink.textContent = 'Automa\u00e7\u00f5es';
+  const documentAnalysisLink = document.querySelector('#submenu-automation a[href="#/dashboard/document-analysis"] .submenu-label');
+  if (documentAnalysisLink) documentAnalysisLink.textContent = 'An\u00e1lise de documentos';
 };
 
 const normalizeVisiblePortugueseLabels = () => {
@@ -7499,6 +7662,7 @@ const updateActivePage = () => {
   if (hubScopeBar) {
     const hideHubScopeRoutes = [
       'dashboard/automations',
+      'dashboard/document-analysis',
       'dashboard/schedules',
       'dashboard/voice-messaging',
       'dashboard/campaigns',
@@ -7517,6 +7681,7 @@ const updateActivePage = () => {
     dashboardToggle.textContent = sectionTitle;
     if (
       navRouteKey === 'dashboard/automations' ||
+      navRouteKey === 'dashboard/document-analysis' ||
       navRouteKey === 'dashboard/schedules' ||
       navRouteKey === 'dashboard/agents'
     ) {

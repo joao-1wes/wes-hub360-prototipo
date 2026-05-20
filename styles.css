@@ -3674,6 +3674,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   gap: 12px;
 }
 
+.doc-analysis-three-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+}
+
 .doc-analysis-field {
   display: grid;
   gap: 6px;
@@ -3741,7 +3747,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .doc-classes-option {
   display: grid;
-  grid-template-columns: 20px 20px 1fr;
+  grid-template-columns: 1fr 20px;
   align-items: center;
   gap: 10px;
   border-radius: 8px;
@@ -3757,16 +3763,16 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .doc-classes-option input[type='checkbox'] {
-  margin: 0;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--brand);
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .doc-classes-option-check {
   color: #016ff4;
   opacity: 0;
   font-size: 18px;
+  justify-self: end;
 }
 
 .doc-classes-option input[type='checkbox']:checked + .doc-classes-option-check {
@@ -3831,6 +3837,27 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   display: grid;
   gap: 8px;
   border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.doc-analysis-advanced-block {
+  margin-top: 8px;
+  padding: 14px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.doc-analysis-advanced-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.doc-analysis-advanced-item {
+  display: grid;
+  gap: 8px;
+  align-content: start;
 }
 
 .document-analysis-card h3 {
@@ -3926,10 +3953,15 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .doc-analysis-checkbox {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: center;
   gap: 10px;
   margin-top: 2px;
+  border: 1px solid rgba(1, 111, 244, 0.3);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #f8fbff;
 }
 
 .doc-analysis-checkbox input[type='checkbox'] {
@@ -3940,8 +3972,70 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .doc-analysis-checkbox span {
-  font-size: var(--md-title-large);
+  font-size: var(--md-body-medium);
   line-height: 1.35;
+  font-weight: 600;
+  color: #0d47a1;
+}
+
+.doc-analysis-info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #64748b;
+  font-size: 18px !important;
+  font-family: "Material Symbols Rounded";
+  font-variation-settings: "FILL" 1, "wght" 500, "GRAD" 0, "opsz" 20;
+  line-height: 1;
+  cursor: help;
+  border-radius: 50%;
+  transition: color 0.16s ease, background-color 0.16s ease;
+}
+
+.doc-analysis-info:hover,
+.doc-analysis-info:focus-visible {
+  color: #016ff4;
+  background: rgba(1, 111, 244, 0.08);
+  outline: none;
+}
+
+.doc-analysis-info::after {
+  content: attr(data-tooltip);
+  display: block;
+  position: absolute;
+  right: 0;
+  left: auto;
+  bottom: calc(100% + 10px);
+  transform: none;
+  width: min(360px, 78vw);
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #0f172a;
+  color: #fff;
+  font-family: "Inter", "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  box-shadow: 0 10px 24px rgba(2, 6, 23, 0.24);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease;
+  z-index: 20;
+}
+
+.doc-analysis-info:hover::after,
+.doc-analysis-info:focus-visible::after {
+  opacity: 1;
+}
+
+.doc-analysis-advanced-item:first-child .doc-analysis-info::after {
+  left: 0;
+  right: auto;
 }
 
 .document-analysis-submit {
@@ -3982,6 +4076,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   }
 
   .doc-analysis-two-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-analysis-three-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .doc-analysis-advanced-grid {
     grid-template-columns: 1fr;
   }
 

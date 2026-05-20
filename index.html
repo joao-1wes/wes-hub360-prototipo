@@ -1040,70 +1040,89 @@
                     <div class="doc-classes-menu" data-doc-classes-menu role="listbox" aria-multiselectable="true" hidden>
                       <label class="doc-classes-option">
                         <input type="checkbox" value="nota_fiscal" checked data-doc-class-option />
+                        <span>Nota fiscal</span>
                         <span class="doc-classes-option-check material-symbols-rounded" aria-hidden="true">check</span>
-                        <span>nota_fiscal</span>
                       </label>
                       <label class="doc-classes-option">
                         <input type="checkbox" value="recibo" data-doc-class-option />
+                        <span>Recibo</span>
                         <span class="doc-classes-option-check material-symbols-rounded" aria-hidden="true">check</span>
-                        <span>recibo</span>
                       </label>
                       <label class="doc-classes-option">
                         <input type="checkbox" value="contrato" data-doc-class-option />
+                        <span>Contrato</span>
                         <span class="doc-classes-option-check material-symbols-rounded" aria-hidden="true">check</span>
-                        <span>contrato</span>
                       </label>
                     </div>
                   </div>
 
-                  <div class="doc-analysis-two-cols">
+                  <div class="doc-analysis-three-cols">
                     <div class="doc-analysis-field">
                       <label for="docClassificationThreshold">Limiar de classificação</label>
-                      <p class="input-help">Confiança mínima da classificação (0 a 1).</p>
-                      <input id="docClassificationThreshold" class="doc-analysis-input" type="text" inputmode="decimal" value="0,75" />
+                      <div class="hub-select-wrap doc-analysis-select-wrap">
+                        <select id="docClassificationThreshold" class="hub-select" aria-label="Limiar de classificação">
+                          <option value="0.75" selected>75%</option>
+                          <option value="0.80">80%</option>
+                          <option value="0.85">85%</option>
+                          <option value="0.90">90%</option>
+                          <option value="0.95">95%</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
                     </div>
                     <div class="doc-analysis-field">
-                      <label for="docOcrLocale">Locale do OCR (WES AI)</label>
-                      <p class="input-help">Idioma do OCR.</p>
+                      <label for="docOcrLocale">Idioma do arquivo</label>
                       <div class="hub-select-wrap doc-analysis-select-wrap">
                         <select id="docOcrLocale" class="hub-select" aria-label="Locale do OCR">
-                          <option value="pt-BR" selected>pt-BR</option>
-                          <option value="en">en</option>
-                          <option value="es">es</option>
+                          <option value="pt-BR" selected>PT-BR</option>
+                          <option value="en">EN</option>
+                          <option value="es">ES</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+
+                    <div class="doc-analysis-field">
+                      <label for="docPreprocessProfile">Perfil de pré-processamento</label>
+                      <div class="hub-select-wrap doc-analysis-select-wrap">
+                        <select id="docPreprocessProfile" class="hub-select" aria-label="Perfil de pré-processamento">
+                          <option selected>Padrão</option>
+                          <option>Manuscrito</option>
+                          <option>Impresso</option>
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
                     </div>
                   </div>
-
-                  <label for="docPreprocessProfile">Perfil de pré-processamento</label>
-                  <p class="input-help">Intensidade do pré-processamento da imagem. Manuscrito = mais suave para não apagar traços.</p>
-                  <div class="hub-select-wrap doc-analysis-select-wrap">
-                    <select id="docPreprocessProfile" class="hub-select" aria-label="Perfil de pré-processamento">
-                      <option selected>Padrão</option>
-                      <option>Manuscrito (denoise mais leve)</option>
-                      <option>Impresso</option>
-                    </select>
-                    <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                  </div>
-                  <details class="doc-analysis-accordion">
-                    <summary class="doc-analysis-accordion-summary">Opções avançadas (opcional)</summary>
-                    <div class="doc-analysis-accordion-content">
-                      <p class="input-help">Idioma do OCR, opção de pular o tratamento da imagem/PDF antes do OCR, perfil de tratamento e dicas de manuscrito para o modelo.</p>
-
+                  <div class="doc-analysis-advanced-grid">
+                    <div class="doc-analysis-advanced-item">
                       <label class="doc-analysis-checkbox" for="docSkipPreprocessing">
                         <input id="docSkipPreprocessing" type="checkbox" />
                         <span>Pular pré-processamento</span>
+                        <span
+                          class="doc-analysis-info material-symbols-rounded"
+                          tabindex="0"
+                          role="img"
+                          aria-label="Informação sobre pular pré-processamento"
+                          data-tooltip="Ative esta opção para enviar o arquivo direto ao OCR, sem melhorias de imagem. Use quando o pré-processamento piorar o resultado."
+                        >info</span>
                       </label>
-                      <p class="input-help">Quando marcado, o arquivo segue direto para o OCR sem denoise, CLAHE ou reconstrução de PDF. O perfil de pré-processamento abaixo é ignorado.</p>
-
+                    </div>
+                    <div class="doc-analysis-advanced-item">
                       <label class="doc-analysis-checkbox" for="docHandwritingHints">
                         <input id="docHandwritingHints" type="checkbox" />
-                        <span>Enviar ao modelo os intervalos de manuscrito (JSON)</span>
+                        <span>Enviar ao modelo os intervalos de manuscrito</span>
+                        <span
+                          class="doc-analysis-info material-symbols-rounded"
+                          tabindex="0"
+                          role="img"
+                          aria-label="Informação sobre intervalos de manuscrito"
+                          data-tooltip="Ative para o sistema avisar ao modelo quais partes do documento parecem manuscritas."
+                        >info</span>
                       </label>
-                      <p class="input-help">Se marcado, o backend informa ao modelo quais trechos foram detectados como manuscrito.</p>
                     </div>
-                  </details>
+
+                  </div>
 
                   <button class="btn primary document-analysis-submit" id="docProcessButton" type="button" disabled>
                     Processar documento

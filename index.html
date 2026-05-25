@@ -1005,7 +1005,7 @@
                 </div>
               </div>
 
-              <div class="document-analysis-grid">
+              <div class="document-analysis-grid" id="docAnalysisFormArea">
                 <div class="document-analysis-card document-analysis-card--upload">
                   <input id="docUploadInput" type="file" accept=".jpg,.jpeg,.png,.pdf,.bmp,.tif,.tiff" hidden />
                   <div class="document-upload-dropzone document-upload-dropzone-square" role="button" tabindex="0" aria-label="Enviar documento">
@@ -1127,6 +1127,132 @@
                   <button class="btn primary document-analysis-submit" id="docProcessButton" type="button" disabled>
                     Processar documento
                   </button>
+                </div>
+              </div>
+
+              <div class="document-analysis-result" id="docAnalysisResult" hidden>
+                <div class="document-analysis-status-card" id="docAnalysisStatusCard" hidden>
+                  <p>Processando documento...</p>
+                  <p>Simulação de OCR e análise em andamento (10 segundos).</p>
+                  <div class="doc-analysis-progress" aria-hidden="true">
+                    <div class="doc-analysis-progress-bar" id="docAnalysisProgressBar"></div>
+                  </div>
+                  <p class="doc-analysis-progress-text" id="docAnalysisProgressText">0%</p>
+                </div>
+
+                <div id="docAnalysisResultContent" hidden>
+                  <section class="document-analysis-card document-result-panel">
+                    <div class="document-result-header-top">
+                      <div>
+                        <h3>Resultado</h3>
+                      </div>
+                      <div class="document-result-actions">
+                        <button class="btn outline" id="docChangeFileButton" type="button">Alterar arquivo</button>
+                        <button class="btn outline" id="docExportJsonButton" type="button">Exportar JSON</button>
+                      </div>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>Configurações escolhidas</h3>
+                      <p class="input-help">Opções selecionadas antes de iniciar o processamento.</p>
+                      <div class="doc-analysis-meta">
+                        <p><strong>Arquivo:</strong> <span id="docResultFileName">Sem arquivo selecionado</span></p>
+                        <p><strong>Classes:</strong> <span id="docResultClasses">-</span></p>
+                        <p><strong>Limiar:</strong> <span id="docResultThreshold">-</span></p>
+                        <p><strong>Idioma:</strong> <span id="docResultLocale">-</span></p>
+                        <p><strong>Pré-processamento:</strong> <span id="docResultPreprocess">-</span></p>
+                        <p><strong>Pular pré-processamento:</strong> <span id="docResultSkipPreprocess">Não</span></p>
+                        <p><strong>Intervalos de manuscrito:</strong> <span id="docResultHandwritingHints">Não</span></p>
+                      </div>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>Resumo do documento</h3>
+                      <p class="input-help">Síntese geral produzida a partir do OCR.</p>
+                      <div class="doc-analysis-highlight" id="docResultSummary">-</div>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>Classificação</h3>
+                      <p class="input-help">Classe mais provável entre as classes selecionadas.</p>
+                      <p><strong>Classe prevista:</strong> <span id="docResultClass">-</span></p>
+                      <p><strong>Confiança:</strong> <span id="docResultConfidence">-</span></p>
+                      <p><strong>Revisão necessária:</strong> <span id="docResultNeedsReview">-</span></p>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>OCR</h3>
+                      <p class="input-help">Texto lido pelo OCR e organização por página.</p>
+                      <details open>
+                        <summary>Texto completo</summary>
+                        <pre class="doc-analysis-ocr-block" id="docResultOcrText">-</pre>
+                      </details>
+                      <h3>Páginas</h3>
+                      <p class="input-help">Detalhe por página e blocos reconhecidos.</p>
+                      <details>
+                        <summary>Página 1</summary>
+                        <p id="docResultPage1">-</p>
+                      </details>
+                      <details>
+                        <summary>Página 2</summary>
+                        <p id="docResultPage2">-</p>
+                      </details>
+                      <details>
+                        <summary>Página 3</summary>
+                        <p id="docResultPage3">-</p>
+                      </details>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>Extração estruturada</h3>
+                      <p class="input-help">Campos soltos e tabelas inferidos a partir do texto do OCR.</p>
+                      <h3>Campos</h3>
+                      <p class="input-help">Lista de pares nome → valor encontrados no documento.</p>
+                      <p id="docResultFields">-</p>
+                      <h3>Tabelas</h3>
+                      <p class="input-help">Tabelas em grade (linhas × colunas), quando identificadas.</p>
+                      <p id="docResultTables">-</p>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>Alertas</h3>
+                      <p class="input-help">Avisos que não impedem resposta.</p>
+                      <ul class="doc-result-list" id="docResultAlertsList"></ul>
+                      <h3>Erros</h3>
+                      <p class="input-help">Falhas de validação, credenciais ou chamadas de backend.</p>
+                      <p id="docResultErrors">-</p>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>Metadados</h3>
+                      <p class="input-help">ID da requisição, tempo de processamento e modelos usados no backend.</p>
+                      <p><strong>ID de correlação:</strong> <span id="docResultCorrelationId">-</span></p>
+                      <p><strong>Tempo de processamento:</strong> <span id="docResultProcessingMs">-</span></p>
+                      <h3>Tempos por etapa</h3>
+                      <p class="input-help">Tempo aproximado em cada etapa do servidor (milissegundos).</p>
+                      <div class="data-table doc-result-table">
+                        <div class="data-row header">
+                          <span>Etapa</span>
+                          <span>Tempo (ms)</span>
+                        </div>
+                        <div class="data-row"><span>Validação do arquivo</span><span id="docStepValidation">-</span></div>
+                        <div class="data-row"><span>Pré-processamento</span><span id="docStepPreprocess">-</span></div>
+                        <div class="data-row"><span>OCR (WES AI)</span><span id="docStepOcr">-</span></div>
+                        <div class="data-row"><span>Chunks e preparação</span><span id="docStepChunks">-</span></div>
+                        <div class="data-row"><span>LLM — trechos (chunks)</span><span id="docStepLlmChunks">-</span></div>
+                        <div class="data-row"><span>LLM — consolidação</span><span id="docStepLlmConsolidation">-</span></div>
+                        <div class="data-row"><span>Normalização da extração</span><span id="docStepNormalization">-</span></div>
+                        <div class="data-row"><span><strong>Soma das etapas</strong></span><span id="docStepTotal"><strong>-</strong></span></div>
+                        <div class="data-row"><span>Demais (montagem, overhead)</span><span id="docStepOverhead">-</span></div>
+                      </div>
+                    </div>
+
+                    <div class="document-result-block">
+                      <h3>modelInfo</h3>
+                      <p class="input-help">Nomes técnicos dos modelos da WES AI usados na chamada.</p>
+                      <pre class="doc-analysis-ocr-block" id="docResultModelInfo">-</pre>
+                    </div>
+                  </section>
                 </div>
               </div>
             </div>
@@ -2718,28 +2844,155 @@
 
           <div class="page" id="page-hybrid-flows" data-title="Fluxos híbridos">
             <div class="section">
-              <div class="page-header">
+              <div class="page-header hybrid-flows-page-header">
                 <div>
                   <h2>Fluxos híbridos</h2>
-                  <p class="page-subtitle">Organize experiências que combinam automação, voz, mensageria e agentes em uma mesma jornada.</p>
+                  <p class="page-subtitle">Atendimentos que combinam coleta por voz e confirmação no Telegram.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Novo fluxo
+                  </button>
                 </div>
               </div>
-              <div class="info-banner">
-                Página-base criada no padrão atual de UI. Quando você enviar o conteúdo, eu encaixo aqui sem refazer a navegação.
+
+              <div class="filters-grid">
+                <div class="form-field hybrid-flows-search-field-wrap">
+                  <div class="search-field hybrid-flows-search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="search" placeholder="Filtre por nome ou descrição..." aria-label="Buscar por nome ou descrição" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="hybridFlowsFilterBtn" type="button">
+                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  </button>
+                  <div class="menu" id="hybridFlowsFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Status</span>
+                      <button class="filter-option active" data-filter="status" data-value="">Todos</button>
+                      <button class="filter-option" data-filter="status" data-value="active">Ativo</button>
+                      <button class="filter-option" data-filter="status" data-value="inactive">Inativo</button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="panel-row">
-                <div class="panel panel-wide">
-                  <div class="panel-header">
-                    <h3>Fluxos disponíveis</h3>
-                  </div>
-                  <div class="panel-empty">Espaço reservado para estrutura principal da página, listagens e estados dos fluxos híbridos.</div>
-                </div>
-                <div class="panel panel-mid">
-                  <div class="panel-header">
-                    <h3>Complementos</h3>
-                  </div>
-                  <div class="panel-empty">Aqui podem entrar atalhos, insights, etapas do fluxo ou blocos auxiliares.</div>
-                </div>
+
+              <div class="hybrid-flows-table-wrap">
+                <table class="hybrid-flows-table" aria-label="Lista de fluxos híbridos">
+                  <thead>
+                    <tr>
+                      <th>Nome</th>
+                      <th>Status</th>
+                      <th>Campos</th>
+                      <th>Criado em</th>
+                      <th>Atualizado em</th>
+                      <th class="hybrid-flows-col-actions">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>teste</strong>
+                        <small>teste</small>
+                      </td>
+                      <td><span class="chip success">Ativo</span></td>
+                      <td>1</td>
+                      <td>08/05/2026, 11:42</td>
+                      <td>08/05/2026, 11:42</td>
+                      <td>
+                        <div class="row-actions hybrid-flows-row-actions">
+                          <button class="icon-btn action-icon" type="button" aria-label="Duplicar fluxo">
+                            <span class="material-symbols-rounded">content_copy</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova página">
+                            <span class="material-symbols-rounded">open_in_new</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Executar fluxo">
+                            <span class="material-symbols-rounded">autorenew</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Ver histórico">
+                            <span class="material-symbols-rounded">history</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar fluxo">
+                            <span class="material-symbols-rounded">edit</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Excluir fluxo">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Atendimento Geral sobre Dúvidas</strong>
+                        <small>Fluxo de Atendimento Geral sobre Dúvidas.</small>
+                      </td>
+                      <td><span class="chip success">Ativo</span></td>
+                      <td>2</td>
+                      <td>29/04/2026, 09:51</td>
+                      <td>29/04/2026, 09:51</td>
+                      <td>
+                        <div class="row-actions hybrid-flows-row-actions">
+                          <button class="icon-btn action-icon" type="button" aria-label="Duplicar fluxo">
+                            <span class="material-symbols-rounded">content_copy</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova página">
+                            <span class="material-symbols-rounded">open_in_new</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Executar fluxo">
+                            <span class="material-symbols-rounded">autorenew</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Ver histórico">
+                            <span class="material-symbols-rounded">history</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar fluxo">
+                            <span class="material-symbols-rounded">edit</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Excluir fluxo">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <strong>Manutenção Pós</strong>
+                        <small>&nbsp;</small>
+                      </td>
+                      <td><span class="chip success">Ativo</span></td>
+                      <td>4</td>
+                      <td>26/04/2026, 21:07</td>
+                      <td>27/04/2026, 17:36</td>
+                      <td>
+                        <div class="row-actions hybrid-flows-row-actions">
+                          <button class="icon-btn action-icon" type="button" aria-label="Duplicar fluxo">
+                            <span class="material-symbols-rounded">content_copy</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova página">
+                            <span class="material-symbols-rounded">open_in_new</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Executar fluxo">
+                            <span class="material-symbols-rounded">autorenew</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Ver histórico">
+                            <span class="material-symbols-rounded">history</span>
+                          </button>
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar fluxo">
+                            <span class="material-symbols-rounded">edit</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Excluir fluxo">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>

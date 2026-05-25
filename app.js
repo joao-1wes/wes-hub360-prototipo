@@ -37,6 +37,8 @@ const packagesFilterBtn = document.getElementById('packagesFilterBtn');
 const packagesFilterMenu = document.getElementById('packagesFilterMenu');
 const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
+const hybridFlowsFilterBtn = document.getElementById('hybridFlowsFilterBtn');
+const hybridFlowsFilterMenu = document.getElementById('hybridFlowsFilterMenu');
 const openManageRolesModal = document.getElementById('openManageRolesModal');
 const manageRolesModal = document.getElementById('manageRolesModal');
 const manageRolesModalForm = document.getElementById('manageRolesModalForm');
@@ -1260,6 +1262,43 @@ if (usersFilterBtn && usersFilterMenu) {
         .querySelectorAll('.filter-option[data-value=\"\"]')
         .forEach((item) => item.classList.add('active'));
       usersFilterMenu.classList.remove('open');
+    });
+  }
+}
+
+if (hybridFlowsFilterBtn && hybridFlowsFilterMenu) {
+  hybridFlowsFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    hybridFlowsFilterMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    hybridFlowsFilterMenu.classList.remove('open');
+  });
+
+  const filterOptions = hybridFlowsFilterMenu.querySelectorAll('.filter-option');
+  const clearButton = hybridFlowsFilterMenu.querySelector('.filter-clear');
+
+  filterOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const group = button.dataset.filter;
+      hybridFlowsFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      hybridFlowsFilterMenu.classList.remove('open');
+    });
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      hybridFlowsFilterMenu
+        .querySelectorAll('.filter-option')
+        .forEach((item) => item.classList.remove('active'));
+      hybridFlowsFilterMenu
+        .querySelectorAll('.filter-option[data-value=\"\"]')
+        .forEach((item) => item.classList.add('active'));
+      hybridFlowsFilterMenu.classList.remove('open');
     });
   }
 }
@@ -5062,7 +5101,11 @@ function initDocClassesMultiSelect() {
   if (!trigger || !label || !menu || !options.length) return;
 
   const updateLabel = () => {
-    const selected = options.filter((option) => option.checked).map((option) => option.value);
+    const toLabel = (value) =>
+      String(value || '')
+        .replaceAll('_', ' ')
+        .replace(/\b\w/g, (char) => char.toUpperCase());
+    const selected = options.filter((option) => option.checked).map((option) => toLabel(option.value));
     label.textContent = selected.length ? selected.join(', ') : 'Selecione ao menos uma classe';
   };
 
@@ -5106,14 +5149,107 @@ function initDocumentAnalysisValidation() {
   const uploadDropzone = page.querySelector('.document-upload-dropzone');
   const fileNameEl = page.querySelector('#docUploadFileName');
   const processBtn = page.querySelector('#docProcessButton');
+  const formAreaEl = page.querySelector('#docAnalysisFormArea');
+  const resultEl = page.querySelector('#docAnalysisResult');
+  const statusCardEl = page.querySelector('#docAnalysisStatusCard');
+  const resultContentEl = page.querySelector('#docAnalysisResultContent');
+  const progressBarEl = page.querySelector('#docAnalysisProgressBar');
+  const progressTextEl = page.querySelector('#docAnalysisProgressText');
+  const exportBtn = page.querySelector('#docExportJsonButton');
+  const changeFileBtn = page.querySelector('#docChangeFileButton');
+  const skipPreprocessInput = page.querySelector('#docSkipPreprocessing');
+  const handwritingHintsInput = page.querySelector('#docHandwritingHints');
+  const resultFileNameEl = page.querySelector('#docResultFileName');
+  const resultSummaryEl = page.querySelector('#docResultSummary');
+  const resultClassesEl = page.querySelector('#docResultClasses');
+  const resultClassEl = page.querySelector('#docResultClass');
+  const resultConfidenceEl = page.querySelector('#docResultConfidence');
+  const resultNeedsReviewEl = page.querySelector('#docResultNeedsReview');
+  const resultOcrTextEl = page.querySelector('#docResultOcrText');
+  const resultPage1El = page.querySelector('#docResultPage1');
+  const resultPage2El = page.querySelector('#docResultPage2');
+  const resultPage3El = page.querySelector('#docResultPage3');
+  const resultFieldsEl = page.querySelector('#docResultFields');
+  const resultTablesEl = page.querySelector('#docResultTables');
+  const resultAlertsListEl = page.querySelector('#docResultAlertsList');
+  const resultErrorsEl = page.querySelector('#docResultErrors');
+  const resultCorrelationIdEl = page.querySelector('#docResultCorrelationId');
+  const resultProcessingMsEl = page.querySelector('#docResultProcessingMs');
+  const resultModelInfoEl = page.querySelector('#docResultModelInfo');
+  const stepValidationEl = page.querySelector('#docStepValidation');
+  const stepPreprocessEl = page.querySelector('#docStepPreprocess');
+  const stepOcrEl = page.querySelector('#docStepOcr');
+  const stepChunksEl = page.querySelector('#docStepChunks');
+  const stepLlmChunksEl = page.querySelector('#docStepLlmChunks');
+  const stepLlmConsolidationEl = page.querySelector('#docStepLlmConsolidation');
+  const stepNormalizationEl = page.querySelector('#docStepNormalization');
+  const stepTotalEl = page.querySelector('#docStepTotal');
+  const stepOverheadEl = page.querySelector('#docStepOverhead');
+  const resultThresholdEl = page.querySelector('#docResultThreshold');
+  const resultLocaleEl = page.querySelector('#docResultLocale');
+  const resultPreprocessEl = page.querySelector('#docResultPreprocess');
+  const resultSkipPreprocessEl = page.querySelector('#docResultSkipPreprocess');
+  const resultHandwritingHintsEl = page.querySelector('#docResultHandwritingHints');
   const thresholdInput = page.querySelector('#docClassificationThreshold');
   const localeSelect = page.querySelector('#docOcrLocale');
   const preprocessSelect = page.querySelector('#docPreprocessProfile');
   const classOptions = Array.from(page.querySelectorAll('[data-doc-class-option]'));
-  if (!uploadInput || !chooseLink || !uploadDropzone || !processBtn || !thresholdInput || !localeSelect || !preprocessSelect || !classOptions.length) return;
+  if (
+    !uploadInput ||
+    !chooseLink ||
+    !uploadDropzone ||
+    !processBtn ||
+    !formAreaEl ||
+    !resultEl ||
+    !statusCardEl ||
+    !resultContentEl ||
+    !progressBarEl ||
+    !progressTextEl ||
+    !exportBtn ||
+    !changeFileBtn ||
+    !skipPreprocessInput ||
+    !handwritingHintsInput ||
+    !resultFileNameEl ||
+    !resultSummaryEl ||
+    !resultClassEl ||
+    !resultConfidenceEl ||
+    !resultNeedsReviewEl ||
+    !resultOcrTextEl ||
+    !resultPage1El ||
+    !resultPage2El ||
+    !resultPage3El ||
+    !resultFieldsEl ||
+    !resultTablesEl ||
+    !resultAlertsListEl ||
+    !resultErrorsEl ||
+    !resultCorrelationIdEl ||
+    !resultProcessingMsEl ||
+    !resultModelInfoEl ||
+    !stepValidationEl ||
+    !stepPreprocessEl ||
+    !stepOcrEl ||
+    !stepChunksEl ||
+    !stepLlmChunksEl ||
+    !stepLlmConsolidationEl ||
+    !stepNormalizationEl ||
+    !stepTotalEl ||
+    !stepOverheadEl ||
+    !resultClassesEl ||
+    !resultThresholdEl ||
+    !resultLocaleEl ||
+    !resultPreprocessEl ||
+    !resultSkipPreprocessEl ||
+    !resultHandwritingHintsEl ||
+    !thresholdInput ||
+    !localeSelect ||
+    !preprocessSelect ||
+    !classOptions.length
+  ) return;
 
   const allowedExt = new Set(['jpg', 'jpeg', 'png', 'pdf', 'bmp', 'tif', 'tiff']);
   let selectedFile = null;
+  let isProcessing = false;
+  const isMockMode = true;
 
   const getThresholdValue = () => {
     const raw = String(thresholdInput.value || '').trim().replace(',', '.');
@@ -5148,6 +5284,14 @@ function initDocumentAnalysisValidation() {
   };
 
   const updateButtonState = () => {
+    if (isProcessing) {
+      processBtn.disabled = true;
+      return;
+    }
+    if (isMockMode) {
+      processBtn.disabled = false;
+      return;
+    }
     const valid = Boolean(selectedFile) && hasRequiredFields();
     processBtn.disabled = !valid;
   };
@@ -5198,9 +5342,163 @@ function initDocumentAnalysisValidation() {
   });
 
   thresholdInput.addEventListener('input', updateButtonState);
+  thresholdInput.addEventListener('change', updateButtonState);
   localeSelect.addEventListener('change', updateButtonState);
   preprocessSelect.addEventListener('change', updateButtonState);
   classOptions.forEach((option) => option.addEventListener('change', updateButtonState));
+
+  const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const setProgress = (value) => {
+    const bounded = Math.max(0, Math.min(100, Math.round(value)));
+    progressBarEl.style.width = `${bounded}%`;
+    progressTextEl.textContent = `${bounded}%`;
+  };
+
+  const buildMockResult = () => ({
+    resumo:
+      'Documento processado em modo demonstração. A estrutura exibe resumo, classificação, OCR consolidado e detalhes por página para validação de layout e fluxo.',
+    classificacao: {
+      classePrevista: 'Documento Geral',
+      confianca: 0.93,
+      revisaoNecessaria: 'Não'
+    },
+    ocr: {
+      textoCompleto:
+        'Texto OCR mockado para demonstração.\n\nEste conteúdo simula a extração integral do documento com quebras de linha e organização pronta para leitura.',
+      paginas: [
+        'Página 1: Cabeçalho, identificação e contexto inicial do documento.',
+        'Página 2: Corpo principal com informações organizadas por blocos.',
+        'Página 3: Encerramento, observações e seção final.'
+      ]
+    },
+    extracaoEstruturada: {
+      campos: 'Nenhum campo',
+      tabelas: 'Nenhuma tabela'
+    },
+    alertas: [
+      'page 1: preprocess: upscaled low-resolution image',
+      'page 2: preprocess: upscaled low-resolution image',
+      'page 3: preprocess: upscaled low-resolution image'
+    ],
+    erros: 'Nenhum',
+    metadados: {
+      correlationId: 'de6f1fe2-ed48-4d8b-a5b5-33754d377426',
+      processingMs: 27330,
+      timings: {
+        validation: 0,
+        preprocess: 16819,
+        ocr: 4890,
+        chunks: 0,
+        llmChunks: 5373,
+        llmConsolidation: 0,
+        normalization: 0,
+        total: 27082,
+        overhead: 248
+      }
+    },
+    modelInfo: {
+      wesOcrModel: 'prebuilt-read',
+      wesAiApiVersion: '2024-12-01-preview',
+      wesAiDeployment: 'wes-ai-gpt-5.2-chat'
+    }
+  });
+
+  const getSelectedClasses = () =>
+    classOptions
+      .filter((option) => option.checked)
+      .map((option) => String(option.value || '').replaceAll('_', ' '))
+      .map((value) => value.replace(/\b\w/g, (char) => char.toUpperCase()));
+
+  const fillResultMeta = () => {
+    resultFileNameEl.textContent = selectedFile?.name || 'Sem arquivo selecionado';
+    resultClassesEl.textContent = getSelectedClasses().join(', ') || '-';
+    resultThresholdEl.textContent = thresholdInput.options[thresholdInput.selectedIndex]?.textContent || String(thresholdInput.value || '-');
+    resultLocaleEl.textContent = localeSelect.options[localeSelect.selectedIndex]?.textContent || String(localeSelect.value || '-');
+    resultPreprocessEl.textContent = preprocessSelect.options[preprocessSelect.selectedIndex]?.textContent || String(preprocessSelect.value || '-');
+    resultSkipPreprocessEl.textContent = skipPreprocessInput.checked ? 'Sim' : 'Não';
+    resultHandwritingHintsEl.textContent = handwritingHintsInput.checked ? 'Sim' : 'Não';
+    const mock = buildMockResult();
+    resultSummaryEl.textContent = mock.resumo;
+    resultClassEl.textContent = mock.classificacao.classePrevista;
+    const confidencePercent = `${Math.round(Number(mock.classificacao.confianca || 0) * 100)}%`;
+    resultConfidenceEl.textContent = confidencePercent;
+    resultNeedsReviewEl.textContent = mock.classificacao.revisaoNecessaria;
+    resultOcrTextEl.textContent = mock.ocr.textoCompleto;
+    resultPage1El.textContent = mock.ocr.paginas[0];
+    resultPage2El.textContent = mock.ocr.paginas[1];
+    resultPage3El.textContent = mock.ocr.paginas[2];
+    resultFieldsEl.textContent = mock.extracaoEstruturada.campos;
+    resultTablesEl.textContent = mock.extracaoEstruturada.tabelas;
+    resultErrorsEl.textContent = mock.erros;
+    resultCorrelationIdEl.textContent = mock.metadados.correlationId;
+    resultProcessingMsEl.textContent = `${mock.metadados.processingMs} ms`;
+    stepValidationEl.textContent = String(mock.metadados.timings.validation);
+    stepPreprocessEl.textContent = String(mock.metadados.timings.preprocess);
+    stepOcrEl.textContent = String(mock.metadados.timings.ocr);
+    stepChunksEl.textContent = String(mock.metadados.timings.chunks);
+    stepLlmChunksEl.textContent = String(mock.metadados.timings.llmChunks);
+    stepLlmConsolidationEl.textContent = String(mock.metadados.timings.llmConsolidation);
+    stepNormalizationEl.textContent = String(mock.metadados.timings.normalization);
+    stepTotalEl.textContent = String(mock.metadados.timings.total);
+    stepOverheadEl.textContent = String(mock.metadados.timings.overhead);
+    resultAlertsListEl.innerHTML = '';
+    mock.alertas.forEach((alert) => {
+      const li = document.createElement('li');
+      li.textContent = alert;
+      resultAlertsListEl.appendChild(li);
+    });
+    resultModelInfoEl.textContent = JSON.stringify(mock.modelInfo, null, 2);
+  };
+
+  const buildExportPayload = () => ({
+    ...buildMockResult(),
+    status: 'processed',
+    processedAt: new Date().toISOString(),
+    fileName: selectedFile?.name || null,
+    sections: buildMockResult()
+  });
+
+  processBtn.addEventListener('click', async () => {
+    if (processBtn.disabled || isProcessing) return;
+    isProcessing = true;
+    processBtn.textContent = 'Processando documento...';
+    fillResultMeta();
+    formAreaEl.hidden = true;
+    resultEl.hidden = false;
+    statusCardEl.hidden = false;
+    resultContentEl.hidden = true;
+    setProgress(0);
+    updateButtonState();
+    const totalMs = 10000;
+    const intervalMs = 100;
+    const steps = totalMs / intervalMs;
+    for (let i = 1; i <= steps; i += 1) {
+      await wait(intervalMs);
+      setProgress((i / steps) * 100);
+    }
+    statusCardEl.hidden = true;
+    resultContentEl.hidden = false;
+    processBtn.textContent = 'Processar documento';
+    isProcessing = false;
+    updateButtonState();
+  });
+
+  changeFileBtn.addEventListener('click', () => {
+    uploadInput.click();
+  });
+
+  exportBtn.addEventListener('click', () => {
+    const payload = JSON.stringify(buildExportPayload(), null, 2);
+    const blob = new Blob([payload], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'document-analysis-result.json';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  });
 
   updateFileVisual();
   updateButtonState();

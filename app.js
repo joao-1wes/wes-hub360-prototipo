@@ -39,6 +39,8 @@ const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
 const hybridFlowsFilterBtn = document.getElementById('hybridFlowsFilterBtn');
 const hybridFlowsFilterMenu = document.getElementById('hybridFlowsFilterMenu');
+const hybridHistoryFilterBtn = document.getElementById('hybridHistoryFilterBtn');
+const hybridHistoryFilterMenu = document.getElementById('hybridHistoryFilterMenu');
 const openManageRolesModal = document.getElementById('openManageRolesModal');
 const manageRolesModal = document.getElementById('manageRolesModal');
 const manageRolesModalForm = document.getElementById('manageRolesModalForm');
@@ -121,6 +123,8 @@ const billingModal = document.getElementById('billingModal');
 const confirmActionModal = document.getElementById('confirmActionModal');
 const confirmActionModalMessage = document.getElementById('confirmActionModalMessage');
 const confirmActionModalConfirm = document.getElementById('confirmActionModalConfirm');
+const rotatePublicLinkModal = document.getElementById('rotatePublicLinkModal');
+const rotatePublicLinkConfirm = document.getElementById('rotatePublicLinkConfirm');
 const openChannelModal = document.getElementById('openChannelModal');
 const channelModal = document.getElementById('channelModal');
 const openTelegramConfigModal = document.getElementById('openTelegramConfigModal');
@@ -184,6 +188,20 @@ const auditDetailsIp = document.getElementById('auditDetailsIp');
 const auditDetailsTarget = document.getElementById('auditDetailsTarget');
 const auditDetailsChange = document.getElementById('auditDetailsChange');
 const auditDetailsSummary = document.getElementById('auditDetailsSummary');
+const hybridFlowCancelBtn = document.getElementById('hybridFlowCancelBtn');
+const hybridFlowNextBtn = document.getElementById('hybridFlowNextBtn');
+const hybridFlowReviewModal = document.getElementById('hybridFlowReviewModal');
+const hybridFlowReviewList = document.getElementById('hybridFlowReviewList');
+const hybridFlowReviewConfirmBtn = document.getElementById('hybridFlowReviewConfirmBtn');
+const hybridFlowDiscardModal = document.getElementById('hybridFlowDiscardModal');
+const hybridFlowDiscardConfirmBtn = document.getElementById('hybridFlowDiscardConfirmBtn');
+const hybridFlowsTableBody = document.querySelector('#page-hybrid-flows .hybrid-flows-table tbody');
+const hybridFlowHistoryFlowName = document.getElementById('hybridFlowHistoryFlowName');
+const hybridFlowHistoryBackBtn = document.getElementById('hybridFlowHistoryBackBtn');
+const hybridHistoryDetailsModal = document.getElementById('hybridHistoryDetailsModal');
+const hybridHistoryCopyIdBtn = document.getElementById('hybridHistoryCopyIdBtn');
+const hybridHistoryDetailsBackBtn = document.getElementById('hybridHistoryDetailsBackBtn');
+const hybridHistoryPageCopyIdBtn = document.getElementById('hybridHistoryPageCopyIdBtn');
 const environmentsTable = document.querySelector('#page-environments .environments-table');
 const environmentsCompanySelect = document.getElementById('environmentsCompanySelect');
 const environmentsCompanySelectWrap = document.getElementById('environmentsCompanySelectWrap');
@@ -219,6 +237,98 @@ const usersPanels = document.querySelectorAll('#page-users .tab-panel');
 const orgTabs = document.querySelectorAll('#page-organization .tab');
 const orgPanels = document.querySelectorAll('#page-organization .tab-panel');
 const orgActionButtons = document.querySelectorAll('#page-organization .org-action');
+
+const HYBRID_FLOWS_STORAGE_KEY = 'hybridFlowsCreated';
+const HYBRID_FLOWS_HISTORY_FLOW_NAME_STORAGE_KEY = 'hybridFlowsHistoryFlowName';
+const getHybridFlowsFromStorage = () => {
+  const raw = window.localStorage.getItem(HYBRID_FLOWS_STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+};
+const saveHybridFlowsToStorage = (flows) => {
+  window.localStorage.setItem(HYBRID_FLOWS_STORAGE_KEY, JSON.stringify(flows));
+};
+const formatHybridFlowDateTime = (value) => {
+  const date = value ? new Date(value) : new Date();
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(date);
+};
+const createHybridFlowActionsHtml = () => `
+  <div class="row-actions hybrid-flows-row-actions">
+    <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
+      <span class="material-symbols-rounded">content_copy</span>
+    </button>
+    <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
+      <span class="material-symbols-rounded">open_in_new</span>
+    </button>
+    <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
+      <span class="material-symbols-rounded">autorenew</span>
+    </button>
+    <button class="icon-btn action-icon" type="button" aria-label="Histórico">
+      <span class="material-symbols-rounded">history</span>
+    </button>
+    <button class="icon-btn action-icon" type="button" aria-label="Editar">
+      <span class="material-symbols-rounded">edit</span>
+    </button>
+    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+      <span class="material-symbols-rounded">delete</span>
+    </button>
+  </div>
+`;
+const appendHybridFlowRow = (flow) => {
+  if (!hybridFlowsTableBody) return;
+  const row = document.createElement('tr');
+  row.dataset.hybridFlowId = flow.id;
+  row.dataset.hybridFlowCreated = 'true';
+  row.innerHTML = `
+    <td>
+      <strong>${escapeHtmlWes(flow.title || 'Sem título')}</strong>
+      <small>${escapeHtmlWes(flow.description || '\u00a0')}</small>
+    </td>
+    <td><span class="chip success">Ativo</span></td>
+    <td>${Number(flow.fieldsCount || 0)}</td>
+    <td>${escapeHtmlWes(formatHybridFlowDateTime(flow.createdAt))}</td>
+    <td>${escapeHtmlWes(formatHybridFlowDateTime(flow.updatedAt || flow.createdAt))}</td>
+    <td>${createHybridFlowActionsHtml()}</td>
+  `;
+  hybridFlowsTableBody.prepend(row);
+};
+const renderHybridFlowsFromStorage = () => {
+  if (!hybridFlowsTableBody) return;
+  hybridFlowsTableBody.querySelectorAll('tr[data-hybrid-flow-created="true"]').forEach((row) => row.remove());
+  getHybridFlowsFromStorage().forEach((flow) => appendHybridFlowRow(flow));
+};
+const persistAndRenderHybridFlow = (flow) => {
+  const current = getHybridFlowsFromStorage();
+  current.unshift(flow);
+  saveHybridFlowsToStorage(current);
+  renderHybridFlowsFromStorage();
+};
+const setHybridFlowHistoryFlowName = (flowName = '') => {
+  const name = String(flowName || '').trim() || 'Fluxo';
+  window.localStorage.setItem(HYBRID_FLOWS_HISTORY_FLOW_NAME_STORAGE_KEY, name);
+  if (hybridFlowHistoryFlowName) hybridFlowHistoryFlowName.textContent = name;
+};
+const hydrateHybridFlowHistoryFlowName = () => {
+  const name = String(window.localStorage.getItem(HYBRID_FLOWS_HISTORY_FLOW_NAME_STORAGE_KEY) || '').trim() || 'Teste';
+  if (hybridFlowHistoryFlowName) hybridFlowHistoryFlowName.textContent = name;
+};
+const removeHybridFlowFromStorage = (flowId = '') => {
+  const normalizedId = String(flowId || '').trim();
+  if (!normalizedId) return;
+  const next = getHybridFlowsFromStorage().filter((flow) => String(flow?.id || '').trim() !== normalizedId);
+  saveHybridFlowsToStorage(next);
+};
 
 const AGENTS_PAGE_ENVIRONMENTS = [
   { id: 'operacoes', label: 'Operações' },
@@ -579,6 +689,37 @@ function confirmDeletionAction(targetLabel = 'este item') {
 
     confirmActionModalConfirm.addEventListener('click', onConfirm);
     confirmActionModal.addEventListener('click', onCancelClick);
+    document.addEventListener('keydown', onEsc);
+  });
+}
+
+function confirmRotatePublicLinkAction() {
+  if (!rotatePublicLinkModal || !rotatePublicLinkConfirm) {
+    return Promise.resolve(window.confirm('O link atual será invalidado imediatamente. Deseja rotacionar o link público?'));
+  }
+
+  rotatePublicLinkModal.classList.add('open');
+  rotatePublicLinkModal.setAttribute('aria-hidden', 'false');
+
+  return new Promise((resolve) => {
+    const close = (confirmed) => {
+      rotatePublicLinkModal.classList.remove('open');
+      rotatePublicLinkModal.setAttribute('aria-hidden', 'true');
+      rotatePublicLinkConfirm.removeEventListener('click', onConfirm);
+      rotatePublicLinkModal.removeEventListener('click', onCancelClick);
+      document.removeEventListener('keydown', onEsc);
+      resolve(confirmed);
+    };
+    const onConfirm = () => close(true);
+    const onCancelClick = (event) => {
+      if (event.target.closest('[data-rotate-link-cancel]')) close(false);
+    };
+    const onEsc = (event) => {
+      if (event.key === 'Escape') close(false);
+    };
+
+    rotatePublicLinkConfirm.addEventListener('click', onConfirm);
+    rotatePublicLinkModal.addEventListener('click', onCancelClick);
     document.addEventListener('keydown', onEsc);
   });
 }
@@ -1299,6 +1440,43 @@ if (hybridFlowsFilterBtn && hybridFlowsFilterMenu) {
         .querySelectorAll('.filter-option[data-value=\"\"]')
         .forEach((item) => item.classList.add('active'));
       hybridFlowsFilterMenu.classList.remove('open');
+    });
+  }
+}
+
+if (hybridHistoryFilterBtn && hybridHistoryFilterMenu) {
+  hybridHistoryFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    hybridHistoryFilterMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    hybridHistoryFilterMenu.classList.remove('open');
+  });
+
+  const filterOptions = hybridHistoryFilterMenu.querySelectorAll('.filter-option');
+  const clearButton = hybridHistoryFilterMenu.querySelector('.filter-clear');
+
+  filterOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const group = button.dataset.filter;
+      hybridHistoryFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      hybridHistoryFilterMenu.classList.remove('open');
+    });
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      hybridHistoryFilterMenu
+        .querySelectorAll('.filter-option')
+        .forEach((item) => item.classList.remove('active'));
+      hybridHistoryFilterMenu
+        .querySelectorAll('.filter-option[data-value="total"]')
+        .forEach((item) => item.classList.add('active'));
+      hybridHistoryFilterMenu.classList.remove('open');
     });
   }
 }
@@ -3367,6 +3545,350 @@ if (agentChatModal && agentsPageForChat) {
   });
 }
 
+const hybridFlowsPage = document.getElementById('page-hybrid-flows');
+if (hybridFlowsPage) {
+  hydrateHybridFlowHistoryFlowName();
+  renderHybridFlowsFromStorage();
+  const openCreatePageBtn = hybridFlowsPage.querySelector('#openHybridFlowCreatePage');
+  if (openCreatePageBtn) {
+    openCreatePageBtn.addEventListener('click', () => {
+      window.location.hash = '#/dashboard/hybrid-flows/new';
+    });
+  }
+
+  hybridFlowsPage.addEventListener('click', async (event) => {
+    const refreshLinkBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Atualizar link"]');
+    if (!refreshLinkBtn || !hybridFlowsPage.contains(refreshLinkBtn)) return;
+    event.stopPropagation();
+    const confirmed = await confirmRotatePublicLinkAction();
+    if (!confirmed) return;
+    showAppToast('Link atualizado');
+  });
+
+  hybridFlowsPage.addEventListener('click', async (event) => {
+    const deleteBtn = event.target.closest('.hybrid-flows-row-actions .action-icon.danger[aria-label="Apagar"]');
+    if (!deleteBtn || !hybridFlowsPage.contains(deleteBtn)) return;
+    event.stopPropagation();
+    const row = deleteBtn.closest('tr');
+    if (!row) return;
+    const flowName = row.querySelector('td strong')?.textContent?.trim() || 'este fluxo';
+    const confirmed = await confirmDeletionAction(`o fluxo "${flowName}"`);
+    if (!confirmed) return;
+    const flowId = row.dataset.hybridFlowId || '';
+    if (flowId) removeHybridFlowFromStorage(flowId);
+    row.remove();
+    showAppToast('Fluxo excluído');
+  });
+
+  hybridFlowsPage.addEventListener('click', (event) => {
+    const historyBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Histórico"]');
+    if (!historyBtn || !hybridFlowsPage.contains(historyBtn)) return;
+    event.stopPropagation();
+    const row = historyBtn.closest('tr');
+    const flowName = row?.querySelector('td strong')?.textContent?.trim() || 'Fluxo';
+    setHybridFlowHistoryFlowName(flowName);
+    window.location.hash = '#/dashboard/hybrid-flows/history';
+  });
+}
+
+const hybridHistoryPage = document.getElementById('page-hybrid-flows-history');
+if (hybridHistoryPage && hybridHistoryDetailsModal) {
+  hybridHistoryPage.addEventListener('click', (event) => {
+    const detailsBtn = event.target.closest('.hybrid-history-table .action-icon[aria-label="Ver detalhes"]');
+    if (!detailsBtn || !hybridHistoryPage.contains(detailsBtn)) return;
+    event.stopPropagation();
+    window.location.hash = '#/dashboard/hybrid-flows/history/details';
+  });
+
+  hybridHistoryDetailsModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-hybrid-history-details-close]')) {
+      hybridHistoryDetailsModal.classList.remove('open');
+      hybridHistoryDetailsModal.setAttribute('aria-hidden', 'true');
+    }
+    const tabBtn = event.target.closest('[data-details-tab]');
+    if (!tabBtn) return;
+    const tab = tabBtn.dataset.detailsTab;
+    hybridHistoryDetailsModal
+      .querySelectorAll('[data-details-tab]')
+      .forEach((btn) => btn.classList.toggle('is-active', btn.dataset.detailsTab === tab));
+    hybridHistoryDetailsModal
+      .querySelectorAll('[data-details-panel]')
+      .forEach((panel) => panel.classList.toggle('is-active', panel.dataset.detailsPanel === tab));
+  });
+
+  hybridHistoryCopyIdBtn?.addEventListener('click', async () => {
+    const idValue = '8a71a24f...';
+    const copied = await copyTextToClipboard(idValue);
+    if (copied) showAppToast('ID copiado');
+  });
+}
+
+const hybridHistoryDetailsPage = document.getElementById('page-hybrid-flows-history-details');
+if (hybridHistoryDetailsPage) {
+  hybridHistoryDetailsBackBtn?.addEventListener('click', () => {
+    window.location.hash = '#/dashboard/hybrid-flows/history';
+  });
+
+  hybridHistoryDetailsPage.addEventListener('click', (event) => {
+    const tabBtn = event.target.closest('[data-page-details-tab]');
+    if (!tabBtn) return;
+    const tab = tabBtn.dataset.pageDetailsTab;
+    hybridHistoryDetailsPage
+      .querySelectorAll('[data-page-details-tab]')
+      .forEach((btn) => btn.classList.toggle('is-active', btn.dataset.pageDetailsTab === tab));
+    hybridHistoryDetailsPage
+      .querySelectorAll('[data-page-details-panel]')
+      .forEach((panel) => panel.classList.toggle('is-active', panel.dataset.pageDetailsPanel === tab));
+  });
+
+  hybridHistoryPageCopyIdBtn?.addEventListener('click', async () => {
+    const copied = await copyTextToClipboard('8a71a24f...');
+    if (copied) showAppToast('ID copiado');
+  });
+}
+
+hybridFlowHistoryBackBtn?.addEventListener('click', () => {
+  window.location.hash = '#/dashboard/hybrid-flows';
+});
+
+const hybridFlowCreatePage = document.getElementById('page-hybrid-flows-create');
+if (hybridFlowCreatePage) {
+  const closeReviewModal = () => {
+    if (!hybridFlowReviewModal) return;
+    hybridFlowReviewModal.classList.remove('open');
+    hybridFlowReviewModal.setAttribute('aria-hidden', 'true');
+  };
+
+  const closeDiscardModal = () => {
+    if (!hybridFlowDiscardModal) return;
+    hybridFlowDiscardModal.classList.remove('open');
+    hybridFlowDiscardModal.setAttribute('aria-hidden', 'true');
+  };
+
+  hybridFlowCancelBtn?.addEventListener('click', () => {
+    if (!hybridFlowDiscardModal) return;
+    hybridFlowDiscardModal.classList.add('open');
+    hybridFlowDiscardModal.setAttribute('aria-hidden', 'false');
+  });
+
+  hybridFlowDiscardModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-hybrid-flow-discard-close]')) closeDiscardModal();
+  });
+
+  hybridFlowReviewModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-hybrid-flow-review-close]')) closeReviewModal();
+  });
+
+  hybridFlowDiscardConfirmBtn?.addEventListener('click', () => {
+    closeDiscardModal();
+    window.location.hash = '#/dashboard/hybrid-flows';
+  });
+
+  hybridFlowNextBtn?.addEventListener('click', () => {
+    if (!hybridFlowReviewModal || !hybridFlowReviewList) return;
+    const title = String(document.getElementById('hybridFlowTitleInput')?.value || '').trim() || 'Não informado';
+    const description = String(document.getElementById('hybridFlowDescriptionInput')?.value || '').trim() || 'Não informado';
+    const fieldsCount = hybridFlowFieldsList ? hybridFlowFieldsList.children.length : 0;
+    const textAgent = String(hybridFlowCreatePage.querySelector('select[aria-label="Selecione o agente de texto"]')?.value || '').trim() || 'Não selecionado';
+    const voiceAgent = String(hybridFlowCreatePage.querySelector('select[aria-label="Selecione o agente de voz"]')?.value || '').trim() || 'Não selecionado';
+    const telegramIntegration = String(hybridFlowCreatePage.querySelector('select[aria-label="Integração do Telegram"]')?.value || '').trim() || 'Não selecionada';
+
+    hybridFlowReviewList.innerHTML = `
+      <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Título</span><span class="hybrid-flow-review-value">${escapeHtmlWes(title)}</span></div>
+      <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Descrição</span><span class="hybrid-flow-review-value">${escapeHtmlWes(description)}</span></div>
+      <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Campos configurados</span><span class="hybrid-flow-review-value">${fieldsCount}</span></div>
+      <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agente de texto</span><span class="hybrid-flow-review-value">${escapeHtmlWes(textAgent)}</span></div>
+      <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agente de voz</span><span class="hybrid-flow-review-value">${escapeHtmlWes(voiceAgent)}</span></div>
+      <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Integração do Telegram</span><span class="hybrid-flow-review-value">${escapeHtmlWes(telegramIntegration)}</span></div>
+    `;
+    hybridFlowReviewModal.classList.add('open');
+    hybridFlowReviewModal.setAttribute('aria-hidden', 'false');
+  });
+
+  hybridFlowReviewConfirmBtn?.addEventListener('click', () => {
+    const title = String(document.getElementById('hybridFlowTitleInput')?.value || '').trim() || 'Sem título';
+    const description = String(document.getElementById('hybridFlowDescriptionInput')?.value || '').trim();
+    const fieldsCount = hybridFlowFieldsList ? hybridFlowFieldsList.children.length : 0;
+    const now = new Date().toISOString();
+    persistAndRenderHybridFlow({
+      id: `hybrid-flow-${Date.now()}`,
+      title,
+      description,
+      fieldsCount,
+      createdAt: now,
+      updatedAt: now
+    });
+    closeReviewModal();
+    showAppToast('Fluxo salvo com sucesso');
+    window.location.hash = '#/dashboard/hybrid-flows';
+  });
+}
+
+const hybridFlowAddFieldBtn = document.getElementById('hybridFlowAddFieldBtn');
+const hybridFlowFieldsList = document.getElementById('hybridFlowFieldsList');
+const hybridFlowFieldsEmpty = document.getElementById('hybridFlowFieldsEmpty');
+if (hybridFlowAddFieldBtn && hybridFlowFieldsList && hybridFlowFieldsEmpty) {
+  const syncHybridFlowFieldsEmpty = () => {
+    hybridFlowFieldsEmpty.hidden = hybridFlowFieldsList.children.length > 0;
+  };
+  const hybridFlowTypeLabelMap = {
+    text: 'Texto livre',
+    phone: 'Telefone',
+    cpf: 'CPF',
+    email: 'Email',
+    number: 'Número',
+    boolean: 'Sim/Não'
+  };
+  const renderHybridFlowFieldEdit = (row, data) => {
+    row.innerHTML = `
+      <div class="hybrid-flow-field-top">
+        <button type="button" class="icon-btn hybrid-flow-drag-handle" aria-label="Mover campo">
+          <span class="material-symbols-rounded">drag_indicator</span>
+        </button>
+        <div>
+          <input class="modal-input hybrid-flow-field-input" type="text" placeholder="Nome (chave JSON) *" value="${escapeHtmlWes(data.name || '')}" />
+        </div>
+        <div>
+          <input class="modal-input hybrid-flow-field-input" type="text" placeholder="Rótulo exibido *" value="${escapeHtmlWes(data.label || '')}" />
+        </div>
+        <div class="form-field hybrid-flow-field-type">
+          <label class="modal-label">Tipo</label>
+          <div class="hub-select-wrap hub-select-wrap--block">
+            <select class="hub-select" aria-label="Tipo do campo">
+              <option value="text"${data.type === 'text' ? ' selected' : ''}>Texto livre</option>
+              <option value="phone"${data.type === 'phone' ? ' selected' : ''}>Telefone</option>
+              <option value="cpf"${data.type === 'cpf' ? ' selected' : ''}>CPF</option>
+              <option value="email"${data.type === 'email' ? ' selected' : ''}>Email</option>
+              <option value="number"${data.type === 'number' ? ' selected' : ''}>Número</option>
+              <option value="boolean"${data.type === 'boolean' ? ' selected' : ''}>Sim/Não</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="icon-btn hybrid-flow-delete-btn" aria-label="Remover campo">
+          <span class="material-symbols-rounded">delete</span>
+        </button>
+      </div>
+      <div class="hybrid-flow-field-middle">
+        <div class="hybrid-flow-middle-spacer" aria-hidden="true"></div>
+        <textarea class="modal-textarea hybrid-flow-field-description" rows="3" placeholder="Descrição para o agente (opcional)">${escapeHtmlWes(data.description || '')}</textarea>
+      </div>
+      <div class="hybrid-flow-field-bottom">
+        <div class="hybrid-flow-middle-spacer" aria-hidden="true"></div>
+        <div class="hybrid-flow-required">
+          <label class="switch small">
+            <input type="checkbox"${data.required ? ' checked' : ''} />
+            <span class="switch-track"></span>
+          </label>
+          <span>Obrigatório</span>
+        </div>
+        <button type="button" class="btn primary hybrid-flow-save-btn">Salvar</button>
+      </div>
+    `;
+    if (typeof hubEnhanceSelectWrap === 'function') {
+      row.querySelectorAll('.hub-select-wrap').forEach(hubEnhanceSelectWrap);
+    }
+  };
+  const renderHybridFlowFieldSummary = (row, data) => {
+    const typeLabel = hybridFlowTypeLabelMap[data.type] || hybridFlowTypeLabelMap.text;
+    row.innerHTML = `
+      <div class="hybrid-flow-field-summary">
+        <button type="button" class="icon-btn hybrid-flow-drag-handle" aria-label="Mover campo">
+          <span class="material-symbols-rounded">drag_indicator</span>
+        </button>
+        <div class="hybrid-flow-field-summary-content">
+          <div class="hybrid-flow-summary-head">
+            <strong>${escapeHtmlWes(data.label || data.name || '-')}</strong>
+            <span class="hybrid-flow-summary-dot">•</span>
+            <span>${escapeHtmlWes(typeLabel)}</span>
+            ${data.required ? '<span class="hybrid-flow-summary-badge">Obrigatório</span>' : ''}
+          </div>
+          <div class="hybrid-flow-summary-subhead">${escapeHtmlWes(data.name || '-')}</div>
+          <p class="hybrid-flow-summary-description">${escapeHtmlWes(data.description || 'Sem descrição')}</p>
+        </div>
+        <div class="hybrid-flow-field-summary-actions">
+          <button type="button" class="icon-btn hybrid-flow-edit-btn" aria-label="Editar campo">
+            <span class="material-symbols-rounded">edit</span>
+          </button>
+          <button type="button" class="icon-btn hybrid-flow-delete-btn" aria-label="Remover campo">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </div>
+      </div>
+    `;
+  };
+
+  hybridFlowAddFieldBtn.addEventListener('click', () => {
+    const fieldRow = document.createElement('div');
+    const fieldId = `field-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    fieldRow.className = 'hybrid-flow-field-card';
+    fieldRow.dataset.fieldId = fieldId;
+    renderHybridFlowFieldEdit(fieldRow, { name: '', label: '', type: 'text', description: '', required: true });
+
+    hybridFlowFieldsList.appendChild(fieldRow);
+    syncHybridFlowFieldsEmpty();
+  });
+
+  hybridFlowFieldsList.addEventListener('click', (event) => {
+    const deleteBtn = event.target.closest('.hybrid-flow-delete-btn');
+    if (!deleteBtn) return;
+    const row = deleteBtn.closest('.hybrid-flow-field-card');
+    if (!row) return;
+    row.remove();
+    syncHybridFlowFieldsEmpty();
+  });
+
+  hybridFlowFieldsList.addEventListener('click', (event) => {
+    const saveBtn = event.target.closest('.hybrid-flow-save-btn');
+    if (!saveBtn) return;
+    const row = saveBtn.closest('.hybrid-flow-field-card');
+    if (!row) return;
+
+    const name = row.querySelector('input[placeholder="Nome (chave JSON) *"]')?.value?.trim() || '';
+    const label = row.querySelector('input[placeholder="Rótulo exibido *"]')?.value?.trim() || '';
+    const type = row.querySelector('select[aria-label="Tipo do campo"]')?.value || 'text';
+    const description = row.querySelector('textarea[placeholder="Descrição para o agente (opcional)"]')?.value?.trim() || '';
+    const required = Boolean(row.querySelector('.hybrid-flow-required input[type="checkbox"]')?.checked);
+
+    const storageKey = 'hybridFlowFieldDrafts';
+    const raw = window.localStorage.getItem(storageKey);
+    let drafts = [];
+    try {
+      drafts = raw ? JSON.parse(raw) : [];
+    } catch (_) {
+      drafts = [];
+    }
+    const nextDrafts = Array.isArray(drafts) ? drafts.filter((item) => item?.id !== row.dataset.fieldId) : [];
+    nextDrafts.push({
+      id: row.dataset.fieldId,
+      name,
+      label,
+      type,
+      description,
+      required
+    });
+    window.localStorage.setItem(storageKey, JSON.stringify(nextDrafts));
+    row.dataset.fieldData = JSON.stringify({ name, label, type, description, required });
+    renderHybridFlowFieldSummary(row, { name, label, type, description, required });
+    showAppToast('Campo salvo');
+  });
+
+  hybridFlowFieldsList.addEventListener('click', (event) => {
+    const editBtn = event.target.closest('.hybrid-flow-edit-btn');
+    if (!editBtn) return;
+    const row = editBtn.closest('.hybrid-flow-field-card');
+    if (!row) return;
+    let data = { name: '', label: '', type: 'text', description: '', required: true };
+    try {
+      data = row.dataset.fieldData ? JSON.parse(row.dataset.fieldData) : data;
+    } catch (_) {
+      data = { name: '', label: '', type: 'text', description: '', required: true };
+    }
+    renderHybridFlowFieldEdit(row, data);
+  });
+
+  syncHybridFlowFieldsEmpty();
+}
+
 const agentShareModalEl = document.getElementById('agentShareModal');
 const agentShareCopyBtnEl = document.getElementById('agentShareCopyBtn');
 const agentShareSaveBtnEl = document.getElementById('agentShareSaveBtn');
@@ -5046,7 +5568,13 @@ function hubEnhanceSelectWrap(wrap) {
     wrap.dataset.hubCustomReady = 'true';
     wrap.classList.add('hub-custom-select');
     const icon = wrap.querySelector('.hub-select-icon');
-    const chev = wrap.querySelector('.hub-select-chevron');
+    let chev = wrap.querySelector('.hub-select-chevron');
+    if (!chev) {
+      chev = document.createElement('span');
+      chev.className = 'material-symbols-rounded hub-select-chevron';
+      chev.setAttribute('aria-hidden', 'true');
+      chev.textContent = 'expand_more';
+    }
     const trigger = document.createElement('button');
     trigger.type = 'button';
     trigger.className = 'hub-custom-trigger';
@@ -5062,7 +5590,7 @@ function hubEnhanceSelectWrap(wrap) {
     wrap.insertBefore(trigger, sel);
     if (icon) trigger.appendChild(icon);
     trigger.appendChild(label);
-    if (chev) trigger.appendChild(chev);
+    trigger.appendChild(chev);
     wrap.appendChild(menu);
     sel.classList.add('hub-select-native');
     trigger.addEventListener('click', (e) => {
@@ -5076,7 +5604,7 @@ function hubEnhanceSelectWrap(wrap) {
         hubPositionCustomMenu(wrap, menu);
         hubSyncModalSelectOverflow(wrap);
         trigger.setAttribute('aria-expanded', 'true');
-        chev?.classList.add('is-open');
+        chev.classList.add('is-open');
       }
     });
     sel.addEventListener('change', () => hubCustomSelectRefresh(wrap));
@@ -7765,6 +8293,9 @@ const routeMap = {
   'dashboard/voice-messaging': 'page-voice-messaging',
   'dashboard/campaigns': 'page-campaigns',
   'dashboard/hybrid-flows': 'page-hybrid-flows',
+  'dashboard/hybrid-flows/new': 'page-hybrid-flows-create',
+  'dashboard/hybrid-flows/history': 'page-hybrid-flows-history',
+  'dashboard/hybrid-flows/history/details': 'page-hybrid-flows-history-details',
   'dashboard/executors': 'page-executors',
   'dashboard/packages': 'page-packages',
   'dashboard/channels': 'page-channels',
@@ -7789,14 +8320,17 @@ const sectionMap = {
   'dashboard/document-analysis': 'Automa\u00e7\u00e3o',
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
   'dashboard/agents': 'Automa\u00e7\u00e3o',
-  'dashboard/voice-messaging': 'Integrações',
-  'dashboard/campaigns': 'Integrações',
-  'dashboard/hybrid-flows': 'Integrações',
+  'dashboard/voice-messaging': 'Atendimento dinâmico',
+  'dashboard/campaigns': 'Atendimento dinâmico',
+  'dashboard/hybrid-flows': 'Atendimento dinâmico',
+  'dashboard/hybrid-flows/new': 'Atendimento dinâmico',
+  'dashboard/hybrid-flows/history': 'Atendimento dinâmico',
+  'dashboard/hybrid-flows/history/details': 'Atendimento dinâmico',
   'dashboard/executors': 'Infraestrutura',
   'dashboard/packages': 'Infraestrutura',
-  'dashboard/channels': 'Integrações',
-  'dashboard/channels/telegram': 'Integrações',
-  'dashboard/channels/telegram/botfather': 'Integrações',
+  'dashboard/channels': 'Atendimento dinâmico',
+  'dashboard/channels/telegram': 'Atendimento dinâmico',
+  'dashboard/channels/telegram/botfather': 'Atendimento dinâmico',
   'dashboard/credentials': 'Armazenamento',
   'dashboard/input-files': 'Armazenamento',
   'dashboard/users': 'Administração',

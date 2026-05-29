@@ -202,11 +202,11 @@
           <a class="nav-item active" href="#/dashboard" data-route="dashboard"><span class="material-symbols-rounded">grid_view</span><span class="nav-label">Painel</span></a>
 
           <div class="nav-group">
-            <a class="nav-item nav-trigger" data-menu="automation" data-route="dashboard/automations" href="#/dashboard/automations">
+            <button class="nav-item nav-trigger" data-menu="automation" data-route="dashboard/automations" type="button">
               <span class="material-symbols-rounded">smart_toy</span>
               <span class="nav-label">Automação</span>
               <span class="nav-caret">▾</span>
-            </a>
+            </button>
             <div class="submenu" id="submenu-automation">
               <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
               <a class="submenu-item" href="#/dashboard/agents"><span class="submenu-label">Agentes</span></a>
@@ -229,8 +229,8 @@
 
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="integrations" type="button">
-              <span class="material-symbols-rounded">hub</span>
-              <span class="nav-label">Integrações</span>
+              <span class="material-symbols-rounded">account_tree</span>
+              <span class="nav-label nav-label--two-lines">Atendimento dinâmico</span>
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-integrations">
@@ -2850,9 +2850,8 @@
                   <p class="page-subtitle">Atendimentos que combinam coleta por voz e confirmação no Telegram.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary" type="button">
-                    <span class="material-symbols-rounded">add</span>
-                    Novo fluxo
+                  <button class="btn primary hybrid-flows-create-btn" id="openHybridFlowCreatePage" type="button">
+                    <span class="btn-label">Novo fluxo</span>
                   </button>
                 </div>
               </div>
@@ -2906,22 +2905,22 @@
                       <td>08/05/2026, 11:42</td>
                       <td>
                         <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Duplicar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
                             <span class="material-symbols-rounded">content_copy</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova página">
+                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
                             <span class="material-symbols-rounded">open_in_new</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Executar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
                             <span class="material-symbols-rounded">autorenew</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Ver histórico">
+                          <button class="icon-btn action-icon" type="button" aria-label="Histórico">
                             <span class="material-symbols-rounded">history</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
                             <span class="material-symbols-rounded">edit</span>
                           </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Excluir fluxo">
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
                             <span class="material-symbols-rounded">delete</span>
                           </button>
                         </div>
@@ -2938,22 +2937,22 @@
                       <td>29/04/2026, 09:51</td>
                       <td>
                         <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Duplicar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
                             <span class="material-symbols-rounded">content_copy</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova página">
+                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
                             <span class="material-symbols-rounded">open_in_new</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Executar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
                             <span class="material-symbols-rounded">autorenew</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Ver histórico">
+                          <button class="icon-btn action-icon" type="button" aria-label="Histórico">
                             <span class="material-symbols-rounded">history</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
                             <span class="material-symbols-rounded">edit</span>
                           </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Excluir fluxo">
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
                             <span class="material-symbols-rounded">delete</span>
                           </button>
                         </div>
@@ -2970,22 +2969,22 @@
                       <td>27/04/2026, 17:36</td>
                       <td>
                         <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Duplicar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
                             <span class="material-symbols-rounded">content_copy</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova página">
+                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
                             <span class="material-symbols-rounded">open_in_new</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Executar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
                             <span class="material-symbols-rounded">autorenew</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Ver histórico">
+                          <button class="icon-btn action-icon" type="button" aria-label="Histórico">
                             <span class="material-symbols-rounded">history</span>
                           </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar fluxo">
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
                             <span class="material-symbols-rounded">edit</span>
                           </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Excluir fluxo">
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
                             <span class="material-symbols-rounded">delete</span>
                           </button>
                         </div>
@@ -2994,6 +2993,103 @@
                   </tbody>
                 </table>
               </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-hybrid-flows-create" data-title="Novo fluxo híbrido">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Novo fluxo híbrido</h2>
+                </div>
+              </div>
+
+              <div class="hybrid-flow-initial-section">
+                <h3>Dados iniciais</h3>
+                <div class="hybrid-flow-basic-grid">
+                <div class="form-field">
+                  <label class="modal-label modal-label--required" for="hybridFlowTitleInput">Título</label>
+                  <input class="modal-input" id="hybridFlowTitleInput" type="text" placeholder="Digite o título do fluxo" />
+                </div>
+                <div class="form-field">
+                  <label class="modal-label" for="hybridFlowDescriptionInput">Descrição</label>
+                  <textarea class="modal-textarea" id="hybridFlowDescriptionInput" rows="4" placeholder="Descreva brevemente este fluxo"></textarea>
+                </div>
+              </div>
+              </div>
+
+              <div class="hybrid-flow-fields-section">
+                <h3>Campos</h3>
+                <p class="page-subtitle">
+                  Defina o que o agente de voz vai coletar e o que o agente de texto vai usar para confirmar com o usuário no Telegram. O telefone é tratado como dado-chave para essa transição entre os dois agentes.
+                </p>
+                <div class="hybrid-flow-fields-empty" id="hybridFlowFieldsEmpty">
+                  Nenhum campo configurado ainda. Clique em "Adicionar campo" para começar.
+                </div>
+                <div class="hybrid-flow-fields-list" id="hybridFlowFieldsList"></div>
+                <button class="btn outline hybrid-flow-add-field-btn" id="hybridFlowAddFieldBtn" type="button">
+                  <span class="material-symbols-rounded">add</span>
+                  Adicionar campo
+                </button>
+              </div>
+
+              <div class="hybrid-flow-integrations-section">
+                <h3>Integrações</h3>
+                <p class="page-subtitle">
+                  Vincule o fluxo aos agentes de voz, texto e à integração de Telegram que vão atendê-lo.
+                </p>
+
+                <div class="info-banner hybrid-flow-info-banner">
+                  <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                  <span>Você pode selecionar abaixo uma integração Telegram já configurada neste tenant.</span>
+                </div>
+
+                <div class="form-field">
+                  <div class="hub-select-wrap hub-select-wrap--block">
+                    <select class="hub-select" aria-label="Selecione o agente de texto">
+                      <option value="" selected>Selecione o agente de texto</option>
+                      <option value="atlas-core">Atlas Core</option>
+                      <option value="nimbus-ops">Nimbus Ops</option>
+                      <option value="pulse-finance">Pulse Finance</option>
+                    </select>
+                  </div>
+                  <p class="page-subtitle">Obrigatório para fluxos ativos: usado na confirmação via Telegram.</p>
+                </div>
+
+                <div class="form-field">
+                  <div class="hub-select-wrap hub-select-wrap--block">
+                    <select class="hub-select" aria-label="Selecione o agente de voz">
+                      <option value="" selected>Selecione o agente de voz</option>
+                      <option value="atlas-core-voice">Atlas Core (voz)</option>
+                      <option value="nimbus-voice">Nimbus Voice</option>
+                      <option value="pulse-voice">Pulse Voice</option>
+                    </select>
+                  </div>
+                  <p class="page-subtitle">Obrigatório para fluxos ativos: conduz a coleta por voz.</p>
+                </div>
+
+                <div class="form-field">
+                  <textarea class="modal-textarea" rows="4" placeholder="Saudação inicial do agente de voz"></textarea>
+                  <p class="page-subtitle">Frase curta que o agente fala antes do usuário, no início da chamada. Deixe vazio para usar a saudação padrão gerada com o nome do fluxo. (0/500)</p>
+                </div>
+
+                <div class="form-field">
+                  <div class="hub-select-wrap hub-select-wrap--block">
+                    <select class="hub-select" aria-label="Integração do Telegram">
+                      <option value="" selected>Integração do Telegram</option>
+                      <option value="telegram-wes-hub-bot">wes_hub_bot</option>
+                      <option value="telegram-operacoes-bot">operacoes_bot</option>
+                    </select>
+                  </div>
+                  <p class="page-subtitle">Selecione uma integração Telegram já cadastrada.</p>
+                </div>
+              </div>
+
+              <div class="hybrid-flow-create-actions">
+                <button class="btn outline" id="hybridFlowCancelBtn" type="button">Cancelar</button>
+                <button class="btn primary" id="hybridFlowNextBtn" type="button">Continuar</button>
+              </div>
+
             </div>
           </div>
 
@@ -3435,7 +3531,6 @@
                 </div>
                 <div class="page-actions">
                   <button class="btn primary">
-                    <span class="material-symbols-rounded">cloud_upload</span>
                     Enviar pacote
                   </button>
                 </div>
@@ -4052,7 +4147,6 @@
                 </div>
                 <div class="page-actions">
                   <button class="btn outline" id="openManageRolesModal" type="button">
-                    <span class="material-symbols-rounded">add</span>
                     Criar nova função
                   </button>
                   <button class="btn primary" id="openCreateUserModal" type="button">
@@ -5346,7 +5440,347 @@
               </div>
               <div class="modal-footer">
                 <button class="btn outline" type="button" data-confirm-action-cancel>Cancelar</button>
-                <button class="btn danger" type="button" id="confirmActionModalConfirm">Excluir</button>
+                <button class="btn primary" type="button" id="confirmActionModalConfirm">Excluir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="rotatePublicLinkModal" aria-hidden="true">
+            <div class="modal-backdrop" data-rotate-link-cancel></div>
+            <div class="modal-dialog rotate-public-link-dialog" role="dialog" aria-modal="true" aria-labelledby="rotatePublicLinkModalTitle">
+              <div class="modal-header">
+                <h3 id="rotatePublicLinkModalTitle">Atualizar link público?</h3>
+                <button class="icon-btn" aria-label="Fechar" data-rotate-link-cancel type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>O link atual será invalidado imediatamente. Quem tiver a URL antiga não conseguirá mais iniciar o atendimento.</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-rotate-link-cancel>Cancelar</button>
+                <button class="btn rotate-link-confirm-btn" type="button" id="rotatePublicLinkConfirm">Atualizar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="hybridFlowReviewModal" aria-hidden="true">
+            <div class="modal-backdrop" data-hybrid-flow-review-close></div>
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="hybridFlowReviewTitle">
+              <div class="modal-header">
+                <h3 id="hybridFlowReviewTitle">Revisar fluxo</h3>
+                <button class="icon-btn" aria-label="Fechar" data-hybrid-flow-review-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="hybrid-flow-review-list" id="hybridFlowReviewList"></div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-hybrid-flow-review-close>Cancelar</button>
+                <button class="btn primary" type="button" id="hybridFlowReviewConfirmBtn">Salvar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="hybridFlowDiscardModal" aria-hidden="true">
+            <div class="modal-backdrop" data-hybrid-flow-discard-close></div>
+            <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="hybridFlowDiscardTitle">
+              <div class="modal-header">
+                <h3 id="hybridFlowDiscardTitle">Tem certeza?</h3>
+                <button class="icon-btn" aria-label="Fechar" data-hybrid-flow-discard-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <p>Tudo que você fez será descartado. Deseja continuar?</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-hybrid-flow-discard-close>Voltar</button>
+                <button class="btn danger" type="button" id="hybridFlowDiscardConfirmBtn">Descartar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="hybridHistoryDetailsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-hybrid-history-details-close></div>
+            <div class="modal-dialog hybrid-history-details-dialog" role="dialog" aria-modal="true" aria-labelledby="hybridHistoryDetailsTitle">
+              <div class="modal-body hybrid-history-details-body">
+                <div class="hybrid-history-details-head">
+                  <span class="chip success">Concluído</span>
+                  <div class="hybrid-history-details-id">
+                    <span>ID:</span>
+                    <strong>8a71a24f...</strong>
+                    <button class="icon-btn" type="button" aria-label="Copiar ID" id="hybridHistoryCopyIdBtn">
+                      <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                    <button class="icon-btn" type="button" aria-label="Fechar" data-hybrid-history-details-close>
+                      <span class="material-symbols-rounded">close</span>
+                    </button>
+                  </div>
+                </div>
+
+                <h3 class="hybrid-history-details-title" id="hybridHistoryDetailsTitle">Sem telefone</h3>
+
+                <div class="hybrid-history-details-meta">
+                  <div><span>Iniciado em</span><strong>08/05/2026, 11:06</strong></div>
+                  <div><span>Finalizado em</span><strong>08/05/2026, 11:10</strong></div>
+                  <div><span>Duração</span><strong>3m 29s</strong></div>
+                </div>
+
+                <div class="hybrid-history-details-tabs" role="tablist">
+                  <button class="hybrid-history-details-tab is-active" type="button" data-details-tab="summary"><span class="material-symbols-rounded">list_alt</span>Resumo</button>
+                  <button class="hybrid-history-details-tab" type="button" data-details-tab="timeline"><span class="material-symbols-rounded">timeline</span>Linha do tempo <span class="hybrid-history-details-badge">8</span></button>
+                  <button class="hybrid-history-details-tab" type="button" data-details-tab="chat"><span class="material-symbols-rounded">chat_bubble_outline</span>Conversa <span class="hybrid-history-details-badge">1</span></button>
+                </div>
+
+                <div class="hybrid-history-details-panel is-active" data-details-panel="summary">
+                  <h4 class="hybrid-history-details-kicker"><span class="material-symbols-rounded">auto_awesome</span>Resumo gerado por IA <span>fallback-template</span></h4>
+                  <div class="hybrid-history-summary-card">
+                    Fluxo "Teste" encerrado com outcome "confirmed". Dados: id=12345678, name=Alex Souza, subject=Dúvida sobre salário. Foram trocadas 1 mensagens no Telegram durante a confirmação.
+                  </div>
+                  <h4 class="hybrid-history-details-section-title">Dados validados</h4>
+                  <div class="hybrid-history-validated-grid">
+                    <div><span>ID</span><strong>12345678</strong></div>
+                    <div><span>NAME</span><strong>Alex Souza</strong></div>
+                    <div><span>SUBJECT</span><strong>Dúvida sobre salário</strong></div>
+                  </div>
+                </div>
+
+                <div class="hybrid-history-details-panel" data-details-panel="timeline">
+                  <div class="hybrid-history-timeline">
+                    <div class="hybrid-history-timeline-item"><strong>Sessão aberta</strong><span>08/05/2026, 11:06</span><p>O atendimento foi iniciado a partir do link público.</p></div>
+                    <div class="hybrid-history-timeline-item"><strong>Dados coletados (voz)</strong><span>08/05/2026, 11:08</span><p>O agente de voz concluiu a coleta dos dados do visitante.</p></div>
+                    <div class="hybrid-history-timeline-item"><strong>Validação aprovada</strong><span>08/05/2026, 11:08</span><p>Os dados coletados passaram na checagem automática do fluxo.</p></div>
+                    <div class="hybrid-history-timeline-item"><strong>Telegram disparado</strong><span>08/05/2026, 11:08</span><p>Foi enviado o acesso para o visitante continuar no Telegram (link do bot e instruções).</p></div>
+                    <div class="hybrid-history-timeline-item"><strong>Chat capturado</strong><span>08/05/2026, 11:09</span><p>A conversa do Telegram foi vinculada a esta mesma sessão de atendimento.</p></div>
+                    <div class="hybrid-history-timeline-item">
+                      <strong><span class="material-symbols-rounded" aria-hidden="true">chat_bubble_outline</span>Conversa</strong><span>08/05/2026, 11:09</span>
+                      <p>Mensagens trocadas com o visitante no Telegram.</p>
+                      <div class="hybrid-history-chat-wrap">
+                        <div class="hybrid-history-chat-author">BOT DO HUB360</div>
+                        <div class="hybrid-history-chat-bubble">
+                          Olá! Aqui é o assistente do WES HUB 360.<br><br>
+                          Para revisar e confirmar os dados que coletamos, abra o link abaixo:<br><br>
+                          https://hub360.1wes.com/p/hf/c/676cd823-dab9-4bb5-9aaf-c169c16f3646<br><br>
+                          Você pode editar qualquer campo antes de confirmar. Se preferir desistir, basta clicar em "Cancelar atendimento" na mesma página.
+                        </div>
+                        <div class="hybrid-history-chat-time">11:09:08</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="hybrid-history-details-panel" data-details-panel="chat">
+                  <div class="hybrid-history-chat-wrap">
+                    <div class="hybrid-history-chat-author">BOT DO HUB360</div>
+                    <div class="hybrid-history-chat-bubble">
+                      Olá! Aqui é o assistente do WES HUB 360.<br><br>
+                      Para revisar e confirmar os dados que coletamos, abra o link abaixo:<br><br>
+                      https://hub360.1wes.com/p/hf/c/676cd823-dab9-4bb5-9aaf-c169c16f3646<br><br>
+                      Você pode editar qualquer campo antes de confirmar. Se preferir desistir, basta clicar em "Cancelar atendimento" na mesma página.
+                    </div>
+                    <div class="hybrid-history-chat-time">08/05/2026, 11:09</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-hybrid-flows-history" data-title="Histórico de atendimentos">
+            <div class="hybrid-history-top-link-wrap">
+              <button class="hybrid-history-top-link" id="hybridFlowHistoryBackBtn" type="button">
+                <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                Voltar para Fluxos híbridos
+              </button>
+            </div>
+            <div class="section">
+              <div class="hybrid-history-hero">
+                <div class="hybrid-history-hero-main">
+                  <div>
+                    <h2>Histórico de atendimentos</h2>
+                    <p class="page-subtitle">
+                      Acompanhe cada sessão iniciada por este fluxo, da chamada de voz até a confirmação no Telegram.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hybrid-history-stats">
+                <div class="hybrid-history-stat-card">
+                  <div class="hybrid-history-stat-icon hybrid-history-stat-icon--blue"><span class="material-symbols-rounded">chat</span></div>
+                  <div><strong>3</strong><span>Total</span></div>
+                </div>
+                <div class="hybrid-history-stat-card">
+                  <div class="hybrid-history-stat-icon hybrid-history-stat-icon--green"><span class="material-symbols-rounded">check_circle</span></div>
+                  <div><strong>3</strong><span>Concluídas</span></div>
+                </div>
+                <div class="hybrid-history-stat-card">
+                  <div class="hybrid-history-stat-icon hybrid-history-stat-icon--gray"><span class="material-symbols-rounded">hourglass_bottom</span></div>
+                  <div><strong>0</strong><span>Em andamento</span></div>
+                </div>
+                <div class="hybrid-history-stat-card">
+                  <div class="hybrid-history-stat-icon hybrid-history-stat-icon--red"><span class="material-symbols-rounded">error</span></div>
+                  <div><strong>0</strong><span>Com falha</span></div>
+                </div>
+              </div>
+
+              <div class="hybrid-history-filters">
+                <div class="search-field hybrid-history-search-field">
+                  <span class="material-symbols-rounded">search</span>
+                  <input type="search" placeholder="Buscar por telefone ou ID" aria-label="Buscar por telefone ou ID" />
+                </div>
+                <div class="form-field hybrid-history-filter-field">
+                  <button class="btn filter-btn" id="hybridHistoryFilterBtn" type="button">
+                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  </button>
+                  <div class="menu" id="hybridHistoryFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Status</span>
+                      <button class="filter-option active" data-filter="status" data-value="total">Total (3)</button>
+                      <button class="filter-option" data-filter="status" data-value="in-progress">Em andamento (0)</button>
+                      <button class="filter-option" data-filter="status" data-value="completed">Concluídas (3)</button>
+                      <button class="filter-option" data-filter="status" data-value="failed">Com falha (0)</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hybrid-history-table-wrap">
+                <table class="hybrid-history-table" aria-label="Histórico de atendimentos por fluxo">
+                  <thead>
+                    <tr>
+                      <th>Iniciado em</th>
+                      <th>Status</th>
+                      <th>Telefone</th>
+                      <th>Duração</th>
+                      <th class="hybrid-history-col-actions">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>8 de mai. de 2026</strong><small>11:06</small></td>
+                      <td><span class="chip success">Concluído</span></td>
+                      <td>Sem telefone</td>
+                      <td>3m 29s</td>
+                      <td>
+                        <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes">
+                          <span class="material-symbols-rounded">more_vert</span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>8 de mai. de 2026</strong><small>07:15</small></td>
+                      <td><span class="chip success">Concluído</span></td>
+                      <td>Sem telefone</td>
+                      <td>1m 33s</td>
+                      <td>
+                        <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes">
+                          <span class="material-symbols-rounded">more_vert</span>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>7 de mai. de 2026</strong><small>22:58</small></td>
+                      <td><span class="chip success">Concluído</span></td>
+                      <td>Sem telefone</td>
+                      <td>1m 30s</td>
+                      <td>
+                        <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes">
+                          <span class="material-symbols-rounded">more_vert</span>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-hybrid-flows-history-details" data-title="Detalhes do atendimento">
+            <div class="hybrid-history-top-link-wrap">
+              <button class="hybrid-history-top-link" id="hybridHistoryDetailsBackBtn" type="button">
+                <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                Voltar para Histórico de atendimentos
+              </button>
+            </div>
+            <div class="section hybrid-history-details-page">
+              <div class="hybrid-history-details-head">
+                <span class="chip success">Concluído</span>
+                <div class="hybrid-history-details-id">
+                  <span>ID:</span>
+                  <strong>8a71a24f...</strong>
+                  <button class="icon-btn" type="button" aria-label="Copiar ID" id="hybridHistoryPageCopyIdBtn">
+                    <span class="material-symbols-rounded">content_copy</span>
+                  </button>
+                </div>
+              </div>
+
+              <h3 class="hybrid-history-details-title">Sem telefone</h3>
+
+              <div class="hybrid-history-details-meta">
+                <div><span>Iniciado em</span><strong>08/05/2026, 11:06</strong></div>
+                <div><span>Finalizado em</span><strong>08/05/2026, 11:10</strong></div>
+                <div><span>Duração</span><strong>3m 29s</strong></div>
+              </div>
+
+              <div class="hybrid-history-details-tabs" role="tablist">
+                <button class="hybrid-history-details-tab is-active" type="button" data-page-details-tab="summary"><span class="material-symbols-rounded">list_alt</span>Resumo</button>
+                <button class="hybrid-history-details-tab" type="button" data-page-details-tab="timeline"><span class="material-symbols-rounded">timeline</span>Linha do tempo</button>
+                <button class="hybrid-history-details-tab" type="button" data-page-details-tab="chat"><span class="material-symbols-rounded">chat_bubble_outline</span>Conversa</button>
+              </div>
+
+              <div class="hybrid-history-details-panel is-active" data-page-details-panel="summary">
+                <h4 class="hybrid-history-details-kicker"><span class="material-symbols-rounded">auto_awesome</span>Resumo gerado por IA <span>fallback-template</span></h4>
+                <div class="hybrid-history-summary-card">
+                  Fluxo "Teste" encerrado com outcome "confirmed". Dados: id=12345678, name=Alex Souza, subject=Dúvida sobre salário. Foram trocadas 1 mensagens no Telegram durante a confirmação.
+                </div>
+                <h4 class="hybrid-history-details-section-title">Dados validados</h4>
+                <div class="hybrid-history-validated-grid">
+                  <div><span>ID</span><strong>12345678</strong></div>
+                  <div><span>NAME</span><strong>Alex Souza</strong></div>
+                  <div><span>SUBJECT</span><strong>Dúvida sobre salário</strong></div>
+                </div>
+              </div>
+
+              <div class="hybrid-history-details-panel" data-page-details-panel="timeline">
+                <div class="hybrid-history-timeline">
+                  <div class="hybrid-history-timeline-item"><strong>Sessão aberta</strong><span>08/05/2026, 11:06</span><p>O atendimento foi iniciado a partir do link público.</p></div>
+                  <div class="hybrid-history-timeline-item"><strong>Dados coletados (voz)</strong><span>08/05/2026, 11:08</span><p>O agente de voz concluiu a coleta dos dados do visitante.</p></div>
+                  <div class="hybrid-history-timeline-item"><strong>Validação aprovada</strong><span>08/05/2026, 11:08</span><p>Os dados coletados passaram na checagem automática do fluxo.</p></div>
+                  <div class="hybrid-history-timeline-item"><strong>Telegram disparado</strong><span>08/05/2026, 11:08</span><p>Foi enviado o acesso para o visitante continuar no Telegram (link do bot e instruções).</p></div>
+                  <div class="hybrid-history-timeline-item"><strong>Chat capturado</strong><span>08/05/2026, 11:09</span><p>A conversa do Telegram foi vinculada a esta mesma sessão de atendimento.</p></div>
+                  <div class="hybrid-history-timeline-item">
+                    <strong>Conversa</strong><span>08/05/2026, 11:09</span>
+                    <p>Mensagens trocadas com o visitante no Telegram.</p>
+                    <div class="hybrid-history-chat-wrap">
+                      <div class="hybrid-history-chat-author">BOT DO HUB360</div>
+                      <div class="hybrid-history-chat-bubble">
+                        Olá! Aqui é o assistente do WES HUB 360.<br><br>
+                        Para revisar e confirmar os dados que coletamos, abra o link abaixo:<br><br>
+                        https://hub360.1wes.com/p/hf/c/676cd823-dab9-4bb5-9aaf-c169c16f3646<br><br>
+                        Você pode editar qualquer campo antes de confirmar. Se preferir desistir, basta clicar em "Cancelar atendimento" na mesma página.
+                      </div>
+                      <div class="hybrid-history-chat-time">11:09:08</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="hybrid-history-details-panel" data-page-details-panel="chat">
+                <div class="hybrid-history-chat-wrap">
+                  <div class="hybrid-history-chat-author">BOT DO HUB360</div>
+                  <div class="hybrid-history-chat-bubble">
+                    Olá! Aqui é o assistente do WES HUB 360.<br><br>
+                    Para revisar e confirmar os dados que coletamos, abra o link abaixo:<br><br>
+                    https://hub360.1wes.com/p/hf/c/676cd823-dab9-4bb5-9aaf-c169c16f3646<br><br>
+                    Você pode editar qualquer campo antes de confirmar. Se preferir desistir, basta clicar em "Cancelar atendimento" na mesma página.
+                  </div>
+                  <div class="hybrid-history-chat-time">08/05/2026, 11:09</div>
+                </div>
               </div>
             </div>
           </div>

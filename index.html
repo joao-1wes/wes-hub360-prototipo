@@ -2523,9 +2523,62 @@
                           <i data-lucide="play"></i>
                           <span>Iniciar conversa</span>
                         </button>
-                        <button class="icon-btn chat-voice-control" type="button" id="chatVoiceHistoryBtn" aria-label="Abrir histórico">
+                        <button class="icon-btn chat-voice-control" type="button" id="chatVoiceHistoryBtn" aria-label="Configurações da conversa">
                           <i data-lucide="sliders-horizontal"></i>
                         </button>
+                      </div>
+                      <div class="chat-voice-menu-popover" id="chatVoiceMenuPopover" aria-hidden="true" hidden>
+                        <p class="chat-voice-menu-label">Voz da IA</p>
+                        <div class="chat-voice-selector" id="chatVoiceSelector">
+                          <button class="chat-voice-selector-trigger" type="button" id="chatVoiceSelectorTrigger" aria-expanded="false" aria-label="Selecionar voz da IA">
+                            <span class="chat-voice-selector-value" id="chatVoiceSelectorValue">Francisca (Feminina)</span>
+                            <i data-lucide="chevron-down" class="chat-voice-selector-caret"></i>
+                          </button>
+                          <div class="chat-voice-selector-menu" id="chatVoiceSelectorMenu">
+                            <button class="chat-voice-selector-option is-active" type="button" data-voice-option="Francisca (Feminina)">Francisca (Feminina)</button>
+                            <button class="chat-voice-selector-option" type="button" data-voice-option="Antonio (Masculina)">Antonio (Masculina)</button>
+                            <button class="chat-voice-selector-option" type="button" data-voice-option="Brenda (Feminina)">Brenda (Feminina)</button>
+                            <button class="chat-voice-selector-option" type="button" data-voice-option="Donato (Masculina)">Donato (Masculina)</button>
+                          </div>
+                        </div>
+                        <div class="chat-voice-field">
+                          <label class="chat-voice-field-label" for="chatVoiceLanguageSelect">Idioma do agente</label>
+                          <div class="chat-voice-inline-select">
+                            <select id="chatVoiceLanguageSelect" aria-label="Idioma do agente">
+                              <option selected>Português (Brasil)</option>
+                              <option>Português (Portugal)</option>
+                              <option>English (US)</option>
+                              <option>Español (Latinoamérica)</option>
+                            </select>
+                            <i data-lucide="chevron-down"></i>
+                          </div>
+                        </div>
+                        <div class="chat-voice-field">
+                          <label class="chat-voice-field-label" for="chatVoiceTypeSelect">Tipo de voz</label>
+                          <div class="chat-voice-inline-select">
+                            <select id="chatVoiceTypeSelect" aria-label="Tipo de voz">
+                              <option selected>Natural</option>
+                              <option>Profissional</option>
+                              <option>Expressiva</option>
+                              <option>Neutra</option>
+                            </select>
+                            <i data-lucide="chevron-down"></i>
+                          </div>
+                        </div>
+                        <div class="chat-voice-interrupt-row">
+                          <span>Permitir interrupção</span>
+                          <label class="switch" for="chatVoiceInterruptToggle">
+                            <input id="chatVoiceInterruptToggle" type="checkbox" checked />
+                            <span class="switch-track"></span>
+                          </label>
+                        </div>
+                        <div class="chat-voice-interrupt-row">
+                          <span>Modo fone de ouvido</span>
+                          <label class="switch" for="chatVoiceHeadsetToggle">
+                            <input id="chatVoiceHeadsetToggle" type="checkbox" />
+                            <span class="switch-track"></span>
+                          </label>
+                        </div>
                       </div>
                     </div>
                     <div class="chat-empty is-hidden" id="chatEmpty">

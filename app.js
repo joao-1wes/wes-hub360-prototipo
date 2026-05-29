@@ -115,6 +115,10 @@ const chatInput = document.querySelector('.chat-input');
 const chatVoiceStartButton = document.getElementById('chatVoiceStartBtn');
 const chatVoiceMuteButton = document.getElementById('chatVoiceMuteBtn');
 const chatVoiceHistoryButton = document.getElementById('chatVoiceHistoryBtn');
+const chatVoiceMenuPopover = document.getElementById('chatVoiceMenuPopover');
+const chatVoiceSelector = document.getElementById('chatVoiceSelector');
+const chatVoiceSelectorTrigger = document.getElementById('chatVoiceSelectorTrigger');
+const chatVoiceSelectorValue = document.getElementById('chatVoiceSelectorValue');
 const chatVoiceStatus = document.getElementById('chatVoiceStatus');
 const chatVoiceUserLine = document.getElementById('chatVoiceUserLine');
 const chatVoiceAgentLine = document.getElementById('chatVoiceAgentLine');
@@ -3400,7 +3404,13 @@ function applyAgentConversationMode(payload = {}) {
   if (!agentChatModal) return;
   const voiceMode = Boolean(payload.voiceEnabled);
   agentChatModal.classList.toggle('voice-mode', voiceMode);
-  if (!voiceMode) agentChatModal.classList.remove('voice-history-open');
+  if (!voiceMode) {
+    agentChatModal.classList.remove('voice-history-open');
+    if (chatVoiceMenuPopover) {
+      chatVoiceMenuPopover.hidden = true;
+      chatVoiceMenuPopover.setAttribute('aria-hidden', 'true');
+    }
+  }
   agentChatModal.classList.remove('has-voice-transcript');
   agentChatModal.dataset.voiceMode = voiceMode ? 'true' : 'false';
   agentChatModal.dataset.voiceStage = 'idle';
@@ -3945,6 +3955,14 @@ if (agentChatModal) {
       agentChatModal.classList.remove('open');
       agentChatModal.classList.remove('voice-history-open');
       agentChatModal.setAttribute('aria-hidden', 'true');
+      if (chatVoiceMenuPopover) {
+        chatVoiceMenuPopover.hidden = true;
+        chatVoiceMenuPopover.setAttribute('aria-hidden', 'true');
+      }
+      if (chatVoiceSelector) {
+        chatVoiceSelector.classList.remove('is-open');
+        chatVoiceSelectorTrigger?.setAttribute('aria-expanded', 'false');
+      }
       const scopeLine = document.getElementById('agentChatScopeLine');
       if (scopeLine) scopeLine.hidden = true;
       if (chatAttachMenu) {
@@ -4243,6 +4261,21 @@ document.addEventListener('click', (event) => {
   if (!event.target.closest('.chat-history-menu')) {
     closeHistoryMenus();
   }
+  if (
+    agentChatModal?.classList.contains('voice-history-open') &&
+    !event.target.closest('#chatVoiceMenuPopover') &&
+    !event.target.closest('#chatVoiceHistoryBtn')
+  ) {
+    agentChatModal.classList.remove('voice-history-open');
+    if (chatVoiceMenuPopover) {
+      chatVoiceMenuPopover.hidden = true;
+      chatVoiceMenuPopover.setAttribute('aria-hidden', 'true');
+    }
+    if (chatVoiceSelector) {
+      chatVoiceSelector.classList.remove('is-open');
+      chatVoiceSelectorTrigger?.setAttribute('aria-expanded', 'false');
+    }
+  }
 });
 
 window.addEventListener('resize', closeHistoryMenus);
@@ -4276,9 +4309,40 @@ if (chatVoiceMuteButton) {
 }
 
 if (chatVoiceHistoryButton && agentChatModal) {
-  chatVoiceHistoryButton.addEventListener('click', () => {
-    const historyList = agentChatModal.querySelector('.chat-history');
-    historyList?.scrollTo({ top: 0, behavior: 'smooth' });
+  chatVoiceHistoryButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = agentChatModal.classList.toggle('voice-history-open');
+    if (chatVoiceMenuPopover) {
+      chatVoiceMenuPopover.hidden = !isOpen;
+      chatVoiceMenuPopover.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    }
+    if (!isOpen && chatVoiceSelector) {
+      chatVoiceSelector.classList.remove('is-open');
+      chatVoiceSelectorTrigger?.setAttribute('aria-expanded', 'false');
+    }
+  });
+}
+
+if (chatVoiceSelectorTrigger && chatVoiceSelector) {
+  chatVoiceSelectorTrigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const isOpen = chatVoiceSelector.classList.toggle('is-open');
+    chatVoiceSelectorTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  });
+}
+
+if (chatVoiceMenuPopover && chatVoiceSelectorValue) {
+  chatVoiceMenuPopover.addEventListener('click', (event) => {
+    const option = event.target.closest('.chat-voice-selector-option');
+    if (!option) return;
+    const selectedVoice = String(option.dataset.voiceOption || option.textContent || '').trim();
+    if (!selectedVoice) return;
+    chatVoiceSelectorValue.textContent = selectedVoice;
+    chatVoiceMenuPopover.querySelectorAll('.chat-voice-selector-option').forEach((item) => {
+      item.classList.toggle('is-active', item === option);
+    });
+    chatVoiceSelector?.classList.remove('is-open');
+    chatVoiceSelectorTrigger?.setAttribute('aria-expanded', 'false');
   });
 }
 

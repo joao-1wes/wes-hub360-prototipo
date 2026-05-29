@@ -8022,6 +8022,200 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   height: 20px;
 }
 
+.chat-voice-menu-popover {
+  position: absolute;
+  right: 18px;
+  bottom: 76px;
+  width: min(356px, calc(100% - 36px));
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  padding: 14px;
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 20;
+  text-align: left;
+}
+
+#agentChatModal.voice-history-open .chat-voice-menu-popover {
+  display: flex;
+}
+
+.chat-voice-menu-label {
+  margin: 0;
+  font-size: var(--md-label-medium);
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.chat-voice-selector {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-voice-selector-trigger {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 10px;
+  border: var(--field-outline-width) solid #016ff4;
+  background: #ffffff;
+  display: grid;
+  grid-template-columns: 1fr 18px;
+  align-items: center;
+  column-gap: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  text-align: left;
+  color: #0d47a1;
+  cursor: pointer;
+  box-shadow: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-voice-selector-trigger:hover,
+.chat-voice-selector-trigger:focus-visible {
+  border-color: #016ff4;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.18), 0 2px 8px rgba(1, 111, 244, 0.1);
+  outline: none;
+}
+
+.chat-voice-selector-caret {
+  color: #016ff4;
+}
+
+.chat-voice-selector-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+  font-weight: 600;
+}
+
+.chat-voice-selector-caret {
+  width: 16px;
+  height: 16px;
+  transition: transform 0.2s ease;
+}
+
+.chat-voice-selector.is-open .chat-voice-selector-caret {
+  transform: rotate(180deg);
+}
+
+.chat-voice-selector-menu {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(1, 111, 244, 0.14);
+  background: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 10px 28px rgba(1, 111, 244, 0.12), 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+.chat-voice-selector.is-open .chat-voice-selector-menu {
+  display: flex;
+}
+
+.chat-voice-selector-option {
+  border: none;
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 10px 12px;
+  text-align: left;
+  font: inherit;
+  font-size: var(--md-body-medium);
+  line-height: 18px;
+  font-weight: 500;
+  color: #111827;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.chat-voice-selector-option:hover {
+  background: #f8fafc;
+}
+
+.chat-voice-selector-option.is-active {
+  background: #e6f0ff;
+  color: #016ff4;
+  font-weight: 700;
+}
+
+.chat-voice-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-voice-field-label {
+  font-size: var(--md-label-medium);
+  line-height: 16px;
+  color: var(--muted);
+  font-weight: 600;
+  text-align: left;
+}
+
+.chat-voice-inline-select {
+  min-height: 44px;
+  border-radius: 10px;
+  border: var(--field-outline-width) solid #016ff4;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.chat-voice-inline-select:focus-within {
+  border-color: #016ff4;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.18), 0 2px 8px rgba(1, 111, 244, 0.1);
+}
+
+.chat-voice-inline-select select {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+  font-weight: 600;
+  color: #0d47a1;
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 8px;
+}
+
+.chat-voice-inline-select .lucide {
+  width: 16px;
+  height: 16px;
+  color: #016ff4;
+  pointer-events: none;
+}
+
+.chat-voice-interrupt-row {
+  min-height: 46px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+  font-weight: 600;
+  color: #111827;
+}
+
 #agentChatModal.voice-mode .chat-layout {
   position: relative;
 }
@@ -8226,6 +8420,24 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
   .chat-history-item {
     min-width: 200px;
+  }
+
+  .chat-voice-menu-popover {
+    right: 12px;
+    left: 12px;
+    width: auto;
+    bottom: 72px;
+    border-radius: 14px;
+    padding: 10px;
+  }
+
+  .chat-voice-selector-trigger {
+    min-height: 44px;
+    padding: 10px 12px;
+  }
+
+  .chat-voice-selector-value {
+    font-size: var(--md-body-medium);
   }
 }
 

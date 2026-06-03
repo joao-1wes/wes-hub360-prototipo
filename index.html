@@ -1514,8 +1514,8 @@
                           <span>Adicionar texto</span>
                         </button>
                       </div>
-                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar por voz">
-                        <i data-lucide="audio-lines"></i>
+                      <button class="icon-btn action-icon agent-chat-toggle" aria-label="Conversar">
+                        <span class="material-symbols-rounded">chat</span>
                       </button>
                       <button class="icon-btn action-icon danger" aria-label="Excluir">
                         <span class="material-symbols-rounded">delete</span>
@@ -2518,14 +2518,14 @@
                         </div>
                       </div>
                       <div class="chat-voice-controls">
-                        <button class="icon-btn chat-voice-control" type="button" id="chatVoiceMuteBtn" aria-label="Silenciar microfone">
+                        <button class="icon-btn chat-voice-control has-tooltip" type="button" id="chatVoiceMuteBtn" aria-label="Silenciar microfone" data-tooltip="Silenciar microfone">
                           <i data-lucide="mic-off"></i>
                         </button>
                         <button class="btn primary chat-voice-start" type="button" id="chatVoiceStartBtn">
                           <i data-lucide="play"></i>
                           <span>Iniciar conversa</span>
                         </button>
-                        <button class="icon-btn chat-voice-control" type="button" id="chatVoiceHistoryBtn" aria-label="Configurações da conversa">
+                        <button class="icon-btn chat-voice-control has-tooltip" type="button" id="chatVoiceHistoryBtn" aria-label="Configurações da conversa" data-tooltip="Configurações da conversa">
                           <i data-lucide="sliders-horizontal"></i>
                         </button>
                       </div>
@@ -2648,45 +2648,49 @@
                       </div>
                     </div>
                     <div class="chat-composer">
-                      <div class="chat-attach-group">
-                        <button class="icon-btn chat-attach-toggle" type="button" aria-label="Adicionar" aria-expanded="false">
-                          <i data-lucide="plus"></i>
-                        </button>
-                        <div class="chat-menu chat-attach-menu">
-                          <button type="button" class="ui-menu-item">
-                            <i data-lucide="paperclip"></i>
-                            <span>Inserir arquivo</span>
+                      <div class="chat-input-shell">
+                        <div class="chat-attach-group chat-input-attach">
+                          <button class="icon-btn chat-attach-toggle" type="button" aria-label="Adicionar" aria-expanded="false">
+                            <i data-lucide="plus"></i>
                           </button>
-                          <button type="button" class="ui-menu-item chat-skill-toggle">
-                            <i data-lucide="puzzle"></i>
-                            <span>Habilidades</span>
-                            <i data-lucide="chevron-right" class="menu-caret"></i>
-                          </button>
-                          <div class="chat-menu chat-skill-menu">
-                            <div class="chat-skill-item">
-                              <span>CEP</span>
-                              <label class="switch small">
-                                <input type="checkbox" />
-                                <span class="switch-track"></span>
-                              </label>
-                            </div>
-                            <div class="chat-skill-item">
-                              <span>Clima</span>
-                              <label class="switch small">
-                                <input type="checkbox" />
-                                <span class="switch-track"></span>
-                              </label>
+                          <div class="chat-menu chat-attach-menu">
+                            <button type="button" class="ui-menu-item">
+                              <i data-lucide="paperclip"></i>
+                              <span>Inserir arquivo</span>
+                            </button>
+                            <button type="button" class="ui-menu-item chat-skill-toggle">
+                              <i data-lucide="puzzle"></i>
+                              <span>Habilidades</span>
+                              <i data-lucide="chevron-right" class="menu-caret"></i>
+                            </button>
+                            <div class="chat-menu chat-skill-menu">
+                              <div class="chat-skill-item">
+                                <span>CEP</span>
+                                <label class="switch small">
+                                  <input type="checkbox" />
+                                  <span class="switch-track"></span>
+                                </label>
+                              </div>
+                              <div class="chat-skill-item">
+                                <span>Clima</span>
+                                <label class="switch small">
+                                  <input type="checkbox" />
+                                  <span class="switch-track"></span>
+                                </label>
+                              </div>
                             </div>
                           </div>
                         </div>
-	                      </div>
-		                      <input class="chat-input" type="text" placeholder="Digite sua mensagem" />
-	                      <button class="btn outline small chat-mic icon-only has-tooltip" type="button" aria-label="Ditar mensagem" data-tooltip="Ditar mensagem">
-	                        <i data-lucide="mic"></i>
-	                      </button>
-	                      <button class="btn primary small chat-send icon-only has-tooltip" type="button" aria-label="Enviar" data-tooltip="Enviar">
-	                        <i data-lucide="send"></i>
-	                      </button>
+                        <input class="chat-input" type="text" placeholder="Pergunte alguma coisa" />
+                        <div class="chat-input-actions">
+                          <button class="chat-mic icon-only has-tooltip" type="button" aria-label="Ditar mensagem" data-tooltip="Ditar mensagem">
+                            <i data-lucide="mic"></i>
+                          </button>
+                          <button class="chat-send icon-only has-tooltip" type="button" aria-label="Conversar por voz" data-tooltip="Conversar por voz" data-chat-mode="voice">
+                            <i data-lucide="audio-lines"></i>
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>

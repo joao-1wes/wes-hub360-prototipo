@@ -985,13 +985,17 @@ function setChatDictationState(isActive) {
   chatDictationButton.setAttribute('aria-label', nextTooltip);
   chatDictationButton.dataset.tooltip = nextTooltip;
   chatDictationButton.innerHTML = `<i data-lucide="${isActive ? 'circle-stop' : 'mic'}"></i>`;
+  scheduleLucideRefresh();
+}
+
+function setVoiceConversationState(isActive) {
+  if (!agentChatModal?.classList.contains('voice-mode')) return;
   if (chatVoiceStatus) {
     chatVoiceStatus.textContent = isActive ? 'Ouvindo...' : 'Pronto para começar';
   }
-  if (agentChatModal?.classList.contains('voice-mode')) {
-    agentChatModal.dataset.voiceStage = isActive ? 'listening' : 'idle';
-  }
+  agentChatModal.dataset.voiceStage = isActive ? 'listening' : 'idle';
   if (chatVoiceStartButton) {
+    chatVoiceStartButton.dataset.voiceActive = isActive ? 'true' : 'false';
     chatVoiceStartButton.innerHTML = isActive
       ? '<i data-lucide="square"></i><span>Encerrar conversa</span>'
       : '<i data-lucide="play"></i><span>Iniciar conversa</span>';
@@ -3458,7 +3462,6 @@ function buildAgentChatPayloadFromButton(button) {
   let rowCtxId = '';
   const environmentSlug = String(row?.dataset.hubOrg || hubOrgId || '').trim();
   const projectId = String(row?.dataset.projectId || '').trim();
-  const voiceEnabled = String(row?.dataset.voiceEnabled || '').trim() === 'true';
 
   if (row) {
     const nameStrong = row.querySelector('span strong');
@@ -3486,7 +3489,7 @@ function buildAgentChatPayloadFromButton(button) {
     rowCtxId,
     environmentSlug,
     projectId,
-    voiceEnabled,
+    voiceEnabled: false,
     projectSlug: project?.slug || '',
     projectTitle: project?.title || ''
   };
@@ -3510,7 +3513,39 @@ function applyAgentConversationMode(payload = {}) {
     if (chatVoiceUserLine) chatVoiceUserLine.textContent = '...';
     if (chatVoiceAgentLine) chatVoiceAgentLine.textContent = '...';
     if (chatVoiceStatus) chatVoiceStatus.textContent = 'Pronto para começar';
+    setVoiceConversationState(false);
   }
+}
+
+function getCurrentAgentChatName() {
+  if (!agentChatTitle) return 'Agente';
+  return agentChatTitle.textContent
+    .replace(/^Conversa por voz com\s+/i, '')
+    .replace(/^Chat com\s+/i, '')
+    .trim() || 'Agente';
+}
+
+function openAgentVoiceConversationStage() {
+  if (!agentChatModal) return;
+  setChatDictationState(false);
+  const agentName = getCurrentAgentChatName();
+  applyAgentConversationMode({ voiceEnabled: true });
+  setVoiceConversationState(false);
+  if (agentChatTitle) {
+    agentChatTitle.textContent = `Conversa por voz com ${agentName}`;
+  }
+  if (agentChatSubtitle) {
+    const activeHistory = chatHistoryList?.querySelector('.chat-history-item.active:not([hidden])');
+    if (activeHistory) {
+      const historyTitle = activeHistory.querySelector('.chat-history-title')?.value || 'Conversa';
+      const historyDate = activeHistory.querySelector('.chat-history-date')?.textContent?.trim() || 'Hoje';
+      agentChatSubtitle.textContent = `${historyTitle} • Última conversa por voz ${historyDate}`;
+    } else {
+      const agentId = String(agentChatModal.dataset.agentId || '').trim();
+      agentChatSubtitle.textContent = agentId ? `${agentId} • Voz pronta` : 'Voz pronta';
+    }
+  }
+  scheduleLucideRefresh();
 }
 
 function openAgentChatModalWithPayload(payload) {
@@ -3563,13 +3598,11 @@ function openAgentChatModalFromToggle(button) {
   let agentName = 'Agente';
   let agentId = '';
   let rowCtxId = '';
-  let voiceEnabled = false;
 
   if (row) {
     const nameStrong = row.querySelector('span strong');
     if (nameStrong) agentName = nameStrong.textContent.trim();
     const uuid = row.dataset.agentUuid;
-    voiceEnabled = String(row.dataset.voiceEnabled || '').trim() === 'true';
     rowCtxId = String(row.dataset.hubContext || '').trim();
     if (!rowCtxId) {
       rowCtxId = String(row.closest('.agents-context-block')?.dataset.hubContext || '').trim();
@@ -3585,9 +3618,9 @@ function openAgentChatModalFromToggle(button) {
   }
 
   if (agentChatTitle) {
-    agentChatTitle.textContent = voiceEnabled ? `Conversa por voz com ${agentName}` : `Chat com ${agentName}`;
+    agentChatTitle.textContent = `Chat com ${agentName}`;
   }
-  applyAgentConversationMode({ voiceEnabled });
+  applyAgentConversationMode({ voiceEnabled: false });
   agentChatModal.dataset.agentId = agentId;
   agentChatModal.dataset.contextId = rowCtxId || String(hubContextId || '').trim();
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
@@ -3597,9 +3630,7 @@ function openAgentChatModalFromToggle(button) {
     if (activeHistory) {
       const historyTitle = activeHistory.querySelector('.chat-history-title')?.value || 'Conversa';
       const historyDate = activeHistory.querySelector('.chat-history-date')?.textContent?.trim() || 'Hoje';
-      agentChatSubtitle.textContent = voiceEnabled
-        ? `${historyTitle} • Última conversa por voz ${historyDate}`
-        : `${historyTitle} • Última conversa ${historyDate}`;
+      agentChatSubtitle.textContent = `${historyTitle} • Última conversa ${historyDate}`;
 	    } else {
 	      agentChatSubtitle.textContent = agentId ? `${agentId} • Online agora` : 'Online agora';
 	    }
@@ -4382,10 +4413,10 @@ if (chatDictationButton) {
   });
 }
 
-if (chatVoiceStartButton && chatDictationButton) {
+if (chatVoiceStartButton) {
   chatVoiceStartButton.addEventListener('click', () => {
-    chatDictationButton.click();
-    chatInput?.focus();
+    const isActive = chatVoiceStartButton.dataset.voiceActive === 'true';
+    setVoiceConversationState(!isActive);
   });
 }
 
@@ -4445,7 +4476,11 @@ if (chatVoiceMenuPopover && chatVoiceSelectorValue) {
 
 if (chatSendButton) {
   chatSendButton.addEventListener('click', () => {
-    if (chatSendButton.disabled) return;
+    const hasText = Boolean(chatInput?.value.trim());
+    if (!hasText) {
+      openAgentVoiceConversationStage();
+      return;
+    }
     setChatDictationState(false);
     const activeHistory = document.querySelector('.chat-history-item.active');
     if (!activeHistory) return;
@@ -4545,7 +4580,14 @@ const updateSkillStatus = () => {
 const updateChatSendState = () => {
   if (!chatInput || !chatSendButton) return;
   const hasText = chatInput.value.trim().length > 0;
-  chatSendButton.disabled = !hasText;
+  const nextIcon = hasText ? 'send' : 'audio-lines';
+  const nextLabel = hasText ? 'Enviar' : 'Conversar por voz';
+  chatSendButton.disabled = false;
+  chatSendButton.dataset.chatMode = hasText ? 'send' : 'voice';
+  chatSendButton.dataset.tooltip = nextLabel;
+  chatSendButton.setAttribute('aria-label', nextLabel);
+  chatSendButton.innerHTML = `<i data-lucide="${nextIcon}"></i>`;
+  scheduleLucideRefresh();
 };
 
 const resetChatThread = () => {
@@ -6280,6 +6322,7 @@ function hubCloseAgentChatIfOpen() {
   agentChatModal.setAttribute('aria-hidden', 'true');
   stopChatSpeechPlayback();
   setChatDictationState(false);
+  setVoiceConversationState(false);
   const scopeLine = document.getElementById('agentChatScopeLine');
   if (scopeLine) scopeLine.hidden = true;
   if (chatAttachMenu) chatAttachMenu.classList.remove('open');
@@ -7060,12 +7103,8 @@ function getAgentPublicLink(agent = {}) {
   return url.toString();
 }
 
-function getAgentActionIcon(agent = {}) {
-  return agent.voice_enabled ? 'audio-lines' : 'message-circle';
-}
-
 function getAgentActionLabel(agent = {}) {
-  return agent.voice_enabled ? 'Conversar por voz' : 'Conversar';
+  return 'Conversar';
 }
 
 async function copyTextToClipboard(text) {
@@ -7167,9 +7206,8 @@ function buildAgentRowElement(agent) {
   const publicLink = visibility.isPublic ? getAgentPublicLink(agent) : '';
   const hasProject = Boolean(agent.project_id);
   const desc = escapeHtmlWes(`${(agent.description || '').trim()}${hasProject ? '' : ' • Sem projeto'}`.trim());
-  const actionIcon = getAgentActionIcon(agent);
   const actionLabel = getAgentActionLabel(agent);
-  row.innerHTML = `<span><strong>${name}</strong></span><span class="agents-row-description">${desc}</span><span title="${escapeHtmlWes(agent.id)}">${idCell}</span><span><span class="${ragClass}">${rag}</span></span><span class="agents-row-environment"><span class="agents-environment-badge">${escapeHtmlWes(environmentLabel)}</span></span><span class="agents-row-visibility"><span class="agents-visibility-badge${visibility.isPublic ? ' agents-visibility-badge--public' : ''}">${escapeHtmlWes(visibility.label)}</span></span><span class="row-actions"><button type="button" class="icon-btn action-icon agent-edit-toggle" data-agent-id="${escapeHtmlWes(agent.id)}" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button><button type="button" class="icon-btn action-icon ${visibility.isPublic && publicLink ? 'agents-copy-link-btn' : 'muted-icon'}" data-agent-public-link="${escapeHtmlWes(publicLink)}" aria-label="Compartilhar agente"${visibility.isPublic && publicLink ? '' : ' disabled'}><i data-lucide="share"></i></button><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="${escapeHtmlWes(actionLabel)}"><i data-lucide="${escapeHtmlWes(actionIcon)}"></i></button></span>`;
+  row.innerHTML = `<span><strong>${name}</strong></span><span class="agents-row-description">${desc}</span><span title="${escapeHtmlWes(agent.id)}">${idCell}</span><span><span class="${ragClass}">${rag}</span></span><span class="agents-row-environment"><span class="agents-environment-badge">${escapeHtmlWes(environmentLabel)}</span></span><span class="agents-row-visibility"><span class="agents-visibility-badge${visibility.isPublic ? ' agents-visibility-badge--public' : ''}">${escapeHtmlWes(visibility.label)}</span></span><span class="row-actions"><button type="button" class="icon-btn action-icon agent-edit-toggle" data-agent-id="${escapeHtmlWes(agent.id)}" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button><button type="button" class="icon-btn action-icon ${visibility.isPublic && publicLink ? 'agents-copy-link-btn' : 'muted-icon'}" data-agent-public-link="${escapeHtmlWes(publicLink)}" aria-label="Compartilhar agente"${visibility.isPublic && publicLink ? '' : ' disabled'}><i data-lucide="share"></i></button><button type="button" class="icon-btn action-icon danger agent-delete-toggle" aria-label="Excluir agente"><span class="material-symbols-rounded">delete</span></button><button type="button" class="icon-btn action-icon agent-chat-toggle" aria-label="${escapeHtmlWes(actionLabel)}"><span class="material-symbols-rounded">chat</span></button></span>`;
   return row;
 }
 

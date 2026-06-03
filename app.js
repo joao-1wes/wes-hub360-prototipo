@@ -37,6 +37,11 @@ const packagesFilterBtn = document.getElementById('packagesFilterBtn');
 const packagesFilterMenu = document.getElementById('packagesFilterMenu');
 const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
+const voiceMessagingFilterBtn = document.getElementById('voiceMessagingFilterBtn');
+const voiceMessagingFilterMenu = document.getElementById('voiceMessagingFilterMenu');
+const openVoiceMessagingCreatePage = document.getElementById('openVoiceMessagingCreatePage');
+const voiceMessagingCreateBackBtn = document.getElementById('voiceMessagingCreateBackBtn');
+const voiceMessagingCreateCancelBtn = document.getElementById('voiceMessagingCreateCancelBtn');
 const hybridFlowsFilterBtn = document.getElementById('hybridFlowsFilterBtn');
 const hybridFlowsFilterMenu = document.getElementById('hybridFlowsFilterMenu');
 const hybridHistoryFilterBtn = document.getElementById('hybridHistoryFilterBtn');
@@ -119,6 +124,11 @@ const chatVoiceMenuPopover = document.getElementById('chatVoiceMenuPopover');
 const chatVoiceSelector = document.getElementById('chatVoiceSelector');
 const chatVoiceSelectorTrigger = document.getElementById('chatVoiceSelectorTrigger');
 const chatVoiceSelectorValue = document.getElementById('chatVoiceSelectorValue');
+const chatVoiceInterruptToggle = document.getElementById('chatVoiceInterruptToggle');
+const chatVoiceInterruptSensitivity = document.getElementById('chatVoiceInterruptSensitivity');
+const chatVoiceInterruptSensitivityValue = document.getElementById('chatVoiceInterruptSensitivityValue');
+const chatVoiceInterruptSensitivityDescription = document.getElementById('chatVoiceInterruptSensitivityDescription');
+const chatVoiceSensitivityGroup = document.getElementById('chatVoiceSensitivityGroup');
 const chatVoiceStatus = document.getElementById('chatVoiceStatus');
 const chatVoiceUserLine = document.getElementById('chatVoiceUserLine');
 const chatVoiceAgentLine = document.getElementById('chatVoiceAgentLine');
@@ -1001,6 +1011,39 @@ function setVoiceStageIdle() {
   if (chatVoiceStatus) chatVoiceStatus.textContent = 'Pronto para começar';
 }
 
+function syncChatVoiceInterruptSensitivity() {
+  if (!chatVoiceInterruptSensitivity) return;
+  const sensitivity = Number(chatVoiceInterruptSensitivity.value || 1);
+  const levels = [
+    {
+      label: 'Baixa',
+      description: 'Prioriza a fala da IA e só interrompe quando a sua fala estiver bem clara.',
+    },
+    {
+      label: 'Média',
+      description: 'Equilibra fluidez e resposta para interromper sem cortar cedo demais.',
+    },
+    {
+      label: 'Alta',
+      description: 'Reage às pausas mais rápido, ideal para interromper a IA com menos esforço.',
+    },
+  ];
+  const current = levels[Math.min(Math.max(sensitivity, 0), levels.length - 1)] || levels[1];
+  if (chatVoiceInterruptSensitivityValue) {
+    chatVoiceInterruptSensitivityValue.textContent = current.label;
+  }
+  if (chatVoiceInterruptSensitivityDescription) {
+    chatVoiceInterruptSensitivityDescription.textContent = current.description;
+  }
+}
+
+function syncChatVoiceInterruptSensitivityEnabled() {
+  if (!chatVoiceInterruptSensitivity) return;
+  const enabled = Boolean(chatVoiceInterruptToggle?.checked);
+  chatVoiceInterruptSensitivity.disabled = !enabled;
+  chatVoiceSensitivityGroup?.classList.toggle('is-disabled', !enabled);
+}
+
 function isValidAgentsPageEnvironmentId(environmentId) {
   return AGENTS_PAGE_ENVIRONMENTS.some((item) => item.id === environmentId);
 }
@@ -1411,6 +1454,43 @@ if (usersFilterBtn && usersFilterMenu) {
   }
 }
 
+if (voiceMessagingFilterBtn && voiceMessagingFilterMenu) {
+  voiceMessagingFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    voiceMessagingFilterMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    voiceMessagingFilterMenu.classList.remove('open');
+  });
+
+  const filterOptions = voiceMessagingFilterMenu.querySelectorAll('.filter-option');
+  const clearButton = voiceMessagingFilterMenu.querySelector('.filter-clear');
+
+  filterOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const group = button.dataset.filter;
+      voiceMessagingFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      voiceMessagingFilterMenu.classList.remove('open');
+    });
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      voiceMessagingFilterMenu
+        .querySelectorAll('.filter-option')
+        .forEach((item) => item.classList.remove('active'));
+      voiceMessagingFilterMenu
+        .querySelectorAll('.filter-option[data-value=\"\"]')
+        .forEach((item) => item.classList.add('active'));
+      voiceMessagingFilterMenu.classList.remove('open');
+    });
+  }
+}
+
 if (hybridFlowsFilterBtn && hybridFlowsFilterMenu) {
   hybridFlowsFilterBtn.addEventListener('click', (event) => {
     event.stopPropagation();
@@ -1447,6 +1527,18 @@ if (hybridFlowsFilterBtn && hybridFlowsFilterMenu) {
     });
   }
 }
+
+openVoiceMessagingCreatePage?.addEventListener('click', () => {
+  window.location.hash = '#/dashboard/voice-messaging/new';
+});
+
+voiceMessagingCreateBackBtn?.addEventListener('click', () => {
+  window.location.hash = '#/dashboard/voice-messaging';
+});
+
+voiceMessagingCreateCancelBtn?.addEventListener('click', () => {
+  window.location.hash = '#/dashboard/voice-messaging';
+});
 
 if (hybridHistoryFilterBtn && hybridHistoryFilterMenu) {
   hybridHistoryFilterBtn.addEventListener('click', (event) => {
@@ -4330,6 +4422,11 @@ if (chatVoiceSelectorTrigger && chatVoiceSelector) {
     chatVoiceSelectorTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
   });
 }
+
+chatVoiceInterruptSensitivity?.addEventListener('input', syncChatVoiceInterruptSensitivity);
+chatVoiceInterruptToggle?.addEventListener('change', syncChatVoiceInterruptSensitivityEnabled);
+syncChatVoiceInterruptSensitivity();
+syncChatVoiceInterruptSensitivityEnabled();
 
 if (chatVoiceMenuPopover && chatVoiceSelectorValue) {
   chatVoiceMenuPopover.addEventListener('click', (event) => {
@@ -8355,6 +8452,7 @@ const routeMap = {
   'dashboard/schedules': 'page-schedules',
   'dashboard/agents': 'page-agents',
   'dashboard/voice-messaging': 'page-voice-messaging',
+  'dashboard/voice-messaging/new': 'page-voice-messaging-create',
   'dashboard/campaigns': 'page-campaigns',
   'dashboard/hybrid-flows': 'page-hybrid-flows',
   'dashboard/hybrid-flows/new': 'page-hybrid-flows-create',
@@ -8368,6 +8466,8 @@ const routeMap = {
   'dashboard/credentials': 'page-credentials',
   'dashboard/input-files': 'page-input-files',
   'dashboard/users': 'page-users',
+  'dashboard/mcps': 'page-mcps',
+  'dashboard/skills': 'page-skills',
   'dashboard/audit': 'page-audit',
   'dashboard/companies': 'page-companies',
   // 'dashboard/organization': 'page-organization',
@@ -8385,6 +8485,7 @@ const sectionMap = {
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
   'dashboard/agents': 'Automa\u00e7\u00e3o',
   'dashboard/voice-messaging': 'Atendimento dinâmico',
+  'dashboard/voice-messaging/new': 'Atendimento dinâmico',
   'dashboard/campaigns': 'Atendimento dinâmico',
   'dashboard/hybrid-flows': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/new': 'Atendimento dinâmico',
@@ -8398,6 +8499,8 @@ const sectionMap = {
   'dashboard/credentials': 'Armazenamento',
   'dashboard/input-files': 'Armazenamento',
   'dashboard/users': 'Administração',
+  'dashboard/mcps': 'Administração',
+  'dashboard/skills': 'Administração',
   'dashboard/audit': 'Administração',
   'dashboard/companies': 'Administração',
   'dashboard/environments': 'Administração',
@@ -8500,6 +8603,8 @@ const normalizeVisiblePortugueseLabels = () => {
   const replacements = [
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
+    ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'MCP\'s'],
+    ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
     ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
     ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
@@ -8551,6 +8656,8 @@ const updateActivePage = () => {
 
   const navRouteKey = routeKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
+    : routeKey.startsWith('dashboard/voice-messaging/')
+      ? 'dashboard/voice-messaging'
     : routeKey.startsWith('dashboard/channels/')
       ? 'dashboard/channels'
       : routeKey;
@@ -8561,6 +8668,7 @@ const updateActivePage = () => {
       'dashboard/document-analysis',
       'dashboard/schedules',
       'dashboard/voice-messaging',
+      'dashboard/voice-messaging/new',
       'dashboard/campaigns',
       'dashboard/hybrid-flows',
       'dashboard/agents',

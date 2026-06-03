@@ -262,6 +262,8 @@
             <div class="submenu" id="submenu-administration">
               <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
               <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
+              <a class="submenu-item" href="#/dashboard/mcps"><span class="submenu-label">MCP's</span></a>
+              <a class="submenu-item" href="#/dashboard/skills"><span class="submenu-label">Habilidades</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
               <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
             </div>
@@ -2565,12 +2567,38 @@
                             <i data-lucide="chevron-down"></i>
                           </div>
                         </div>
-                        <div class="chat-voice-interrupt-row">
-                          <span>Permitir interrupção</span>
-                          <label class="switch" for="chatVoiceInterruptToggle">
-                            <input id="chatVoiceInterruptToggle" type="checkbox" checked />
-                            <span class="switch-track"></span>
-                          </label>
+                        <div class="chat-voice-interrupt-card">
+                          <div class="chat-voice-interrupt-row-top">
+                            <span>Permitir interrupção</span>
+                            <label class="switch" for="chatVoiceInterruptToggle">
+                              <input id="chatVoiceInterruptToggle" type="checkbox" checked />
+                              <span class="switch-track"></span>
+                            </label>
+                          </div>
+                          <div class="chat-voice-sensitivity" id="chatVoiceSensitivityGroup">
+                            <div class="chat-voice-sensitivity-head">
+                              <label class="chat-voice-field-label" for="chatVoiceInterruptSensitivity">Sensibilidade da interrupção</label>
+                              <span class="chat-voice-sensitivity-value" id="chatVoiceInterruptSensitivityValue">Média</span>
+                            </div>
+                            <input
+                              class="chat-voice-sensitivity-range"
+                              id="chatVoiceInterruptSensitivity"
+                              type="range"
+                              min="0"
+                              max="2"
+                              step="1"
+                              value="1"
+                              aria-label="Sensibilidade da interrupção"
+                            />
+                            <div class="chat-voice-sensitivity-scale" aria-hidden="true">
+                              <span>Baixa</span>
+                              <span>Média</span>
+                              <span>Alta</span>
+                            </div>
+                            <p class="chat-voice-sensitivity-description" id="chatVoiceInterruptSensitivityDescription">
+                              Ajusta o quanto a conversa aceita interrupções enquanto a IA está falando. Baixa prioriza continuidade, média equilibra resposta e fluidez, e alta reage mais rápido quando você começa a falar.
+                            </p>
+                          </div>
                         </div>
                         <div class="chat-voice-interrupt-row">
                           <span>Modo fone de ouvido</span>
@@ -2841,27 +2869,150 @@
 
           <div class="page" id="page-voice-messaging" data-title="Mensageria por voz">
             <div class="section">
-              <div class="page-header">
+              <div class="page-header hybrid-flows-page-header">
                 <div>
                   <h2>Mensageria por voz</h2>
-                  <p class="page-subtitle">Estruture jornadas de voz e acompanhe a operação deste canal em um único lugar.</p>
+                  <p class="page-subtitle">Configure agentes e dispare campanhas de chamadas automatizadas para os seus contatos.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn outline" type="button">
+                    Ver insights
+                  </button>
+                  <button class="btn primary" id="openVoiceMessagingCreatePage" type="button">
+                    <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                    Nova mensageria de voz
+                  </button>
                 </div>
               </div>
-              <div class="info-banner">
-                Esta página-base já está pronta no padrão visual do projeto. O conteúdo funcional pode ser encaixado aqui no próximo passo.
-              </div>
-              <div class="panel-row">
-                <div class="panel panel-wide">
-                  <div class="panel-header">
-                    <h3>Visão geral</h3>
+
+              <div class="filters-grid">
+                <div class="form-field hybrid-flows-search-field-wrap">
+                  <div class="search-field hybrid-flows-search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="search" placeholder="Filtre por nome ou descrição..." aria-label="Buscar por nome ou descrição" />
                   </div>
-                  <div class="panel-empty">Espaço reservado para indicadores, filtros e status da mensageria por voz.</div>
                 </div>
-                <div class="panel panel-mid">
-                  <div class="panel-header">
-                    <h3>Próximos blocos</h3>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="voiceMessagingFilterBtn" type="button">
+                    <span class="material-symbols-rounded">filter_list</span>Filtros
+                  </button>
+                  <div class="menu" id="voiceMessagingFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Status</span>
+                      <button class="filter-option active" data-filter="status" data-value="">Todos os status</button>
+                      <button class="filter-option" data-filter="status" data-value="completed">Concluída</button>
+                      <button class="filter-option" data-filter="status" data-value="in-progress">Em andamento</button>
+                      <button class="filter-option" data-filter="status" data-value="failed">Com falha</button>
+                    </div>
                   </div>
-                  <div class="panel-empty">Aqui entram ações rápidas, cards de resumo ou qualquer conteúdo que você enviar depois.</div>
+                </div>
+              </div>
+
+              <div class="hybrid-flows-table-wrap">
+                <table class="hybrid-flows-table" aria-label="Lista de operações de mensageria por voz">
+                  <thead>
+                    <tr>
+                      <th>Operação</th>
+                      <th>Agente</th>
+                      <th>Conexão</th>
+                      <th>Status</th>
+                      <th>Criada em</th>
+                      <th class="hybrid-flows-col-actions">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><strong>Teste POC</strong></td>
+                      <td><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></td>
+                      <td>Oktor</td>
+                      <td><span class="chip success">Concluída</span></td>
+                      <td>08/05/2026, 11:14:25</td>
+                      <td>
+                        <div class="row-actions hybrid-flows-row-actions">
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
+                            <span class="material-symbols-rounded">edit</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><strong>Teste</strong></td>
+                      <td><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></td>
+                      <td>Oktor</td>
+                      <td><span class="chip success">Concluída</span></td>
+                      <td>08/05/2026, 07:30:29</td>
+                      <td>
+                        <div class="row-actions hybrid-flows-row-actions">
+                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
+                            <span class="material-symbols-rounded">edit</span>
+                          </button>
+                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                            <span class="material-symbols-rounded">delete</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-voice-messaging-create" data-title="Nova mensageria de voz">
+            <div class="section voice-messaging-create-page">
+              <div class="telegram-page-topbar">
+                <button class="hybrid-history-top-link" id="voiceMessagingCreateBackBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  Voltar para Mensageria por voz
+                </button>
+              </div>
+              <div class="page-header voice-messaging-create-head">
+                <div class="voice-messaging-create-title-wrap">
+                  <h2>Nova mensageria de voz</h2>
+                  <p class="page-subtitle">Configure um agente de voz e uma conexão Oktor ou NVoIP para disparar campanhas de chamadas automatizadas. As chamadas são feitas pelo provedor escolhido com a sua conta.</p>
+                  <p class="page-subtitle">Etapa 1 de 6</p>
+                </div>
+              </div>
+
+              <div class="voice-messaging-create-card">
+                <div class="form-field">
+                  <label class="modal-label modal-label--required" for="voiceMessagingOperationNameInput">Nome da operação</label>
+                  <input class="modal-input" id="voiceMessagingOperationNameInput" type="text" />
+                  <p class="page-subtitle">Use um nome descritivo para reconhecer esta operação na listagem.</p>
+                </div>
+
+                <div class="voice-messaging-variables-card">
+                  <h3><span class="material-symbols-rounded" aria-hidden="true">info</span>Personalize a mensagem por destinatário</h3>
+                  <p>Cada chamada será disparada com o nome do destinatário no lugar da variável. Clique em uma variável abaixo para inseri-la onde está o cursor. Você também pode criar variáveis personalizadas (ex.: empresa, valor, vencimento) que serão preenchidas na lista de destinatários.</p>
+                  <div class="voice-messaging-variable-actions">
+                    <button class="btn outline" type="button">+ {{name}}</button>
+                    <button class="btn outline" type="button">+ {{phone}}</button>
+                    <button class="btn outline voice-messaging-variable-new" type="button">+ Nova variável</button>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="modal-label" for="voiceMessagingCampaignMessageInput">Mensagem da campanha (opcional)</label>
+                  <textarea class="modal-textarea voice-messaging-message-input" id="voiceMessagingCampaignMessageInput" rows="7" placeholder="Ex.: Olá {{name}}, aqui é a WES Hub360 confirmando sua consulta. Pressione 1 para confirmar ou 2 para remarcar."></textarea>
+                </div>
+
+                <div class="voice-messaging-optimize-row">
+                  <button class="btn outline" type="button">
+                    <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+                    Otimizar com IA
+                  </button>
+                  <p>Corrige ortografia, melhora a naturalidade da fala e mantém suas variáveis intactas.</p>
+                </div>
+
+                <div class="voice-messaging-create-actions">
+                  <button class="btn ghost" id="voiceMessagingCreateCancelBtn" type="button">Cancelar</button>
+                  <button class="btn primary" type="button">Próximo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></button>
                 </div>
               </div>
             </div>
@@ -4412,6 +4563,130 @@
                       </button>
                     </span>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-skills" data-title="Habilidades">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Habilidades</h2>
+                  <p class="page-subtitle">Gerencie habilidades disponíveis para uso dos agentes.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Adicionar nova habilidade
+                  </button>
+                </div>
+              </div>
+              <div class="filters-grid users-filters">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar habilidade" />
+                  </div>
+                </div>
+              </div>
+              <div class="data-table users-table skills-table">
+                <div class="data-row header">
+                  <span>Habilidade</span>
+                  <span>Descrição</span>
+                  <span>Status</span>
+                  <span>Atualizado</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span><strong>CEP</strong></span>
+                  <span class="muted">Busca dados de endereço a partir de um CEP informado na conversa.</span>
+                  <span class="chip success">Ativa</span>
+                  <span>01/06/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar habilidade">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir habilidade">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Clima</strong></span>
+                  <span class="muted">Consulta as condições de tempo e previsão para uma localidade.</span>
+                  <span class="chip success">Ativa</span>
+                  <span>30/05/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar habilidade">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir habilidade">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-mcps" data-title="MCP's">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>MCP's</h2>
+                  <p class="page-subtitle">Gerencie MCP's disponíveis para uso dos agentes.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Adicionar novo MCP
+                  </button>
+                </div>
+              </div>
+              <div class="filters-grid users-filters">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input type="text" placeholder="Buscar MCP" />
+                  </div>
+                </div>
+              </div>
+              <div class="data-table users-table skills-table">
+                <div class="data-row header">
+                  <span>MCP</span>
+                  <span>Descrição</span>
+                  <span>Status</span>
+                  <span>Atualizado</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Weather MCP</strong></span>
+                  <span class="muted">Permite consultar clima e previsão por localidade para respostas em tempo real.</span>
+                  <span class="chip success">Ativo</span>
+                  <span>01/06/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar MCP">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir MCP">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span><strong>CEP MCP</strong></span>
+                  <span class="muted">Permite buscar endereço completo a partir de CEP para enriquecer respostas do agente.</span>
+                  <span class="chip success">Ativo</span>
+                  <span>30/05/2026</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" aria-label="Editar MCP">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir MCP">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
                 </div>
               </div>
             </div>

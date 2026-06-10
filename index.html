@@ -2664,20 +2664,39 @@
                               <i data-lucide="chevron-right" class="menu-caret"></i>
                             </button>
                             <div class="chat-menu chat-skill-menu">
-                              <div class="chat-skill-item">
-                                <span>CEP</span>
-                                <label class="switch small">
-                                  <input type="checkbox" />
-                                  <span class="switch-track"></span>
-                                </label>
+                              <div class="chat-skill-menu-head">
+                                <div>
+                                  <p class="chat-skill-menu-eyebrow">Habilidades</p>
+                                  <h4>Adicionar ao chat</h4>
+                                </div>
+                                <span class="chat-skill-menu-badge" id="chatSkillCountBadge">0 ativas</span>
                               </div>
-                              <div class="chat-skill-item">
-                                <span>Clima</span>
-                                <label class="switch small">
-                                  <input type="checkbox" />
-                                  <span class="switch-track"></span>
-                                </label>
+                              <div class="search-field chat-skill-search">
+                                <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                                <input
+                                  id="chatSkillSearchInput"
+                                  type="search"
+                                  autocomplete="off"
+                                  placeholder="Buscar habilidade"
+                                  aria-label="Buscar habilidade"
+                                />
                               </div>
+                              <div class="chat-skill-section">
+                                <div class="chat-skill-section-head">
+                                  <span>Mais utilizadas com este agente</span>
+                                </div>
+                                <div class="chat-skill-list" id="chatSkillTopList"></div>
+                              </div>
+                              <div class="chat-skill-section">
+                                <div class="chat-skill-section-head">
+                                  <span>Todas as habilidades</span>
+                                  <button type="button" class="chat-skill-section-link" id="chatSkillViewAllButton">Ver todas</button>
+                                </div>
+                                <div class="chat-skill-list" id="chatSkillAllList"></div>
+                              </div>
+                              <p class="chat-skill-empty" id="chatSkillEmptyState" hidden>
+                                Nenhuma habilidade encontrada para esta busca.
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -2980,7 +2999,6 @@
                 <div class="voice-messaging-create-title-wrap">
                   <h2>Nova mensageria de voz</h2>
                   <p class="page-subtitle">Configure um agente de voz e uma conexão Oktor ou NVoIP para disparar campanhas de chamadas automatizadas. As chamadas são feitas pelo provedor escolhido com a sua conta.</p>
-                  <p class="page-subtitle">Etapa 1 de 6</p>
                 </div>
               </div>
 
@@ -2991,27 +3009,132 @@
                   <p class="page-subtitle">Use um nome descritivo para reconhecer esta operação na listagem.</p>
                 </div>
 
-                <div class="voice-messaging-variables-card">
-                  <h3><span class="material-symbols-rounded" aria-hidden="true">info</span>Personalize a mensagem por destinatário</h3>
-                  <p>Cada chamada será disparada com o nome do destinatário no lugar da variável. Clique em uma variável abaixo para inseri-la onde está o cursor. Você também pode criar variáveis personalizadas (ex.: empresa, valor, vencimento) que serão preenchidas na lista de destinatários.</p>
-                  <div class="voice-messaging-variable-actions">
-                    <button class="btn outline" type="button">+ {{name}}</button>
-                    <button class="btn outline" type="button">+ {{phone}}</button>
-                    <button class="btn outline voice-messaging-variable-new" type="button">+ Nova variável</button>
+                <div class="form-field">
+                  <label class="modal-label modal-label--required" for="voiceMessagingAgentSelect">Agente de voz</label>
+                  <div class="agent-create-voice-row voice-messaging-agent-row">
+                    <div class="hub-select-wrap hub-select-wrap--block">
+                      <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">record_voice_over</span>
+                      <select class="hub-select" id="voiceMessagingAgentSelect" aria-label="Selecionar agente de voz" required>
+                        <option value="wes-ai-voice-agent" data-voice-name="Antonio" data-voice-locale="pt-BR" data-agent-description="Agente principal para confirmações, lembretes e campanhas recorrentes." data-preview-text="Olá, aqui é o agente de voz da WES Hub360 confirmando sua consulta.">WES AI Voice Agent</option>
+                        <option value="agente-atendimento-voz" data-voice-name="Clara" data-voice-locale="pt-BR" data-agent-description="Agente de atendimento focado em triagem, dúvidas gerais e direcionamento inicial." data-preview-text="Olá, eu sou a Clara e vou conduzir este atendimento de voz com você.">Agente de Atendimento (Voz)</option>
+                        <option value="agente-manutencao-voz" data-voice-name="Marina" data-voice-locale="pt-BR" data-agent-description="Agente voltado para comunicações operacionais, cobrança e manutenção de agenda." data-preview-text="Olá, aqui é a Marina entrando em contato com um aviso importante da operação.">Agente Manutenção VOZ</option>
+                      </select>
+                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                    </div>
+                    <button class="icon-btn agent-create-voice-preview voice-messaging-agent-preview" id="voiceMessagingAgentPreview" type="button" aria-label="Ouvir prévia da voz do agente">
+                      <span class="material-symbols-rounded" aria-hidden="true">volume_up</span>
+                    </button>
                   </div>
+                  <p class="modal-field-hint voice-messaging-agent-hint" id="voiceMessagingAgentHint">Voz Antonio · PT-BR. Agente principal para confirmações, lembretes e campanhas recorrentes.</p>
                 </div>
 
+                <section class="voice-messaging-connection-section" aria-labelledby="voiceMessagingConnectionTitle">
+                  <div class="voice-messaging-section-copy">
+                    <h3 id="voiceMessagingConnectionTitle">Configurar conexão</h3>
+                    <p>Escolha o provedor e preencha as credenciais da sua conta. Aceitamos Oktor e NVoIP.</p>
+                  </div>
+
+                  <div class="voice-messaging-connection-toggle">
+                    <div class="voice-messaging-simulation-toggle">
+                      <strong>Modo simulação</strong>
+                      <div class="voice-messaging-simulation-toggle-control">
+                        <label class="switch">
+                          <input type="checkbox" id="voiceMessagingSimulationMode" />
+                          <span class="switch-track"></span>
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="modal-label">Provedor</label>
+                    <div class="voice-messaging-provider-tabs" role="radiogroup" aria-label="Selecionar provedor de voz">
+                      <label class="voice-messaging-provider-option">
+                        <input class="voice-messaging-provider-radio" type="radio" name="voiceMessagingProvider" value="oktor" checked />
+                        <span class="voice-messaging-provider-tab">Oktor</span>
+                      </label>
+                      <label class="voice-messaging-provider-option">
+                        <input class="voice-messaging-provider-radio" type="radio" name="voiceMessagingProvider" value="nvoip" />
+                        <span class="voice-messaging-provider-tab">NVoIP</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="voice-messaging-connection-grid">
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="voiceMessagingConnectionNameInput">Nome da conexão</label>
+                      <input class="modal-input" id="voiceMessagingConnectionNameInput" type="text" />
+                      <p class="modal-field-hint">Use um nome que ajude a reconhecer esta conexão na consulta posterior.</p>
+                    </div>
+
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="voiceMessagingConnectionEndpointInput">Endpoint</label>
+                      <input class="modal-input" id="voiceMessagingConnectionEndpointInput" type="text" />
+                      <p class="modal-field-hint">URL do endpoint do provedor.</p>
+                    </div>
+
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="voiceMessagingConnectionAccountInput">ID da conta</label>
+                      <input class="modal-input" id="voiceMessagingConnectionAccountInput" type="text" value="admin@1wes.com" />
+                      <p class="modal-field-hint">Identificador da conta no provedor.</p>
+                    </div>
+
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="voiceMessagingConnectionTokenInput">Token da API</label>
+                      <input class="modal-input" id="voiceMessagingConnectionTokenInput" type="password" value="12345678" />
+                      <p class="modal-field-hint">Token de API que autoriza as chamadas.</p>
+                    </div>
+                  </div>
+
+                  <div class="voice-messaging-connection-actions">
+                    <button class="btn outline voice-messaging-header-action-btn" id="voiceMessagingTestConnectionBtn" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">verified</span>
+                      Testar conexão
+                    </button>
+                    <p>Tentamos autenticar no provedor. É obrigatório passar nesse teste para avançar para a próxima etapa.</p>
+                  </div>
+                </section>
+
                 <div class="form-field">
-                  <label class="modal-label" for="voiceMessagingCampaignMessageInput">Mensagem da campanha (opcional)</label>
+                  <div class="modal-label-row voice-messaging-message-header">
+                    <label class="modal-label modal-label--required" for="voiceMessagingCampaignMessageInput">Mensagem da campanha</label>
+                    <button class="btn outline voice-messaging-optimize-btn" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+                      Otimizar com IA
+                    </button>
+                  </div>
+                  <div class="voice-messaging-message-hint-row">
+                    <div class="modal-field-hint voice-messaging-message-hint">
+                      <span>Digite variáveis entre chaves duplas, como <code>{{name}}</code> ou <code>{{empresa}}</code>, para personalizar a mensagem. No envio, cada destinatário recebe o texto com seus próprios dados.</span>
+                      <details class="voice-messaging-hint-popover">
+                        <summary aria-label="Ver exemplos de variáveis">
+                          <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                        </summary>
+                        <div class="voice-messaging-hint-popover-card">
+                          <strong>Exemplos de variáveis</strong>
+                          <ul>
+                            <li><code>{{name}}</code> para o nome do destinatário</li>
+                            <li><code>{{empresa}}</code> para o nome da empresa</li>
+                            <li><code>{{vencimento}}</code> para uma data ou prazo</li>
+                            <li><code>{{valor}}</code> para valores ou condições da campanha</li>
+                          </ul>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
                   <textarea class="modal-textarea voice-messaging-message-input" id="voiceMessagingCampaignMessageInput" rows="7" placeholder="Ex.: Olá {{name}}, aqui é a WES Hub360 confirmando sua consulta. Pressione 1 para confirmar ou 2 para remarcar."></textarea>
                 </div>
 
-                <div class="voice-messaging-optimize-row">
-                  <button class="btn outline" type="button">
-                    <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
-                    Otimizar com IA
-                  </button>
-                  <p>Corrige ortografia, melhora a naturalidade da fala e mantém suas variáveis intactas.</p>
+                <div class="form-field">
+                  <div class="modal-label-row voice-messaging-message-header">
+                    <label class="modal-label modal-label--required" for="voiceMessagingRecipientsInput">Destinatários</label>
+                    <button class="btn outline voice-messaging-header-action-btn" id="voiceMessagingImportCsvBtn" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                      Importar CSV
+                    </button>
+                  </div>
+                  <p class="modal-field-hint">Cole a lista de contatos que vão receber a chamada. Você pode usar uma linha por destinatário ou importar um CSV.</p>
+                  <textarea class="modal-textarea voice-messaging-message-input voice-messaging-recipients-input" id="voiceMessagingRecipientsInput" rows="7" placeholder="Ex.:\nMaria Silva, +55 21 99999-1234\nJoão Souza, +55 11 98888-4567"></textarea>
                 </div>
 
                 <div class="voice-messaging-create-actions">
@@ -6359,6 +6482,6 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./auth.js"></script>
-    <script src="./app.js"></script>
+    <script src="./app.js?v=20260608-provider-tabs"></script>
   </body>
 </html>

@@ -42,6 +42,14 @@ const voiceMessagingFilterMenu = document.getElementById('voiceMessagingFilterMe
 const openVoiceMessagingCreatePage = document.getElementById('openVoiceMessagingCreatePage');
 const voiceMessagingCreateBackBtn = document.getElementById('voiceMessagingCreateBackBtn');
 const voiceMessagingCreateCancelBtn = document.getElementById('voiceMessagingCreateCancelBtn');
+const voiceMessagingCampaignMessageInput = document.getElementById('voiceMessagingCampaignMessageInput');
+const voiceMessagingAgentSelect = document.getElementById('voiceMessagingAgentSelect');
+const voiceMessagingAgentPreview = document.getElementById('voiceMessagingAgentPreview');
+const voiceMessagingAgentHint = document.getElementById('voiceMessagingAgentHint');
+const voiceMessagingProviderOptions = Array.from(document.querySelectorAll('.voice-messaging-provider-option'));
+const voiceMessagingProviderRadios = Array.from(document.querySelectorAll('.voice-messaging-provider-radio'));
+const voiceMessagingConnectionAccountInput = document.getElementById('voiceMessagingConnectionAccountInput');
+const voiceMessagingConnectionTokenInput = document.getElementById('voiceMessagingConnectionTokenInput');
 const hybridFlowsFilterBtn = document.getElementById('hybridFlowsFilterBtn');
 const hybridFlowsFilterMenu = document.getElementById('hybridFlowsFilterMenu');
 const hybridHistoryFilterBtn = document.getElementById('hybridHistoryFilterBtn');
@@ -104,7 +112,12 @@ const chatAttachToggle = document.querySelector('.chat-attach-toggle');
 const chatAttachMenu = document.querySelector('.chat-attach-menu');
 const chatSkillToggle = document.querySelector('.chat-skill-toggle');
 const chatSkillMenu = document.querySelector('.chat-skill-menu');
-const chatSkillSwitches = document.querySelectorAll('.chat-skill-item input[type="checkbox"]');
+const chatSkillTopList = document.getElementById('chatSkillTopList');
+const chatSkillAllList = document.getElementById('chatSkillAllList');
+const chatSkillSearchInput = document.getElementById('chatSkillSearchInput');
+const chatSkillEmptyState = document.getElementById('chatSkillEmptyState');
+const chatSkillCountBadge = document.getElementById('chatSkillCountBadge');
+const chatSkillViewAllButton = document.getElementById('chatSkillViewAllButton');
 const chatAttachGroup = document.querySelector('.chat-attach-group');
 const chatSkillStatusDot = document.querySelector('.chat-skill-status .status-dot');
 const chatNewButton = document.querySelector('.chat-new-btn');
@@ -425,6 +438,73 @@ let projectModalAvailableAgents = [];
 let appToastTimer = null;
 let telegramConnectionValidated = false;
 let telegramTestSent = false;
+const CHAT_SKILL_CATALOG = Object.freeze([
+  {
+    id: 'cep',
+    name: 'CEP',
+    icon: 'map-pinned',
+    description: 'Busca dados de endereco a partir de um CEP informado na conversa.',
+    tags: ['cep', 'endereco', 'logradouro', 'bairro'],
+  },
+  {
+    id: 'clima',
+    name: 'Clima',
+    icon: 'cloud-sun',
+    description: 'Consulta tempo atual e previsao para uma localidade.',
+    tags: ['clima', 'tempo', 'previsao', 'temperatura'],
+  },
+  {
+    id: 'cnh',
+    name: 'Consulta CNH',
+    icon: 'id-card',
+    description: 'Valida situacao e dados essenciais de uma carteira de habilitacao.',
+    tags: ['cnh', 'habilitacao', 'motorista', 'documento'],
+  },
+  {
+    id: 'veiculos',
+    name: 'Consulta de Veiculos',
+    icon: 'car',
+    description: 'Retorna dados basicos do veiculo por placa ou identificador.',
+    tags: ['veiculo', 'placa', 'frota', 'automovel'],
+  },
+  {
+    id: 'cpf-cnpj',
+    name: 'CPF e CNPJ',
+    icon: 'badge-check',
+    description: 'Enriquece cadastros com dados resumidos de pessoas e empresas.',
+    tags: ['cpf', 'cnpj', 'documento', 'cadastro'],
+  },
+  {
+    id: 'financeiro',
+    name: 'Financeiro',
+    icon: 'banknote',
+    description: 'Apoia consultas de saldos, conciliacoes e indicadores financeiros.',
+    tags: ['financeiro', 'saldo', 'conciliacao', 'pagamento'],
+  },
+  {
+    id: 'tickets',
+    name: 'Tickets',
+    icon: 'ticket',
+    description: 'Busca chamados, filas e SLAs para apoiar o atendimento.',
+    tags: ['ticket', 'chamado', 'sla', 'fila'],
+  },
+  {
+    id: 'crm',
+    name: 'CRM',
+    icon: 'users',
+    description: 'Recupera dados de clientes, funil e historico comercial.',
+    tags: ['crm', 'cliente', 'lead', 'vendas'],
+  },
+]);
+const CHAT_SKILL_AGENT_PROFILES = Object.freeze([
+  { match: ['finance', 'financ', 'pulse', 'ledger'], topSkills: ['financeiro', 'cpf-cnpj', 'cep', 'crm'] },
+  { match: ['ops', 'opera', 'nimbus', 'queue', 'sla'], topSkills: ['tickets', 'clima', 'cep', 'crm'] },
+  { match: ['atlas', 'core', 'api', 'etl', 'stream', 'sentinel'], topSkills: ['tickets', 'crm', 'cep', 'veiculos'] },
+  { match: ['people', 'rh', 'onboarding'], topSkills: ['cpf-cnpj', 'crm', 'cep', 'cnh'] },
+]);
+const CHAT_SKILL_DEFAULT_TOP = Object.freeze(['cep', 'clima', 'crm', 'tickets']);
+const agentChatSkillSelections = new Map();
+let activeAgentChatSkillQuery = '';
 
 if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
@@ -1542,6 +1622,143 @@ voiceMessagingCreateBackBtn?.addEventListener('click', () => {
 
 voiceMessagingCreateCancelBtn?.addEventListener('click', () => {
   window.location.hash = '#/dashboard/voice-messaging';
+});
+
+function syncVoiceMessagingAgentHint() {
+  if (!voiceMessagingAgentSelect || !voiceMessagingAgentHint) return;
+  const selectedOption = voiceMessagingAgentSelect.options[voiceMessagingAgentSelect.selectedIndex];
+  if (!selectedOption) return;
+  const voiceName = String(selectedOption.dataset.voiceName || '').trim() || 'Padrão';
+  const voiceLocale = String(selectedOption.dataset.voiceLocale || '').trim() || 'pt-BR';
+  const description = String(selectedOption.dataset.agentDescription || '').trim();
+  voiceMessagingAgentHint.textContent = `Voz ${voiceName} · ${voiceLocale}.${description ? ` ${description}` : ''}`;
+}
+
+const voiceMessagingProviderFieldConfig = {
+  oktor: {
+    accountLabel: 'ID da conta',
+    accountHint: 'Identificador da conta no provedor.',
+    accountPlaceholder: '',
+    accountType: 'text',
+    accountDefaultValue: 'admin@1wes.com',
+    tokenLabel: 'Token da API',
+    tokenHint: 'Token de API que autoriza as chamadas.',
+    tokenPlaceholder: '',
+    tokenType: 'password',
+    tokenDefaultValue: '12345678',
+  },
+  nvoip: {
+    accountLabel: 'Usuário',
+    accountHint: 'Usuário da conta NVoIP.',
+    accountPlaceholder: '',
+    accountType: 'text',
+    accountDefaultValue: '',
+    tokenLabel: 'ID da rota',
+    tokenHint: 'Identificador da rota de saída.',
+    tokenPlaceholder: '',
+    tokenType: 'text',
+    tokenDefaultValue: '',
+  },
+};
+
+const voiceMessagingProviderFieldValues = {
+  oktor: {
+    account: String(voiceMessagingConnectionAccountInput?.value || ''),
+    token: String(voiceMessagingConnectionTokenInput?.value || ''),
+  },
+  nvoip: {
+    account: '',
+    token: '',
+  },
+};
+
+function getSelectedVoiceMessagingProvider() {
+  return String(voiceMessagingProviderRadios.find((radio) => radio.checked)?.value || 'oktor').trim().toLowerCase();
+}
+
+function storeVoiceMessagingProviderFieldValues(provider = getSelectedVoiceMessagingProvider()) {
+  const key = String(provider || '').trim().toLowerCase();
+  if (!voiceMessagingProviderFieldValues[key]) return;
+  if (voiceMessagingConnectionAccountInput) {
+    voiceMessagingProviderFieldValues[key].account = voiceMessagingConnectionAccountInput.value;
+  }
+  if (voiceMessagingConnectionTokenInput) {
+    voiceMessagingProviderFieldValues[key].token = voiceMessagingConnectionTokenInput.value;
+  }
+}
+
+function syncVoiceMessagingProviderFields(provider = getSelectedVoiceMessagingProvider()) {
+  if (!voiceMessagingConnectionAccountInput || !voiceMessagingConnectionTokenInput) return;
+  const normalizedProvider = String(provider || '').trim().toLowerCase();
+  const config = voiceMessagingProviderFieldConfig[normalizedProvider] || voiceMessagingProviderFieldConfig.oktor;
+  const savedValues = voiceMessagingProviderFieldValues[normalizedProvider] || {
+    account: config.accountDefaultValue,
+    token: config.tokenDefaultValue,
+  };
+
+  const accountLabel = document.querySelector('label[for="voiceMessagingConnectionAccountInput"]');
+  const tokenLabel = document.querySelector('label[for="voiceMessagingConnectionTokenInput"]');
+  const accountHint = voiceMessagingConnectionAccountInput.nextElementSibling;
+  const tokenHint = voiceMessagingConnectionTokenInput.nextElementSibling;
+
+  if (accountLabel) accountLabel.textContent = config.accountLabel;
+  if (tokenLabel) tokenLabel.textContent = config.tokenLabel;
+  if (accountHint) accountHint.textContent = config.accountHint;
+  if (tokenHint) tokenHint.textContent = config.tokenHint;
+
+  voiceMessagingConnectionAccountInput.type = config.accountType;
+  voiceMessagingConnectionTokenInput.type = config.tokenType;
+  voiceMessagingConnectionAccountInput.placeholder = config.accountPlaceholder;
+  voiceMessagingConnectionTokenInput.placeholder = config.tokenPlaceholder;
+  voiceMessagingConnectionAccountInput.value = savedValues.account || config.accountDefaultValue || '';
+  voiceMessagingConnectionTokenInput.value = savedValues.token || config.tokenDefaultValue || '';
+}
+
+voiceMessagingAgentSelect?.addEventListener('change', syncVoiceMessagingAgentHint);
+syncVoiceMessagingAgentHint();
+
+voiceMessagingProviderRadios.forEach((radio) => {
+  const syncFromRadio = () => {
+    if (!radio.checked) return;
+    syncVoiceMessagingProviderFields(radio.value);
+  };
+  radio.addEventListener('change', syncFromRadio);
+  radio.addEventListener('input', syncFromRadio);
+});
+voiceMessagingProviderOptions.forEach((option) => {
+  option.addEventListener('click', () => {
+    window.requestAnimationFrame(() => {
+      syncVoiceMessagingProviderFields();
+    });
+  });
+});
+voiceMessagingConnectionAccountInput?.addEventListener('input', () => {
+  storeVoiceMessagingProviderFieldValues();
+});
+voiceMessagingConnectionTokenInput?.addEventListener('input', () => {
+  storeVoiceMessagingProviderFieldValues();
+});
+syncVoiceMessagingProviderFields();
+
+voiceMessagingAgentPreview?.addEventListener('click', () => {
+  if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance === 'undefined' || !voiceMessagingAgentSelect) return;
+  const selectedOption = voiceMessagingAgentSelect.options[voiceMessagingAgentSelect.selectedIndex];
+  if (!selectedOption) return;
+  const selectedLocale = String(selectedOption.dataset.voiceLocale || 'pt-BR').toLowerCase();
+  const selectedVoiceName = String(selectedOption.dataset.voiceName || '').trim().toLowerCase();
+  const fallbackPreviewText = String(selectedOption.dataset.previewText || '').trim() || 'Olá. Esta é uma prévia da voz configurada para este agente.';
+  const messagePreviewText = String(voiceMessagingCampaignMessageInput?.value || '').trim();
+  const previewText = messagePreviewText || fallbackPreviewText;
+  const utterance = new window.SpeechSynthesisUtterance(previewText);
+  const voices = window.speechSynthesis.getVoices?.() || [];
+  utterance.lang = String(selectedOption.dataset.voiceLocale || 'pt-BR');
+  utterance.voice =
+    voices.find((voice) => String(voice.name || '').toLowerCase().includes(selectedVoiceName) && String(voice.lang || '').toLowerCase() === selectedLocale) ||
+    voices.find((voice) => String(voice.lang || '').toLowerCase() === selectedLocale) ||
+    voices.find((voice) => String(voice.lang || '').toLowerCase().startsWith(selectedLocale.split('-')[0])) ||
+    null;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
 });
 
 if (hybridHistoryFilterBtn && hybridHistoryFilterMenu) {
@@ -3589,6 +3806,9 @@ function openAgentChatModalWithPayload(payload) {
       ? `Conversa por voz com ${payload.agentName}`
       : `Chat com ${payload.agentName}`;
   }
+  activeAgentChatSkillQuery = '';
+  if (chatSkillSearchInput) chatSkillSearchInput.value = '';
+  renderAgentChatSkillMenu();
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
   syncAgentChatHistoryScope();
 }
@@ -3623,6 +3843,8 @@ function openAgentChatModalFromToggle(button) {
   applyAgentConversationMode({ voiceEnabled: false });
   agentChatModal.dataset.agentId = agentId;
   agentChatModal.dataset.contextId = rowCtxId || String(hubContextId || '').trim();
+  activeAgentChatSkillQuery = '';
+  if (chatSkillSearchInput) chatSkillSearchInput.value = '';
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
   syncAgentChatHistoryScope();
   if (agentChatSubtitle) {
@@ -3641,6 +3863,7 @@ function openAgentChatModalFromToggle(button) {
   if (window.lucide) {
     scheduleLucideRefresh();
   }
+  renderAgentChatSkillMenu();
   updateSkillStatus();
   updateChatSendState();
   updateChatEmptyState();
@@ -4094,6 +4317,8 @@ if (agentChatModal) {
       if (chatSkillMenu) {
         chatSkillMenu.classList.remove('open');
       }
+      activeAgentChatSkillQuery = '';
+      if (chatSkillSearchInput) chatSkillSearchInput.value = '';
     }
   });
 }
@@ -4128,12 +4353,15 @@ document.addEventListener('click', (event) => {
     agentChatTitle.textContent = `Chat com ${agentName}`;
     agentChatSubtitle.textContent = date ? `${threadTitle} • Última conversa ${date}` : threadTitle;
     agentChatModal.dataset.contextId = contextId;
+    activeAgentChatSkillQuery = '';
+    if (chatSkillSearchInput) chatSkillSearchInput.value = '';
     const scopeLine = document.getElementById('agentChatScopeLine');
     if (scopeLine) scopeLine.hidden = true;
     syncAgentChatHistoryScope();
     agentChatModal.classList.add('open');
     agentChatModal.setAttribute('aria-hidden', 'false');
     scheduleLucideRefresh();
+    renderAgentChatSkillMenu();
     updateSkillStatus?.();
     updateChatSendState?.();
     updateChatEmptyState?.();
@@ -4556,6 +4784,10 @@ document.addEventListener('click', (event) => {
       chatAttachGroup.classList.toggle('is-skill-open', isOpen);
       chatAttachGroup.classList.add('is-open');
     }
+    if (isOpen) {
+      renderAgentChatSkillMenu();
+      window.setTimeout(() => chatSkillSearchInput?.focus(), 0);
+    }
     return;
   }
 
@@ -4566,14 +4798,131 @@ document.addEventListener('click', (event) => {
   closeChatMenus();
 });
 
+function getActiveAgentChatSkillKey() {
+  const agentId = String(agentChatModal?.dataset.agentId || '').trim();
+  if (agentId) return agentId;
+  const agentName = getAgentName().toLowerCase();
+  return agentName || 'default-agent-chat';
+}
+
+function getSelectedAgentSkillIds() {
+  const key = getActiveAgentChatSkillKey();
+  if (!agentChatSkillSelections.has(key)) {
+    agentChatSkillSelections.set(key, new Set());
+  }
+  return agentChatSkillSelections.get(key);
+}
+
+function getTopSkillsForActiveAgent() {
+  const agentName = getAgentName().toLowerCase();
+  const profile = CHAT_SKILL_AGENT_PROFILES.find(({ match }) => match.some((term) => agentName.includes(term)));
+  const topSkillIds = Array.isArray(profile?.topSkills) && profile.topSkills.length ? profile.topSkills : CHAT_SKILL_DEFAULT_TOP;
+  return topSkillIds
+    .map((id) => CHAT_SKILL_CATALOG.find((skill) => skill.id === id))
+    .filter(Boolean)
+    .slice(0, 4);
+}
+
+function matchesChatSkillQuery(skill, query) {
+  if (!query) return true;
+  const haystack = [skill.name, skill.description, ...(skill.tags || [])]
+    .join(' ')
+    .toLowerCase();
+  return haystack.includes(query);
+}
+
+function buildChatSkillItem(skill, selectedIds, isFeatured = false) {
+  const item = document.createElement('div');
+  item.className = `chat-skill-item${isFeatured ? ' is-featured' : ''}`;
+  item.dataset.skillId = skill.id;
+
+  const info = document.createElement('div');
+  info.className = 'chat-skill-item-info';
+
+  const textWrap = document.createElement('div');
+  textWrap.className = 'chat-skill-item-copy';
+  const title = document.createElement('span');
+  title.className = 'chat-skill-item-title';
+  title.textContent = skill.name;
+  const description = document.createElement('span');
+  description.className = 'chat-skill-item-description';
+  description.textContent = skill.description;
+  description.title = skill.description;
+  textWrap.append(title, description);
+  info.append(textWrap);
+
+  const toggle = document.createElement('span');
+  toggle.className = 'chat-skill-item-toggle';
+  const toggleLabel = document.createElement('label');
+  toggleLabel.className = 'switch small';
+  const input = document.createElement('input');
+  input.type = 'checkbox';
+  input.dataset.skillId = skill.id;
+  input.checked = selectedIds.has(skill.id);
+  const track = document.createElement('span');
+  track.className = 'switch-track';
+  toggleLabel.append(input, track);
+
+  toggle.appendChild(toggleLabel);
+  item.append(info, toggle);
+  item.addEventListener('click', (event) => {
+    if (event.target.closest('.switch')) return;
+    input.checked = !input.checked;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+  return item;
+}
+
+function renderAgentChatSkillMenu() {
+  if (!chatSkillTopList || !chatSkillAllList) return;
+  const selectedIds = getSelectedAgentSkillIds();
+  const query = activeAgentChatSkillQuery.trim().toLowerCase();
+  const topSkills = getTopSkillsForActiveAgent();
+  const topSkillIds = new Set(topSkills.map((skill) => skill.id));
+  const visibleTopSkills = topSkills.filter((skill) => matchesChatSkillQuery(skill, query));
+  const visibleCatalogSkills = CHAT_SKILL_CATALOG
+    .filter((skill) => !topSkillIds.has(skill.id))
+    .filter((skill) => matchesChatSkillQuery(skill, query));
+
+  chatSkillTopList.replaceChildren();
+  chatSkillAllList.replaceChildren();
+
+  visibleTopSkills.forEach((skill) => {
+    chatSkillTopList.appendChild(buildChatSkillItem(skill, selectedIds, true));
+  });
+  visibleCatalogSkills.forEach((skill) => {
+    chatSkillAllList.appendChild(buildChatSkillItem(skill, selectedIds));
+  });
+
+  const topSection = chatSkillTopList.closest('.chat-skill-section');
+  const allSection = chatSkillAllList.closest('.chat-skill-section');
+  if (topSection) topSection.hidden = visibleTopSkills.length === 0;
+  if (allSection) allSection.hidden = visibleCatalogSkills.length === 0;
+  if (chatSkillEmptyState) {
+    chatSkillEmptyState.hidden = visibleTopSkills.length + visibleCatalogSkills.length > 0;
+  }
+
+  updateSkillStatus();
+  scheduleLucideRefresh();
+}
+
 const updateSkillStatus = () => {
   if (!chatSkillStatusDot) return;
-  const anyEnabled = Array.from(chatSkillSwitches).some((toggle) => toggle.checked);
+  const selectedIds = getSelectedAgentSkillIds();
+  const activeCount = selectedIds.size;
+  const anyEnabled = activeCount > 0;
   chatSkillStatusDot.classList.toggle('is-active', anyEnabled);
   chatSkillStatusDot.classList.toggle('is-inactive', !anyEnabled);
   const statusWrapper = chatSkillStatusDot.closest('.chat-skill-status');
   if (statusWrapper) {
-    statusWrapper.dataset.tooltip = anyEnabled ? 'Habilidades ativas' : 'Habilidades inativas';
+    statusWrapper.dataset.tooltip = anyEnabled
+      ? `${activeCount} habilidade${activeCount > 1 ? 's' : ''} ativa${activeCount > 1 ? 's' : ''}`
+      : 'Habilidades inativas';
+  }
+  if (chatSkillCountBadge) {
+    chatSkillCountBadge.textContent = anyEnabled
+      ? `${activeCount} ativa${activeCount > 1 ? 's' : ''}`
+      : '0 ativas';
   }
 };
 
@@ -4599,7 +4948,7 @@ const resetChatThread = () => {
 
 const getAgentName = () => {
   if (!agentChatTitle) return '';
-  return agentChatTitle.textContent.replace(/^Chat com\s+/i, '').trim();
+  return agentChatTitle.textContent.replace(/^(Chat com|Conversa por voz com)\s+/i, '').trim();
 };
 
 const getAgentPrompt = (agentName) => {
@@ -4627,12 +4976,36 @@ const updateChatEmptyState = () => {
   }
 };
 
-if (chatSkillSwitches.length) {
-  chatSkillSwitches.forEach((toggle) => {
-    toggle.addEventListener('change', updateSkillStatus);
+if (chatSkillSearchInput) {
+  chatSkillSearchInput.addEventListener('input', () => {
+    activeAgentChatSkillQuery = String(chatSkillSearchInput.value || '').trim();
+    renderAgentChatSkillMenu();
   });
-  updateSkillStatus();
 }
+
+if (chatSkillMenu) {
+  chatSkillMenu.addEventListener('change', (event) => {
+    const target = event.target.closest('input[type="checkbox"][data-skill-id]');
+    if (!target) return;
+    const selectedIds = getSelectedAgentSkillIds();
+    const skillId = String(target.dataset.skillId || '').trim();
+    if (!skillId) return;
+    if (target.checked) {
+      selectedIds.add(skillId);
+    } else {
+      selectedIds.delete(skillId);
+    }
+    updateSkillStatus();
+  });
+}
+
+chatSkillViewAllButton?.addEventListener('click', () => {
+  closeChatMenus();
+  hubCloseAgentChatIfOpen();
+  window.location.hash = '#/dashboard/skills';
+});
+
+renderAgentChatSkillMenu();
 
 if (chatThread) {
   chatThread.addEventListener('click', (event) => {
@@ -6327,6 +6700,8 @@ function hubCloseAgentChatIfOpen() {
   if (scopeLine) scopeLine.hidden = true;
   if (chatAttachMenu) chatAttachMenu.classList.remove('open');
   if (chatSkillMenu) chatSkillMenu.classList.remove('open');
+  activeAgentChatSkillQuery = '';
+  if (chatSkillSearchInput) chatSkillSearchInput.value = '';
 }
 
 function syncAgentsPageScopeSelects() {
@@ -8794,6 +9169,13 @@ window.addEventListener('resize', syncAgentsFolderStripScroller);
 
 scheduleLucideRefresh();
 
+document.addEventListener('click', (event) => {
+  const openVoiceMessagingPopovers = document.querySelectorAll('.voice-messaging-hint-popover[open]');
+  if (!openVoiceMessagingPopovers.length) return;
+  if (event.target.closest('.voice-messaging-hint-popover')) return;
+  openVoiceMessagingPopovers.forEach((popover) => popover.removeAttribute('open'));
+});
+ 
 /** Painel lateral - chat direto (POST /chat, sem agente) */
 (function initDirectChatDrawer() {
   const drawer = document.getElementById('directChatDrawer');

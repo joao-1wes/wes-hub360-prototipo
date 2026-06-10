@@ -2488,16 +2488,16 @@
                 </aside>
                 <div class="chat-main">
                   <div class="modal-header chat-header">
-                    <div>
-                      <div class="chat-title-row">
-                        <h3 id="agentChatTitle">Chat com agente</h3>
-                        <div class="chat-skill-status" aria-label="Habilidades" data-tooltip="Habilidades inativas">
-                          <i data-lucide="puzzle"></i>
-                          <span class="status-dot is-inactive" aria-hidden="true"></span>
+                      <div>
+                        <div class="chat-title-row">
+                          <h3 id="agentChatTitle">Chat com agente</h3>
+                          <div class="chat-skill-status" aria-label="Habilidades" data-tooltip="Habilidades inativas">
+                            <i data-lucide="puzzle"></i>
+                            <span class="status-dot is-inactive" aria-hidden="true"></span>
+                          </div>
                         </div>
+                        <p class="chat-subtitle" id="agentChatSubtitle">Selecione um agente para iniciar</p>
                       </div>
-                      <p class="chat-subtitle" id="agentChatSubtitle">Selecione um agente para iniciar</p>
-                    </div>
                     <button class="icon-btn" aria-label="Fechar" data-modal-close>
                       <i data-lucide="x"></i>
                     </button>
@@ -2518,6 +2518,16 @@
                         </div>
                       </div>
                       <div class="chat-voice-controls">
+                        <button
+                          class="icon-btn chat-voice-control has-tooltip"
+                          type="button"
+                          id="chatVoiceScreenShareBtn"
+                          aria-label="Compartilhar tela"
+                          data-tooltip="Compartilhar tela"
+                          disabled
+                        >
+                          <i data-lucide="screen-share"></i>
+                        </button>
                         <button class="icon-btn chat-voice-control has-tooltip" type="button" id="chatVoiceMuteBtn" aria-label="Silenciar microfone" data-tooltip="Silenciar microfone">
                           <i data-lucide="mic-off"></i>
                         </button>
@@ -2525,6 +2535,53 @@
                           <i data-lucide="play"></i>
                           <span>Iniciar conversa</span>
                         </button>
+                        <div class="chat-voice-skill-wrap" id="chatVoiceSkillWrap">
+                          <button
+                            class="icon-btn chat-voice-control chat-voice-skill-toggle has-tooltip"
+                            type="button"
+                            id="chatVoiceSkillToggle"
+                            aria-label="Habilidades"
+                            aria-expanded="false"
+                            data-tooltip="Habilidades"
+                          >
+                            <i data-lucide="puzzle"></i>
+                          </button>
+                          <div class="chat-menu chat-skill-menu chat-skill-menu--voice" id="chatVoiceSkillMenu" data-chat-skill-menu-root>
+                            <div class="chat-skill-menu-head">
+                              <div>
+                                <p class="chat-skill-menu-eyebrow">Habilidades</p>
+                                <h4>Adicionar ao chat</h4>
+                              </div>
+                              <span class="chat-skill-menu-badge" data-chat-skill-count-badge>0 ativas</span>
+                            </div>
+                            <div class="search-field chat-skill-search">
+                              <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                              <input
+                                data-chat-skill-search-input
+                                type="search"
+                                autocomplete="off"
+                                placeholder="Buscar habilidade"
+                                aria-label="Buscar habilidade"
+                              />
+                            </div>
+                            <div class="chat-skill-section">
+                              <div class="chat-skill-section-head">
+                                <span>Mais utilizadas com este agente</span>
+                              </div>
+                              <div class="chat-skill-list" data-chat-skill-top-list></div>
+                            </div>
+                            <div class="chat-skill-section">
+                              <div class="chat-skill-section-head">
+                                <span>Todas as habilidades</span>
+                                <button type="button" class="chat-skill-section-link" data-chat-skill-view-all-button>Ver todas</button>
+                              </div>
+                              <div class="chat-skill-list" data-chat-skill-all-list></div>
+                            </div>
+                            <p class="chat-skill-empty" data-chat-skill-empty-state hidden>
+                              Nenhuma habilidade encontrada para esta busca.
+                            </p>
+                          </div>
+                        </div>
                         <button class="icon-btn chat-voice-control has-tooltip" type="button" id="chatVoiceHistoryBtn" aria-label="Configurações da conversa" data-tooltip="Configurações da conversa">
                           <i data-lucide="sliders-horizontal"></i>
                         </button>
@@ -2663,18 +2720,19 @@
                               <span>Habilidades</span>
                               <i data-lucide="chevron-right" class="menu-caret"></i>
                             </button>
-                            <div class="chat-menu chat-skill-menu">
+                            <div class="chat-menu chat-skill-menu" data-chat-skill-menu-root>
                               <div class="chat-skill-menu-head">
                                 <div>
                                   <p class="chat-skill-menu-eyebrow">Habilidades</p>
                                   <h4>Adicionar ao chat</h4>
                                 </div>
-                                <span class="chat-skill-menu-badge" id="chatSkillCountBadge">0 ativas</span>
+                                <span class="chat-skill-menu-badge" id="chatSkillCountBadge" data-chat-skill-count-badge>0 ativas</span>
                               </div>
                               <div class="search-field chat-skill-search">
                                 <span class="material-symbols-rounded" aria-hidden="true">search</span>
                                 <input
                                   id="chatSkillSearchInput"
+                                  data-chat-skill-search-input
                                   type="search"
                                   autocomplete="off"
                                   placeholder="Buscar habilidade"
@@ -2685,16 +2743,16 @@
                                 <div class="chat-skill-section-head">
                                   <span>Mais utilizadas com este agente</span>
                                 </div>
-                                <div class="chat-skill-list" id="chatSkillTopList"></div>
+                                <div class="chat-skill-list" id="chatSkillTopList" data-chat-skill-top-list></div>
                               </div>
                               <div class="chat-skill-section">
                                 <div class="chat-skill-section-head">
                                   <span>Todas as habilidades</span>
-                                  <button type="button" class="chat-skill-section-link" id="chatSkillViewAllButton">Ver todas</button>
+                                  <button type="button" class="chat-skill-section-link" id="chatSkillViewAllButton" data-chat-skill-view-all-button>Ver todas</button>
                                 </div>
-                                <div class="chat-skill-list" id="chatSkillAllList"></div>
+                                <div class="chat-skill-list" id="chatSkillAllList" data-chat-skill-all-list></div>
                               </div>
-                              <p class="chat-skill-empty" id="chatSkillEmptyState" hidden>
+                              <p class="chat-skill-empty" id="chatSkillEmptyState" data-chat-skill-empty-state hidden>
                                 Nenhuma habilidade encontrada para esta busca.
                               </p>
                             </div>

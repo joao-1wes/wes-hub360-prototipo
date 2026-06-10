@@ -2063,6 +2063,21 @@ body {
   background: #eef6ff;
 }
 
+.icon-btn:disabled,
+.icon-btn[disabled] {
+  color: #94a3b8;
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.icon-btn:disabled:hover,
+.icon-btn:disabled:focus-visible,
+.icon-btn[disabled]:hover,
+.icon-btn[disabled]:focus-visible {
+  background: transparent;
+  outline: none;
+}
+
 .icon-btn[aria-label]::after {
   content: attr(aria-label);
   position: absolute;
@@ -8028,6 +8043,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   position: relative;
 }
 
+#agentChatModal.voice-mode .chat-title-row .chat-skill-status {
+  display: inline-flex !important;
+  visibility: visible;
+  opacity: 1;
+}
+
 .chat-skill-status .lucide {
   width: 16px;
   height: 16px;
@@ -8072,6 +8093,36 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   opacity: 1;
 }
 
+.chat-voice-skill-wrap {
+  position: relative;
+  display: none;
+  z-index: 40;
+  align-self: center;
+  overflow: visible;
+}
+
+#agentChatModal.voice-mode .chat-voice-skill-wrap {
+  display: inline-flex;
+}
+
+#agentChatModal.voice-mode .chat-voice-skill-wrap.is-open {
+  z-index: 120;
+}
+
+.chat-voice-skill-toggle .lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 2;
+}
+
+.chat-voice-skill-toggle.has-tooltip::after {
+  top: calc(100% + 8px);
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  transform: translateX(-50%);
+}
+
 .chat-subtitle {
   margin: 4px 0 0;
   font-size: var(--md-body-small);
@@ -8084,6 +8135,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   height: auto;
   flex: 1;
   background: #f8fafc;
+  overflow: visible;
 }
 
 .chat-empty {
@@ -8286,6 +8338,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   padding: 24px 24px 22px;
   text-align: center;
   gap: 18px;
+  overflow: visible;
 }
 
 .chat-voice-content {
@@ -8379,16 +8432,21 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   width: 100%;
   border-top: 1px solid var(--border);
   padding-top: 18px;
+  position: relative;
   display: grid;
-  grid-template-columns: 44px 1fr 44px;
+  grid-template-columns: 44px 44px minmax(0, 280px) 44px 44px;
+  justify-content: center;
   align-items: center;
   gap: 16px;
   flex-shrink: 0;
+  overflow: visible;
+  z-index: 5;
 }
 
 .chat-voice-start {
   justify-self: center;
-  min-width: 320px;
+  width: min(100%, 280px);
+  min-width: 0;
   min-height: 52px;
   border-radius: 16px;
   display: inline-flex;
@@ -8864,6 +8922,24 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   box-sizing: border-box;
   overflow-y: auto;
   z-index: 50;
+  text-align: left;
+}
+
+.chat-skill-menu--voice {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: auto;
+  right: auto;
+  visibility: visible;
+  width: min(360px, calc(100vw - 96px));
+  max-width: calc(100vw - 96px);
+  max-height: min(460px, calc(100vh - 140px));
+  z-index: 1000;
+}
+
+.chat-skill-menu--voice.open {
+  display: flex !important;
 }
 
 .chat-attach-menu .ui-menu-item,

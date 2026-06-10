@@ -111,13 +111,18 @@ const agentChatSubtitle = document.getElementById('agentChatSubtitle');
 const chatAttachToggle = document.querySelector('.chat-attach-toggle');
 const chatAttachMenu = document.querySelector('.chat-attach-menu');
 const chatSkillToggle = document.querySelector('.chat-skill-toggle');
-const chatSkillMenu = document.querySelector('.chat-skill-menu');
-const chatSkillTopList = document.getElementById('chatSkillTopList');
-const chatSkillAllList = document.getElementById('chatSkillAllList');
-const chatSkillSearchInput = document.getElementById('chatSkillSearchInput');
-const chatSkillEmptyState = document.getElementById('chatSkillEmptyState');
-const chatSkillCountBadge = document.getElementById('chatSkillCountBadge');
-const chatSkillViewAllButton = document.getElementById('chatSkillViewAllButton');
+const chatSkillMenu = document.getElementById('chatSkillTopList')?.closest('[data-chat-skill-menu-root]')
+  || document.querySelector('.chat-attach-group [data-chat-skill-menu-root]');
+const chatVoiceSkillWrap = document.getElementById('chatVoiceSkillWrap');
+const chatVoiceSkillToggle = document.getElementById('chatVoiceSkillToggle');
+const chatVoiceSkillMenu = document.getElementById('chatVoiceSkillMenu');
+const chatSkillMenus = Array.from(document.querySelectorAll('[data-chat-skill-menu-root]'));
+const chatSkillTopLists = Array.from(document.querySelectorAll('[data-chat-skill-top-list]'));
+const chatSkillAllLists = Array.from(document.querySelectorAll('[data-chat-skill-all-list]'));
+const chatSkillSearchInputs = Array.from(document.querySelectorAll('[data-chat-skill-search-input]'));
+const chatSkillEmptyStates = Array.from(document.querySelectorAll('[data-chat-skill-empty-state]'));
+const chatSkillCountBadges = Array.from(document.querySelectorAll('[data-chat-skill-count-badge]'));
+const chatSkillViewAllButtons = Array.from(document.querySelectorAll('[data-chat-skill-view-all-button]'));
 const chatAttachGroup = document.querySelector('.chat-attach-group');
 const chatSkillStatusDot = document.querySelector('.chat-skill-status .status-dot');
 const chatNewButton = document.querySelector('.chat-new-btn');
@@ -3807,7 +3812,9 @@ function openAgentChatModalWithPayload(payload) {
       : `Chat com ${payload.agentName}`;
   }
   activeAgentChatSkillQuery = '';
-  if (chatSkillSearchInput) chatSkillSearchInput.value = '';
+  chatSkillSearchInputs.forEach((input) => {
+    input.value = '';
+  });
   renderAgentChatSkillMenu();
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
   syncAgentChatHistoryScope();
@@ -3844,7 +3851,9 @@ function openAgentChatModalFromToggle(button) {
   agentChatModal.dataset.agentId = agentId;
   agentChatModal.dataset.contextId = rowCtxId || String(hubContextId || '').trim();
   activeAgentChatSkillQuery = '';
-  if (chatSkillSearchInput) chatSkillSearchInput.value = '';
+  chatSkillSearchInputs.forEach((input) => {
+    input.value = '';
+  });
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
   syncAgentChatHistoryScope();
   if (agentChatSubtitle) {
@@ -4318,7 +4327,9 @@ if (agentChatModal) {
         chatSkillMenu.classList.remove('open');
       }
       activeAgentChatSkillQuery = '';
-      if (chatSkillSearchInput) chatSkillSearchInput.value = '';
+      chatSkillSearchInputs.forEach((input) => {
+        input.value = '';
+      });
     }
   });
 }
@@ -4354,7 +4365,9 @@ document.addEventListener('click', (event) => {
     agentChatSubtitle.textContent = date ? `${threadTitle} • Última conversa ${date}` : threadTitle;
     agentChatModal.dataset.contextId = contextId;
     activeAgentChatSkillQuery = '';
-    if (chatSkillSearchInput) chatSkillSearchInput.value = '';
+    chatSkillSearchInputs.forEach((input) => {
+      input.value = '';
+    });
     const scopeLine = document.getElementById('agentChatScopeLine');
     if (scopeLine) scopeLine.hidden = true;
     syncAgentChatHistoryScope();
@@ -4747,6 +4760,9 @@ const closeChatMenus = () => {
   if (chatSkillMenu) {
     chatSkillMenu.classList.remove('open');
   }
+  if (chatVoiceSkillMenu) {
+    chatVoiceSkillMenu.classList.remove('open');
+  }
   if (chatAttachGroup) {
     chatAttachGroup.classList.remove('is-open');
     chatAttachGroup.classList.remove('is-skill-open');
@@ -4754,12 +4770,80 @@ const closeChatMenus = () => {
   if (chatAttachToggle) {
     chatAttachToggle.setAttribute('aria-expanded', 'false');
   }
+  if (chatVoiceSkillToggle) {
+    chatVoiceSkillToggle.setAttribute('aria-expanded', 'false');
+  }
+  chatVoiceSkillWrap?.classList.remove('is-open');
 };
+
+function setVoiceSkillMenuOpen(nextOpen) {
+  if (!chatVoiceSkillMenu || !chatVoiceSkillToggle) return;
+  const isOpen = Boolean(nextOpen);
+  chatVoiceSkillMenu.classList.toggle('open', isOpen);
+  chatVoiceSkillToggle.setAttribute('aria-expanded', String(isOpen));
+  chatVoiceSkillWrap?.classList.toggle('is-open', isOpen);
+  if (!isOpen) return;
+  if (chatAttachMenu) chatAttachMenu.classList.remove('open');
+  if (chatSkillMenu) chatSkillMenu.classList.remove('open');
+  if (chatAttachGroup) {
+    chatAttachGroup.classList.remove('is-open');
+    chatAttachGroup.classList.remove('is-skill-open');
+  }
+  if (chatAttachToggle) {
+    chatAttachToggle.setAttribute('aria-expanded', 'false');
+  }
+  if (agentChatModal) {
+    agentChatModal.classList.remove('voice-history-open');
+  }
+  if (chatVoiceMenuPopover) {
+    chatVoiceMenuPopover.hidden = true;
+    chatVoiceMenuPopover.setAttribute('aria-hidden', 'true');
+  }
+  if (chatVoiceSelector) {
+    chatVoiceSelector.classList.remove('is-open');
+    chatVoiceSelectorTrigger?.setAttribute('aria-expanded', 'false');
+  }
+  renderAgentChatSkillMenu();
+  window.requestAnimationFrame(() => {
+    positionVoiceSkillMenu();
+    const targetInput = chatVoiceSkillMenu.querySelector('[data-chat-skill-search-input]');
+    targetInput?.focus();
+  });
+}
+
+function positionVoiceSkillMenu() {
+  if (!chatVoiceSkillMenu?.classList.contains('open') || !chatVoiceSkillToggle) return;
+  const buttonRect = chatVoiceSkillToggle.getBoundingClientRect();
+  const viewportPadding = 12;
+  const offset = 12;
+
+  chatVoiceSkillMenu.style.left = '0px';
+  chatVoiceSkillMenu.style.top = '0px';
+
+  const menuRect = chatVoiceSkillMenu.getBoundingClientRect();
+  const maxLeft = Math.max(viewportPadding, window.innerWidth - menuRect.width - viewportPadding);
+  const preferredLeft = buttonRect.right - menuRect.width;
+  const left = Math.min(Math.max(viewportPadding, preferredLeft), maxLeft);
+
+  const preferredTop = buttonRect.top - menuRect.height - offset;
+  const fallbackTop = buttonRect.bottom + offset;
+  const top = preferredTop >= viewportPadding
+    ? preferredTop
+    : Math.min(
+        Math.max(viewportPadding, fallbackTop),
+        Math.max(viewportPadding, window.innerHeight - menuRect.height - viewportPadding)
+      );
+
+  chatVoiceSkillMenu.style.left = `${Math.round(left)}px`;
+  chatVoiceSkillMenu.style.top = `${Math.round(top)}px`;
+}
 
 document.addEventListener('click', (event) => {
   const attachToggleTarget = event.target.closest('.chat-attach-toggle');
   const skillToggleTarget = event.target.closest('.chat-skill-toggle');
+  const voiceSkillToggleTarget = event.target.closest('.chat-voice-skill-toggle');
   const insideAttachGroup = chatAttachGroup && chatAttachGroup.contains(event.target);
+  const insideVoiceSkillWrap = chatVoiceSkillWrap && chatVoiceSkillWrap.contains(event.target);
 
   if (attachToggleTarget && chatAttachMenu) {
     event.stopPropagation();
@@ -4784,10 +4868,22 @@ document.addEventListener('click', (event) => {
       chatAttachGroup.classList.toggle('is-skill-open', isOpen);
       chatAttachGroup.classList.add('is-open');
     }
+    if (chatVoiceSkillMenu) {
+      chatVoiceSkillMenu.classList.remove('open');
+    }
+    if (chatVoiceSkillToggle) {
+      chatVoiceSkillToggle.setAttribute('aria-expanded', 'false');
+    }
     if (isOpen) {
       renderAgentChatSkillMenu();
-      window.setTimeout(() => chatSkillSearchInput?.focus(), 0);
+      window.setTimeout(() => chatSkillMenu?.querySelector('[data-chat-skill-search-input]')?.focus(), 0);
     }
+    return;
+  }
+
+  if (voiceSkillToggleTarget && chatVoiceSkillMenu) {
+    event.stopPropagation();
+    setVoiceSkillMenuOpen(!chatVoiceSkillMenu.classList.contains('open'));
     return;
   }
 
@@ -4795,8 +4891,28 @@ document.addEventListener('click', (event) => {
     return;
   }
 
+  if (insideVoiceSkillWrap) {
+    return;
+  }
+
   closeChatMenus();
 });
+
+if (chatVoiceSkillToggle) {
+  chatVoiceSkillToggle.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setVoiceSkillMenuOpen(!chatVoiceSkillMenu?.classList.contains('open'));
+  });
+}
+
+window.addEventListener('resize', () => {
+  positionVoiceSkillMenu();
+});
+
+window.addEventListener('scroll', () => {
+  positionVoiceSkillMenu();
+}, true);
 
 function getActiveAgentChatSkillKey() {
   const agentId = String(agentChatModal?.dataset.agentId || '').trim();
@@ -4873,8 +4989,18 @@ function buildChatSkillItem(skill, selectedIds, isFeatured = false) {
   return item;
 }
 
+function getChatSkillMenuSections(root) {
+  if (!root) return null;
+  return {
+    topList: root.querySelector('[data-chat-skill-top-list]'),
+    allList: root.querySelector('[data-chat-skill-all-list]'),
+    emptyState: root.querySelector('[data-chat-skill-empty-state]'),
+    countBadge: root.querySelector('[data-chat-skill-count-badge]'),
+  };
+}
+
 function renderAgentChatSkillMenu() {
-  if (!chatSkillTopList || !chatSkillAllList) return;
+  if (!chatSkillMenus.length) return;
   const selectedIds = getSelectedAgentSkillIds();
   const query = activeAgentChatSkillQuery.trim().toLowerCase();
   const topSkills = getTopSkillsForActiveAgent();
@@ -4884,23 +5010,28 @@ function renderAgentChatSkillMenu() {
     .filter((skill) => !topSkillIds.has(skill.id))
     .filter((skill) => matchesChatSkillQuery(skill, query));
 
-  chatSkillTopList.replaceChildren();
-  chatSkillAllList.replaceChildren();
+  chatSkillMenus.forEach((root) => {
+    const sections = getChatSkillMenuSections(root);
+    if (!sections?.topList || !sections?.allList) return;
 
-  visibleTopSkills.forEach((skill) => {
-    chatSkillTopList.appendChild(buildChatSkillItem(skill, selectedIds, true));
-  });
-  visibleCatalogSkills.forEach((skill) => {
-    chatSkillAllList.appendChild(buildChatSkillItem(skill, selectedIds));
-  });
+    sections.topList.replaceChildren();
+    sections.allList.replaceChildren();
 
-  const topSection = chatSkillTopList.closest('.chat-skill-section');
-  const allSection = chatSkillAllList.closest('.chat-skill-section');
-  if (topSection) topSection.hidden = visibleTopSkills.length === 0;
-  if (allSection) allSection.hidden = visibleCatalogSkills.length === 0;
-  if (chatSkillEmptyState) {
-    chatSkillEmptyState.hidden = visibleTopSkills.length + visibleCatalogSkills.length > 0;
-  }
+    visibleTopSkills.forEach((skill) => {
+      sections.topList.appendChild(buildChatSkillItem(skill, selectedIds, true));
+    });
+    visibleCatalogSkills.forEach((skill) => {
+      sections.allList.appendChild(buildChatSkillItem(skill, selectedIds));
+    });
+
+    const topSection = sections.topList.closest('.chat-skill-section');
+    const allSection = sections.allList.closest('.chat-skill-section');
+    if (topSection) topSection.hidden = visibleTopSkills.length === 0;
+    if (allSection) allSection.hidden = visibleCatalogSkills.length === 0;
+    if (sections.emptyState) {
+      sections.emptyState.hidden = visibleTopSkills.length + visibleCatalogSkills.length > 0;
+    }
+  });
 
   updateSkillStatus();
   scheduleLucideRefresh();
@@ -4919,11 +5050,11 @@ const updateSkillStatus = () => {
       ? `${activeCount} habilidade${activeCount > 1 ? 's' : ''} ativa${activeCount > 1 ? 's' : ''}`
       : 'Habilidades inativas';
   }
-  if (chatSkillCountBadge) {
-    chatSkillCountBadge.textContent = anyEnabled
+  chatSkillCountBadges.forEach((badge) => {
+    badge.textContent = anyEnabled
       ? `${activeCount} ativa${activeCount > 1 ? 's' : ''}`
       : '0 ativas';
-  }
+  });
 };
 
 const updateChatSendState = () => {
@@ -4976,15 +5107,18 @@ const updateChatEmptyState = () => {
   }
 };
 
-if (chatSkillSearchInput) {
-  chatSkillSearchInput.addEventListener('input', () => {
-    activeAgentChatSkillQuery = String(chatSkillSearchInput.value || '').trim();
+if (chatSkillSearchInputs.length) {
+  chatSkillSearchInputs.forEach((input) => input.addEventListener('input', () => {
+    activeAgentChatSkillQuery = String(input.value || '').trim();
+    chatSkillSearchInputs.forEach((field) => {
+      if (field !== input) field.value = activeAgentChatSkillQuery;
+    });
     renderAgentChatSkillMenu();
-  });
+  }));
 }
 
-if (chatSkillMenu) {
-  chatSkillMenu.addEventListener('change', (event) => {
+chatSkillMenus.forEach((menu) => {
+  menu.addEventListener('change', (event) => {
     const target = event.target.closest('input[type="checkbox"][data-skill-id]');
     if (!target) return;
     const selectedIds = getSelectedAgentSkillIds();
@@ -4997,13 +5131,13 @@ if (chatSkillMenu) {
     }
     updateSkillStatus();
   });
-}
+});
 
-chatSkillViewAllButton?.addEventListener('click', () => {
+chatSkillViewAllButtons.forEach((button) => button.addEventListener('click', () => {
   closeChatMenus();
   hubCloseAgentChatIfOpen();
   window.location.hash = '#/dashboard/skills';
-});
+}));
 
 renderAgentChatSkillMenu();
 
@@ -6701,7 +6835,9 @@ function hubCloseAgentChatIfOpen() {
   if (chatAttachMenu) chatAttachMenu.classList.remove('open');
   if (chatSkillMenu) chatSkillMenu.classList.remove('open');
   activeAgentChatSkillQuery = '';
-  if (chatSkillSearchInput) chatSkillSearchInput.value = '';
+  chatSkillSearchInputs.forEach((input) => {
+    input.value = '';
+  });
 }
 
 function syncAgentsPageScopeSelects() {

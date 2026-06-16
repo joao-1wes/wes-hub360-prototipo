@@ -39,17 +39,35 @@ const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
 const voiceMessagingFilterBtn = document.getElementById('voiceMessagingFilterBtn');
 const voiceMessagingFilterMenu = document.getElementById('voiceMessagingFilterMenu');
+const openVoiceMessagingInsightsPage = document.getElementById('openVoiceMessagingInsightsPage');
 const openVoiceMessagingCreatePage = document.getElementById('openVoiceMessagingCreatePage');
+const voiceMessagingInsightsBackBtn = document.getElementById('voiceMessagingInsightsBackBtn');
+const voiceMessagingInsightsChartCanvas = document.getElementById('voiceMessagingInsightsChart');
 const voiceMessagingCreateBackBtn = document.getElementById('voiceMessagingCreateBackBtn');
 const voiceMessagingCreateCancelBtn = document.getElementById('voiceMessagingCreateCancelBtn');
+const voiceMessagingNextBtn = document.getElementById('voiceMessagingNextBtn');
 const voiceMessagingCampaignMessageInput = document.getElementById('voiceMessagingCampaignMessageInput');
+const voiceMessagingOperationNameInput = document.getElementById('voiceMessagingOperationNameInput');
 const voiceMessagingAgentSelect = document.getElementById('voiceMessagingAgentSelect');
 const voiceMessagingAgentPreview = document.getElementById('voiceMessagingAgentPreview');
 const voiceMessagingAgentHint = document.getElementById('voiceMessagingAgentHint');
 const voiceMessagingProviderOptions = Array.from(document.querySelectorAll('.voice-messaging-provider-option'));
 const voiceMessagingProviderRadios = Array.from(document.querySelectorAll('.voice-messaging-provider-radio'));
+const voiceMessagingSimulationMode = document.getElementById('voiceMessagingSimulationMode');
+const voiceMessagingConnectionNameInput = document.getElementById('voiceMessagingConnectionNameInput');
+const voiceMessagingConnectionEndpointInput = document.getElementById('voiceMessagingConnectionEndpointInput');
 const voiceMessagingConnectionAccountInput = document.getElementById('voiceMessagingConnectionAccountInput');
 const voiceMessagingConnectionTokenInput = document.getElementById('voiceMessagingConnectionTokenInput');
+const voiceMessagingTestConnectionBtn = document.getElementById('voiceMessagingTestConnectionBtn');
+const voiceMessagingConnectionFeedback = document.getElementById('voiceMessagingConnectionFeedback');
+const voiceMessagingConnectionProgress = document.getElementById('voiceMessagingConnectionProgress');
+const voiceMessagingConnectionStatus = document.getElementById('voiceMessagingConnectionStatus');
+const voiceMessagingConnectionStatusIcon = document.getElementById('voiceMessagingConnectionStatusIcon');
+const voiceMessagingConnectionStatusMessage = document.getElementById('voiceMessagingConnectionStatusMessage');
+const voiceMessagingRecipientsInput = document.getElementById('voiceMessagingRecipientsInput');
+const voiceMessagingReviewModal = document.getElementById('voiceMessagingReviewModal');
+const voiceMessagingReviewList = document.getElementById('voiceMessagingReviewList');
+const voiceMessagingReviewConfirmBtn = document.getElementById('voiceMessagingReviewConfirmBtn');
 const hybridFlowsFilterBtn = document.getElementById('hybridFlowsFilterBtn');
 const hybridFlowsFilterMenu = document.getElementById('hybridFlowsFilterMenu');
 const hybridHistoryFilterBtn = document.getElementById('hybridHistoryFilterBtn');
@@ -78,6 +96,34 @@ const createUserPassword = document.getElementById('createUserPassword');
 const createUserStatus = document.getElementById('createUserStatus');
 const createUserRole = document.getElementById('createUserRole');
 const createUserSubmit = document.getElementById('createUserSubmit');
+const openSkillModal = document.getElementById('openSkillModal');
+const skillModal = document.getElementById('skillModal');
+const skillModalForm = document.getElementById('skillModalForm');
+const skillsTable = document.getElementById('skillsTable');
+const skillModalTitle = document.getElementById('skillModalTitle');
+const skillNameInput = document.getElementById('skillNameInput');
+const skillStatusInput = document.getElementById('skillStatusInput');
+const skillStatusValue = document.getElementById('skillStatusValue');
+const skillDescriptionInput = document.getElementById('skillDescriptionInput');
+const skillFileInput = document.getElementById('skillFileInput');
+const skillFileName = document.getElementById('skillFileName');
+const skillFileSection = document.getElementById('skillFileSection');
+const skillUploadDropzone = document.getElementById('skillUploadDropzone');
+const skillUploadChooseLink = document.getElementById('skillUploadChooseLink');
+const skillModalSubmit = document.getElementById('skillModalSubmit');
+const mcpsGrid = document.getElementById('mcpsGrid');
+const mcpsTable = document.getElementById('mcpsTable');
+const mcpsSearchInput = document.getElementById('mcpsSearchInput');
+const mcpsEmptyState = document.getElementById('mcpsEmptyState');
+const mcpsGridViewBtn = document.getElementById('mcpsGridViewBtn');
+const mcpsListViewBtn = document.getElementById('mcpsListViewBtn');
+const mcpConnectionModal = document.getElementById('mcpConnectionModal');
+const mcpConnectionModalLogo = document.getElementById('mcpConnectionModalLogo');
+const mcpConnectionModalName = document.getElementById('mcpConnectionModalName');
+const mcpConnectionModalStatus = document.getElementById('mcpConnectionModalStatus');
+const mcpConnectionModalDescription = document.getElementById('mcpConnectionModalDescription');
+const mcpConnectionDisconnectBtn = document.getElementById('mcpConnectionDisconnectBtn');
+const mcpConnectionReconnectBtn = document.getElementById('mcpConnectionReconnectBtn');
 const auditFilterBtn = document.getElementById('auditFilterBtn');
 const auditFilterMenu = document.getElementById('auditFilterMenu');
 const auditPeriodBtn = document.getElementById('auditPeriodBtn');
@@ -227,7 +273,11 @@ const hybridFlowReviewList = document.getElementById('hybridFlowReviewList');
 const hybridFlowReviewConfirmBtn = document.getElementById('hybridFlowReviewConfirmBtn');
 const hybridFlowDiscardModal = document.getElementById('hybridFlowDiscardModal');
 const hybridFlowDiscardConfirmBtn = document.getElementById('hybridFlowDiscardConfirmBtn');
-const hybridFlowsTableBody = document.querySelector('#page-hybrid-flows .hybrid-flows-table tbody');
+const hybridFlowsTable = document.getElementById('hybridFlowsTable');
+const voiceMessagingTable = document.getElementById('voiceMessagingTable');
+const voiceMessagingCreatePage = document.getElementById('page-voice-messaging-create');
+const voiceMessagingCreatePageTitle = voiceMessagingCreatePage?.querySelector('.voice-messaging-create-title-wrap h2');
+const voiceMessagingCreatePageSubtitle = voiceMessagingCreatePage?.querySelector('.voice-messaging-create-title-wrap .page-subtitle');
 const hybridFlowHistoryFlowName = document.getElementById('hybridFlowHistoryFlowName');
 const hybridFlowHistoryBackBtn = document.getElementById('hybridFlowHistoryBackBtn');
 const hybridHistoryDetailsModal = document.getElementById('hybridHistoryDetailsModal');
@@ -271,6 +321,39 @@ const orgPanels = document.querySelectorAll('#page-organization .tab-panel');
 const orgActionButtons = document.querySelectorAll('#page-organization .org-action');
 
 const HYBRID_FLOWS_STORAGE_KEY = 'hybridFlowsCreated';
+const VOICE_MESSAGING_STORAGE_KEY = 'voiceMessagingCreated';
+const MCP_VIEW_MODE_STORAGE_KEY = 'mcpsViewMode';
+const MCP_CONNECTIONS_STATE_STORAGE_KEY = 'mcpsConnectionsState';
+const MCP_CONNECTIONS_CATALOG = Object.freeze([
+  { id: 'filesystem-mcp', name: 'Filesystem', description: 'Acessa arquivos e diretórios do workspace com segurança para leitura, escrita e automações internas.', accent: '#2563eb', mark: 'FS', connected: false, updatedAt: '16/06/2026' },
+  { id: 'google-drive-mcp', name: 'Google Drive', description: 'Conecta documentos e pastas do Google Drive para leitura, organização e uso pelos agentes.', accent: '#16a34a', mark: 'GD', connected: true, updatedAt: '14/06/2026' },
+  { id: 'gitlab-mcp', name: 'GitLab', description: 'Integra repositórios, merge requests, issues e pipelines hospedados no GitLab.', accent: '#ea580c', mark: 'GL', connected: false, updatedAt: '16/06/2026' },
+  { id: 'gmail-mcp', name: 'Gmail', description: 'Permite leitura, triagem e apoio a fluxos com mensagens da caixa de entrada do Gmail.', accent: '#dc2626', mark: 'GM', connected: true, updatedAt: '15/06/2026' },
+  { id: 'zoho-mcp', name: 'ZOHO', description: 'Conecta produtos Zoho para consultas operacionais, CRM e automações administrativas.', accent: '#0891b2', mark: 'ZH', connected: false, updatedAt: '16/06/2026' },
+  { id: 'postgresql-mcp', name: 'PostgreSQL', description: 'Acessa bancos PostgreSQL para consultas estruturadas, relatórios e enriquecimento de contexto.', accent: '#0f766e', mark: 'PG', connected: false, updatedAt: '16/06/2026' },
+  { id: 'github-mcp', name: 'GitHub', description: 'Integra repositórios, pull requests, issues, actions e arquivos versionados no GitHub.', accent: '#111827', mark: 'GH', connected: true, updatedAt: '15/06/2026' },
+  { id: 'sqlite-mcp', name: 'SQLite', description: 'Permite ler e consultar bases SQLite locais para testes, protótipos e cenários embarcados.', accent: '#1d4ed8', mark: 'SQ', connected: false, updatedAt: '16/06/2026' },
+  { id: 'slack-mcp', name: 'Slack', description: 'Conecta canais, mensagens e contexto operacional do Slack para alertas e colaboração.', accent: '#7c3aed', mark: 'SL', connected: true, updatedAt: '16/06/2026' },
+  { id: 'teams-mcp', name: 'Teams', description: 'Integra mensagens e colaboração do Microsoft Teams em fluxos de suporte e operação.', accent: '#4f46e5', mark: 'TM', connected: false, updatedAt: '16/06/2026' },
+  { id: 'google-calendar-mcp', name: 'Google Calendar', description: 'Permite acessar agendas, eventos e compromissos sincronizados no Google Calendar.', accent: '#2563eb', mark: 'GC', connected: true, updatedAt: '13/06/2026' },
+  { id: 'notion-mcp', name: 'Notion', description: 'Conecta páginas, bancos e documentação do Notion para consulta e base de conhecimento.', accent: '#111827', mark: 'NO', connected: true, updatedAt: '12/06/2026' },
+  { id: 'jira-mcp', name: 'Jira', description: 'Integra tickets, sprints, projetos e status operacionais gerenciados no Jira.', accent: '#1d4ed8', mark: 'JI', connected: true, updatedAt: '16/06/2026' },
+  { id: 'confluence-mcp', name: 'Confluence', description: 'Permite leitura e uso de documentação corporativa hospedada no Confluence.', accent: '#0f62fe', mark: 'CF', connected: false, updatedAt: '16/06/2026' },
+  { id: 'zendesk-mcp', name: 'Zendesk', description: 'Conecta tickets e históricos de atendimento para acelerar suporte assistido por agentes.', accent: '#16a34a', mark: 'ZD', connected: false, updatedAt: '16/06/2026' },
+  { id: 'grafana-mcp', name: 'Grafana', description: 'Acessa dashboards, métricas e painéis do Grafana para observabilidade e monitoramento.', accent: '#f97316', mark: 'GF', connected: false, updatedAt: '16/06/2026' },
+  { id: 'aws-kb-mcp', name: 'AWS / AWS KB Retrieval', description: 'Integra serviços AWS e recuperação de conhecimento para fluxos com cloud e RAG.', accent: '#b45309', mark: 'AW', connected: true, updatedAt: '15/06/2026' },
+  { id: 'azure-mcp', name: 'Azure', description: 'Conecta recursos e serviços Azure para operações, dados e automações corporativas.', accent: '#0284c7', mark: 'AZ', connected: false, updatedAt: '16/06/2026' },
+  { id: 'web-fetch-mcp', name: 'Web Fetch', description: 'Faz busca e leitura controlada de páginas web para coleta de informações externas.', accent: '#0f766e', mark: 'WF', connected: false, updatedAt: '16/06/2026' },
+  { id: 'figma-mcp', name: 'Figma', description: 'Integra arquivos, componentes e contextos de design do Figma ao fluxo de trabalho.', accent: '#a21caf', mark: 'FG', connected: true, updatedAt: '11/06/2026' },
+  { id: 'brave-search-mcp', name: 'Brave Search / Web Search', description: 'Permite busca web estruturada para pesquisas, verificação e coleta de contexto online.', accent: '#be123c', mark: 'BS', connected: false, updatedAt: '16/06/2026' },
+]);
+const VOICE_MESSAGING_CREATE_SUBTITLE = 'Configure um agente de voz e uma conexão Oktor ou NVoIP para disparar campanhas de chamadas automatizadas. As chamadas são feitas pelo provedor escolhido com a sua conta.';
+const VOICE_MESSAGING_STATUS_META = {
+  completed: { label: 'Concluída', chipClass: 'success' },
+  'in-progress': { label: 'Em andamento', chipClass: 'warning' },
+  draft: { label: 'Rascunho', chipClass: 'neutral' },
+  error: { label: 'Erro', chipClass: 'error' },
+};
 const HYBRID_FLOWS_HISTORY_FLOW_NAME_STORAGE_KEY = 'hybridFlowsHistoryFlowName';
 const getHybridFlowsFromStorage = () => {
   const raw = window.localStorage.getItem(HYBRID_FLOWS_STORAGE_KEY);
@@ -285,6 +368,51 @@ const getHybridFlowsFromStorage = () => {
 const saveHybridFlowsToStorage = (flows) => {
   window.localStorage.setItem(HYBRID_FLOWS_STORAGE_KEY, JSON.stringify(flows));
 };
+const getVoiceMessagingFromStorage = () => {
+  const raw = window.localStorage.getItem(VOICE_MESSAGING_STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+};
+const saveVoiceMessagingToStorage = (operations) => {
+  window.localStorage.setItem(VOICE_MESSAGING_STORAGE_KEY, JSON.stringify(operations));
+};
+const getVoiceMessagingStatusMeta = (status = 'completed') => {
+  const normalizedStatus = String(status || '').trim().toLowerCase();
+  return VOICE_MESSAGING_STATUS_META[normalizedStatus] || VOICE_MESSAGING_STATUS_META.completed;
+};
+const isVoiceMessagingEditableStatus = (status = '') => {
+  const normalizedStatus = String(status || '').trim().toLowerCase();
+  return normalizedStatus === 'draft' || normalizedStatus === 'error';
+};
+const resolveVoiceMessagingStatus = ({ status = '', connectionName = '' } = {}) => {
+  const normalizedConnectionName = String(connectionName || '').trim().toLowerCase();
+  if (normalizedConnectionName === 'sem conexão') return 'error';
+  const normalizedStatus = String(status || '').trim().toLowerCase();
+  return normalizedStatus || 'completed';
+};
+const removeVoiceMessagingFromStorage = (operationId = '') => {
+  const normalizedId = String(operationId || '').trim();
+  if (!normalizedId) return;
+  const next = getVoiceMessagingFromStorage().filter((operation) => String(operation?.id || '').trim() !== normalizedId);
+  saveVoiceMessagingToStorage(next);
+};
+const upsertVoiceMessagingInStorage = (operation) => {
+  const normalizedId = String(operation?.id || '').trim();
+  if (!normalizedId) return;
+  const current = getVoiceMessagingFromStorage();
+  const index = current.findIndex((item) => String(item?.id || '').trim() === normalizedId);
+  if (index >= 0) {
+    current[index] = operation;
+  } else {
+    current.unshift(operation);
+  }
+  saveVoiceMessagingToStorage(current);
+};
 const formatHybridFlowDateTime = (value) => {
   const date = value ? new Date(value) : new Date();
   return new Intl.DateTimeFormat('pt-BR', {
@@ -295,8 +423,19 @@ const formatHybridFlowDateTime = (value) => {
     minute: '2-digit'
   }).format(date);
 };
+const formatVoiceMessagingDateTime = (value) => {
+  const date = value ? new Date(value) : new Date();
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  }).format(date);
+};
 const createHybridFlowActionsHtml = () => `
-  <div class="row-actions hybrid-flows-row-actions">
+  <span class="row-actions hybrid-flows-row-actions">
     <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
       <span class="material-symbols-rounded">content_copy</span>
     </button>
@@ -315,29 +454,35 @@ const createHybridFlowActionsHtml = () => `
     <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
       <span class="material-symbols-rounded">delete</span>
     </button>
-  </div>
+  </span>
 `;
 const appendHybridFlowRow = (flow) => {
-  if (!hybridFlowsTableBody) return;
-  const row = document.createElement('tr');
+  if (!hybridFlowsTable) return;
+  const row = document.createElement('div');
+  row.className = 'data-row';
   row.dataset.hybridFlowId = flow.id;
   row.dataset.hybridFlowCreated = 'true';
   row.innerHTML = `
-    <td>
+    <span>
       <strong>${escapeHtmlWes(flow.title || 'Sem título')}</strong>
       <small>${escapeHtmlWes(flow.description || '\u00a0')}</small>
-    </td>
-    <td><span class="chip success">Ativo</span></td>
-    <td>${Number(flow.fieldsCount || 0)}</td>
-    <td>${escapeHtmlWes(formatHybridFlowDateTime(flow.createdAt))}</td>
-    <td>${escapeHtmlWes(formatHybridFlowDateTime(flow.updatedAt || flow.createdAt))}</td>
-    <td>${createHybridFlowActionsHtml()}</td>
+    </span>
+    <span><span class="chip success">Ativo</span></span>
+    <span>${Number(flow.fieldsCount || 0)}</span>
+    <span>${escapeHtmlWes(formatHybridFlowDateTime(flow.createdAt))}</span>
+    <span>${escapeHtmlWes(formatHybridFlowDateTime(flow.updatedAt || flow.createdAt))}</span>
+    <span>${createHybridFlowActionsHtml()}</span>
   `;
-  hybridFlowsTableBody.prepend(row);
+  const firstDataRow = hybridFlowsTable.querySelector('.data-row.header + .data-row');
+  if (firstDataRow) {
+    firstDataRow.insertAdjacentElement('beforebegin', row);
+  } else {
+    hybridFlowsTable.append(row);
+  }
 };
 const renderHybridFlowsFromStorage = () => {
-  if (!hybridFlowsTableBody) return;
-  hybridFlowsTableBody.querySelectorAll('tr[data-hybrid-flow-created="true"]').forEach((row) => row.remove());
+  if (!hybridFlowsTable) return;
+  hybridFlowsTable.querySelectorAll('.data-row[data-hybrid-flow-created="true"]').forEach((row) => row.remove());
   getHybridFlowsFromStorage().forEach((flow) => appendHybridFlowRow(flow));
 };
 const persistAndRenderHybridFlow = (flow) => {
@@ -345,6 +490,113 @@ const persistAndRenderHybridFlow = (flow) => {
   current.unshift(flow);
   saveHybridFlowsToStorage(current);
   renderHybridFlowsFromStorage();
+};
+const createVoiceMessagingActionsHtml = (status = 'completed') => `
+  <span class="row-actions hybrid-flows-row-actions">
+    <button class="icon-btn action-icon${isVoiceMessagingEditableStatus(status) ? '' : ' muted-icon'}" type="button" aria-label="Editar"${isVoiceMessagingEditableStatus(status) ? '' : ' disabled'}>
+      <span class="material-symbols-rounded">edit</span>
+    </button>
+    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+      <span class="material-symbols-rounded">delete</span>
+    </button>
+  </span>
+`;
+const appendVoiceMessagingRow = (operation) => {
+  if (!voiceMessagingTable) return;
+  const status = resolveVoiceMessagingStatus(operation);
+  const statusMeta = getVoiceMessagingStatusMeta(status);
+  const row = document.createElement('div');
+  row.className = 'data-row';
+  row.dataset.voiceMessagingId = operation.id;
+  row.dataset.voiceMessagingCreated = 'true';
+  row.dataset.voiceMessagingCreatedAt = String(operation.createdAt || '');
+  row.dataset.voiceMessagingStatus = status;
+  row.innerHTML = `
+    <span><strong>${escapeHtmlWes(operation.operationName || 'Sem nome')}</strong></span>
+    <span><strong>${escapeHtmlWes(operation.agentName || 'Não selecionado')}</strong><small>${escapeHtmlWes(operation.agentSubtitle || '\u00a0')}</small></span>
+    <span><strong>${escapeHtmlWes(operation.providerLabel || 'Oktor')}</strong><small>${escapeHtmlWes(operation.connectionName || '\u00a0')}</small></span>
+    <span><span class="chip ${escapeHtmlWes(statusMeta.chipClass)}">${escapeHtmlWes(statusMeta.label)}</span></span>
+    <span>${escapeHtmlWes(formatVoiceMessagingDateTime(operation.createdAt))}</span>
+    <span>${createVoiceMessagingActionsHtml(status)}</span>
+  `;
+  const firstDataRow = voiceMessagingTable.querySelector('.data-row.header + .data-row');
+  if (firstDataRow) {
+    firstDataRow.insertAdjacentElement('beforebegin', row);
+  } else {
+    voiceMessagingTable.append(row);
+  }
+};
+const renderVoiceMessagingFromStorage = () => {
+  if (!voiceMessagingTable) return;
+  voiceMessagingTable.querySelectorAll('.data-row[data-voice-messaging-created="true"]').forEach((row) => row.remove());
+  getVoiceMessagingFromStorage().slice().reverse().forEach((operation) => appendVoiceMessagingRow(operation));
+};
+const persistAndRenderVoiceMessaging = (operation) => {
+  const current = getVoiceMessagingFromStorage();
+  current.unshift(operation);
+  saveVoiceMessagingToStorage(current);
+  renderVoiceMessagingFromStorage();
+};
+const updateVoiceMessagingRow = (row, operation) => {
+  if (!row || !operation) return;
+  const cells = row.querySelectorAll(':scope > span');
+  const operationCell = cells[0];
+  const agentCell = cells[1];
+  const connectionCell = cells[2];
+  const statusCell = cells[3];
+  const createdAtCell = cells[4];
+  const status = resolveVoiceMessagingStatus({
+    status: operation.status || row.dataset.voiceMessagingStatus || 'completed',
+    connectionName: operation.connectionName || cells[2]?.querySelector('small')?.textContent || '',
+  });
+  const statusMeta = getVoiceMessagingStatusMeta(status);
+
+  row.dataset.voiceMessagingStatus = status;
+
+  if (operationCell) {
+    operationCell.innerHTML = `<strong>${escapeHtmlWes(operation.operationName || 'Sem nome')}</strong>`;
+  }
+  if (agentCell) {
+    agentCell.innerHTML = `<strong>${escapeHtmlWes(operation.agentName || 'Não selecionado')}</strong><small>${escapeHtmlWes(operation.agentSubtitle || '\u00a0')}</small>`;
+  }
+  if (connectionCell) {
+    connectionCell.innerHTML = `<strong>${escapeHtmlWes(operation.providerLabel || 'Oktor')}</strong><small>${escapeHtmlWes(operation.connectionName || '\u00a0')}</small>`;
+  }
+  if (statusCell) {
+    statusCell.innerHTML = `<span class="chip ${escapeHtmlWes(statusMeta.chipClass)}">${escapeHtmlWes(statusMeta.label)}</span>`;
+  }
+  if (createdAtCell) {
+    createdAtCell.textContent = escapeHtmlWes(formatVoiceMessagingDateTime(operation.createdAt));
+  }
+  const actionsCell = cells[5];
+  if (actionsCell) {
+    actionsCell.innerHTML = createVoiceMessagingActionsHtml(status);
+  }
+};
+  const normalizeVoiceMessagingTableRow = (row) => {
+  if (!row) return;
+  const cells = row.querySelectorAll(':scope > span');
+  const statusLabel = cells[3]?.querySelector('.chip')?.textContent?.trim().toLowerCase() || '';
+  const connectionName = cells[2]?.querySelector('small')?.textContent?.trim() || '';
+  let status = 'completed';
+  if (statusLabel.includes('rascunho')) {
+    status = 'draft';
+  } else if (statusLabel.includes('andamento')) {
+    status = 'in-progress';
+  } else if (statusLabel.includes('erro')) {
+    status = 'error';
+  }
+  status = resolveVoiceMessagingStatus({ status, connectionName });
+  row.dataset.voiceMessagingStatus = status;
+  const statusCell = cells[3];
+  const statusMeta = getVoiceMessagingStatusMeta(status);
+  if (statusCell) {
+    statusCell.innerHTML = `<span class="chip ${escapeHtmlWes(statusMeta.chipClass)}">${escapeHtmlWes(statusMeta.label)}</span>`;
+  }
+  const actionsCell = cells[5];
+  if (actionsCell) {
+    actionsCell.innerHTML = createVoiceMessagingActionsHtml(status);
+  }
 };
 const setHybridFlowHistoryFlowName = (flowName = '') => {
   const name = String(flowName || '').trim() || 'Fluxo';
@@ -443,6 +695,7 @@ let projectModalAvailableAgents = [];
 let appToastTimer = null;
 let telegramConnectionValidated = false;
 let telegramTestSent = false;
+let voiceMessagingInsightsChart = null;
 const CHAT_SKILL_CATALOG = Object.freeze([
   {
     id: 'cep',
@@ -572,6 +825,482 @@ function scheduleLucideRefresh() {
 
 window.scheduleLucideRefresh = scheduleLucideRefresh;
 enhanceFilterOptionIcons();
+
+function buildMcpLogoDataUri(item) {
+  const logoById = {
+    'filesystem-mcp': './assets/logos%20MCP/Filesystem_logo.png',
+    'google-drive-mcp': './assets/logos%20MCP/Google_Drive_logo.svg',
+    'gitlab-mcp': './assets/logos%20MCP/GitLab_logo.svg',
+    'gmail-mcp': './assets/logos%20MCP/Gmail_logo.svg',
+    'zoho-mcp': './assets/logos%20MCP/Zoho_logo.svg',
+    'postgresql-mcp': './assets/logos%20MCP/PostgreSQL_logo.svg',
+    'github-mcp': './assets/logos%20MCP/GitHub_logo.svg',
+    'sqlite-mcp': './assets/logos%20MCP/SQLite_logo.svg',
+    'slack-mcp': './assets/logos%20MCP/Slack_logo.svg',
+    'teams-mcp': './assets/logos%20MCP/Teams_logo.svg',
+    'google-calendar-mcp': './assets/logos%20MCP/Google_Calendar_logo.svg',
+    'notion-mcp': './assets/logos%20MCP/Notion_logo.svg',
+    'jira-mcp': './assets/logos%20MCP/Jira_logo.svg',
+    'confluence-mcp': './assets/logos%20MCP/Confluence_logo.svg',
+    'zendesk-mcp': './assets/logos%20MCP/Zendesk_logo.svg',
+    'grafana-mcp': './assets/logos%20MCP/Grafana_logo.svg',
+    'aws-kb-mcp': './assets/logos%20MCP/AWS_logo.svg',
+    'azure-mcp': './assets/logos%20MCP/Azure_logo.svg',
+    'figma-mcp': './assets/logos%20MCP/Figma_logo.svg',
+  };
+
+  const explicitLogo = logoById[item?.id];
+  if (explicitLogo) return explicitLogo;
+
+  const safeAccent = String(item?.accent || '#016ff4');
+  const safeMark = String(item?.mark || 'MC').slice(0, 2).toUpperCase();
+  const isNeutralInitialBadge = item?.id === 'web-fetch-mcp' || item?.id === 'brave-search-mcp';
+  const badgeFontSize = isNeutralInitialBadge ? 32 : 26;
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
+      <defs>
+        <linearGradient id="g" x1="12" y1="10" x2="82" y2="84" gradientUnits="userSpaceOnUse">
+          <stop stop-color="${safeAccent}"/>
+          <stop offset="1" stop-color="#0f172a"/>
+        </linearGradient>
+      </defs>
+      <rect x="6" y="6" width="84" height="84" rx="24" fill="${isNeutralInitialBadge ? '#ffffff' : 'url(#g)'}"/>
+      ${isNeutralInitialBadge ? '' : '<circle cx="72" cy="24" r="8" fill="rgba(255,255,255,0.22)"/>'}
+      ${isNeutralInitialBadge ? '' : '<path d="M25 66c8-16 16-24 23-24 8 0 12 10 23 10" stroke="rgba(255,255,255,0.22)" stroke-width="6" stroke-linecap="round"/>'}
+      <text x="48" y="56" text-anchor="middle" fill="${isNeutralInitialBadge ? '#016ff4' : 'white'}" font-family="Inter, Arial, sans-serif" font-size="${badgeFontSize}" font-weight="700">${safeMark}</text>
+    </svg>
+  `.trim();
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+}
+
+function getDefaultMcpConnectionsState() {
+  return MCP_CONNECTIONS_CATALOG.reduce((acc, item) => {
+    acc[item.id] = {
+      connected: Boolean(item.connected),
+      updatedAt: String(item.updatedAt || '16/06/2026'),
+    };
+    return acc;
+  }, {});
+}
+
+function getMcpConnectionsState() {
+  const defaults = getDefaultMcpConnectionsState();
+  const raw = window.localStorage.getItem(MCP_CONNECTIONS_STATE_STORAGE_KEY);
+  if (!raw) return defaults;
+  try {
+    const parsed = JSON.parse(raw);
+    return Object.keys(defaults).reduce((acc, key) => {
+      const value = parsed?.[key];
+      acc[key] = {
+        connected: typeof value?.connected === 'boolean' ? value.connected : defaults[key].connected,
+        updatedAt: String(value?.updatedAt || defaults[key].updatedAt),
+      };
+      return acc;
+    }, {});
+  } catch (_) {
+    return defaults;
+  }
+}
+
+function saveMcpConnectionsState(state) {
+  window.localStorage.setItem(MCP_CONNECTIONS_STATE_STORAGE_KEY, JSON.stringify(state));
+}
+
+function formatMcpDate(date = new Date()) {
+  return new Intl.DateTimeFormat('pt-BR').format(date);
+}
+
+function getMcpConnectionById(connectionId = '') {
+  const normalizedId = String(connectionId || '').trim();
+  return MCP_CONNECTIONS_CATALOG.find((item) => item.id === normalizedId) || null;
+}
+
+function getMcpConnectionViewModel(item) {
+  const state = getMcpConnectionsState();
+  const connectionState = state[item.id] || {};
+  const isConnected = Boolean(connectionState.connected);
+  return {
+    ...item,
+    isConnected,
+    updatedAt: String(connectionState.updatedAt || item.updatedAt || '16/06/2026'),
+    statusLabel: isConnected ? 'Conectado' : 'Disponível',
+    statusClass: isConnected ? 'success' : 'neutral',
+    actionLabel: isConnected ? 'Editar conexão' : 'Conectar',
+    actionIcon: isConnected ? 'edit' : 'link',
+  };
+}
+
+function closeMcpConnectionModal() {
+  if (!mcpConnectionModal) return;
+  mcpConnectionModal.classList.remove('open');
+  mcpConnectionModal.setAttribute('aria-hidden', 'true');
+  delete mcpConnectionModal.dataset.mcpId;
+}
+
+function openMcpConnectionModal(connection) {
+  if (!mcpConnectionModal || !connection) return;
+  mcpConnectionModal.dataset.mcpId = connection.id;
+  if (mcpConnectionModalLogo) {
+    mcpConnectionModalLogo.src = buildMcpLogoDataUri(connection);
+    mcpConnectionModalLogo.alt = `Logo ${connection.name}`;
+  }
+  if (mcpConnectionModalName) mcpConnectionModalName.textContent = connection.name;
+  if (mcpConnectionModalStatus) {
+    mcpConnectionModalStatus.textContent = 'Conectado';
+    mcpConnectionModalStatus.className = 'chip success';
+  }
+  if (mcpConnectionModalDescription) {
+    mcpConnectionModalDescription.textContent =
+      `Desconecte ${connection.name} ou tente conectar novamente caso alguma habilidade vinculada precise ser restabelecida.`;
+  }
+  mcpConnectionModal.classList.add('open');
+  mcpConnectionModal.setAttribute('aria-hidden', 'false');
+}
+
+function updateMcpConnectionState(connectionId, nextState) {
+  const state = getMcpConnectionsState();
+  const current = state[connectionId] || {};
+  state[connectionId] = {
+    connected: typeof nextState.connected === 'boolean' ? nextState.connected : Boolean(current.connected),
+    updatedAt: String(nextState.updatedAt || current.updatedAt || formatMcpDate()),
+  };
+  saveMcpConnectionsState(state);
+}
+
+function renderMcpConnections() {
+  if (!mcpsGrid || !mcpsTable) return;
+  const query = String(mcpsSearchInput?.value || '').trim().toLowerCase();
+  const visibleConnections = MCP_CONNECTIONS_CATALOG
+    .map((item) => getMcpConnectionViewModel(item))
+    .filter((item) => {
+    const haystack = `${item.name} ${item.description}`.toLowerCase();
+    return haystack.includes(query);
+  });
+
+  mcpsGrid.replaceChildren();
+  mcpsTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+
+  visibleConnections.forEach((item) => {
+    const card = document.createElement('article');
+    card.className = 'mcps-card';
+
+    const logo = document.createElement('img');
+    logo.className = 'mcps-card-logo';
+    logo.dataset.mcpId = item.id;
+    logo.src = buildMcpLogoDataUri(item);
+    logo.alt = `Logo ${item.name}`;
+
+    const copy = document.createElement('div');
+    copy.className = 'mcps-card-copy';
+
+    const title = document.createElement('h3');
+    title.textContent = item.name;
+
+    const description = document.createElement('p');
+    description.textContent = item.description;
+
+    copy.append(title, description);
+
+    const footer = document.createElement('div');
+    footer.className = 'mcps-card-footer';
+
+    const button = document.createElement('button');
+    button.className = 'btn primary';
+    button.type = 'button';
+    button.dataset.mcpId = item.id;
+    button.dataset.mcpAction = item.isConnected ? 'edit' : 'connect';
+    button.innerHTML = `
+      <span class="material-symbols-rounded" aria-hidden="true">${item.actionIcon}</span>
+      ${item.actionLabel}
+    `;
+
+    footer.append(button);
+    card.append(logo, copy, footer);
+    mcpsGrid.append(card);
+
+    const row = document.createElement('div');
+    row.className = 'data-row';
+    row.innerHTML = `
+      <span><strong>${escapeHtmlWes(item.name)}</strong></span>
+      <span class="muted">${escapeHtmlWes(item.description)}</span>
+      <span class="chip ${escapeHtmlWes(item.statusClass)}">${escapeHtmlWes(item.statusLabel)}</span>
+      <span>${escapeHtmlWes(item.updatedAt)}</span>
+      <span class="row-actions">
+        <button class="icon-btn action-icon" type="button" data-mcp-id="${escapeHtmlWes(item.id)}" data-mcp-action="${escapeHtmlWes(item.isConnected ? 'edit' : 'connect')}" aria-label="${escapeHtmlWes(item.actionLabel)} ${escapeHtmlWes(item.name)}" title="${escapeHtmlWes(item.actionLabel)} ${escapeHtmlWes(item.name)}">
+          <span class="material-symbols-rounded" aria-hidden="true">${escapeHtmlWes(item.actionIcon)}</span>
+        </button>
+      </span>
+    `;
+    mcpsTable.append(row);
+  });
+
+  mcpsEmptyState?.classList.toggle('is-hidden', visibleConnections.length > 0);
+}
+
+function setMcpsViewMode(mode) {
+  if (!mcpsGrid || !mcpsTable || !mcpsGridViewBtn || !mcpsListViewBtn) return;
+  const normalizedMode = mode === 'list' ? 'list' : 'grid';
+  const isGrid = normalizedMode === 'grid';
+
+  mcpsGrid.classList.toggle('is-hidden', !isGrid);
+  mcpsTable.classList.toggle('is-hidden', isGrid);
+  mcpsGridViewBtn.classList.toggle('is-active', isGrid);
+  mcpsListViewBtn.classList.toggle('is-active', !isGrid);
+  mcpsGridViewBtn.setAttribute('aria-pressed', isGrid ? 'true' : 'false');
+  mcpsListViewBtn.setAttribute('aria-pressed', isGrid ? 'false' : 'true');
+  window.localStorage.setItem(MCP_VIEW_MODE_STORAGE_KEY, normalizedMode);
+}
+
+if (mcpsGrid && mcpsTable) {
+  renderMcpConnections();
+  setMcpsViewMode(window.localStorage.getItem(MCP_VIEW_MODE_STORAGE_KEY) || 'grid');
+  mcpsSearchInput?.addEventListener('input', renderMcpConnections);
+  mcpsGridViewBtn?.addEventListener('click', () => setMcpsViewMode('grid'));
+  mcpsListViewBtn?.addEventListener('click', () => setMcpsViewMode('list'));
+  const handleMcpConnect = (event) => {
+    const button = event.target.closest('[data-mcp-action][data-mcp-id]');
+    if (!button) return;
+    const connection = getMcpConnectionById(button.dataset.mcpId);
+    if (!connection) return;
+    if (button.dataset.mcpAction === 'edit') {
+      openMcpConnectionModal(getMcpConnectionViewModel(connection));
+      return;
+    }
+    updateMcpConnectionState(connection.id, {
+      connected: true,
+      updatedAt: formatMcpDate(),
+    });
+    renderMcpConnections();
+    showAppToast(`Conexão ${connection.name} configurada com sucesso`);
+  };
+  mcpsGrid.addEventListener('click', handleMcpConnect);
+  mcpsTable.addEventListener('click', handleMcpConnect);
+}
+
+if (mcpConnectionModal && mcpConnectionDisconnectBtn && mcpConnectionReconnectBtn) {
+  mcpConnectionModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-mcp-connection-close]')) closeMcpConnectionModal();
+  });
+
+  mcpConnectionDisconnectBtn.addEventListener('click', () => {
+    const connection = getMcpConnectionById(mcpConnectionModal.dataset.mcpId);
+    if (!connection) return;
+    updateMcpConnectionState(connection.id, {
+      connected: false,
+      updatedAt: formatMcpDate(),
+    });
+    closeMcpConnectionModal();
+    renderMcpConnections();
+    showAppToast(`Conexão ${connection.name} desconectada`);
+  });
+
+  mcpConnectionReconnectBtn.addEventListener('click', () => {
+    const connection = getMcpConnectionById(mcpConnectionModal.dataset.mcpId);
+    if (!connection) return;
+    updateMcpConnectionState(connection.id, {
+      connected: true,
+      updatedAt: formatMcpDate(),
+    });
+    closeMcpConnectionModal();
+    renderMcpConnections();
+    showAppToast(`Conexão ${connection.name} reconectada com sucesso`);
+  });
+}
+
+function destroyVoiceMessagingInsightsChart() {
+  if (!voiceMessagingInsightsChart) return;
+  voiceMessagingInsightsChart.destroy();
+  voiceMessagingInsightsChart = null;
+}
+
+function getVoiceMessagingInsightsBarRadius(context) {
+  const { chart, dataIndex, datasetIndex } = context;
+  const datasets = chart?.data?.datasets || [];
+  const currentValue = Number(datasets[datasetIndex]?.data?.[dataIndex] || 0);
+  if (currentValue <= 0) return 0;
+
+  let topDatasetIndex = -1;
+  datasets.forEach((dataset, index) => {
+    if (Number(dataset?.data?.[dataIndex] || 0) > 0) {
+      topDatasetIndex = index;
+    }
+  });
+
+  if (datasetIndex !== topDatasetIndex) return 0;
+  return { topLeft: 12, topRight: 12 };
+}
+
+function syncVoiceMessagingInsightsChart(routeKey = '') {
+  const isInsightsRoute = routeKey === 'dashboard/voice-messaging/insights';
+  if (!isInsightsRoute) {
+    destroyVoiceMessagingInsightsChart();
+    return;
+  }
+  if (!voiceMessagingInsightsChartCanvas || !window.Chart) return;
+  if (voiceMessagingInsightsChart) return;
+
+  voiceMessagingInsightsChart = new window.Chart(voiceMessagingInsightsChartCanvas, {
+    type: 'bar',
+    data: {
+      labels: ['10h', '14h'],
+      datasets: [
+        {
+          label: 'Confirmadas',
+          data: [1, 1],
+          backgroundColor: '#0b82f9',
+          borderRadius: getVoiceMessagingInsightsBarRadius,
+          borderSkipped: false,
+          stack: 'calls',
+          maxBarThickness: 86,
+        },
+        {
+          label: 'Atendidas',
+          data: [0, 1],
+          backgroundColor: '#60a5fa',
+          borderRadius: getVoiceMessagingInsightsBarRadius,
+          borderSkipped: false,
+          stack: 'calls',
+          maxBarThickness: 86,
+        },
+        {
+          label: 'Recusadas',
+          data: [0, 0],
+          backgroundColor: '#dbeafe',
+          borderRadius: getVoiceMessagingInsightsBarRadius,
+          borderSkipped: false,
+          stack: 'calls',
+          maxBarThickness: 86,
+        },
+        {
+          label: 'Sem resposta',
+          data: [0, 1],
+          backgroundColor: '#94a3b8',
+          borderRadius: getVoiceMessagingInsightsBarRadius,
+          borderSkipped: false,
+          stack: 'calls',
+          maxBarThickness: 86,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: false,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      layout: {
+        padding: { top: 8, right: 18, bottom: 0, left: 0 },
+      },
+      plugins: {
+        legend: {
+          position: 'right',
+          align: 'center',
+          labels: {
+            usePointStyle: true,
+            pointStyle: 'rectRounded',
+            boxWidth: 12,
+            boxHeight: 12,
+            color: '#475569',
+            font: {
+              family: 'inherit',
+              size: 13,
+              weight: '600',
+            },
+            padding: 16,
+          },
+        },
+        tooltip: {
+          backgroundColor: '#0f172a',
+          titleColor: '#f8fafc',
+          bodyColor: '#e2e8f0',
+          padding: 12,
+          displayColors: true,
+          callbacks: {
+            title(items) {
+              const hour = items[0]?.label || '';
+              return `Horário ${hour}`;
+            },
+            label(context) {
+              const value = Number(context.parsed.y || 0);
+              const suffix = value === 1 ? 'chamada' : 'chamadas';
+              return `${context.dataset.label}: ${value} ${suffix}`;
+            },
+            footer(items) {
+              const total = items.reduce((sum, item) => sum + Number(item.parsed.y || 0), 0);
+              return `Total no horário: ${total}`;
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: {
+            display: false,
+            drawBorder: false,
+          },
+          border: {
+            display: false,
+          },
+          ticks: {
+            color: '#475569',
+            font: {
+              family: 'inherit',
+              size: 13,
+              weight: '600',
+            },
+          },
+          title: {
+            display: true,
+            text: 'Horário do disparo',
+            color: '#64748b',
+            font: {
+              family: 'inherit',
+              size: 12,
+              weight: '600',
+            },
+            padding: { top: 10 },
+          },
+        },
+        y: {
+          stacked: true,
+          beginAtZero: true,
+          suggestedMax: 4,
+          ticks: {
+            stepSize: 1,
+            precision: 0,
+            color: '#64748b',
+            font: {
+              family: 'inherit',
+              size: 12,
+              weight: '500',
+            },
+          },
+          grid: {
+            color: 'rgba(214, 224, 237, 0.9)',
+            drawBorder: false,
+          },
+          border: {
+            display: false,
+          },
+          title: {
+            display: true,
+            text: 'Quantidade de chamadas',
+            color: '#64748b',
+            font: {
+              family: 'inherit',
+              size: 12,
+              weight: '600',
+            },
+            padding: { bottom: 8 },
+          },
+        },
+      },
+    },
+  });
+}
 
 function normalizeTelegramUsername(value) {
   return value.replace(/^@+/, '').replace(/\s+/g, '').trim();
@@ -820,6 +1549,29 @@ function confirmRotatePublicLinkAction() {
     rotatePublicLinkConfirm.addEventListener('click', onConfirm);
     rotatePublicLinkModal.addEventListener('click', onCancelClick);
     document.addEventListener('keydown', onEsc);
+  });
+}
+
+function bindStaticTableDeleteConfirmation(table, {
+  buttonSelector = '.row-actions .action-icon.danger',
+  getTargetLabel = () => 'este item',
+  getSuccessMessage = () => 'Item excluído',
+} = {}) {
+  if (!table) return;
+
+  table.addEventListener('click', async (event) => {
+    const deleteButton = event.target.closest(buttonSelector);
+    if (!deleteButton || !table.contains(deleteButton)) return;
+    if (deleteButton.disabled || deleteButton.getAttribute('disabled') !== null || deleteButton.classList.contains('muted-icon')) return;
+
+    const row = deleteButton.closest('.data-row, .agents-row');
+    if (!row || row.classList.contains('header')) return;
+
+    const targetLabel = getTargetLabel(row, deleteButton);
+    if (!(await confirmDeletionAction(targetLabel))) return;
+
+    row.remove();
+    showAppToast(getSuccessMessage(row, deleteButton));
   });
 }
 
@@ -1618,14 +2370,24 @@ if (hybridFlowsFilterBtn && hybridFlowsFilterMenu) {
 }
 
 openVoiceMessagingCreatePage?.addEventListener('click', () => {
-  window.location.hash = '#/dashboard/voice-messaging/new';
+  openVoiceMessagingCreateMode('create');
+});
+
+openVoiceMessagingInsightsPage?.addEventListener('click', () => {
+  window.location.hash = '#/dashboard/voice-messaging/insights';
+});
+
+voiceMessagingInsightsBackBtn?.addEventListener('click', () => {
+  window.location.hash = '#/dashboard/voice-messaging';
 });
 
 voiceMessagingCreateBackBtn?.addEventListener('click', () => {
+  resetVoiceMessagingCreateForm();
   window.location.hash = '#/dashboard/voice-messaging';
 });
 
 voiceMessagingCreateCancelBtn?.addEventListener('click', () => {
+  resetVoiceMessagingCreateForm();
   window.location.hash = '#/dashboard/voice-messaging';
 });
 
@@ -1677,6 +2439,206 @@ const voiceMessagingProviderFieldValues = {
   },
 };
 
+let voiceMessagingConnectionTestTimer = null;
+let voiceMessagingConnectionTestAttempt = 0;
+let activeVoiceMessagingEditId = '';
+let activeVoiceMessagingEditRow = null;
+
+function getVoiceMessagingCreateMode() {
+  return activeVoiceMessagingEditId || activeVoiceMessagingEditRow ? 'edit' : 'create';
+}
+
+function syncVoiceMessagingCreateModeUi() {
+  const isEdit = getVoiceMessagingCreateMode() === 'edit';
+  if (voiceMessagingCreatePage) {
+    voiceMessagingCreatePage.dataset.mode = isEdit ? 'edit' : 'create';
+    voiceMessagingCreatePage.dataset.title = isEdit ? 'Editar mensageria por voz' : 'Nova mensageria de voz';
+  }
+  if (voiceMessagingCreatePageTitle) {
+    voiceMessagingCreatePageTitle.textContent = isEdit ? 'Editar mensageria por voz' : 'Nova mensageria de voz';
+  }
+  if (voiceMessagingCreatePageSubtitle) {
+    voiceMessagingCreatePageSubtitle.textContent = VOICE_MESSAGING_CREATE_SUBTITLE;
+  }
+  if (voiceMessagingReviewConfirmBtn) {
+    voiceMessagingReviewConfirmBtn.textContent = isEdit ? 'Salvar alterações' : 'Continuar';
+  }
+}
+
+function findVoiceMessagingAgentOption(value = '', fallbackLabel = '') {
+  if (!voiceMessagingAgentSelect) return null;
+  const normalizedValue = String(value || '').trim().toLowerCase();
+  const normalizedFallback = String(fallbackLabel || '').trim().toLowerCase();
+  return Array.from(voiceMessagingAgentSelect.options).find((option) => {
+    const optionValue = String(option.value || '').trim().toLowerCase();
+    const optionLabel = String(option.textContent || '').trim().toLowerCase();
+    return (normalizedValue && optionValue === normalizedValue)
+      || (normalizedFallback && optionLabel === normalizedFallback);
+  }) || null;
+}
+
+function readVoiceMessagingRowData(row) {
+  if (!row) return null;
+  const cells = row.querySelectorAll(':scope > span');
+  if (cells.length < 5) return null;
+
+  const operationName = cells[0]?.querySelector('strong')?.textContent?.trim() || '';
+  const agentName = cells[1]?.querySelector('strong')?.textContent?.trim() || '';
+  const agentSubtitle = cells[1]?.querySelector('small')?.textContent?.trim() || '';
+  const providerLabel = cells[2]?.querySelector('strong')?.textContent?.trim() || cells[2]?.textContent?.trim() || 'Oktor';
+  const connectionName = cells[2]?.querySelector('small')?.textContent?.trim() || '';
+
+  return {
+    id: String(row.dataset.voiceMessagingId || '').trim(),
+    operationName,
+    agentId: findVoiceMessagingAgentOption('', agentName)?.value || '',
+    agentName,
+    agentSubtitle,
+    status: String(row.dataset.voiceMessagingStatus || '').trim().toLowerCase() || 'draft',
+    provider: providerLabel.toLowerCase() === 'nvoip' ? 'nvoip' : 'oktor',
+    providerLabel,
+    connectionName,
+    endpoint: '',
+    account: '',
+    token: '',
+    simulationMode: false,
+    message: '',
+    recipients: '',
+    createdAt: new Date().toISOString(),
+  };
+}
+
+function populateVoiceMessagingForm(operation = {}) {
+  const operationData = operation || {};
+  if (voiceMessagingOperationNameInput) {
+    voiceMessagingOperationNameInput.value = String(operationData.operationName || '').trim();
+  }
+
+  if (voiceMessagingAgentSelect) {
+    const matchingAgent = findVoiceMessagingAgentOption(operationData.agentId, operationData.agentName);
+    voiceMessagingAgentSelect.value = matchingAgent?.value || voiceMessagingAgentSelect.options[0]?.value || '';
+  }
+
+  if (voiceMessagingSimulationMode) {
+    voiceMessagingSimulationMode.checked = operationData.simulationMode === true;
+  }
+
+  const provider = String(operationData.provider || '').trim().toLowerCase() === 'nvoip' ? 'nvoip' : 'oktor';
+  if (voiceMessagingProviderRadios.length) {
+    voiceMessagingProviderRadios.forEach((radio) => {
+      radio.checked = radio.value === provider;
+    });
+  }
+
+  if (voiceMessagingConnectionNameInput) {
+    voiceMessagingConnectionNameInput.value = String(operationData.connectionName || '').trim();
+  }
+  if (voiceMessagingConnectionEndpointInput) {
+    voiceMessagingConnectionEndpointInput.value = String(operationData.endpoint || '').trim();
+  }
+
+  voiceMessagingProviderFieldValues[provider].account = String(operationData.account || '').trim();
+  voiceMessagingProviderFieldValues[provider].token = String(operationData.token || '').trim();
+  syncVoiceMessagingProviderFields(provider);
+
+  if (voiceMessagingCampaignMessageInput) {
+    voiceMessagingCampaignMessageInput.value = String(operationData.message || '').trim();
+  }
+  if (voiceMessagingRecipientsInput) {
+    voiceMessagingRecipientsInput.value = String(operationData.recipients || '').trim();
+  }
+
+  resetVoiceMessagingConnectionFeedback();
+  syncVoiceMessagingAgentHint();
+}
+
+function openVoiceMessagingCreateMode(mode = 'create', operation = null, row = null) {
+  if (mode === 'edit') {
+    activeVoiceMessagingEditId = String(operation?.id || '').trim();
+    activeVoiceMessagingEditRow = row || null;
+    populateVoiceMessagingForm(operation || {});
+  } else {
+    activeVoiceMessagingEditId = '';
+    activeVoiceMessagingEditRow = null;
+    resetVoiceMessagingCreateForm();
+  }
+
+  syncVoiceMessagingCreateModeUi();
+  window.location.hash = '#/dashboard/voice-messaging/new';
+}
+
+function clearVoiceMessagingConnectionTestTimer() {
+  if (!voiceMessagingConnectionTestTimer) return;
+  window.clearTimeout(voiceMessagingConnectionTestTimer);
+  voiceMessagingConnectionTestTimer = null;
+}
+
+function resetVoiceMessagingConnectionFeedback() {
+  clearVoiceMessagingConnectionTestTimer();
+  if (voiceMessagingConnectionFeedback) {
+    voiceMessagingConnectionFeedback.hidden = true;
+    delete voiceMessagingConnectionFeedback.dataset.state;
+  }
+  if (voiceMessagingConnectionProgress) {
+    voiceMessagingConnectionProgress.hidden = true;
+    voiceMessagingConnectionProgress.setAttribute('aria-hidden', 'true');
+  }
+  if (voiceMessagingConnectionStatusIcon) {
+    voiceMessagingConnectionStatusIcon.textContent = 'check_circle';
+  }
+  if (voiceMessagingConnectionStatusMessage) {
+    voiceMessagingConnectionStatusMessage.textContent = '';
+  }
+  if (voiceMessagingTestConnectionBtn) {
+    voiceMessagingTestConnectionBtn.disabled = false;
+    voiceMessagingTestConnectionBtn.setAttribute('aria-busy', 'false');
+  }
+}
+
+function setVoiceMessagingConnectionFeedback(state, message) {
+  if (!voiceMessagingConnectionFeedback || !voiceMessagingConnectionProgress || !voiceMessagingConnectionStatusIcon || !voiceMessagingConnectionStatusMessage) return;
+  voiceMessagingConnectionFeedback.hidden = false;
+  voiceMessagingConnectionFeedback.dataset.state = state;
+  voiceMessagingConnectionStatusMessage.textContent = message;
+
+  if (state === 'loading') {
+    voiceMessagingConnectionProgress.hidden = false;
+    voiceMessagingConnectionProgress.setAttribute('aria-hidden', 'false');
+    voiceMessagingConnectionStatusIcon.textContent = 'progress_activity';
+    if (voiceMessagingTestConnectionBtn) {
+      voiceMessagingTestConnectionBtn.disabled = true;
+      voiceMessagingTestConnectionBtn.setAttribute('aria-busy', 'true');
+    }
+    return;
+  }
+
+  voiceMessagingConnectionProgress.hidden = true;
+  voiceMessagingConnectionProgress.setAttribute('aria-hidden', 'true');
+  voiceMessagingConnectionStatusIcon.textContent = state === 'success' ? 'check_circle' : 'cancel';
+  if (voiceMessagingTestConnectionBtn) {
+    voiceMessagingTestConnectionBtn.disabled = false;
+    voiceMessagingTestConnectionBtn.setAttribute('aria-busy', 'false');
+  }
+}
+
+function validateVoiceMessagingConnectionFields() {
+  const connectionName = String(voiceMessagingConnectionNameInput?.value || '').trim();
+  const endpoint = String(voiceMessagingConnectionEndpointInput?.value || '').trim();
+  const account = String(voiceMessagingConnectionAccountInput?.value || '').trim();
+  const token = String(voiceMessagingConnectionTokenInput?.value || '').trim();
+
+  if (!connectionName || !endpoint || !account || !token) {
+    return false;
+  }
+
+  try {
+    const normalizedUrl = new URL(endpoint);
+    return normalizedUrl.protocol === 'http:' || normalizedUrl.protocol === 'https:';
+  } catch (error) {
+    return false;
+  }
+}
+
 function getSelectedVoiceMessagingProvider() {
   return String(voiceMessagingProviderRadios.find((radio) => radio.checked)?.value || 'oktor').trim().toLowerCase();
 }
@@ -1725,6 +2687,7 @@ syncVoiceMessagingAgentHint();
 voiceMessagingProviderRadios.forEach((radio) => {
   const syncFromRadio = () => {
     if (!radio.checked) return;
+    resetVoiceMessagingConnectionFeedback();
     syncVoiceMessagingProviderFields(radio.value);
   };
   radio.addEventListener('change', syncFromRadio);
@@ -1739,11 +2702,143 @@ voiceMessagingProviderOptions.forEach((option) => {
 });
 voiceMessagingConnectionAccountInput?.addEventListener('input', () => {
   storeVoiceMessagingProviderFieldValues();
+  resetVoiceMessagingConnectionFeedback();
 });
 voiceMessagingConnectionTokenInput?.addEventListener('input', () => {
   storeVoiceMessagingProviderFieldValues();
+  resetVoiceMessagingConnectionFeedback();
 });
+voiceMessagingConnectionNameInput?.addEventListener('input', resetVoiceMessagingConnectionFeedback);
+voiceMessagingConnectionEndpointInput?.addEventListener('input', resetVoiceMessagingConnectionFeedback);
 syncVoiceMessagingProviderFields();
+
+voiceMessagingTestConnectionBtn?.addEventListener('click', () => {
+  clearVoiceMessagingConnectionTestTimer();
+  setVoiceMessagingConnectionFeedback('loading', 'Testando a conexão com o provedor...');
+  voiceMessagingConnectionTestTimer = window.setTimeout(() => {
+    voiceMessagingConnectionTestAttempt += 1;
+    const shouldSucceed = voiceMessagingConnectionTestAttempt % 2 === 0;
+    if (shouldSucceed) {
+      setVoiceMessagingConnectionFeedback('success', 'Conexão validada com sucesso.');
+    } else {
+      setVoiceMessagingConnectionFeedback('error', 'Falha ao validar a conexão. Verifique os campos e tente novamente.');
+    }
+    voiceMessagingConnectionTestTimer = null;
+  }, 1400);
+});
+
+function closeVoiceMessagingReviewModal() {
+  if (!voiceMessagingReviewModal) return;
+  voiceMessagingReviewModal.classList.remove('open');
+  voiceMessagingReviewModal.setAttribute('aria-hidden', 'true');
+}
+
+function getVoiceMessagingRecipientsCount() {
+  return String(voiceMessagingRecipientsInput?.value || '')
+    .split('\n')
+    .map((item) => item.trim())
+    .filter(Boolean).length;
+}
+
+function buildVoiceMessagingReviewHtml() {
+  const operationName = String(voiceMessagingOperationNameInput?.value || '').trim() || 'Não informado';
+  const selectedAgent = voiceMessagingAgentSelect?.options?.[voiceMessagingAgentSelect.selectedIndex];
+  const agentName = String(selectedAgent?.textContent || '').trim() || 'Não selecionado';
+  const provider = getSelectedVoiceMessagingProvider();
+  const providerLabel = provider === 'nvoip' ? 'NVoIP' : 'Oktor';
+  const connectionName = String(voiceMessagingConnectionNameInput?.value || '').trim() || 'Não informado';
+  const endpoint = String(voiceMessagingConnectionEndpointInput?.value || '').trim() || 'Não informado';
+  const account = String(voiceMessagingConnectionAccountInput?.value || '').trim() || 'Não informado';
+  const recipientsCount = getVoiceMessagingRecipientsCount();
+  const simulation = voiceMessagingSimulationMode?.checked ? 'Ativado' : 'Desativado';
+  const message = String(voiceMessagingCampaignMessageInput?.value || '').trim() || 'Não informada';
+  return `
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Operação</span><span class="hybrid-flow-review-value">${escapeHtmlWes(operationName)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agente de voz</span><span class="hybrid-flow-review-value">${escapeHtmlWes(agentName)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Provedor</span><span class="hybrid-flow-review-value">${escapeHtmlWes(providerLabel)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Conexão</span><span class="hybrid-flow-review-value">${escapeHtmlWes(connectionName)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Endpoint</span><span class="hybrid-flow-review-value">${escapeHtmlWes(endpoint)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">${escapeHtmlWes(provider === 'nvoip' ? 'Usuário' : 'ID da conta')}</span><span class="hybrid-flow-review-value">${escapeHtmlWes(account)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Modo simulação</span><span class="hybrid-flow-review-value">${escapeHtmlWes(simulation)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Destinatários</span><span class="hybrid-flow-review-value">${escapeHtmlWes(String(recipientsCount))}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Mensagem</span><span class="hybrid-flow-review-value">${escapeHtmlWes(message)}</span></div>
+  `;
+}
+
+function resetVoiceMessagingCreateForm() {
+  activeVoiceMessagingEditId = '';
+  activeVoiceMessagingEditRow = null;
+  resetVoiceMessagingConnectionFeedback();
+  if (voiceMessagingOperationNameInput) voiceMessagingOperationNameInput.value = '';
+  if (voiceMessagingAgentSelect) voiceMessagingAgentSelect.selectedIndex = 0;
+  if (voiceMessagingSimulationMode) voiceMessagingSimulationMode.checked = false;
+  if (voiceMessagingConnectionNameInput) voiceMessagingConnectionNameInput.value = '';
+  if (voiceMessagingConnectionEndpointInput) voiceMessagingConnectionEndpointInput.value = '';
+  if (voiceMessagingCampaignMessageInput) voiceMessagingCampaignMessageInput.value = '';
+  if (voiceMessagingRecipientsInput) voiceMessagingRecipientsInput.value = '';
+  if (voiceMessagingProviderRadios.length) {
+    voiceMessagingProviderRadios.forEach((radio) => {
+      radio.checked = radio.value === 'oktor';
+    });
+  }
+  voiceMessagingProviderFieldValues.oktor.account = voiceMessagingProviderFieldConfig.oktor.accountDefaultValue;
+  voiceMessagingProviderFieldValues.oktor.token = voiceMessagingProviderFieldConfig.oktor.tokenDefaultValue;
+  voiceMessagingProviderFieldValues.nvoip.account = voiceMessagingProviderFieldConfig.nvoip.accountDefaultValue;
+  voiceMessagingProviderFieldValues.nvoip.token = voiceMessagingProviderFieldConfig.nvoip.tokenDefaultValue;
+  syncVoiceMessagingProviderFields('oktor');
+  syncVoiceMessagingAgentHint();
+  syncVoiceMessagingCreateModeUi();
+}
+
+voiceMessagingReviewModal?.addEventListener('click', (event) => {
+  if (event.target.closest('[data-voice-messaging-review-close]')) closeVoiceMessagingReviewModal();
+});
+
+voiceMessagingNextBtn?.addEventListener('click', () => {
+  if (!voiceMessagingReviewModal || !voiceMessagingReviewList) return;
+  voiceMessagingReviewList.innerHTML = buildVoiceMessagingReviewHtml();
+  voiceMessagingReviewModal.classList.add('open');
+  voiceMessagingReviewModal.setAttribute('aria-hidden', 'false');
+});
+
+voiceMessagingReviewConfirmBtn?.addEventListener('click', () => {
+  const selectedAgent = voiceMessagingAgentSelect?.options?.[voiceMessagingAgentSelect.selectedIndex];
+  const provider = getSelectedVoiceMessagingProvider();
+  const isEdit = getVoiceMessagingCreateMode() === 'edit';
+  const existingOperation = activeVoiceMessagingEditId
+    ? getVoiceMessagingFromStorage().find((item) => String(item?.id || '').trim() === activeVoiceMessagingEditId) || null
+    : null;
+  const operation = {
+    id: activeVoiceMessagingEditId || `voice-messaging-${Date.now()}`,
+    operationName: String(voiceMessagingOperationNameInput?.value || '').trim() || 'Sem nome',
+    agentId: String(selectedAgent?.value || '').trim(),
+    agentName: String(selectedAgent?.textContent || '').trim() || 'Não selecionado',
+    agentSubtitle: voiceMessagingAgentHint?.textContent?.trim() || '',
+    status: existingOperation?.status || 'in-progress',
+    provider,
+    providerLabel: provider === 'nvoip' ? 'NVoIP' : 'Oktor',
+    connectionName: String(voiceMessagingConnectionNameInput?.value || '').trim() || 'Sem conexão',
+    endpoint: String(voiceMessagingConnectionEndpointInput?.value || '').trim(),
+    account: String(voiceMessagingConnectionAccountInput?.value || '').trim(),
+    token: String(voiceMessagingConnectionTokenInput?.value || '').trim(),
+    simulationMode: voiceMessagingSimulationMode?.checked === true,
+    message: String(voiceMessagingCampaignMessageInput?.value || '').trim(),
+    recipients: String(voiceMessagingRecipientsInput?.value || '').trim(),
+    createdAt: existingOperation?.createdAt || activeVoiceMessagingEditRow?.dataset.voiceMessagingCreatedAt || new Date().toISOString()
+  };
+  if (activeVoiceMessagingEditId) {
+    upsertVoiceMessagingInStorage(operation);
+    renderVoiceMessagingFromStorage();
+  } else if (activeVoiceMessagingEditRow) {
+    updateVoiceMessagingRow(activeVoiceMessagingEditRow, operation);
+  } else {
+    persistAndRenderVoiceMessaging(operation);
+  }
+  closeVoiceMessagingReviewModal();
+  resetVoiceMessagingCreateForm();
+  showAppToast(isEdit ? 'Mensageria atualizada com sucesso' : 'Mensageria criada com sucesso');
+  window.location.hash = '#/dashboard/voice-messaging';
+});
 
 voiceMessagingAgentPreview?.addEventListener('click', () => {
   if (!window.speechSynthesis || typeof window.SpeechSynthesisUtterance === 'undefined' || !voiceMessagingAgentSelect) return;
@@ -1940,6 +3035,249 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     createUserModal.setAttribute('aria-hidden', 'false');
     createUserName?.focus();
   });
+
+  usersTable?.addEventListener('click', async (event) => {
+    const deleteButton = event.target.closest('.row-actions .action-icon.danger[aria-label="Excluir"]');
+    if (!deleteButton || !usersTable.contains(deleteButton)) return;
+    if (deleteButton.disabled || deleteButton.getAttribute('disabled') !== null || deleteButton.classList.contains('muted-icon')) return;
+
+    const row = deleteButton.closest('.data-row');
+    if (!row || row.classList.contains('header')) return;
+
+    const userName = row.querySelector('.user-cell strong')?.textContent?.trim() || 'este usuário';
+    if (!(await confirmDeletionAction(`o usuário "${userName}"`))) return;
+
+    row.remove();
+    showAppToast('Usuário excluído');
+  });
+}
+
+if (openSkillModal && skillModal && skillModalForm && skillsTable) {
+  let editingSkillRow = null;
+
+  const closeSkillModal = () => {
+    editingSkillRow = null;
+    skillModal.classList.remove('open');
+    skillModal.setAttribute('aria-hidden', 'true');
+  };
+
+  const setSkillModalMode = (mode = 'create') => {
+    const isEdit = mode === 'edit';
+    skillModal.dataset.mode = isEdit ? 'edit' : 'create';
+    if (skillModalTitle) skillModalTitle.textContent = isEdit ? 'Editar habilidade' : 'Adicionar nova habilidade';
+    if (skillModalSubmit) skillModalSubmit.textContent = isEdit ? 'Salvar alterações' : 'Salvar habilidade';
+    skillFileSection?.classList.toggle('is-hidden', isEdit);
+  };
+
+  const getSkillStatusMeta = (isActive) => ({
+    label: isActive ? 'Ativa' : 'Inativa',
+    className: isActive ? 'success' : 'warning',
+  });
+
+  const readSkillRowData = (row) => {
+    const cells = row?.querySelectorAll(':scope > span') || [];
+    const name = cells[0]?.querySelector('strong')?.textContent?.trim() || '';
+    const description = cells[1]?.textContent?.trim() || '';
+    const statusText = cells[2]?.querySelector('.chip')?.textContent?.trim().toLowerCase() || '';
+    return {
+      name,
+      description,
+      isActive: !statusText.includes('inativa'),
+    };
+  };
+
+  const syncSkillStatus = () => {
+    if (!skillStatusInput || !skillStatusValue) return;
+    const statusWrap = skillStatusInput.closest('.skill-status-toggle');
+    const isActive = skillStatusInput.checked;
+    skillStatusValue.textContent = isActive ? 'Ativa' : 'Inativa';
+    statusWrap?.classList.toggle('is-active', isActive);
+    statusWrap?.classList.toggle('is-inactive', !isActive);
+  };
+
+  const isValidSkillFile = (file) => {
+    if (!file) return false;
+    const normalized = String(file.name || '').trim().toLowerCase();
+    return normalized.endsWith('.zip') || normalized.endsWith('.md');
+  };
+
+  const setSkillFileFeedback = (file) => {
+    if (!skillFileName) return;
+    if (!file) {
+      skillFileName.hidden = true;
+      skillFileName.textContent = '';
+      skillUploadDropzone?.classList.remove('is-invalid');
+      return;
+    }
+
+    const hasValidFile = isValidSkillFile(file);
+    skillFileName.hidden = false;
+    skillFileName.textContent = hasValidFile ? `Arquivo: ${file.name}` : 'Arquivo inválido. Envie um `.zip` ou `.md`.';
+    skillUploadDropzone?.classList.toggle('is-invalid', !hasValidFile);
+  };
+
+  const syncSkillSubmit = () => {
+    const hasName = Boolean(String(skillNameInput?.value || '').trim());
+    const isEdit = skillModal.dataset.mode === 'edit';
+    const file = skillFileInput?.files?.[0] || null;
+    const hasValidFile = isEdit ? true : isValidSkillFile(file);
+    if (!isEdit) setSkillFileFeedback(file);
+    else setSkillFileFeedback(null);
+    if (skillModalSubmit) skillModalSubmit.disabled = !(hasName && hasValidFile);
+  };
+
+  const openSkillDialog = () => {
+    editingSkillRow = null;
+    setSkillModalMode('create');
+    skillModalForm.reset();
+    if (skillStatusInput) skillStatusInput.checked = true;
+    syncSkillStatus();
+    setSkillFileFeedback(null);
+    syncSkillSubmit();
+    skillModal.classList.add('open');
+    skillModal.setAttribute('aria-hidden', 'false');
+    skillNameInput?.focus();
+  };
+
+  openSkillModal.addEventListener('click', openSkillDialog);
+  skillNameInput?.addEventListener('input', syncSkillSubmit);
+  skillFileInput?.addEventListener('change', syncSkillSubmit);
+  skillStatusInput?.addEventListener('change', syncSkillStatus);
+  skillUploadChooseLink?.addEventListener('click', (event) => {
+    event.preventDefault();
+    skillFileInput?.click();
+  });
+  skillUploadDropzone?.addEventListener('click', () => skillFileInput?.click());
+  skillUploadDropzone?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    skillFileInput?.click();
+  });
+  skillUploadDropzone?.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    skillUploadDropzone.classList.add('is-dragover');
+  });
+  skillUploadDropzone?.addEventListener('dragleave', () => {
+    skillUploadDropzone.classList.remove('is-dragover');
+  });
+  skillUploadDropzone?.addEventListener('drop', (event) => {
+    event.preventDefault();
+    skillUploadDropzone.classList.remove('is-dragover');
+    const droppedFile = event.dataTransfer?.files?.[0] || null;
+    if (!skillFileInput) return;
+    if (!isValidSkillFile(droppedFile)) {
+      skillFileInput.value = '';
+      setSkillFileFeedback(droppedFile);
+      if (skillModalSubmit) skillModalSubmit.disabled = true;
+      return;
+    }
+    const transfer = new DataTransfer();
+    transfer.items.add(droppedFile);
+    skillFileInput.files = transfer.files;
+    syncSkillSubmit();
+  });
+
+  skillModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeSkillModal();
+  });
+
+  skillModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    const name = String(skillNameInput?.value || '').trim();
+    const description = String(skillDescriptionInput?.value || '').trim();
+    const file = skillFileInput?.files?.[0];
+    const isActive = skillStatusInput?.checked !== false;
+    const status = isActive ? 'active' : 'inactive';
+    const isEdit = skillModal.dataset.mode === 'edit';
+
+    if (!name || (!isEdit && !isValidSkillFile(file))) {
+      syncSkillSubmit();
+      return;
+    }
+
+    const statusMeta = getSkillStatusMeta(isActive);
+    const updatedAt = new Intl.DateTimeFormat('pt-BR').format(new Date());
+    const safeName = escapeHtmlWes(name);
+    const safeDescription = escapeHtmlWes(description || (!isEdit && file ? `Arquivo enviado: ${file.name}` : 'Sem descrição'));
+
+    if (isEdit && editingSkillRow) {
+      const cells = editingSkillRow.querySelectorAll(':scope > span');
+      if (cells[0]) cells[0].innerHTML = `<strong>${safeName}</strong>`;
+      if (cells[1]) cells[1].textContent = description || 'Sem descrição';
+      if (cells[2]) cells[2].innerHTML = `<span class="chip ${statusMeta.className}">${statusMeta.label}</span>`;
+      if (cells[3]) cells[3].textContent = updatedAt;
+
+      closeSkillModal();
+      showAppToast('Habilidade atualizada com sucesso');
+      return;
+    }
+
+    const rowMarkup = `
+      <div class="data-row">
+        <span><strong>${safeName}</strong></span>
+        <span class="muted">${safeDescription}</span>
+        <span class="chip ${statusMeta.className}">${statusMeta.label}</span>
+        <span>${updatedAt}</span>
+        <span class="row-actions">
+          <button class="icon-btn action-icon" aria-label="Editar habilidade" data-skill-edit type="button">
+            <span class="material-symbols-rounded">edit</span>
+          </button>
+          <button class="icon-btn action-icon danger" aria-label="Excluir habilidade">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </span>
+      </div>
+    `;
+
+    const firstDataRow = skillsTable.querySelector('.data-row.header + .data-row');
+    if (firstDataRow) {
+      firstDataRow.insertAdjacentHTML('beforebegin', rowMarkup);
+    } else {
+      skillsTable.insertAdjacentHTML('beforeend', rowMarkup);
+    }
+
+    closeSkillModal();
+    showAppToast('Habilidade criada com sucesso');
+  });
+
+  skillsTable.addEventListener('click', async (event) => {
+    const editButton = event.target.closest('[data-skill-edit]');
+    if (!editButton) return;
+
+    const row = editButton.closest('.data-row');
+    if (!row || row.classList.contains('header')) return;
+
+    const skillData = readSkillRowData(row);
+    editingSkillRow = row;
+    setSkillModalMode('edit');
+    skillModalForm.reset();
+    if (skillNameInput) skillNameInput.value = skillData.name;
+    if (skillDescriptionInput) skillDescriptionInput.value = skillData.description;
+    if (skillStatusInput) skillStatusInput.checked = skillData.isActive;
+    if (skillFileInput) skillFileInput.value = '';
+    setSkillFileFeedback(null);
+    syncSkillStatus();
+    syncSkillSubmit();
+    skillModal.classList.add('open');
+    skillModal.setAttribute('aria-hidden', 'false');
+    skillNameInput?.focus();
+  });
+
+  skillsTable.addEventListener('click', async (event) => {
+    const deleteButton = event.target.closest('.row-actions .action-icon.danger[aria-label="Excluir habilidade"]');
+    if (!deleteButton || !skillsTable.contains(deleteButton)) return;
+    if (deleteButton.disabled || deleteButton.getAttribute('disabled') !== null || deleteButton.classList.contains('muted-icon')) return;
+
+    const row = deleteButton.closest('.data-row');
+    if (!row || row.classList.contains('header')) return;
+
+    const skillName = row.querySelector('strong')?.textContent?.trim() || 'esta habilidade';
+    if (!(await confirmDeletionAction(`a habilidade "${skillName}"`))) return;
+
+    row.remove();
+    showAppToast('Habilidade excluída');
+  });
 }
 
 if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect) {
@@ -2097,12 +3435,24 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     companyUserSelect.focus();
   };
 
-  companiesTable.addEventListener('click', (event) => {
+  companiesTable.addEventListener('click', async (event) => {
     const editButton = event.target.closest('[data-company-edit]');
-    if (!editButton) return;
-    const row = editButton.closest('[data-company-row]');
+    if (editButton) {
+      const row = editButton.closest('[data-company-row]');
+      if (!row) return;
+      openCompanyUsersModal(row);
+      return;
+    }
+
+    const deleteButton = event.target.closest('.row-actions .action-icon.danger[aria-label="Excluir empresa"]');
+    if (!deleteButton) return;
+    if (deleteButton.disabled || deleteButton.getAttribute('disabled') !== null || deleteButton.classList.contains('muted-icon')) return;
+    const row = deleteButton.closest('[data-company-row]');
     if (!row) return;
-    openCompanyUsersModal(row);
+    const companyName = row.dataset.companyName || row.querySelector('strong')?.textContent?.trim() || 'esta empresa';
+    if (!(await confirmDeletionAction(`a empresa "${companyName}"`))) return;
+    row.remove();
+    showAppToast('Empresa excluída');
   });
 
   companyUserSelect.addEventListener('change', () => {
@@ -2150,6 +3500,89 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     showAppToast('Usuários da empresa atualizados');
   });
 }
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-schedules .data-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'este agendamento';
+    return `o agendamento "${name}"`;
+  },
+  getSuccessMessage: () => 'Agendamento excluído',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-executors .executors-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'este executor';
+    return `o executor "${name}"`;
+  },
+  getSuccessMessage: () => 'Executor excluído',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-executors .tab-panel[data-panel="executors-service"] .data-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'esta conta de serviço';
+    return `a conta de serviço "${name}"`;
+  },
+  getSuccessMessage: () => 'Conta de serviço excluída',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-packages .packages-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'este pacote';
+    return `o pacote "${name}"`;
+  },
+  getSuccessMessage: () => 'Pacote excluído',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-channels .channels-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('.channel-cell strong')?.textContent?.trim() || 'este canal';
+    return `o canal "${name}"`;
+  },
+  getSuccessMessage: () => 'Canal excluído',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-credentials .credentials-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'esta credencial';
+    return `a credencial "${name}"`;
+  },
+  getSuccessMessage: () => 'Credencial excluída',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-input-files .data-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'este arquivo';
+    return `o arquivo "${name}"`;
+  },
+  getSuccessMessage: () => 'Arquivo excluído',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-users .roles-table'), {
+  getTargetLabel: (row) => {
+    const roleCell = row.querySelector('.role-cell');
+    const iconText = roleCell?.querySelector('.material-symbols-rounded')?.textContent?.trim() || '';
+    const name = (roleCell?.textContent || '').replace(iconText, '').trim() || 'esta função';
+    return `a função "${name}"`;
+  },
+  getSuccessMessage: () => 'Função excluída',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-organization .tab-panel[data-panel="org-keys"] .data-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'esta chave de API';
+    return `a chave de API "${name}"`;
+  },
+  getSuccessMessage: () => 'Chave de API excluída',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-settings .sessions-table'), {
+  buttonSelector: '.row-actions .action-icon.danger[aria-label="Encerrar sessão"]',
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child')?.textContent?.trim() || 'esta sessão';
+    return `a sessão "${name}"`;
+  },
+  getSuccessMessage: () => 'Sessão encerrada',
+});
 
 if (environmentsTable && environmentModal && environmentModalForm) {
   let activeEnvironmentRow = null;
@@ -3934,9 +5367,9 @@ if (hybridFlowsPage) {
     const deleteBtn = event.target.closest('.hybrid-flows-row-actions .action-icon.danger[aria-label="Apagar"]');
     if (!deleteBtn || !hybridFlowsPage.contains(deleteBtn)) return;
     event.stopPropagation();
-    const row = deleteBtn.closest('tr');
+    const row = deleteBtn.closest('.data-row');
     if (!row) return;
-    const flowName = row.querySelector('td strong')?.textContent?.trim() || 'este fluxo';
+    const flowName = row.querySelector('strong')?.textContent?.trim() || 'este fluxo';
     const confirmed = await confirmDeletionAction(`o fluxo "${flowName}"`);
     if (!confirmed) return;
     const flowId = row.dataset.hybridFlowId || '';
@@ -3949,10 +5382,47 @@ if (hybridFlowsPage) {
     const historyBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Histórico"]');
     if (!historyBtn || !hybridFlowsPage.contains(historyBtn)) return;
     event.stopPropagation();
-    const row = historyBtn.closest('tr');
-    const flowName = row?.querySelector('td strong')?.textContent?.trim() || 'Fluxo';
+    const row = historyBtn.closest('.data-row');
+    const flowName = row?.querySelector('strong')?.textContent?.trim() || 'Fluxo';
     setHybridFlowHistoryFlowName(flowName);
     window.location.hash = '#/dashboard/hybrid-flows/history';
+  });
+}
+
+const voiceMessagingPage = document.getElementById('page-voice-messaging');
+if (voiceMessagingPage) {
+  voiceMessagingPage.querySelectorAll('#voiceMessagingTable .data-row:not(.header)').forEach((row) => {
+    normalizeVoiceMessagingTableRow(row);
+  });
+  renderVoiceMessagingFromStorage();
+
+  voiceMessagingPage.addEventListener('click', async (event) => {
+    const editBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Editar"]');
+    if (editBtn && voiceMessagingPage.contains(editBtn)) {
+      event.stopPropagation();
+      const row = editBtn.closest('.data-row');
+      if (!isVoiceMessagingEditableStatus(row?.dataset.voiceMessagingStatus || '')) return;
+      const operationId = String(row?.dataset.voiceMessagingId || '').trim();
+      const storedOperation = operationId
+        ? getVoiceMessagingFromStorage().find((item) => String(item?.id || '').trim() === operationId) || null
+        : null;
+      const operation = storedOperation || readVoiceMessagingRowData(row);
+      if (row && operation) openVoiceMessagingCreateMode('edit', operation, row);
+      return;
+    }
+
+    const deleteBtn = event.target.closest('.hybrid-flows-row-actions .action-icon.danger[aria-label="Apagar"]');
+    if (!deleteBtn || !voiceMessagingPage.contains(deleteBtn)) return;
+    event.stopPropagation();
+    const row = deleteBtn.closest('.data-row');
+    if (!row) return;
+    const operationName = row.querySelector('strong')?.textContent?.trim() || 'esta mensageria';
+    const confirmed = await confirmDeletionAction(`a mensageria "${operationName}"`);
+    if (!confirmed) return;
+    const operationId = String(row.dataset.voiceMessagingId || '').trim();
+    if (operationId) removeVoiceMessagingFromStorage(operationId);
+    row.remove();
+    showAppToast('Mensageria excluída');
   });
 }
 
@@ -9001,6 +10471,7 @@ const routeMap = {
   'dashboard/schedules': 'page-schedules',
   'dashboard/agents': 'page-agents',
   'dashboard/voice-messaging': 'page-voice-messaging',
+  'dashboard/voice-messaging/insights': 'page-voice-messaging-insights',
   'dashboard/voice-messaging/new': 'page-voice-messaging-create',
   'dashboard/campaigns': 'page-campaigns',
   'dashboard/hybrid-flows': 'page-hybrid-flows',
@@ -9034,6 +10505,7 @@ const sectionMap = {
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
   'dashboard/agents': 'Automa\u00e7\u00e3o',
   'dashboard/voice-messaging': 'Atendimento dinâmico',
+  'dashboard/voice-messaging/insights': 'Atendimento dinâmico',
   'dashboard/voice-messaging/new': 'Atendimento dinâmico',
   'dashboard/campaigns': 'Atendimento dinâmico',
   'dashboard/hybrid-flows': 'Atendimento dinâmico',
@@ -9152,7 +10624,7 @@ const normalizeVisiblePortugueseLabels = () => {
   const replacements = [
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
-    ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'MCP\'s'],
+    ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'Conex\u00f5es'],
     ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
     ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
@@ -9291,6 +10763,7 @@ const updateActivePage = () => {
   document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
   document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
+  syncVoiceMessagingInsightsChart(routeKey);
   if (typeof window.ensureAgentsAutoRefresh === 'function') {
     window.ensureAgentsAutoRefresh();
   }

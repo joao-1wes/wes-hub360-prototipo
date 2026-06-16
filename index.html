@@ -262,7 +262,7 @@
             <div class="submenu" id="submenu-administration">
               <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
               <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
-              <a class="submenu-item" href="#/dashboard/mcps"><span class="submenu-label">MCP's</span></a>
+              <a class="submenu-item" href="#/dashboard/mcps"><span class="submenu-label">Conexões</span></a>
               <a class="submenu-item" href="#/dashboard/skills"><span class="submenu-label">Habilidades</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
               <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
@@ -271,7 +271,7 @@
 
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="processes" type="button">
-              <span class="material-symbols-rounded">link</span>
+              <span class="material-symbols-rounded">schema</span>
               <span class="nav-label">Processos</span>
               <span class="nav-caret">▾</span>
             </button>
@@ -2956,7 +2956,7 @@
                   <p class="page-subtitle">Configure agentes e dispare campanhas de chamadas automatizadas para os seus contatos.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn outline" type="button">
+                  <button class="btn outline" id="openVoiceMessagingInsightsPage" type="button">
                     Ver insights
                   </button>
                   <button class="btn primary" id="openVoiceMessagingCreatePage" type="button">
@@ -2986,62 +2986,217 @@
                       <button class="filter-option active" data-filter="status" data-value="">Todos os status</button>
                       <button class="filter-option" data-filter="status" data-value="completed">Concluída</button>
                       <button class="filter-option" data-filter="status" data-value="in-progress">Em andamento</button>
-                      <button class="filter-option" data-filter="status" data-value="failed">Com falha</button>
+                      <button class="filter-option" data-filter="status" data-value="error">Erro</button>
+                      <button class="filter-option" data-filter="status" data-value="draft">Rascunho</button>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="hybrid-flows-table-wrap">
-                <table class="hybrid-flows-table" aria-label="Lista de operações de mensageria por voz">
-                  <thead>
-                    <tr>
-                      <th>Operação</th>
-                      <th>Agente</th>
-                      <th>Conexão</th>
-                      <th>Status</th>
-                      <th>Criada em</th>
-                      <th class="hybrid-flows-col-actions">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td><strong>Teste POC</strong></td>
-                      <td><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></td>
-                      <td>Oktor</td>
-                      <td><span class="chip success">Concluída</span></td>
-                      <td>08/05/2026, 11:14:25</td>
-                      <td>
-                        <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
-                            <span class="material-symbols-rounded">edit</span>
-                          </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
-                            <span class="material-symbols-rounded">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><strong>Teste</strong></td>
-                      <td><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></td>
-                      <td>Oktor</td>
-                      <td><span class="chip success">Concluída</span></td>
-                      <td>08/05/2026, 07:30:29</td>
-                      <td>
-                        <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
-                            <span class="material-symbols-rounded">edit</span>
-                          </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
-                            <span class="material-symbols-rounded">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="data-table voice-messaging-data-table" id="voiceMessagingTable" aria-label="Lista de operações de mensageria por voz">
+                <div class="data-row header">
+                  <span>Operação</span>
+                  <span>Agente</span>
+                  <span>Conexão</span>
+                  <span>Status</span>
+                  <span>Criada em</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Teste POC</strong></span>
+                  <span><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></span>
+                  <span>Oktor</span>
+                  <span><span class="chip success">Concluída</span></span>
+                  <span>08/05/2026, 11:14:25</span>
+                  <span class="row-actions hybrid-flows-row-actions">
+                    <button class="icon-btn action-icon muted-icon" type="button" aria-label="Editar" disabled>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Campanha em revisão</strong></span>
+                  <span><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></span>
+                  <span>Oktor</span>
+                  <span><span class="chip neutral">Rascunho</span></span>
+                  <span>08/05/2026, 07:30:29</span>
+                  <span class="row-actions hybrid-flows-row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Disparo carteira ativa</strong></span>
+                  <span><strong>wes-ai voice agent (2120...)</strong><small>AntonioNeural</small></span>
+                  <span><strong>Oktor</strong><small>Sem conexão</small></span>
+                  <span><span class="chip error">Erro</span></span>
+                  <span>08/05/2026, 09:42:18</span>
+                  <span class="row-actions hybrid-flows-row-actions">
+                    <button class="icon-btn action-icon muted-icon" type="button" aria-label="Editar" disabled>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
               </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-voice-messaging-insights" data-title="Insights de mensageria por voz">
+            <div class="section voice-messaging-insights-page">
+              <div class="telegram-page-topbar">
+                <button class="hybrid-history-top-link" id="voiceMessagingInsightsBackBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  Voltar para Mensageria por voz
+                </button>
+              </div>
+              <div class="voice-messaging-insights-header">
+                <div class="voice-messaging-insights-title-wrap">
+                  <h2>Insights de mensageria por voz</h2>
+                  <p class="page-subtitle">Visão consolidada das chamadas simuladas executadas por todas as operações deste tenant.</p>
+                </div>
+              </div>
+
+              <div class="stats-cards voice-messaging-insights-stats">
+                <article class="stat-card voice-messaging-insight-stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">task</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">2</div>
+                    <div class="stat-label">Operações executadas</div>
+                    <div class="stat-sub">Operações simuladas</div>
+                  </div>
+                </article>
+                <article class="stat-card voice-messaging-insight-stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">call</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">4</div>
+                    <div class="stat-label">Total de chamadas</div>
+                    <div class="stat-sub">Chamadas processadas</div>
+                  </div>
+                </article>
+                <article class="stat-card voice-messaging-insight-stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">call_received</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">75%</div>
+                    <div class="stat-label">Taxa de atendimento</div>
+                    <div class="stat-sub">Chamadas que conectaram</div>
+                  </div>
+                </article>
+                <article class="stat-card voice-messaging-insight-stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">verified</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">50%</div>
+                    <div class="stat-label">Taxa de confirmação</div>
+                    <div class="stat-sub">Chamadas com confirmação</div>
+                  </div>
+                </article>
+              </div>
+
+              <section class="voice-messaging-insights-content-card">
+                <div class="voice-messaging-insights-section voice-messaging-insights-hero-card">
+                  <div class="voice-messaging-insights-hero-head">
+                    <div class="voice-messaging-insights-hero-copy">
+                      <div class="voice-messaging-insights-hero-title">
+                        <h3>Insights da IA</h3>
+                      </div>
+                      <p>Recomendações geradas a partir do histórico de chamadas simuladas.</p>
+                    </div>
+                  </div>
+                  <div class="voice-messaging-insights-highlight">
+                    <div class="voice-messaging-insights-highlight-main">
+                      <span class="voice-messaging-insights-highlight-icon" aria-hidden="true"><i data-lucide="badge-check"></i></span>
+                      <div>
+                        <strong>Melhor janela de disparo: 14h</strong>
+                        <p>Em 3 ligações nesta faixa, 66% foram atendidas. Concentre as próximas campanhas neste horário para maximizar a taxa de resposta.</p>
+                      </div>
+                    </div>
+                    <span class="voice-messaging-insights-highlight-tag">Análise automática</span>
+                  </div>
+                </div>
+
+                <div class="voice-messaging-insights-section voice-messaging-insights-grid">
+                  <section class="voice-messaging-insights-chart-card">
+                    <h3>Desempenho por horário</h3>
+                    <p>Distribuição das chamadas por hora do dia, com cada barra separada por resultado para facilitar a leitura.</p>
+                    <div class="voice-messaging-insights-chart-shell">
+                      <canvas id="voiceMessagingInsightsChart" aria-label="Gráfico de desempenho por horário" role="img"></canvas>
+                    </div>
+                  </section>
+
+                  <section class="voice-messaging-insights-agents-card">
+                    <h3>Desempenho dos agentes</h3>
+                    <p>Comparativo dos agentes por taxa de confirmação.</p>
+                    <div class="voice-messaging-insights-agent-row">
+                      <div class="voice-messaging-insights-agent-meta">
+                        <div class="voice-messaging-insights-agent-name-row">
+                          <span class="material-symbols-rounded" aria-hidden="true">support_agent</span>
+                          <strong>wes-ai voice agent (21201ae7)</strong>
+                          <span>· AntonioNeural</span>
+                        </div>
+                        <p>2 operações · 4 chamadas · 2 confirmadas</p>
+                      </div>
+                      <strong class="voice-messaging-insights-agent-rate">50%</strong>
+                    </div>
+                    <div class="voice-messaging-insights-agent-progress" aria-hidden="true">
+                      <span class="voice-messaging-insights-agent-progress-fill"></span>
+                    </div>
+                  </section>
+                </div>
+
+                <section class="voice-messaging-insights-section voice-messaging-insights-recipients-card">
+                  <h3>Perfil dos destinatários</h3>
+                  <p>Quem atende, quem nunca atende e em qual horário cada contato costuma ser ligado.</p>
+                  <div class="hybrid-flows-table-wrap voice-messaging-insights-recipients-table-wrap">
+                    <table class="hybrid-flows-table voice-messaging-insights-recipients-table" aria-label="Perfil dos destinatários">
+                      <thead>
+                        <tr>
+                          <th>Destinatário</th>
+                          <th>Perfil</th>
+                          <th>Chamadas</th>
+                          <th>Atendimento</th>
+                          <th>Horário mais comum</th>
+                          <th>Último resultado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>Alex Souza</strong><small>51994380430</small></td>
+                          <td><span class="voice-messaging-recipient-pill">Neutro</span></td>
+                          <td>2</td>
+                          <td><strong>50%</strong><small>1 confirmadas</small></td>
+                          <td>10h</td>
+                          <td>Sem resposta</td>
+                        </tr>
+                        <tr>
+                          <td><strong>João Silva</strong><small>55997158922</small></td>
+                          <td><span class="voice-messaging-recipient-pill">Neutro</span></td>
+                          <td>1</td>
+                          <td><strong>100%</strong><small>0 confirmadas</small></td>
+                          <td>14h</td>
+                          <td>Atendidas</td>
+                        </tr>
+                        <tr>
+                          <td><strong>Maria Albertina Silva</strong><small>11987653456</small></td>
+                          <td><span class="voice-messaging-recipient-pill">Neutro</span></td>
+                          <td>1</td>
+                          <td><strong>100%</strong><small>1 confirmadas</small></td>
+                          <td>14h</td>
+                          <td>Confirmadas</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </section>
+              </section>
             </div>
           </div>
 
@@ -3087,9 +3242,9 @@
                 </div>
 
                 <section class="voice-messaging-connection-section" aria-labelledby="voiceMessagingConnectionTitle">
-                  <div class="voice-messaging-section-copy">
-                    <h3 id="voiceMessagingConnectionTitle">Configurar conexão</h3>
-                    <p>Escolha o provedor e preencha as credenciais da sua conta. Aceitamos Oktor e NVoIP.</p>
+                  <div class="form-field voice-messaging-section-copy">
+                    <div class="modal-label" id="voiceMessagingConnectionTitle">Configurar conexão</div>
+                    <p class="page-subtitle">Escolha o provedor e preencha as credenciais da sua conta. Aceitamos Oktor e NVoIP.</p>
                   </div>
 
                   <div class="voice-messaging-connection-toggle">
@@ -3145,21 +3300,23 @@
                   </div>
 
                   <div class="voice-messaging-connection-actions">
-                    <button class="btn outline voice-messaging-header-action-btn" id="voiceMessagingTestConnectionBtn" type="button">
-                      <span class="material-symbols-rounded" aria-hidden="true">verified</span>
-                      Testar conexão
-                    </button>
-                    <p>Tentamos autenticar no provedor. É obrigatório passar nesse teste para avançar para a próxima etapa.</p>
+                    <button class="auth-link voice-messaging-inline-link voice-messaging-header-action-btn" id="voiceMessagingTestConnectionBtn" type="button">Testar conexão <span class="voice-messaging-required-indicator" aria-hidden="true">*</span></button>
+                    <div class="voice-messaging-connection-feedback" id="voiceMessagingConnectionFeedback" hidden aria-live="polite">
+                      <div class="voice-messaging-connection-progress" id="voiceMessagingConnectionProgress" hidden aria-hidden="true">
+                        <span class="voice-messaging-connection-progress-bar"></span>
+                      </div>
+                      <div class="voice-messaging-connection-status" id="voiceMessagingConnectionStatus">
+                        <span class="material-symbols-rounded voice-messaging-connection-status-icon" id="voiceMessagingConnectionStatusIcon" aria-hidden="true">check_circle</span>
+                        <span class="voice-messaging-connection-status-message" id="voiceMessagingConnectionStatusMessage"></span>
+                      </div>
+                    </div>
                   </div>
                 </section>
 
                 <div class="form-field">
                   <div class="modal-label-row voice-messaging-message-header">
                     <label class="modal-label modal-label--required" for="voiceMessagingCampaignMessageInput">Mensagem da campanha</label>
-                    <button class="btn outline voice-messaging-optimize-btn" type="button">
-                      <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
-                      Otimizar com IA
-                    </button>
+                    <button class="auth-link voice-messaging-inline-link voice-messaging-optimize-btn" type="button">Otimizar com IA</button>
                   </div>
                   <div class="voice-messaging-message-hint-row">
                     <div class="modal-field-hint voice-messaging-message-hint">
@@ -3186,10 +3343,7 @@
                 <div class="form-field">
                   <div class="modal-label-row voice-messaging-message-header">
                     <label class="modal-label modal-label--required" for="voiceMessagingRecipientsInput">Destinatários</label>
-                    <button class="btn outline voice-messaging-header-action-btn" id="voiceMessagingImportCsvBtn" type="button">
-                      <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
-                      Importar CSV
-                    </button>
+                    <button class="auth-link voice-messaging-inline-link voice-messaging-import-btn" id="voiceMessagingImportCsvBtn" type="button">Importar CSV</button>
                   </div>
                   <p class="modal-field-hint">Cole a lista de contatos que vão receber a chamada. Você pode usar uma linha por destinatário ou importar um CSV.</p>
                   <textarea class="modal-textarea voice-messaging-message-input voice-messaging-recipients-input" id="voiceMessagingRecipientsInput" rows="7" placeholder="Ex.:\nMaria Silva, +55 21 99999-1234\nJoão Souza, +55 11 98888-4567"></textarea>
@@ -3197,8 +3351,30 @@
 
                 <div class="voice-messaging-create-actions">
                   <button class="btn ghost" id="voiceMessagingCreateCancelBtn" type="button">Cancelar</button>
-                  <button class="btn primary" type="button">Próximo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></button>
+                  <button class="btn primary" id="voiceMessagingNextBtn" type="button">Próximo <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="voiceMessagingReviewModal" aria-hidden="true">
+            <div class="modal-backdrop" data-voice-messaging-review-close></div>
+            <div class="modal-dialog voice-messaging-review-dialog" role="dialog" aria-modal="true" aria-labelledby="voiceMessagingReviewTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="voiceMessagingReviewTitle">Revisar mensageria por voz</h3>
+                  <p class="voice-messaging-review-subtitle">Confira os dados antes de iniciar o disparo da operação.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-voice-messaging-review-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="hybrid-flow-review-list" id="voiceMessagingReviewList"></div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-voice-messaging-review-close>Cancelar</button>
+                <button class="btn primary" type="button" id="voiceMessagingReviewConfirmBtn">Continuar</button>
               </div>
             </div>
           </div>
@@ -3270,117 +3446,96 @@
                 </div>
               </div>
 
-              <div class="hybrid-flows-table-wrap">
-                <table class="hybrid-flows-table" aria-label="Lista de fluxos híbridos">
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>Status</th>
-                      <th>Campos</th>
-                      <th>Criado em</th>
-                      <th>Atualizado em</th>
-                      <th class="hybrid-flows-col-actions">Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>
-                        <strong>teste</strong>
-                        <small>teste</small>
-                      </td>
-                      <td><span class="chip success">Ativo</span></td>
-                      <td>1</td>
-                      <td>08/05/2026, 11:42</td>
-                      <td>08/05/2026, 11:42</td>
-                      <td>
-                        <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
-                            <span class="material-symbols-rounded">content_copy</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
-                            <span class="material-symbols-rounded">open_in_new</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
-                            <span class="material-symbols-rounded">autorenew</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Histórico">
-                            <span class="material-symbols-rounded">history</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
-                            <span class="material-symbols-rounded">edit</span>
-                          </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
-                            <span class="material-symbols-rounded">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Atendimento Geral sobre Dúvidas</strong>
-                        <small>Fluxo de Atendimento Geral sobre Dúvidas.</small>
-                      </td>
-                      <td><span class="chip success">Ativo</span></td>
-                      <td>2</td>
-                      <td>29/04/2026, 09:51</td>
-                      <td>29/04/2026, 09:51</td>
-                      <td>
-                        <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
-                            <span class="material-symbols-rounded">content_copy</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
-                            <span class="material-symbols-rounded">open_in_new</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
-                            <span class="material-symbols-rounded">autorenew</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Histórico">
-                            <span class="material-symbols-rounded">history</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
-                            <span class="material-symbols-rounded">edit</span>
-                          </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
-                            <span class="material-symbols-rounded">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>
-                        <strong>Manutenção Pós</strong>
-                        <small>&nbsp;</small>
-                      </td>
-                      <td><span class="chip success">Ativo</span></td>
-                      <td>4</td>
-                      <td>26/04/2026, 21:07</td>
-                      <td>27/04/2026, 17:36</td>
-                      <td>
-                        <div class="row-actions hybrid-flows-row-actions">
-                          <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
-                            <span class="material-symbols-rounded">content_copy</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
-                            <span class="material-symbols-rounded">open_in_new</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
-                            <span class="material-symbols-rounded">autorenew</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Histórico">
-                            <span class="material-symbols-rounded">history</span>
-                          </button>
-                          <button class="icon-btn action-icon" type="button" aria-label="Editar">
-                            <span class="material-symbols-rounded">edit</span>
-                          </button>
-                          <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
-                            <span class="material-symbols-rounded">delete</span>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+              <div class="data-table hybrid-flows-data-table" id="hybridFlowsTable" aria-label="Lista de fluxos híbridos">
+                <div class="data-row header">
+                  <span>Nome</span>
+                  <span>Status</span>
+                  <span>Campos</span>
+                  <span>Criado em</span>
+                  <span>Atualizado em</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row">
+                  <span><strong>teste</strong><small>teste</small></span>
+                  <span><span class="chip success">Ativo</span></span>
+                  <span>1</span>
+                  <span>08/05/2026, 11:42</span>
+                  <span>08/05/2026, 11:42</span>
+                  <span class="row-actions hybrid-flows-row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
+                      <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
+                      <span class="material-symbols-rounded">open_in_new</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
+                      <span class="material-symbols-rounded">autorenew</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Histórico">
+                      <span class="material-symbols-rounded">history</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Atendimento Geral sobre Dúvidas</strong><small>Fluxo de Atendimento Geral sobre Dúvidas.</small></span>
+                  <span><span class="chip success">Ativo</span></span>
+                  <span>2</span>
+                  <span>29/04/2026, 09:51</span>
+                  <span>29/04/2026, 09:51</span>
+                  <span class="row-actions hybrid-flows-row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
+                      <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
+                      <span class="material-symbols-rounded">open_in_new</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
+                      <span class="material-symbols-rounded">autorenew</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Histórico">
+                      <span class="material-symbols-rounded">history</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span><strong>Manutenção Pós</strong><small>&nbsp;</small></span>
+                  <span><span class="chip success">Ativo</span></span>
+                  <span>4</span>
+                  <span>26/04/2026, 21:07</span>
+                  <span>27/04/2026, 17:36</span>
+                  <span class="row-actions hybrid-flows-row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Copiar link">
+                      <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Abrir em nova guia">
+                      <span class="material-symbols-rounded">open_in_new</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Atualizar link">
+                      <span class="material-symbols-rounded">autorenew</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Histórico">
+                      <span class="material-symbols-rounded">history</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" type="button" aria-label="Apagar">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
@@ -4761,7 +4916,7 @@
                   <p class="page-subtitle">Gerencie habilidades disponíveis para uso dos agentes.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary" type="button">
+                  <button class="btn primary" id="openSkillModal" type="button">
                     <span class="material-symbols-rounded">add</span>
                     Adicionar nova habilidade
                   </button>
@@ -4775,7 +4930,7 @@
                   </div>
                 </div>
               </div>
-              <div class="data-table users-table skills-table">
+              <div class="data-table users-table skills-table" id="skillsTable">
                 <div class="data-row header">
                   <span>Habilidade</span>
                   <span>Descrição</span>
@@ -4789,7 +4944,7 @@
                   <span class="chip success">Ativa</span>
                   <span>01/06/2026</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar habilidade">
+                    <button class="icon-btn action-icon" aria-label="Editar habilidade" data-skill-edit type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir habilidade">
@@ -4803,7 +4958,7 @@
                   <span class="chip success">Ativa</span>
                   <span>30/05/2026</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar habilidade">
+                    <button class="icon-btn action-icon" aria-label="Editar habilidade" data-skill-edit type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir habilidade">
@@ -4815,64 +4970,137 @@
             </div>
           </div>
 
-          <div class="page" id="page-mcps" data-title="MCP's">
+          <div class="modal" id="skillModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog skill-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="skillModalTitle">
+              <div class="modal-header">
+                <h3 id="skillModalTitle">Adicionar nova habilidade</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <form id="skillModalForm">
+                <div class="modal-body skill-modal-body">
+                  <div class="users-modal-section">
+                    <div class="modal-row">
+                      <div>
+                        <label class="modal-label modal-label--required" for="skillNameInput">Nome da habilidade</label>
+                        <input class="modal-input" id="skillNameInput" name="name" type="text" maxlength="80" placeholder="Ex.: Consulta de contratos" autocomplete="off" />
+                      </div>
+                    </div>
+
+                    <label class="modal-label" for="skillDescriptionInput">Descrição</label>
+                    <textarea class="modal-textarea" id="skillDescriptionInput" name="description" rows="4" maxlength="280" placeholder="Descreva brevemente o objetivo desta habilidade."></textarea>
+
+                    <div id="skillFileSection">
+                      <label class="modal-label modal-label--required" for="skillFileInput">Arquivo da habilidade</label>
+                      <input id="skillFileInput" name="file" type="file" accept=".zip,.md,application/zip,text/markdown,text/plain" hidden />
+                      <div class="document-upload-dropzone document-upload-dropzone-square skill-upload-dropzone" id="skillUploadDropzone" role="button" tabindex="0" aria-label="Enviar arquivo da habilidade">
+                        <div class="document-upload-head">
+                          <h3>Upload de arquivo</h3>
+                          <p>Envie o pacote da habilidade para cadastro no catálogo.</p>
+                        </div>
+                        <div class="document-upload-body">
+                          <span class="material-symbols-rounded" aria-hidden="true">upload</span>
+                          <p>Arraste um arquivo para cá ou <a href="#" id="skillUploadChooseLink">escolha um arquivo</a>.</p>
+                          <small>Formatos aceitos: `.zip` e `.md`</small>
+                          <small id="skillFileName" hidden></small>
+                        </div>
+                      </div>
+                      <p class="modal-field-hint">Tipos aceitos: `.zip` e `.md`.</p>
+                    </div>
+                    <div class="modal-toggle skill-status-toggle is-active">
+                      <span class="modal-toggle-label modal-toggle-label--required" id="skillStatusInputLabel">Status</span>
+                      <label class="switch" for="skillStatusInput">
+                        <input type="checkbox" id="skillStatusInput" name="status" aria-labelledby="skillStatusInputLabel" checked />
+                        <span class="switch-track"></span>
+                      </label>
+                      <span class="switch-label" id="skillStatusValue">Ativa</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-modal-close type="button">Cancelar</button>
+                  <button class="btn primary" id="skillModalSubmit" type="submit" disabled>Salvar habilidade</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="page" id="page-mcps" data-title="Conexões">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>MCP's</h2>
-                  <p class="page-subtitle">Gerencie MCP's disponíveis para uso dos agentes.</p>
+                  <h2>Conexões</h2>
+                  <p class="page-subtitle">Conecte integrações e fontes de dados para ampliar as capacidades dos agentes.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn primary" type="button">
                     <span class="material-symbols-rounded">add</span>
-                    Adicionar novo MCP
+                    Adicionar nova conexão
                   </button>
                 </div>
               </div>
-              <div class="filters-grid users-filters">
+              <div class="filters-grid users-filters mcps-toolbar">
                 <div class="form-field">
                   <div class="search-field">
                     <span class="material-symbols-rounded">search</span>
-                    <input type="text" placeholder="Buscar MCP" />
+                    <input id="mcpsSearchInput" type="text" placeholder="Buscar conexão" />
                   </div>
                 </div>
+                <div class="mcps-view-toggle" role="group" aria-label="Alternar visualização das conexões">
+                  <button class="mcps-view-toggle-btn is-active" id="mcpsGridViewBtn" type="button" aria-pressed="true" title="Visualização em grade">
+                    <span class="material-symbols-rounded">grid_view</span>
+                  </button>
+                  <button class="mcps-view-toggle-btn" id="mcpsListViewBtn" type="button" aria-pressed="false" title="Visualização em lista">
+                    <span class="material-symbols-rounded">view_list</span>
+                  </button>
+                </div>
               </div>
-              <div class="data-table users-table skills-table">
+              <div class="mcps-grid" id="mcpsGrid"></div>
+              <div class="data-table users-table skills-table mcps-table" id="mcpsTable">
                 <div class="data-row header">
-                  <span>MCP</span>
+                  <span>Conexão</span>
                   <span>Descrição</span>
                   <span>Status</span>
                   <span>Atualizado</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row">
-                  <span><strong>Weather MCP</strong></span>
-                  <span class="muted">Permite consultar clima e previsão por localidade para respostas em tempo real.</span>
-                  <span class="chip success">Ativo</span>
-                  <span>01/06/2026</span>
-                  <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar MCP">
-                      <span class="material-symbols-rounded">edit</span>
-                    </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir MCP">
-                      <span class="material-symbols-rounded">delete</span>
-                    </button>
-                  </span>
+              </div>
+              <p class="mcps-empty-state is-hidden" id="mcpsEmptyState">Nenhuma conexão encontrada para esta busca.</p>
+            </div>
+          </div>
+
+          <div class="modal" id="mcpConnectionModal" aria-hidden="true">
+            <div class="modal-backdrop" data-mcp-connection-close></div>
+            <div class="modal-dialog mcp-connection-dialog" role="dialog" aria-modal="true" aria-labelledby="mcpConnectionModalTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="mcpConnectionModalTitle">Editar conexão</h3>
+                  <p class="page-subtitle mcp-connection-modal-subtitle" id="mcpConnectionModalSubtitle">Revise a integração e reconecte se houver algum problema.</p>
                 </div>
-                <div class="data-row">
-                  <span><strong>CEP MCP</strong></span>
-                  <span class="muted">Permite buscar endereço completo a partir de CEP para enriquecer respostas do agente.</span>
-                  <span class="chip success">Ativo</span>
-                  <span>30/05/2026</span>
-                  <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar MCP">
-                      <span class="material-symbols-rounded">edit</span>
-                    </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir MCP">
-                      <span class="material-symbols-rounded">delete</span>
-                    </button>
-                  </span>
+                <button class="icon-btn" aria-label="Fechar" data-mcp-connection-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="mcp-connection-modal-summary">
+                  <img class="mcp-connection-modal-logo" id="mcpConnectionModalLogo" alt="" />
+                  <div class="mcp-connection-modal-copy">
+                    <strong id="mcpConnectionModalName">Conexão</strong>
+                    <span class="chip success" id="mcpConnectionModalStatus">Conectado</span>
+                  </div>
                 </div>
+                <p class="mcp-connection-modal-description" id="mcpConnectionModalDescription">
+                  Desconecte esta integração ou tente conectar novamente caso a habilidade precise ser restabelecida.
+                </p>
+              </div>
+              <div class="modal-footer mcp-connection-modal-footer">
+                <button class="btn danger" type="button" id="mcpConnectionDisconnectBtn">Desconectar</button>
+                <button class="btn primary" type="button" id="mcpConnectionReconnectBtn">
+                  <span class="material-symbols-rounded" aria-hidden="true">autorenew</span>
+                  Conectar novamente
+                </button>
               </div>
             </div>
           </div>
@@ -6539,7 +6767,8 @@
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="./assets/chart.umd.min.js"></script>
     <script src="./auth.js"></script>
-    <script src="./app.js?v=20260608-provider-tabs"></script>
+    <script src="./app.js?v=20260615-voice-insights-chartjs"></script>
   </body>
 </html>

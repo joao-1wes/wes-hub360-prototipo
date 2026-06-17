@@ -3101,31 +3101,33 @@
                 </article>
               </div>
 
-              <section class="voice-messaging-insights-content-card">
-                <div class="voice-messaging-insights-section voice-messaging-insights-hero-card">
-                  <div class="voice-messaging-insights-hero-head">
-                    <div class="voice-messaging-insights-hero-copy">
-                      <div class="voice-messaging-insights-hero-title">
-                        <h3>Insights da IA</h3>
-                      </div>
-                      <p>Recomendações geradas a partir do histórico de chamadas simuladas.</p>
+              <div class="voice-messaging-insights-section voice-messaging-insights-hero-card">
+                <div class="voice-messaging-insights-hero-head">
+                  <div class="voice-messaging-insights-hero-copy">
+                    <div class="voice-messaging-insights-hero-title">
+                      <h3>Insights da IA</h3>
                     </div>
-                  </div>
-                  <div class="voice-messaging-insights-highlight">
-                    <div class="voice-messaging-insights-highlight-main">
-                      <span class="voice-messaging-insights-highlight-icon" aria-hidden="true"><i data-lucide="badge-check"></i></span>
-                      <div>
-                        <strong>Melhor janela de disparo: 14h</strong>
-                        <p>Em 3 ligações nesta faixa, 66% foram atendidas. Concentre as próximas campanhas neste horário para maximizar a taxa de resposta.</p>
-                      </div>
-                    </div>
-                    <span class="voice-messaging-insights-highlight-tag">Análise automática</span>
+                    <p>Recomendações geradas a partir do histórico de chamadas simuladas.</p>
                   </div>
                 </div>
+                <div class="voice-messaging-insights-highlight">
+                  <div class="voice-messaging-insights-highlight-main">
+                    <div class="voice-messaging-insights-highlight-copy">
+                      <strong>Melhor janela de disparo: 14h</strong>
+                      <p>Em 3 ligações nesta faixa, 66% foram atendidas. Concentre as próximas campanhas neste horário para maximizar a taxa de resposta.</p>
+                    </div>
+                    <span class="voice-messaging-insights-highlight-icon" aria-hidden="true"><i data-lucide="badge-check"></i></span>
+                  </div>
+                </div>
+              </div>
 
-                <div class="voice-messaging-insights-section voice-messaging-insights-grid">
+              <section class="voice-messaging-insights-section">
+                <div class="voice-messaging-insights-section-title">
+                  <h3>Desempenho</h3>
+                </div>
+                <div class="voice-messaging-insights-grid">
                   <section class="voice-messaging-insights-chart-card">
-                    <h3>Desempenho por horário</h3>
+                    <h4>Por horário</h4>
                     <p>Distribuição das chamadas por hora do dia, com cada barra separada por resultado para facilitar a leitura.</p>
                     <div class="voice-messaging-insights-chart-shell">
                       <canvas id="voiceMessagingInsightsChart" aria-label="Gráfico de desempenho por horário" role="img"></canvas>
@@ -3133,7 +3135,7 @@
                   </section>
 
                   <section class="voice-messaging-insights-agents-card">
-                    <h3>Desempenho dos agentes</h3>
+                    <h4>Por agente</h4>
                     <p>Comparativo dos agentes por taxa de confirmação.</p>
                     <div class="voice-messaging-insights-agent-row">
                       <div class="voice-messaging-insights-agent-meta">
@@ -3151,23 +3153,24 @@
                     </div>
                   </section>
                 </div>
+              </section>
 
-                <section class="voice-messaging-insights-section voice-messaging-insights-recipients-card">
-                  <h3>Perfil dos destinatários</h3>
-                  <p>Quem atende, quem nunca atende e em qual horário cada contato costuma ser ligado.</p>
-                  <div class="hybrid-flows-table-wrap voice-messaging-insights-recipients-table-wrap">
-                    <table class="hybrid-flows-table voice-messaging-insights-recipients-table" aria-label="Perfil dos destinatários">
-                      <thead>
-                        <tr>
-                          <th>Destinatário</th>
-                          <th>Perfil</th>
-                          <th>Chamadas</th>
-                          <th>Atendimento</th>
-                          <th>Horário mais comum</th>
-                          <th>Último resultado</th>
-                        </tr>
-                      </thead>
-                      <tbody>
+              <section class="voice-messaging-insights-section voice-messaging-insights-recipients-card">
+                <h3>Perfil dos destinatários</h3>
+                <p>Quem atende, quem nunca atende e em qual horário cada contato costuma ser ligado.</p>
+                <div class="hybrid-flows-table-wrap voice-messaging-insights-recipients-table-wrap">
+                  <table class="hybrid-flows-table voice-messaging-insights-recipients-table" aria-label="Perfil dos destinatários">
+                    <thead>
+                      <tr>
+                        <th>Destinatário</th>
+                        <th>Perfil</th>
+                        <th>Chamadas</th>
+                        <th>Atendimento</th>
+                        <th>Horário mais comum</th>
+                        <th>Último resultado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
                         <tr>
                           <td><strong>Alex Souza</strong><small>51994380430</small></td>
                           <td><span class="voice-messaging-recipient-pill">Neutro</span></td>
@@ -3192,10 +3195,9 @@
                           <td>14h</td>
                           <td>Confirmadas</td>
                         </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </section>
+                    </tbody>
+                  </table>
+                </div>
               </section>
             </div>
           </div>

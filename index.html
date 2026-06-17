@@ -5001,13 +5001,22 @@
                           <p>Envie o pacote da habilidade para cadastro no catálogo.</p>
                         </div>
                         <div class="document-upload-body">
-                          <span class="material-symbols-rounded" aria-hidden="true">upload</span>
-                          <p>Arraste um arquivo para cá ou <a href="#" id="skillUploadChooseLink">escolha um arquivo</a>.</p>
-                          <small>Formatos aceitos: `.zip` e `.md`</small>
-                          <small id="skillFileName" hidden></small>
+                          <div id="skillUploadEmptyState">
+                            <span class="material-symbols-rounded" aria-hidden="true">upload</span>
+                            <p>Arraste um arquivo para cá ou <a href="#" id="skillUploadChooseLink">escolha um arquivo</a>.</p>
+                            <small>Formatos aceitos: `.zip` e `.md`</small>
+                          </div>
                         </div>
                       </div>
-                      <p class="modal-field-hint">Tipos aceitos: `.zip` e `.md`.</p>
+                      <div class="skill-upload-selected-state" id="skillUploadSelectedState" hidden>
+                        <div class="modal-input-action-wrap skill-upload-selected-field">
+                          <input class="modal-input modal-input--with-action" id="skillFileName" type="text" readonly aria-label="Arquivo selecionado" />
+                          <button class="skill-file-delete-btn icon-btn" id="skillFileDeleteButton" type="button" aria-label="Remover arquivo">
+                            <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+                          </button>
+                        </div>
+                      </div>
+                      <p class="modal-field-hint skill-file-feedback" id="skillFileFeedback" hidden></p>
                     </div>
                     <div class="modal-toggle skill-status-toggle is-active">
                       <span class="modal-toggle-label modal-toggle-label--required" id="skillStatusInputLabel">Status</span>
@@ -5035,7 +5044,7 @@
                   <p class="page-subtitle">Conecte integrações e fontes de dados para ampliar as capacidades dos agentes.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary" type="button">
+                  <button class="btn primary" id="openMcpCreateModalBtn" type="button">
                     <span class="material-symbols-rounded">add</span>
                     Adicionar nova conexão
                   </button>
@@ -5102,6 +5111,112 @@
                   Conectar novamente
                 </button>
               </div>
+            </div>
+          </div>
+
+          <div class="modal" id="mcpCreateModal" aria-hidden="true">
+            <div class="modal-backdrop" data-mcp-create-close></div>
+            <div class="modal-dialog mcp-create-dialog" role="dialog" aria-modal="true" aria-labelledby="mcpCreateModalTitle">
+              <form id="mcpCreateForm">
+                <div class="modal-header">
+                  <h3 id="mcpCreateModalTitle">Nova conexão MCP</h3>
+                  <button class="icon-btn" aria-label="Fechar" data-mcp-create-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body mcp-create-modal-body">
+                  <div class="users-modal-section">
+                    <p class="modal-field-hint mcp-create-intro">Cadastre a conexão e o sistema executa teste, handshake, descoberta e armazenamento automaticamente.</p>
+
+                    <div class="modal-row">
+                      <div>
+                        <label class="modal-label modal-label--required" for="mcpCreateName">Nome</label>
+                        <input class="modal-input" id="mcpCreateName" name="name" type="text" placeholder="Ex.: CRM interno" autocomplete="off" required />
+                        <p class="modal-field-hint">Nome usado para identificar a conexão nas listas e fluxos.</p>
+                      </div>
+                      <div>
+                        <label class="modal-label modal-label--required" for="mcpCreateAuthType">Tipo de autenticação</label>
+                        <select class="modal-input" id="mcpCreateAuthType" name="authType" required>
+                          <option value="bearer">Token</option>
+                          <option value="basic">Usuário e senha (Basic)</option>
+                          <option value="api-key">Chave de API</option>
+                          <option value="none">Sem autenticação</option>
+                        </select>
+                        <p class="modal-field-hint">Defina como o endpoint MCP valida o acesso.</p>
+                      </div>
+                    </div>
+
+                    <label class="modal-label modal-label--required" for="mcpCreateUrl">URL do MCP</label>
+                    <input class="modal-input" id="mcpCreateUrl" name="url" type="url" inputmode="url" placeholder="https://mcp.exemplo.com" autocomplete="off" required />
+                    <p class="modal-field-hint">Endpoint usado para validar a conexão e descobrir ferramentas.</p>
+
+                    <div id="mcpCreateBasicFields" hidden>
+                      <div class="modal-row">
+                        <div>
+                          <label class="modal-label modal-label--required" for="mcpCreateBasicUsername">Usuário</label>
+                          <input class="modal-input" id="mcpCreateBasicUsername" name="basicUsername" type="text" placeholder="Ex.: admin@empresa.com" autocomplete="off" />
+                          <p class="modal-field-hint">Login usado na autenticação Basic.</p>
+                        </div>
+                        <div>
+                          <label class="modal-label modal-label--required" for="mcpCreateBasicPassword">Senha</label>
+                          <input class="modal-input" id="mcpCreateBasicPassword" name="basicPassword" type="password" placeholder="Digite a senha" autocomplete="off" />
+                          <p class="modal-field-hint">Senha vinculada ao usuário informado.</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div id="mcpCreateCredentialField">
+                      <label class="modal-label modal-label--required" for="mcpCreateCredential" id="mcpCreateCredentialLabel">Credencial</label>
+                      <textarea class="modal-textarea" id="mcpCreateCredential" name="credential" rows="4" placeholder="Cole aqui o token ou a chave de API" required></textarea>
+                      <p class="modal-field-hint" id="mcpCreateCredentialHint">O valor informado será usado no teste inicial e salvo na configuração da conexão.</p>
+                    </div>
+                  </div>
+
+                  <div class="mcp-create-progress" id="mcpCreateProgress" hidden aria-hidden="true">
+                    <div class="mcp-create-progress-header">
+                      <strong id="mcpCreateProgressTitle">Validando conexão</strong>
+                      <span id="mcpCreateProgressStatus">Preparando cadastro...</span>
+                    </div>
+                    <div class="mcp-create-progress-steps">
+                      <div class="mcp-create-progress-step" data-mcp-step="connection-test">
+                        <span class="material-symbols-rounded" aria-hidden="true">radio_button_unchecked</span>
+                        <div>
+                          <strong>Teste de conexão</strong>
+                          <p>Valida a URL e acessibilidade do endpoint.</p>
+                        </div>
+                      </div>
+                      <div class="mcp-create-progress-step" data-mcp-step="handshake">
+                        <span class="material-symbols-rounded" aria-hidden="true">radio_button_unchecked</span>
+                        <div>
+                          <strong>Handshake</strong>
+                          <p>Confirma identidade, protocolo e autenticação.</p>
+                        </div>
+                      </div>
+                      <div class="mcp-create-progress-step" data-mcp-step="discovery">
+                        <span class="material-symbols-rounded" aria-hidden="true">radio_button_unchecked</span>
+                        <div>
+                          <strong>Descoberta de ferramentas</strong>
+                          <p>Carrega capacidades para uso pelos agentes.</p>
+                        </div>
+                      </div>
+                      <div class="mcp-create-progress-step" data-mcp-step="storage">
+                        <span class="material-symbols-rounded" aria-hidden="true">radio_button_unchecked</span>
+                        <div>
+                          <strong>Armazenamento</strong>
+                          <p>Salva dados, configuração e status da conexão.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-mcp-create-close type="button">Cancelar</button>
+                  <button class="btn primary" id="mcpCreateSubmitBtn" type="submit">
+                    <span class="material-symbols-rounded" aria-hidden="true">link</span>
+                    Conectar
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 

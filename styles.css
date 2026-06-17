@@ -7758,6 +7758,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .skill-upload-dropzone {
   cursor: pointer;
+  flex: 0 0 auto;
+  height: auto;
   min-height: 188px;
   transition: border-color 0.18s ease, background 0.18s ease, transform 0.18s ease;
 }
@@ -7768,17 +7770,78 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   transform: translateY(-1px);
 }
 
+.skill-upload-dropzone.is-loading {
+  opacity: 0.82;
+  pointer-events: none;
+}
+
+.skill-upload-dropzone.is-invalid {
+  border-color: rgba(185, 28, 28, 0.35);
+  background: #fff7f7;
+}
+
+.skill-upload-dropzone.is-valid {
+  border-color: rgba(5, 150, 105, 0.28);
+  background: #f4fbf7;
+}
+
 .skill-upload-dropzone .document-upload-body {
   padding: 10px 0 4px;
 }
 
-.skill-upload-dropzone #skillFileName {
-  color: #016ff4;
-  font-weight: 600;
+.skill-upload-dropzone.has-file {
+  display: none;
 }
 
-.skill-upload-dropzone.is-invalid #skillFileName {
+.skill-upload-selected-state {
+  display: grid;
+  width: 100%;
+  min-height: 0;
+}
+
+.skill-upload-selected-field {
+  width: 100%;
+}
+
+.skill-upload-selected-field .modal-input {
+  padding-right: 52px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.skill-file-delete-btn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  flex: 0 0 auto;
+  width: 32px;
+  height: 32px;
   color: #b91c1c;
+  border-radius: 8px;
+}
+
+.skill-file-delete-btn:hover {
+  color: #991b1b;
+  background: rgba(185, 28, 28, 0.08);
+}
+
+.skill-file-feedback {
+  margin: 0;
+}
+
+.skill-file-feedback.is-success {
+  color: #047857;
+}
+
+.skill-file-feedback.is-error,
+.skill-file-feedback.is-warning {
+  color: #b91c1c;
+}
+
+.skill-file-feedback.is-loading {
+  color: #64748b;
 }
 
 .mcps-grid {
@@ -7940,6 +8003,107 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   max-width: 560px;
 }
 
+.mcp-create-dialog {
+  max-width: 620px;
+}
+
+.mcp-create-modal-body {
+  display: grid;
+  gap: 16px;
+}
+
+.mcp-create-intro {
+  margin: 0 0 4px;
+}
+
+.mcp-create-modal-body .users-modal-section {
+  gap: 14px;
+}
+
+.mcp-create-modal-body .modal-input,
+.mcp-create-modal-body .modal-textarea {
+  width: 100%;
+}
+
+.mcp-create-modal-body .modal-textarea {
+  min-height: 108px;
+}
+
+.mcp-create-progress {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(207, 216, 228, 0.92);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.mcp-create-progress-header {
+  display: grid;
+  gap: 4px;
+}
+
+.mcp-create-progress-header strong {
+  color: #0f172a;
+}
+
+.mcp-create-progress-header span {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.mcp-create-progress-steps {
+  display: grid;
+  gap: 10px;
+}
+
+.mcp-create-progress-step {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+}
+
+.mcp-create-progress-step .material-symbols-rounded {
+  font-size: 20px;
+  color: #94a3b8;
+}
+
+.mcp-create-progress-step strong {
+  display: block;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.mcp-create-progress-step p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.mcp-create-progress-step.is-active {
+  border-color: rgba(1, 111, 244, 0.24);
+  background: rgba(239, 246, 255, 0.9);
+}
+
+.mcp-create-progress-step.is-active .material-symbols-rounded {
+  color: #016ff4;
+}
+
+.mcp-create-progress-step.is-complete {
+  border-color: rgba(34, 197, 94, 0.2);
+  background: rgba(240, 253, 244, 0.92);
+}
+
+.mcp-create-progress-step.is-complete .material-symbols-rounded {
+  color: #16a34a;
+}
+
 .mcp-connection-modal-subtitle {
   margin: 6px 0 0;
 }
@@ -7999,13 +8163,20 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .skill-status-toggle {
+  flex-wrap: wrap;
   gap: 12px;
-  margin-top: 4px;
+  margin-top: 0;
+  padding-top: 4px;
 }
 
 .skill-status-toggle .modal-toggle-label {
   font-weight: 600;
   color: #111827;
+}
+
+#skillFileSection {
+  display: grid;
+  gap: 10px;
 }
 
 .skill-status-toggle .switch-label {

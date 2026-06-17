@@ -110,6 +110,10 @@ const skillFileName = document.getElementById('skillFileName');
 const skillFileSection = document.getElementById('skillFileSection');
 const skillUploadDropzone = document.getElementById('skillUploadDropzone');
 const skillUploadChooseLink = document.getElementById('skillUploadChooseLink');
+const skillUploadEmptyState = document.getElementById('skillUploadEmptyState');
+const skillUploadSelectedState = document.getElementById('skillUploadSelectedState');
+const skillFileDeleteButton = document.getElementById('skillFileDeleteButton');
+const skillFileFeedback = document.getElementById('skillFileFeedback');
 const skillModalSubmit = document.getElementById('skillModalSubmit');
 const mcpsGrid = document.getElementById('mcpsGrid');
 const mcpsTable = document.getElementById('mcpsTable');
@@ -117,6 +121,7 @@ const mcpsSearchInput = document.getElementById('mcpsSearchInput');
 const mcpsEmptyState = document.getElementById('mcpsEmptyState');
 const mcpsGridViewBtn = document.getElementById('mcpsGridViewBtn');
 const mcpsListViewBtn = document.getElementById('mcpsListViewBtn');
+const openMcpCreateModalBtn = document.getElementById('openMcpCreateModalBtn');
 const mcpConnectionModal = document.getElementById('mcpConnectionModal');
 const mcpConnectionModalLogo = document.getElementById('mcpConnectionModalLogo');
 const mcpConnectionModalName = document.getElementById('mcpConnectionModalName');
@@ -124,6 +129,22 @@ const mcpConnectionModalStatus = document.getElementById('mcpConnectionModalStat
 const mcpConnectionModalDescription = document.getElementById('mcpConnectionModalDescription');
 const mcpConnectionDisconnectBtn = document.getElementById('mcpConnectionDisconnectBtn');
 const mcpConnectionReconnectBtn = document.getElementById('mcpConnectionReconnectBtn');
+const mcpCreateModal = document.getElementById('mcpCreateModal');
+const mcpCreateForm = document.getElementById('mcpCreateForm');
+const mcpCreateName = document.getElementById('mcpCreateName');
+const mcpCreateUrl = document.getElementById('mcpCreateUrl');
+const mcpCreateAuthType = document.getElementById('mcpCreateAuthType');
+const mcpCreateBasicFields = document.getElementById('mcpCreateBasicFields');
+const mcpCreateBasicUsername = document.getElementById('mcpCreateBasicUsername');
+const mcpCreateBasicPassword = document.getElementById('mcpCreateBasicPassword');
+const mcpCreateCredentialField = document.getElementById('mcpCreateCredentialField');
+const mcpCreateCredentialLabel = document.getElementById('mcpCreateCredentialLabel');
+const mcpCreateCredentialHint = document.getElementById('mcpCreateCredentialHint');
+const mcpCreateCredential = document.getElementById('mcpCreateCredential');
+const mcpCreateProgress = document.getElementById('mcpCreateProgress');
+const mcpCreateProgressTitle = document.getElementById('mcpCreateProgressTitle');
+const mcpCreateProgressStatus = document.getElementById('mcpCreateProgressStatus');
+const mcpCreateSubmitBtn = document.getElementById('mcpCreateSubmitBtn');
 const auditFilterBtn = document.getElementById('auditFilterBtn');
 const auditFilterMenu = document.getElementById('auditFilterMenu');
 const auditPeriodBtn = document.getElementById('auditPeriodBtn');
@@ -324,6 +345,7 @@ const HYBRID_FLOWS_STORAGE_KEY = 'hybridFlowsCreated';
 const VOICE_MESSAGING_STORAGE_KEY = 'voiceMessagingCreated';
 const MCP_VIEW_MODE_STORAGE_KEY = 'mcpsViewMode';
 const MCP_CONNECTIONS_STATE_STORAGE_KEY = 'mcpsConnectionsState';
+const MCP_CUSTOM_CONNECTIONS_STORAGE_KEY = 'mcpsCustomConnections';
 const MCP_CONNECTIONS_CATALOG = Object.freeze([
   { id: 'filesystem-mcp', name: 'Filesystem', description: 'Acessa arquivos e diretórios do workspace com segurança para leitura, escrita e automações internas.', accent: '#2563eb', mark: 'FS', connected: false, updatedAt: '16/06/2026' },
   { id: 'google-drive-mcp', name: 'Google Drive', description: 'Conecta documentos e pastas do Google Drive para leitura, organização e uso pelos agentes.', accent: '#16a34a', mark: 'GD', connected: true, updatedAt: '14/06/2026' },
@@ -345,7 +367,7 @@ const MCP_CONNECTIONS_CATALOG = Object.freeze([
   { id: 'azure-mcp', name: 'Azure', description: 'Conecta recursos e serviços Azure para operações, dados e automações corporativas.', accent: '#0284c7', mark: 'AZ', connected: false, updatedAt: '16/06/2026' },
   { id: 'web-fetch-mcp', name: 'Web Fetch', description: 'Faz busca e leitura controlada de páginas web para coleta de informações externas.', accent: '#0f766e', mark: 'WF', connected: false, updatedAt: '16/06/2026' },
   { id: 'figma-mcp', name: 'Figma', description: 'Integra arquivos, componentes e contextos de design do Figma ao fluxo de trabalho.', accent: '#a21caf', mark: 'FG', connected: true, updatedAt: '11/06/2026' },
-  { id: 'brave-search-mcp', name: 'Brave Search / Web Search', description: 'Permite busca web estruturada para pesquisas, verificação e coleta de contexto online.', accent: '#be123c', mark: 'BS', connected: false, updatedAt: '16/06/2026' },
+  { id: 'brave-search-mcp', name: 'Web Search', description: 'Permite busca web estruturada para pesquisas, verificação e coleta de contexto online.', accent: '#be123c', mark: 'WS', connected: false, updatedAt: '16/06/2026' },
 ]);
 const VOICE_MESSAGING_CREATE_SUBTITLE = 'Configure um agente de voz e uma conexão Oktor ou NVoIP para disparar campanhas de chamadas automatizadas. As chamadas são feitas pelo provedor escolhido com a sua conta.';
 const VOICE_MESSAGING_STATUS_META = {
@@ -854,7 +876,7 @@ function buildMcpLogoDataUri(item) {
 
   const safeAccent = String(item?.accent || '#016ff4');
   const safeMark = String(item?.mark || 'MC').slice(0, 2).toUpperCase();
-  const isNeutralInitialBadge = item?.id === 'web-fetch-mcp' || item?.id === 'brave-search-mcp';
+  const isNeutralInitialBadge = item?.id === 'web-fetch-mcp' || item?.id === 'brave-search-mcp' || Boolean(item?.isCustom);
   const badgeFontSize = isNeutralInitialBadge ? 32 : 26;
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" width="96" height="96" viewBox="0 0 96 96" fill="none">
@@ -878,14 +900,78 @@ function getDefaultMcpConnectionsState() {
     acc[item.id] = {
       connected: Boolean(item.connected),
       updatedAt: String(item.updatedAt || '16/06/2026'),
+      url: String(item.url || ''),
+      authType: String(item.authType || 'bearer'),
+      credential: String(item.credential || ''),
+      basicUsername: String(item.basicUsername || ''),
+      basicPassword: String(item.basicPassword || ''),
+      toolCount: Number(item.toolCount || 0),
     };
     return acc;
   }, {});
 }
 
+function getCustomMcpConnections() {
+  const raw = window.localStorage.getItem(MCP_CUSTOM_CONNECTIONS_STORAGE_KEY);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .map((item, index) => {
+        const name = String(item?.name || '').trim();
+        const url = String(item?.url || '').trim();
+        const authType = String(item?.authType || 'bearer').trim() || 'bearer';
+        const credential = String(item?.credential || '').trim();
+        if (!name || !url) return null;
+        const fallbackId = `custom-mcp-${index + 1}`;
+        return {
+          id: String(item?.id || fallbackId).trim() || fallbackId,
+          name,
+          description: String(item?.description || `Conexão MCP personalizada vinculada a ${url}.`).trim(),
+          accent: String(item?.accent || '#0f766e'),
+          mark: String(item?.mark || name.split(/\s+/).map((part) => part[0] || '').join('').slice(0, 2).toUpperCase()).slice(0, 2) || 'MC',
+          connected: Boolean(item?.connected ?? true),
+          updatedAt: String(item?.updatedAt || formatMcpDate()),
+          isCustom: true,
+          url,
+          authType,
+          credential,
+          basicUsername: String(item?.basicUsername || ''),
+          basicPassword: String(item?.basicPassword || ''),
+          toolCount: Number(item?.toolCount || 0),
+        };
+      })
+      .filter(Boolean);
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveCustomMcpConnections(connections) {
+  window.localStorage.setItem(MCP_CUSTOM_CONNECTIONS_STORAGE_KEY, JSON.stringify(connections));
+}
+
+function getAllMcpConnectionsCatalog() {
+  return [...MCP_CONNECTIONS_CATALOG, ...getCustomMcpConnections()];
+}
+
 function getMcpConnectionsState() {
   const defaults = getDefaultMcpConnectionsState();
   const raw = window.localStorage.getItem(MCP_CONNECTIONS_STATE_STORAGE_KEY);
+  const customConnections = getCustomMcpConnections();
+  customConnections.forEach((item) => {
+    defaults[item.id] = {
+      connected: Boolean(item.connected),
+      updatedAt: String(item.updatedAt || formatMcpDate()),
+      url: String(item.url || ''),
+      authType: String(item.authType || 'bearer'),
+      credential: String(item.credential || ''),
+      basicUsername: String(item.basicUsername || ''),
+      basicPassword: String(item.basicPassword || ''),
+      toolCount: Number(item.toolCount || 0),
+    };
+  });
   if (!raw) return defaults;
   try {
     const parsed = JSON.parse(raw);
@@ -894,6 +980,12 @@ function getMcpConnectionsState() {
       acc[key] = {
         connected: typeof value?.connected === 'boolean' ? value.connected : defaults[key].connected,
         updatedAt: String(value?.updatedAt || defaults[key].updatedAt),
+        url: String(value?.url || defaults[key].url || ''),
+        authType: String(value?.authType || defaults[key].authType || 'bearer'),
+        credential: String(value?.credential || defaults[key].credential || ''),
+        basicUsername: String(value?.basicUsername || defaults[key].basicUsername || ''),
+        basicPassword: String(value?.basicPassword || defaults[key].basicPassword || ''),
+        toolCount: Number(value?.toolCount || defaults[key].toolCount || 0),
       };
       return acc;
     }, {});
@@ -912,7 +1004,7 @@ function formatMcpDate(date = new Date()) {
 
 function getMcpConnectionById(connectionId = '') {
   const normalizedId = String(connectionId || '').trim();
-  return MCP_CONNECTIONS_CATALOG.find((item) => item.id === normalizedId) || null;
+  return getAllMcpConnectionsCatalog().find((item) => item.id === normalizedId) || null;
 }
 
 function getMcpConnectionViewModel(item) {
@@ -923,6 +1015,12 @@ function getMcpConnectionViewModel(item) {
     ...item,
     isConnected,
     updatedAt: String(connectionState.updatedAt || item.updatedAt || '16/06/2026'),
+    url: String(connectionState.url || item.url || ''),
+    authType: String(connectionState.authType || item.authType || 'bearer'),
+    credential: String(connectionState.credential || item.credential || ''),
+    basicUsername: String(connectionState.basicUsername || item.basicUsername || ''),
+    basicPassword: String(connectionState.basicPassword || item.basicPassword || ''),
+    toolCount: Number(connectionState.toolCount || item.toolCount || 0),
     statusLabel: isConnected ? 'Conectado' : 'Disponível',
     statusClass: isConnected ? 'success' : 'neutral',
     actionLabel: isConnected ? 'Editar conexão' : 'Conectar',
@@ -957,12 +1055,209 @@ function openMcpConnectionModal(connection) {
   mcpConnectionModal.setAttribute('aria-hidden', 'false');
 }
 
+function setMcpCreateProgressVisible(isVisible) {
+  if (!mcpCreateProgress) return;
+  mcpCreateProgress.hidden = !isVisible;
+  mcpCreateProgress.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+}
+
+function resetMcpCreateProgress() {
+  if (mcpCreateProgressTitle) mcpCreateProgressTitle.textContent = 'Validando conexão';
+  if (mcpCreateProgressStatus) mcpCreateProgressStatus.textContent = 'Preparando cadastro...';
+  mcpCreateProgress?.querySelectorAll('[data-mcp-step]').forEach((step) => {
+    step.classList.remove('is-active', 'is-complete');
+    const icon = step.querySelector('.material-symbols-rounded');
+    if (icon) icon.textContent = 'radio_button_unchecked';
+  });
+}
+
+function syncMcpCreateCredentialField() {
+  if (!mcpCreateCredential || !mcpCreateAuthType) return;
+  const authType = mcpCreateAuthType.value;
+  const isBasic = authType === 'basic';
+  const hasNoAuth = authType === 'none';
+
+  if (mcpCreateBasicFields) mcpCreateBasicFields.hidden = !isBasic;
+  if (mcpCreateCredentialField) mcpCreateCredentialField.hidden = isBasic || hasNoAuth;
+
+  if (mcpCreateBasicUsername) {
+    mcpCreateBasicUsername.required = isBasic;
+    mcpCreateBasicUsername.disabled = !isBasic;
+    if (!isBasic) mcpCreateBasicUsername.value = '';
+  }
+  if (mcpCreateBasicPassword) {
+    mcpCreateBasicPassword.required = isBasic;
+    mcpCreateBasicPassword.disabled = !isBasic;
+    if (!isBasic) mcpCreateBasicPassword.value = '';
+  }
+
+  const requiresCredential = !isBasic && !hasNoAuth;
+  mcpCreateCredential.required = requiresCredential;
+  mcpCreateCredential.disabled = isBasic || hasNoAuth;
+
+  if (hasNoAuth) {
+    mcpCreateCredential.value = '';
+    mcpCreateCredential.placeholder = 'Nao e necessario informar credencial para esta opcao';
+    if (mcpCreateCredentialLabel) mcpCreateCredentialLabel.textContent = 'Credencial';
+    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'Nao sera necessario informar credenciais para esta conexao.';
+  } else if (authType === 'api-key') {
+    if (mcpCreateCredentialLabel) mcpCreateCredentialLabel.textContent = 'Chave de API';
+    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'Informe a chave de API usada para autenticar no endpoint.';
+    mcpCreateCredential.placeholder = 'Cole aqui a chave de API';
+  } else {
+    if (mcpCreateCredentialLabel) mcpCreateCredentialLabel.textContent = 'Token';
+    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'O valor informado sera usado no teste inicial e salvo na configuracao da conexao.';
+    mcpCreateCredential.placeholder = 'Cole aqui o token';
+  }
+
+}
+
+function closeMcpCreateModal() {
+  if (!mcpCreateModal || !mcpCreateForm) return;
+  mcpCreateModal.classList.remove('open');
+  mcpCreateModal.setAttribute('aria-hidden', 'true');
+  delete mcpCreateModal.dataset.connectionId;
+  delete mcpCreateModal.dataset.mode;
+  mcpCreateForm.reset();
+  if (mcpCreateAuthType) mcpCreateAuthType.value = 'bearer';
+  syncMcpCreateCredentialField();
+  setMcpCreateProgressVisible(false);
+  resetMcpCreateProgress();
+  if (mcpCreateSubmitBtn) {
+    mcpCreateSubmitBtn.disabled = false;
+    mcpCreateSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">link</span>Conectar';
+  }
+}
+
+function openMcpCreateModal(connection = null) {
+  if (!mcpCreateModal || !mcpCreateForm) return;
+  const normalizedConnection = connection ? getMcpConnectionViewModel(connection) : null;
+  mcpCreateModal.dataset.mode = normalizedConnection ? 'existing' : 'custom';
+  if (normalizedConnection?.id) mcpCreateModal.dataset.connectionId = normalizedConnection.id;
+  if (mcpCreateName) mcpCreateName.value = normalizedConnection?.name || '';
+  if (mcpCreateUrl) mcpCreateUrl.value = normalizedConnection?.url || '';
+  if (mcpCreateAuthType) mcpCreateAuthType.value = normalizedConnection?.authType || 'bearer';
+  if (mcpCreateCredential) mcpCreateCredential.value = normalizedConnection?.credential || '';
+  if (mcpCreateBasicUsername) mcpCreateBasicUsername.value = normalizedConnection?.basicUsername || '';
+  if (mcpCreateBasicPassword) mcpCreateBasicPassword.value = normalizedConnection?.basicPassword || '';
+  syncMcpCreateCredentialField();
+  setMcpCreateProgressVisible(false);
+  resetMcpCreateProgress();
+  if (mcpCreateSubmitBtn) {
+    mcpCreateSubmitBtn.disabled = false;
+    mcpCreateSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">link</span>Conectar';
+  }
+  mcpCreateModal.classList.add('open');
+  mcpCreateModal.setAttribute('aria-hidden', 'false');
+}
+
+function setMcpProgressStepState(stepKey, state) {
+  const step = mcpCreateProgress?.querySelector(`[data-mcp-step="${stepKey}"]`);
+  if (!step) return;
+  step.classList.remove('is-active', 'is-complete');
+  const icon = step.querySelector('.material-symbols-rounded');
+  if (state === 'active') {
+    step.classList.add('is-active');
+    if (icon) icon.textContent = 'progress_activity';
+    return;
+  }
+  if (state === 'complete') {
+    step.classList.add('is-complete');
+    if (icon) icon.textContent = 'check_circle';
+    return;
+  }
+  if (icon) icon.textContent = 'radio_button_unchecked';
+}
+
+function waitMcpFlowStep(delay = 450) {
+  return new Promise((resolve) => {
+    window.setTimeout(resolve, delay);
+  });
+}
+
+async function runMcpConnectionProvisionFlow(payload) {
+  const steps = [
+    { key: 'connection-test', label: 'Executando teste de conexão...' },
+    { key: 'handshake', label: 'Realizando handshake com o servidor MCP...' },
+    { key: 'discovery', label: 'Descobrindo ferramentas e capacidades...' },
+    { key: 'storage', label: 'Armazenando credenciais e configuração...' },
+  ];
+
+  for (const step of steps) {
+    if (mcpCreateProgressStatus) mcpCreateProgressStatus.textContent = step.label;
+    setMcpProgressStepState(step.key, 'active');
+    await waitMcpFlowStep();
+    setMcpProgressStepState(step.key, 'complete');
+  }
+
+  const normalizedName = String(payload.name || '').trim();
+  const existingId = String(payload.connectionId || '').trim();
+  const normalizedId = existingId || `custom-mcp-${Date.now()}`;
+  const discoveredTools = Math.max(3, Math.min(12, Math.ceil(normalizedName.length / 2)));
+  const normalizedDescription = existingId
+    ? String(payload.description || `Integração MCP configurada para ${normalizedName}.`).trim()
+    : `Conexão MCP personalizada vinculada a ${payload.url}.`;
+  const connectionRecord = {
+    id: normalizedId,
+    name: normalizedName,
+    description: normalizedDescription,
+    accent: payload.accent || '#0f766e',
+    mark: payload.mark || normalizedName.slice(0, 2).toUpperCase() || 'MC',
+    connected: true,
+    updatedAt: formatMcpDate(),
+    isCustom: !existingId,
+    url: payload.url,
+    authType: payload.authType,
+    credential: payload.credential,
+    basicUsername: payload.basicUsername || '',
+    basicPassword: payload.basicPassword || '',
+    toolCount: discoveredTools,
+  };
+
+  if (!existingId) {
+    const currentConnections = getCustomMcpConnections();
+    currentConnections.unshift(connectionRecord);
+    saveCustomMcpConnections(currentConnections);
+  } else {
+    const currentConnections = getCustomMcpConnections();
+    const index = currentConnections.findIndex((item) => item.id === normalizedId);
+    if (index >= 0) {
+      currentConnections[index] = { ...currentConnections[index], ...connectionRecord };
+      saveCustomMcpConnections(currentConnections);
+    }
+  }
+
+  updateMcpConnectionState(normalizedId, {
+    connected: true,
+    updatedAt: connectionRecord.updatedAt,
+    url: connectionRecord.url,
+    authType: connectionRecord.authType,
+    credential: connectionRecord.credential,
+    basicUsername: connectionRecord.basicUsername,
+    basicPassword: connectionRecord.basicPassword,
+    toolCount: connectionRecord.toolCount,
+  });
+
+  if (mcpCreateProgressTitle) mcpCreateProgressTitle.textContent = 'Conexão pronta';
+  if (mcpCreateProgressStatus) {
+    mcpCreateProgressStatus.textContent = `${discoveredTools} ferramentas identificadas e salvas com sucesso.`;
+  }
+
+  return { connectionRecord, discoveredTools };
+}
+
 function updateMcpConnectionState(connectionId, nextState) {
   const state = getMcpConnectionsState();
   const current = state[connectionId] || {};
   state[connectionId] = {
     connected: typeof nextState.connected === 'boolean' ? nextState.connected : Boolean(current.connected),
     updatedAt: String(nextState.updatedAt || current.updatedAt || formatMcpDate()),
+    url: String(nextState.url || current.url || ''),
+    authType: String(nextState.authType || current.authType || 'bearer'),
+    credential: String(nextState.credential || current.credential || ''),
+    basicUsername: String(nextState.basicUsername || current.basicUsername || ''),
+    basicPassword: String(nextState.basicPassword || current.basicPassword || ''),
+    toolCount: Number(nextState.toolCount || current.toolCount || 0),
   };
   saveMcpConnectionsState(state);
 }
@@ -970,10 +1265,10 @@ function updateMcpConnectionState(connectionId, nextState) {
 function renderMcpConnections() {
   if (!mcpsGrid || !mcpsTable) return;
   const query = String(mcpsSearchInput?.value || '').trim().toLowerCase();
-  const visibleConnections = MCP_CONNECTIONS_CATALOG
+  const visibleConnections = getAllMcpConnectionsCatalog()
     .map((item) => getMcpConnectionViewModel(item))
     .filter((item) => {
-    const haystack = `${item.name} ${item.description}`.toLowerCase();
+    const haystack = `${item.name} ${item.description} ${item.url || ''}`.toLowerCase();
     return haystack.includes(query);
   });
 
@@ -1057,6 +1352,7 @@ if (mcpsGrid && mcpsTable) {
   mcpsSearchInput?.addEventListener('input', renderMcpConnections);
   mcpsGridViewBtn?.addEventListener('click', () => setMcpsViewMode('grid'));
   mcpsListViewBtn?.addEventListener('click', () => setMcpsViewMode('list'));
+  openMcpCreateModalBtn?.addEventListener('click', () => openMcpCreateModal());
   const handleMcpConnect = (event) => {
     const button = event.target.closest('[data-mcp-action][data-mcp-id]');
     if (!button) return;
@@ -1066,15 +1362,70 @@ if (mcpsGrid && mcpsTable) {
       openMcpConnectionModal(getMcpConnectionViewModel(connection));
       return;
     }
-    updateMcpConnectionState(connection.id, {
-      connected: true,
-      updatedAt: formatMcpDate(),
-    });
-    renderMcpConnections();
-    showAppToast(`Conexão ${connection.name} configurada com sucesso`);
+    openMcpCreateModal(connection);
   };
   mcpsGrid.addEventListener('click', handleMcpConnect);
   mcpsTable.addEventListener('click', handleMcpConnect);
+}
+
+if (mcpCreateModal && mcpCreateForm) {
+  mcpCreateModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-mcp-create-close]')) closeMcpCreateModal();
+  });
+
+  mcpCreateAuthType?.addEventListener('change', syncMcpCreateCredentialField);
+  syncMcpCreateCredentialField();
+
+  mcpCreateForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const authType = String(mcpCreateAuthType?.value || 'bearer').trim();
+    const basicUsername = String(mcpCreateBasicUsername?.value || '').trim();
+    const basicPassword = String(mcpCreateBasicPassword?.value || '').trim();
+    const credential = authType === 'basic'
+      ? `${basicUsername}:${basicPassword}`
+      : String(mcpCreateCredential?.value || '').trim();
+    const payload = {
+      connectionId: mcpCreateModal.dataset.mode === 'existing' ? mcpCreateModal.dataset.connectionId : '',
+      name: String(mcpCreateName?.value || '').trim(),
+      url: String(mcpCreateUrl?.value || '').trim(),
+      authType,
+      credential,
+      basicUsername,
+      basicPassword,
+    };
+    if (!payload.name || !payload.url) return;
+    if (payload.authType === 'basic' && (!payload.basicUsername || !payload.basicPassword)) return;
+    if (payload.authType !== 'basic' && payload.authType !== 'none' && !payload.credential) return;
+    const baseConnection = payload.connectionId ? getMcpConnectionById(payload.connectionId) : null;
+    if (baseConnection) {
+      payload.description = baseConnection.description;
+      payload.accent = baseConnection.accent;
+      payload.mark = baseConnection.mark;
+    }
+
+    if (mcpCreateSubmitBtn) {
+      mcpCreateSubmitBtn.disabled = true;
+      mcpCreateSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">progress_activity</span>Conectando...';
+    }
+    setMcpCreateProgressVisible(true);
+    resetMcpCreateProgress();
+
+    try {
+      const { connectionRecord, discoveredTools } = await runMcpConnectionProvisionFlow(payload);
+      renderMcpConnections();
+      window.setTimeout(() => {
+        closeMcpCreateModal();
+      }, 650);
+      showAppToast(`Conexão ${connectionRecord.name} criada com sucesso (${discoveredTools} ferramentas encontradas)`);
+    } catch (_) {
+      if (mcpCreateProgressTitle) mcpCreateProgressTitle.textContent = 'Falha na conexão';
+      if (mcpCreateProgressStatus) mcpCreateProgressStatus.textContent = 'Não foi possível concluir o provisionamento desta conexão.';
+      if (mcpCreateSubmitBtn) {
+        mcpCreateSubmitBtn.disabled = false;
+        mcpCreateSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">refresh</span>Tentar novamente';
+      }
+    }
+  });
 }
 
 if (mcpConnectionModal && mcpConnectionDisconnectBtn && mcpConnectionReconnectBtn) {
@@ -1097,13 +1448,8 @@ if (mcpConnectionModal && mcpConnectionDisconnectBtn && mcpConnectionReconnectBt
   mcpConnectionReconnectBtn.addEventListener('click', () => {
     const connection = getMcpConnectionById(mcpConnectionModal.dataset.mcpId);
     if (!connection) return;
-    updateMcpConnectionState(connection.id, {
-      connected: true,
-      updatedAt: formatMcpDate(),
-    });
     closeMcpConnectionModal();
-    renderMcpConnections();
-    showAppToast(`Conexão ${connection.name} reconectada com sucesso`);
+    openMcpCreateModal(connection);
   });
 }
 
@@ -3054,6 +3400,8 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
 
 if (openSkillModal && skillModal && skillModalForm && skillsTable) {
   let editingSkillRow = null;
+  let skillFileValidationState = 'empty';
+  let skillFileValidationRun = 0;
 
   const closeSkillModal = () => {
     editingSkillRow = null;
@@ -3095,35 +3443,169 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
     statusWrap?.classList.toggle('is-inactive', !isActive);
   };
 
-  const isValidSkillFile = (file) => {
+  const isSupportedSkillFile = (file) => {
     if (!file) return false;
-    const normalized = String(file.name || '').trim().toLowerCase();
-    return normalized.endsWith('.zip') || normalized.endsWith('.md');
+    const normalizedName = String(file.name || '').trim().toLowerCase();
+    return normalizedName.endsWith('.zip') || normalizedName.endsWith('.md');
   };
 
-  const setSkillFileFeedback = (file) => {
-    if (!skillFileName) return;
+  const resetSkillFileValidation = () => {
+    skillFileValidationRun += 1;
+    skillFileValidationState = 'empty';
+
+    if (skillFileName) skillFileName.value = '';
+    if (skillFileFeedback) {
+      skillFileFeedback.hidden = true;
+      skillFileFeedback.textContent = '';
+      skillFileFeedback.classList.remove('is-error', 'is-success', 'is-warning', 'is-loading');
+    }
+    skillUploadDropzone?.classList.remove('is-invalid', 'is-valid', 'is-loading', 'has-file');
+    if (skillUploadEmptyState) skillUploadEmptyState.hidden = false;
+    if (skillUploadSelectedState) skillUploadSelectedState.hidden = true;
+  };
+
+  const setSkillFileValidationFeedback = (state, message, file = null) => {
+    skillFileValidationState = state;
+
+    const hasValidFile = state === 'valid' && file;
+    skillUploadDropzone?.classList.toggle('is-invalid', state === 'invalid' || state === 'dangerous');
+    skillUploadDropzone?.classList.toggle('is-valid', hasValidFile);
+    skillUploadDropzone?.classList.toggle('is-loading', state === 'loading');
+    skillUploadDropzone?.classList.toggle('has-file', hasValidFile);
+
+    if (skillUploadEmptyState) skillUploadEmptyState.hidden = hasValidFile;
+    if (skillUploadSelectedState) skillUploadSelectedState.hidden = !hasValidFile;
+    if (skillFileName) skillFileName.value = hasValidFile ? file.name : '';
+
+    if (skillFileFeedback) {
+      skillFileFeedback.hidden = !message;
+      skillFileFeedback.textContent = message || '';
+      skillFileFeedback.classList.remove('is-error', 'is-success', 'is-warning', 'is-loading');
+      if (state === 'valid') skillFileFeedback.classList.add('is-success');
+      if (state === 'invalid') skillFileFeedback.classList.add('is-error');
+      if (state === 'dangerous') skillFileFeedback.classList.add('is-warning');
+      if (state === 'loading') skillFileFeedback.classList.add('is-loading');
+    }
+  };
+
+  const isZipArchiveCompatible = async (file) => {
+    const buffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(buffer);
+    const hasZipHeader = bytes.length >= 4
+      && bytes[0] === 0x50
+      && bytes[1] === 0x4b
+      && [0x03, 0x05, 0x07].includes(bytes[2])
+      && [0x04, 0x06, 0x08].includes(bytes[3]);
+
+    if (!hasZipHeader) {
+      return {
+        valid: false,
+        message: 'Erro ao processar o arquivo: o `.zip` enviado é incompatível com o catálogo de habilidades.',
+      };
+    }
+
+    const zipText = new TextDecoder('utf-8', { fatal: false }).decode(bytes);
+    const hasSkillDescriptor = /(^|\/)SKILL\.md\b/i.test(zipText) || /(^|\/)[^/\0]+\.md\b/i.test(zipText);
+
+    if (!hasSkillDescriptor) {
+      return {
+        valid: false,
+        message: 'Erro ao processar o arquivo: o `.zip` não contém uma estrutura compatível de habilidade.',
+      };
+    }
+
+    return {
+      valid: true,
+      message: 'Arquivo validado com sucesso pelo sistema.',
+    };
+  };
+
+  const findDangerousMarkdownPattern = (content) => {
+    const rules = [
+      /<script\b/i,
+      /javascript:/i,
+      /onerror\s*=/i,
+      /<iframe\b/i,
+      /rm\s+-rf\b/i,
+      /curl\b[\s\S]{0,80}\|\s*(sh|bash)\b/i,
+      /wget\b[\s\S]{0,80}\|\s*(sh|bash)\b/i,
+      /powershell\b/i,
+      /invoke-webrequest\b/i,
+      /eval\s*\(/i,
+      /chmod\s+\+x\b/i,
+      /base64\s+-d\b/i,
+    ];
+
+    return rules.find((rule) => rule.test(content)) || null;
+  };
+
+  const inspectMarkdownSafety = async (file) => {
+    const content = await file.text();
+    const suspiciousPattern = findDangerousMarkdownPattern(content);
+
+    if (suspiciousPattern) {
+      return {
+        valid: false,
+        dangerous: true,
+        message: 'O arquivo foi considerado perigoso pelo sistema e não pode ser implementado.',
+      };
+    }
+
+    return {
+      valid: true,
+      message: 'Arquivo validado com sucesso pelo sistema.',
+    };
+  };
+
+  const validateSkillFile = async (file) => {
     if (!file) {
-      skillFileName.hidden = true;
-      skillFileName.textContent = '';
-      skillUploadDropzone?.classList.remove('is-invalid');
+      resetSkillFileValidation();
+      syncSkillSubmit();
       return;
     }
 
-    const hasValidFile = isValidSkillFile(file);
-    skillFileName.hidden = false;
-    skillFileName.textContent = hasValidFile ? `Arquivo: ${file.name}` : 'Arquivo inválido. Envie um `.zip` ou `.md`.';
-    skillUploadDropzone?.classList.toggle('is-invalid', !hasValidFile);
+    if (!isSupportedSkillFile(file)) {
+      setSkillFileValidationFeedback('invalid', 'Erro ao processar o arquivo: envie um `.zip` ou `.md` válido.');
+      syncSkillSubmit();
+      return;
+    }
+
+    const currentRun = ++skillFileValidationRun;
+    setSkillFileValidationFeedback('loading', 'Analisando arquivo enviado...');
+    syncSkillSubmit();
+
+    try {
+      const normalizedName = String(file.name || '').trim().toLowerCase();
+      const result = normalizedName.endsWith('.zip')
+        ? await isZipArchiveCompatible(file)
+        : await inspectMarkdownSafety(file);
+
+      if (currentRun !== skillFileValidationRun) return;
+
+      if (result.valid) {
+        setSkillFileValidationFeedback('valid', result.message, file);
+      } else if (result.dangerous) {
+        if (skillFileInput) skillFileInput.value = '';
+        setSkillFileValidationFeedback('dangerous', result.message);
+      } else {
+        if (skillFileInput) skillFileInput.value = '';
+        setSkillFileValidationFeedback('invalid', result.message);
+      }
+    } catch (error) {
+      if (currentRun !== skillFileValidationRun) return;
+      if (skillFileInput) skillFileInput.value = '';
+      setSkillFileValidationFeedback('invalid', 'Erro ao processar o arquivo enviado. Tente novamente com outro pacote.');
+    }
+
+    syncSkillSubmit();
   };
 
   const syncSkillSubmit = () => {
     const hasName = Boolean(String(skillNameInput?.value || '').trim());
     const isEdit = skillModal.dataset.mode === 'edit';
-    const file = skillFileInput?.files?.[0] || null;
-    const hasValidFile = isEdit ? true : isValidSkillFile(file);
-    if (!isEdit) setSkillFileFeedback(file);
-    else setSkillFileFeedback(null);
-    if (skillModalSubmit) skillModalSubmit.disabled = !(hasName && hasValidFile);
+    const hasValidFile = isEdit || skillFileValidationState === 'valid';
+    const isBusy = skillFileValidationState === 'loading';
+    if (skillModalSubmit) skillModalSubmit.disabled = !(hasName && hasValidFile) || isBusy;
   };
 
   const openSkillDialog = () => {
@@ -3132,20 +3614,33 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
     skillModalForm.reset();
     if (skillStatusInput) skillStatusInput.checked = true;
     syncSkillStatus();
-    setSkillFileFeedback(null);
+    resetSkillFileValidation();
     syncSkillSubmit();
     skillModal.classList.add('open');
     skillModal.setAttribute('aria-hidden', 'false');
+    const skillModalBody = skillModal.querySelector('.skill-modal-body');
+    if (skillModalBody) skillModalBody.scrollTop = 0;
     skillNameInput?.focus();
   };
 
   openSkillModal.addEventListener('click', openSkillDialog);
   skillNameInput?.addEventListener('input', syncSkillSubmit);
-  skillFileInput?.addEventListener('change', syncSkillSubmit);
+  skillFileInput?.addEventListener('change', (event) => {
+    const file = event.target?.files?.[0] || null;
+    validateSkillFile(file);
+  });
   skillStatusInput?.addEventListener('change', syncSkillStatus);
   skillUploadChooseLink?.addEventListener('click', (event) => {
     event.preventDefault();
+    event.stopPropagation();
     skillFileInput?.click();
+  });
+  skillFileDeleteButton?.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (skillFileInput) skillFileInput.value = '';
+    resetSkillFileValidation();
+    syncSkillSubmit();
   });
   skillUploadDropzone?.addEventListener('click', () => skillFileInput?.click());
   skillUploadDropzone?.addEventListener('keydown', (event) => {
@@ -3165,16 +3660,15 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
     skillUploadDropzone.classList.remove('is-dragover');
     const droppedFile = event.dataTransfer?.files?.[0] || null;
     if (!skillFileInput) return;
-    if (!isValidSkillFile(droppedFile)) {
-      skillFileInput.value = '';
-      setSkillFileFeedback(droppedFile);
-      if (skillModalSubmit) skillModalSubmit.disabled = true;
+    if (!droppedFile) {
+      resetSkillFileValidation();
+      syncSkillSubmit();
       return;
     }
     const transfer = new DataTransfer();
     transfer.items.add(droppedFile);
     skillFileInput.files = transfer.files;
-    syncSkillSubmit();
+    validateSkillFile(droppedFile);
   });
 
   skillModal.addEventListener('click', (event) => {
@@ -3191,7 +3685,7 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
     const status = isActive ? 'active' : 'inactive';
     const isEdit = skillModal.dataset.mode === 'edit';
 
-    if (!name || (!isEdit && !isValidSkillFile(file))) {
+    if (!name || (!isEdit && skillFileValidationState !== 'valid')) {
       syncSkillSubmit();
       return;
     }
@@ -3256,11 +3750,13 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
     if (skillDescriptionInput) skillDescriptionInput.value = skillData.description;
     if (skillStatusInput) skillStatusInput.checked = skillData.isActive;
     if (skillFileInput) skillFileInput.value = '';
-    setSkillFileFeedback(null);
+    resetSkillFileValidation();
     syncSkillStatus();
     syncSkillSubmit();
     skillModal.classList.add('open');
     skillModal.setAttribute('aria-hidden', 'false');
+    const skillModalBody = skillModal.querySelector('.skill-modal-body');
+    if (skillModalBody) skillModalBody.scrollTop = 0;
     skillNameInput?.focus();
   });
 

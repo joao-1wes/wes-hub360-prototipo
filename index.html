@@ -1274,6 +1274,12 @@
                   <button class="btn primary">Criar agendamento</button>
                 </div>
               </div>
+              <div class="info-banner dismissible">
+                Importante: se o executor ainda não estiver instalado, o agendamento da automação não irá funcionar.
+                <button class="icon-btn banner-close" aria-label="Fechar aviso">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
               <div class="filters-grid filters-single">
                 <div class="form-field">
                   <div class="search-field">
@@ -6829,35 +6835,65 @@
             aria-labelledby="directChatDrawerTitle"
           >
             <div class="direct-chat-header">
-              <div>
-                <h3 id="directChatDrawerTitle">Chat direto</h3>
-                <p class="direct-chat-sub">API <code>/chat</code> — mesma sessão do login (<code>X-User-Id</code>).</p>
+              <div class="direct-chat-brand">
+                <div class="direct-chat-brand-icon" aria-hidden="true">
+                  <span class="material-symbols-rounded">smart_toy</span>
+                </div>
+                <div>
+                  <h3 id="directChatDrawerTitle">Assistente WES HUB 360</h3>
+                </div>
               </div>
               <div class="direct-chat-header-actions">
-                <button type="button" class="btn outline btn-sm" id="directChatNewBtn">Nova conversa</button>
-                <button type="button" class="icon-btn" aria-label="Fechar" data-direct-chat-close>
+                <button type="button" class="icon-btn direct-chat-header-btn" id="directChatNewBtn" aria-label="Nova conversa">
+                  <span class="material-symbols-rounded">add</span>
+                </button>
+                <button type="button" class="icon-btn direct-chat-header-btn direct-chat-header-btn--badge" id="directChatHistoryBtn" aria-label="Histórico">
+                  <span class="material-symbols-rounded">history</span>
+                </button>
+                <button type="button" class="icon-btn direct-chat-header-btn" aria-label="Fechar" data-direct-chat-close>
                   <span class="material-symbols-rounded">close</span>
                 </button>
               </div>
             </div>
+            <div class="direct-chat-subbar">
+              <p class="direct-chat-sub">Assistente operacional para acompanhar automações, executores e agendamentos.</p>
+            </div>
             <div class="direct-chat-body">
               <div class="direct-chat-empty" id="directChatEmpty">
-                Envie uma mensagem para falar com o modelo. Cada "Nova conversa" inicia outro <code>conversation_id</code> no servidor.
+                <div class="direct-chat-empty-card">
+                  <p>Olá! Sou o assistente de operações do WES HUB 360. Posso ajudar com:</p>
+                  <ul>
+                    <li>Análise de execuções e falhas</li>
+                    <li>Status dos executores</li>
+                    <li>Otimização de agendamentos</li>
+                    <li>Dúvidas sobre automações</li>
+                  </ul>
+                  <p>Como posso ajudar?</p>
+                </div>
               </div>
               <div class="direct-chat-thread" id="directChatThread" aria-live="polite"></div>
             </div>
             <p class="direct-chat-error" id="directChatError" hidden></p>
+            <div class="direct-chat-suggestions" aria-label="Sugestões rápidas">
+              <button type="button" class="direct-chat-chip" data-direct-chat-prompt="Ver falhas recentes">Ver falhas recentes</button>
+              <button type="button" class="direct-chat-chip" data-direct-chat-prompt="Status dos executores">Status dos executores</button>
+              <button type="button" class="direct-chat-chip" data-direct-chat-prompt="Próximos agendamentos">Próximos agendamentos</button>
+            </div>
             <div class="direct-chat-composer">
               <label class="direct-chat-sr-only" for="directChatInput">Mensagem</label>
-              <textarea
-                id="directChatInput"
-                class="direct-chat-input"
-                rows="2"
-                placeholder="Digite sua mensagem…"
-                maxlength="32000"
-                autocomplete="off"
-              ></textarea>
-              <button type="button" class="btn primary" id="directChatSend" disabled>Enviar</button>
+              <div class="direct-chat-input-shell">
+                <textarea
+                  id="directChatInput"
+                  class="direct-chat-input"
+                  rows="2"
+                  placeholder="Digite sua pergunta..."
+                  maxlength="32000"
+                  autocomplete="off"
+                ></textarea>
+                <button type="button" class="direct-chat-send icon-only" id="directChatSend" aria-label="Enviar mensagem" disabled>
+                  <span class="material-symbols-rounded">send</span>
+                </button>
+              </div>
             </div>
           </aside>
         </div>

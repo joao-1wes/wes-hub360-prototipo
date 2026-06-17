@@ -699,7 +699,7 @@ const rangeFields = document.querySelectorAll('.period-field.range-only');
 const singleField = document.querySelector('.period-field.single-only');
 const addToggles = document.querySelectorAll('.add-toggle');
 const licenseToggles = document.querySelectorAll('.license-toggle');
-const firstTimeBanner = document.getElementById('firstTimeBanner');
+const dismissibleInfoBanners = document.querySelectorAll('.info-banner.dismissible');
 const settingsSaveBtn = document.getElementById('settingsSaveBtn');
 const settingsPage = document.getElementById('page-settings');
 const AGENTS_PAGE_SIZE = 5;
@@ -7937,13 +7937,15 @@ if (licenseToggles.length) {
   });
 }
 
-if (firstTimeBanner) {
-  const closeButton = firstTimeBanner.querySelector('.banner-close');
-  if (closeButton) {
-    closeButton.addEventListener('click', () => {
-      firstTimeBanner.remove();
-    });
-  }
+if (dismissibleInfoBanners.length) {
+  dismissibleInfoBanners.forEach((banner) => {
+    const closeButton = banner.querySelector('.banner-close');
+    if (closeButton) {
+      closeButton.addEventListener('click', () => {
+        banner.remove();
+      });
+    }
+  });
 }
 
 if (telegramHelpCard) {
@@ -11291,6 +11293,8 @@ document.addEventListener('click', (event) => {
   const sendBtn = document.getElementById('directChatSend');
   const errEl = document.getElementById('directChatError');
   const newBtn = document.getElementById('directChatNewBtn');
+  const historyBtn = document.getElementById('directChatHistoryBtn');
+  const suggestionButtons = drawer.querySelectorAll('[data-direct-chat-prompt]');
   if (!drawer || !fab || !thread || !input || !sendBtn) return;
 
   let conversationId = null;
@@ -11368,6 +11372,18 @@ document.addEventListener('click', (event) => {
   newBtn?.addEventListener('click', () => {
     resetConversation();
     input.focus();
+  });
+
+  historyBtn?.addEventListener('click', () => {
+    if (typeof showAppToast === 'function') showAppToast('Histórico visual em breve');
+  });
+
+  suggestionButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      input.value = button.dataset.directChatPrompt || '';
+      updateSendState();
+      input.focus();
+    });
   });
 
   input.addEventListener('input', updateSendState);

@@ -3555,6 +3555,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   justify-content: flex-start;
 }
 
+.automations-table .data-row > span > .chip {
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
+}
+
 .automation-status-switch {
   display: inline-flex;
   align-items: center;
@@ -4579,6 +4585,37 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .channel-picker-card:focus-visible {
   outline: 2px solid rgba(1, 111, 244, 0.28);
   outline-offset: 4px;
+}
+
+.channel-picker-card--disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+  box-shadow: none;
+}
+
+.channel-picker-card--disabled:hover {
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: none;
+  transform: none;
+}
+
+.channel-picker-card--disabled .channel-picker-icon,
+.channel-picker-card--disabled .channel-picker-title {
+  color: #94a3b8;
+}
+
+.channel-picker-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: var(--md-label-small);
+  font-weight: 700;
+  line-height: 1;
 }
 
 .campaigns-page-header {
@@ -11163,6 +11200,32 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   text-align: center;
 }
 
+#page-input-files .data-table .data-row > .chip {
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
+}
+
+#page-companies .data-table .data-row > .chip {
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
+}
+
+#page-users .users-table .data-row > span:nth-child(3) > .chip,
+#page-users .users-table .data-row > .chip:nth-child(3) {
+  width: calc(14ch + 16px);
+  min-width: 0;
+  text-align: center;
+}
+
+#page-users .users-table .data-row > span:nth-child(4) > .chip,
+#page-users .users-table .data-row > .chip:nth-child(4) {
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
+}
+
 .chip.priority-high {
   background: #fee2e2;
   color: #b91c1c;
@@ -11182,6 +11245,9 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .chip.priority-low {
   background: #dcfce7;
   color: #15803d;
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
 }
 
 .info-banner {
@@ -11201,6 +11267,16 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .info-banner .banner-close {
   margin-left: auto;
+}
+
+.info-banner a {
+  color: #016ff4;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.info-banner a:hover {
+  text-decoration: underline;
 }
 
 .info-banner.warning {

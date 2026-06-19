@@ -2306,7 +2306,7 @@ function createAutomationRow(data) {
     <span class="muted">${escapeHtmlWes(data.description)}</span>
     <span>${escapeHtmlWes(packageDisplay)}</span>
     <span>${escapeHtmlWes(data.lastExecution || 'Ainda não executada')}</span>
-    <span class="chip ${getAutomationPriorityClass(priority)}">${getAutomationPriorityLabel(priority)}</span>
+    <span><span class="chip ${getAutomationPriorityClass(priority)}">${getAutomationPriorityLabel(priority)}</span></span>
     <span class="automation-status-switch ${status === 'active' ? 'is-active' : 'is-inactive'}">
       <label class="switch small" for="${escapeHtmlWes(switchId)}">
         <input type="checkbox" id="${escapeHtmlWes(switchId)}" ${status === 'active' ? 'checked' : ''} />
@@ -11873,6 +11873,7 @@ const routeMap = {
   'dashboard/mcps': 'page-mcps',
   'dashboard/skills': 'page-skills',
   'dashboard/audit': 'page-audit',
+  'dashboard/agent-history': 'page-agent-history',
   'dashboard/companies': 'page-companies',
   // 'dashboard/organization': 'page-organization',
   'dashboard/environments': 'page-environments',
@@ -11908,6 +11909,7 @@ const sectionMap = {
   'dashboard/mcps': 'Administração',
   'dashboard/skills': 'Administração',
   'dashboard/audit': 'Administração',
+  'dashboard/agent-history': 'Administração',
   'dashboard/companies': 'Administração',
   'dashboard/environments': 'Administração',
   // 'dashboard/organization': 'Organização',
@@ -12012,6 +12014,7 @@ const normalizeVisiblePortugueseLabels = () => {
     ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'Conex\u00f5es'],
     ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
+    ['#submenu-administration a[href="#/dashboard/agent-history"] .submenu-label', 'Hist\u00f3rico de agentes'],
     ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
     ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
     ['#wesProjectDescription', null],

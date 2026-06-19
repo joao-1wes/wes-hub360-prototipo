@@ -210,8 +210,9 @@
             <div class="submenu" id="submenu-automation">
               <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
               <a class="submenu-item" href="#/dashboard/agents"><span class="submenu-label">Agentes</span></a>
-              <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
               <a class="submenu-item" href="#/dashboard/document-analysis"><span class="submenu-label">Análise de documentos</span></a>
+              <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
+              <a class="submenu-item" href="#/dashboard/bpmn"><span class="submenu-label">Processos</span></a>
             </div>
           </div>
 
@@ -260,24 +261,13 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-administration">
-              <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
-              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
               <a class="submenu-item" href="#/dashboard/mcps"><span class="submenu-label">Conexões</span></a>
+              <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
               <a class="submenu-item" href="#/dashboard/skills"><span class="submenu-label">Habilidades</span></a>
+              <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Histórico de ações</span></a>
+              <a class="submenu-item" href="#/dashboard/agent-history"><span class="submenu-label">Histórico de agentes</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
               <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
-            </div>
-          </div>
-
-          <div class="nav-group">
-            <button class="nav-item nav-trigger" data-menu="processes" type="button">
-              <span class="material-symbols-rounded">schema</span>
-              <span class="nav-label">Processos</span>
-              <span class="nav-caret">▾</span>
-            </button>
-            <div class="submenu" id="submenu-processes">
-              <a class="submenu-item" href="#/dashboard/bpmn"><span class="submenu-label">BPMN</span></a>
-              <!-- <a class="submenu-item" href="#/dashboard/fluxos"><span class="submenu-label">Fluxos</span></a> -->
             </div>
           </div>
 
@@ -823,7 +813,7 @@
                     <span class="muted">Gera relatórios operacionais diários.</span>
                     <span>reports • v2.1.0</span>
                     <span>12/03/2025 • 08:30</span>
-                    <span class="chip priority-medium">Média</span>
+                    <span><span class="chip priority-medium">Média</span></span>
                     <span class="automation-status-switch is-active">
                       <label class="switch small" for="automationStatusDaily">
                         <input type="checkbox" id="automationStatusDaily" checked />
@@ -858,7 +848,7 @@
                     <span class="muted">Acompanha o volume das filas críticas.</span>
                     <span>queues • v1.4.0</span>
                     <span>11/03/2025 • 18:10</span>
-                    <span class="chip priority-high">Alta</span>
+                    <span><span class="chip priority-high">Alta</span></span>
                     <span class="automation-status-switch is-inactive">
                       <label class="switch small" for="automationStatusQueues">
                         <input type="checkbox" id="automationStatusQueues" />
@@ -1275,7 +1265,10 @@
                 </div>
               </div>
               <div class="info-banner dismissible">
-                Importante: se o executor ainda não estiver instalado, o agendamento da automação não irá funcionar.
+                <span>
+                  Importante: se o executor ainda não estiver instalado, o agendamento da automação não irá funcionar.
+                  <a href="#/dashboard/executors">Baixar executor</a>
+                </span>
                 <button class="icon-btn banner-close" aria-label="Fechar aviso">
                   <span class="material-symbols-rounded">close</span>
                 </button>
@@ -4766,7 +4759,7 @@
                       </span>
                     </span>
                   </button>
-                  <button class="channel-picker-card" type="button" aria-label="Selecionar WhatsApp Business">
+                  <button class="channel-picker-card channel-picker-card--disabled" type="button" aria-label="Selecionar WhatsApp Business" disabled>
                     <span class="channel-picker-icon channel-picker-icon--whatsapp" aria-hidden="true">
                       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                         <path
@@ -4780,9 +4773,10 @@
                       <span class="channel-picker-description">
                         Conta oficial para mensagens, campanhas e atendimento pelo WhatsApp Business.
                       </span>
+                      <span class="channel-picker-status">Em breve</span>
                     </span>
                   </button>
-                  <button class="channel-picker-card" type="button" aria-label="Selecionar SMS">
+                  <button class="channel-picker-card channel-picker-card--disabled" type="button" aria-label="Selecionar SMS" disabled>
                     <span class="channel-picker-icon channel-picker-icon--sms" aria-hidden="true">
                       <span class="material-symbols-rounded">sms</span>
                     </span>
@@ -4791,6 +4785,7 @@
                       <span class="channel-picker-description">
                         Provedor para avisos rápidos, códigos de confirmação e mensagens transacionais.
                       </span>
+                      <span class="channel-picker-status">Em breve</span>
                     </span>
                   </button>
                 </div>
@@ -6075,6 +6070,18 @@
                   </div>
                 </section>
               </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-agent-history" data-title="Histórico de agentes">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Histórico de agentes</h2>
+                  <p class="page-subtitle">Estamos preparando esta área. Em breve você poderá acompanhar o histórico dos agentes.</p>
+                </div>
+              </div>
+              <div class="empty-state">Funcionalidade em desenvolvimento. Aguarde as próximas versões.</div>
             </div>
           </div>
 

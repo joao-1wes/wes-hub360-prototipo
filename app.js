@@ -68,6 +68,36 @@ const voiceMessagingRecipientsInput = document.getElementById('voiceMessagingRec
 const voiceMessagingReviewModal = document.getElementById('voiceMessagingReviewModal');
 const voiceMessagingReviewList = document.getElementById('voiceMessagingReviewList');
 const voiceMessagingReviewConfirmBtn = document.getElementById('voiceMessagingReviewConfirmBtn');
+const campaignsSearchInput = document.getElementById('campaignsSearchInput');
+const campaignsFilterBtn = document.getElementById('campaignsFilterBtn');
+const campaignsFilterBtnLabel = document.getElementById('campaignsFilterBtnLabel');
+const campaignsFilterMenu = document.getElementById('campaignsFilterMenu');
+const campaignsCreateBtns = document.querySelectorAll('.campaigns-create-btn');
+const campaignsCreateBackBtn = document.getElementById('campaignsCreateBackBtn');
+const campaignsCreateCancelBtn = document.getElementById('campaignsCreateCancelBtn');
+const campaignNameInput = document.getElementById('campaignNameInput');
+const campaignDescriptionInput = document.getElementById('campaignDescriptionInput');
+const campaignAgentSelect = document.getElementById('campaignAgentSelect');
+const campaignIntegrationRadios = document.querySelectorAll('input[name="campaignIntegration"]');
+const campaignIntegrationTargetSelect = document.getElementById('campaignIntegrationTargetSelect');
+const campaignIntegrationTargetIcon = document.getElementById('campaignIntegrationTargetIcon');
+const campaignIntegrationTargetHint = document.getElementById('campaignIntegrationTargetHint');
+const campaignScheduleInput = document.getElementById('campaignScheduleInput');
+const campaignScriptInput = document.getElementById('campaignScriptInput');
+const campaignRecipientsInput = document.getElementById('campaignRecipientsInput');
+const campaignImportCsvBtn = document.getElementById('campaignImportCsvBtn');
+const campaignCsvInput = document.getElementById('campaignCsvInput');
+const campaignCsvHint = document.getElementById('campaignCsvHint');
+const campaignOptimizeScriptBtn = document.getElementById('campaignOptimizeScriptBtn');
+const campaignCreatePageTitle = document.getElementById('campaignCreatePageTitle');
+const campaignCreatePageSubtitle = document.getElementById('campaignCreatePageSubtitle');
+const campaignCreateReviewBtn = document.getElementById('campaignCreateReviewBtn');
+const campaignReviewModal = document.getElementById('campaignReviewModal');
+const campaignReviewList = document.getElementById('campaignReviewList');
+const campaignReviewConfirmBtn = document.getElementById('campaignReviewConfirmBtn');
+const campaignDetailsModal = document.getElementById('campaignDetailsModal');
+const campaignDetailsList = document.getElementById('campaignDetailsList');
+const campaignsTable = document.querySelector('#page-campaigns .campaigns-data-table');
 const hybridFlowsFilterBtn = document.getElementById('hybridFlowsFilterBtn');
 const hybridFlowsFilterMenu = document.getElementById('hybridFlowsFilterMenu');
 const hybridHistoryFilterBtn = document.getElementById('hybridHistoryFilterBtn');
@@ -288,6 +318,7 @@ const auditDetailsTarget = document.getElementById('auditDetailsTarget');
 const auditDetailsChange = document.getElementById('auditDetailsChange');
 const auditDetailsSummary = document.getElementById('auditDetailsSummary');
 const hybridFlowCancelBtn = document.getElementById('hybridFlowCancelBtn');
+const hybridFlowCreateBackBtn = document.getElementById('hybridFlowCreateBackBtn');
 const hybridFlowNextBtn = document.getElementById('hybridFlowNextBtn');
 const hybridFlowReviewModal = document.getElementById('hybridFlowReviewModal');
 const hybridFlowReviewList = document.getElementById('hybridFlowReviewList');
@@ -376,7 +407,34 @@ const VOICE_MESSAGING_STATUS_META = {
   draft: { label: 'Rascunho', chipClass: 'neutral' },
   error: { label: 'Erro', chipClass: 'error' },
 };
+const CAMPAIGN_STATUS_META = {
+  draft: { label: 'Rascunho', chipClass: 'neutral' },
+  scheduled: { label: 'Agendada', chipClass: 'warning' },
+  running: { label: 'Em execução', chipClass: 'running' },
+  paused: { label: 'Pausada', chipClass: 'paused' },
+  completed: { label: 'Concluída', chipClass: 'success' },
+  failed: { label: 'Falhou', chipClass: 'error' },
+};
+const CAMPAIGN_EDITABLE_STATUSES = new Set(['draft', 'scheduled', 'failed']);
+let campaignFormMode = 'create';
+let activeCampaignEditId = '';
 const HYBRID_FLOWS_HISTORY_FLOW_NAME_STORAGE_KEY = 'hybridFlowsHistoryFlowName';
+
+function getCampaignExecutionAction(statusValue) {
+  if (statusValue === 'running') {
+    return { label: 'Pausar', icon: 'pause', enabled: true };
+  }
+
+  if (statusValue === 'scheduled') {
+    return { label: 'Executar', icon: 'play_arrow', enabled: true };
+  }
+
+  return { label: 'Executar', icon: 'play_arrow', enabled: false };
+}
+
+function generateCampaignId() {
+  return `campaign-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
 const getHybridFlowsFromStorage = () => {
   const raw = window.localStorage.getItem(HYBRID_FLOWS_STORAGE_KEY);
   if (!raw) return [];
@@ -848,6 +906,201 @@ function scheduleLucideRefresh() {
 window.scheduleLucideRefresh = scheduleLucideRefresh;
 enhanceFilterOptionIcons();
 
+const tableEmptyStateObservers = new WeakMap();
+const TABLE_EMPTY_STATE_SELECTOR = '[data-table-empty-state="true"]';
+
+function getTableEmptyStateCopy(table) {
+  const ariaLabel = table.getAttribute('aria-label') || '';
+  const normalizedLabel = ariaLabel
+    .replace(/^lista de\s+/i, '')
+    .replace(/^historico de\s+/i, '')
+    .replace(/^histórico de\s+/i, '')
+    .replace(/^perfil dos\s+/i, '')
+    .trim()
+    .toLowerCase();
+
+  return {
+    icon: table.dataset.emptyIcon || 'inbox',
+    title: table.dataset.emptyTitle || 'Nenhum registro encontrado',
+    description: table.dataset.emptyDescription || (normalizedLabel
+      ? `Quando houver registros em ${normalizedLabel}, eles aparecerão aqui.`
+      : 'Quando houver registros, eles aparecerão aqui.'),
+    actionLabel: table.dataset.emptyActionLabel || '',
+    actionTarget: table.dataset.emptyActionTarget || '',
+  };
+}
+
+function createTableEmptyStateContent(table, tagName = 'span') {
+  const copy = getTableEmptyStateCopy(table);
+  const content = document.createElement(tagName);
+  content.className = 'table-empty-content';
+
+  const icon = document.createElement('span');
+  icon.className = 'material-symbols-rounded';
+  icon.setAttribute('aria-hidden', 'true');
+  icon.textContent = copy.icon;
+
+  const title = document.createElement('strong');
+  title.textContent = copy.title;
+
+  const description = document.createElement('small');
+  description.textContent = copy.description;
+
+  content.append(icon, title, description);
+
+  if (copy.actionLabel) {
+    const action = document.createElement('button');
+    action.className = 'btn primary table-empty-action-btn';
+    action.type = 'button';
+    action.textContent = copy.actionLabel;
+    action.addEventListener('click', () => {
+      if (!copy.actionTarget) return;
+      const target = document.querySelector(copy.actionTarget);
+      if (target instanceof HTMLElement) target.click();
+    });
+    content.append(action);
+  }
+
+  return content;
+}
+
+function isTableDataRowVisible(row) {
+  return !row.hidden
+    && row.getAttribute('aria-hidden') !== 'true'
+    && !row.classList.contains('is-hidden')
+    && row.style.display !== 'none';
+}
+
+function getDataTableRows(table) {
+  return Array.from(table.children).filter((row) => row.classList?.contains('data-row')
+    && !row.classList.contains('header')
+    && row.dataset.tableEmptyState !== 'true'
+    && isTableDataRowVisible(row));
+}
+
+function getNativeTableRows(table) {
+  const bodyRows = table.tBodies.length
+    ? Array.from(table.tBodies).flatMap((body) => Array.from(body.rows))
+    : Array.from(table.querySelectorAll('tr')).filter((row) => !row.closest('thead'));
+
+  return bodyRows.filter((row) => row.dataset.tableEmptyState !== 'true' && isTableDataRowVisible(row));
+}
+
+function getNativeTableColumnCount(table) {
+  const headerCells = table.querySelectorAll('thead th, thead td');
+  if (headerCells.length) return headerCells.length;
+  const firstRow = table.querySelector('tr:not([data-table-empty-state="true"])');
+  return firstRow?.children.length || 1;
+}
+
+function getOrCreateDataTableEmptyRow(table) {
+  let emptyRow = Array.from(table.children).find((row) => row.dataset?.tableEmptyState === 'true');
+  if (emptyRow) return emptyRow;
+
+  emptyRow = document.createElement('div');
+  emptyRow.className = 'data-row table-empty-row';
+  emptyRow.dataset.tableEmptyState = 'true';
+  emptyRow.hidden = true;
+  emptyRow.append(createTableEmptyStateContent(table, 'span'));
+  table.append(emptyRow);
+  return emptyRow;
+}
+
+function getOrCreateNativeTableEmptyRow(table) {
+  let emptyRow = table.querySelector(TABLE_EMPTY_STATE_SELECTOR);
+  if (emptyRow) return emptyRow;
+
+  const tbody = table.tBodies[0] || table.createTBody();
+  emptyRow = document.createElement('tr');
+  emptyRow.className = 'table-empty-native-row';
+  emptyRow.dataset.tableEmptyState = 'true';
+  emptyRow.hidden = true;
+
+  const cell = document.createElement('td');
+  cell.className = 'table-empty-native-cell';
+  cell.colSpan = getNativeTableColumnCount(table);
+  cell.append(createTableEmptyStateContent(table, 'div'));
+  emptyRow.append(cell);
+  tbody.append(emptyRow);
+  return emptyRow;
+}
+
+function syncTableEmptyState(table) {
+  if (!table) return;
+  const isDataTable = table.classList.contains('data-table');
+  const rows = isDataTable ? getDataTableRows(table) : getNativeTableRows(table);
+  const emptyRow = isDataTable ? getOrCreateDataTableEmptyRow(table) : getOrCreateNativeTableEmptyRow(table);
+
+  if (!isDataTable) {
+    const emptyCell = emptyRow.querySelector('td');
+    if (emptyCell) emptyCell.colSpan = getNativeTableColumnCount(table);
+  }
+
+  emptyRow.hidden = rows.length > 0;
+}
+
+function scheduleTableEmptyStateSync(table) {
+  if (!table || table.dataset.tableEmptyStateQueued === 'true') return;
+  table.dataset.tableEmptyStateQueued = 'true';
+  window.requestAnimationFrame(() => {
+    delete table.dataset.tableEmptyStateQueued;
+    syncTableEmptyState(table);
+  });
+}
+
+function bindTableEmptyState(table) {
+  if (!table || tableEmptyStateObservers.has(table)) return;
+  syncTableEmptyState(table);
+
+  const observer = new MutationObserver(() => scheduleTableEmptyStateSync(table));
+  observer.observe(table, { childList: true, subtree: true });
+  tableEmptyStateObservers.set(table, observer);
+}
+
+function initTableEmptyStates(root = document) {
+  root.querySelectorAll('.data-table, table').forEach((table) => bindTableEmptyState(table));
+}
+
+function syncTableEmptyStates(root = document) {
+  root.querySelectorAll('.data-table, table').forEach((table) => syncTableEmptyState(table));
+}
+
+window.syncTableEmptyStates = syncTableEmptyStates;
+initTableEmptyStates();
+
+const tableEmptyStateRootObserver = new MutationObserver((mutations) => {
+  mutations.forEach((mutation) => {
+    mutation.addedNodes.forEach((node) => {
+      if (!(node instanceof Element)) return;
+      if (node.matches('.data-table, table')) bindTableEmptyState(node);
+      node.querySelectorAll?.('.data-table, table').forEach((table) => bindTableEmptyState(table));
+    });
+  });
+});
+
+if (document.body) {
+  tableEmptyStateRootObserver.observe(document.body, { childList: true, subtree: true });
+}
+
+function syncChannelTableTooltips() {
+  const tooltipTargets = document.querySelectorAll('#page-channels .channel-tooltip-target');
+  if (!tooltipTargets.length) return;
+
+  tooltipTargets.forEach((el) => {
+    const text = el.textContent?.trim() || '';
+    const isTruncated = el.scrollWidth > el.clientWidth || el.scrollHeight > el.clientHeight;
+
+    if (text && isTruncated) {
+      el.setAttribute('title', text);
+    } else {
+      el.removeAttribute('title');
+    }
+  });
+}
+
+window.addEventListener('resize', syncChannelTableTooltips);
+window.requestAnimationFrame(syncChannelTableTooltips);
+
 function buildMcpLogoDataUri(item) {
   const logoById = {
     'filesystem-mcp': './assets/logos%20MCP/Filesystem_logo.png',
@@ -1097,16 +1350,16 @@ function syncMcpCreateCredentialField() {
 
   if (hasNoAuth) {
     mcpCreateCredential.value = '';
-    mcpCreateCredential.placeholder = 'Nao e necessario informar credencial para esta opcao';
+    mcpCreateCredential.placeholder = 'Não é necessário informar credencial para esta opção';
     if (mcpCreateCredentialLabel) mcpCreateCredentialLabel.textContent = 'Credencial';
-    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'Nao sera necessario informar credenciais para esta conexao.';
+    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'Não será necessário informar credenciais para esta conexão.';
   } else if (authType === 'api-key') {
     if (mcpCreateCredentialLabel) mcpCreateCredentialLabel.textContent = 'Chave de API';
     if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'Informe a chave de API usada para autenticar no endpoint.';
     mcpCreateCredential.placeholder = 'Cole aqui a chave de API';
   } else {
     if (mcpCreateCredentialLabel) mcpCreateCredentialLabel.textContent = 'Token';
-    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'O valor informado sera usado no teste inicial e salvo na configuracao da conexao.';
+    if (mcpCreateCredentialHint) mcpCreateCredentialHint.textContent = 'O valor informado será usado no teste inicial e salvo na configuração da conexão.';
     mcpCreateCredential.placeholder = 'Cole aqui o token';
   }
 
@@ -2715,8 +2968,628 @@ if (hybridFlowsFilterBtn && hybridFlowsFilterMenu) {
   }
 }
 
+if (campaignsFilterBtn && campaignsFilterMenu) {
+  campaignsFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    campaignsFilterMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    campaignsFilterMenu.classList.remove('open');
+  });
+
+  const filterOptions = campaignsFilterMenu.querySelectorAll('.filter-option');
+  const clearButton = campaignsFilterMenu.querySelector('.filter-clear');
+
+  filterOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      const group = button.dataset.filter;
+      campaignsFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      campaignsFilterMenu.classList.remove('open');
+      updateCampaignFilterButtonLabel();
+      applyCampaignFilters();
+    });
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      campaignsFilterMenu
+        .querySelectorAll('.filter-option')
+        .forEach((item) => item.classList.remove('active'));
+      campaignsFilterMenu
+        .querySelectorAll('.filter-option[data-value=\"\"]')
+        .forEach((item) => item.classList.add('active'));
+      campaignsFilterMenu.classList.remove('open');
+      updateCampaignFilterButtonLabel();
+      applyCampaignFilters();
+    });
+  }
+}
+
 openVoiceMessagingCreatePage?.addEventListener('click', () => {
   openVoiceMessagingCreateMode('create');
+});
+
+campaignsCreateBtns.forEach((button) => {
+  button.addEventListener('click', () => {
+    resetCampaignCreateForm();
+    window.location.hash = '#/dashboard/campaigns/new';
+  });
+});
+
+function getSelectedCampaignIntegrationLabel() {
+  const selected = document.querySelector('input[name="campaignIntegration"]:checked');
+  if (!selected) return 'Telegram';
+  const tab = selected.closest('.voice-messaging-provider-option')?.querySelector('.voice-messaging-provider-tab');
+  return tab?.textContent?.trim() || selected.value || 'Telegram';
+}
+
+const campaignIntegrationTargets = {
+  telegram: {
+    icon: 'smart_toy',
+    hint: 'Escolha qual bot do Telegram será usado no envio.',
+    options: [
+      { value: 'telegram-wes-hub-bot', label: 'wes_hub_bot' },
+      { value: 'telegram-operacoes-bot', label: 'operacoes_bot' },
+      { value: 'telegram-atendimento-bot', label: 'atendimento_bot' },
+    ],
+  },
+  whatsapp: {
+    icon: 'smart_toy',
+    hint: 'Escolha qual bot do WhatsApp será usado no envio.',
+    options: [
+      { value: 'whatsapp-atendimento-bot', label: 'Atendimento WhatsApp Bot' },
+      { value: 'whatsapp-comercial-bot', label: 'Comercial WhatsApp Bot' },
+      { value: 'whatsapp-suporte-bot', label: 'Suporte WhatsApp Bot' },
+    ],
+  },
+  sms: {
+    icon: 'call',
+    hint: 'Escolha qual número SMS será usado no envio.',
+    options: [
+      { value: 'sms-5511999991234', label: '+55 11 99999-1234' },
+      { value: 'sms-5521999995678', label: '+55 21 99999-5678' },
+      { value: 'sms-5531999999012', label: '+55 31 99999-9012' },
+    ],
+  },
+};
+
+function getSelectedCampaignIntegrationValue() {
+  return document.querySelector('input[name="campaignIntegration"]:checked')?.value || 'telegram';
+}
+
+function syncCampaignIntegrationTarget() {
+  if (!campaignIntegrationTargetSelect) return;
+  const integration = getSelectedCampaignIntegrationValue();
+  const config = campaignIntegrationTargets[integration] || campaignIntegrationTargets.telegram;
+  campaignIntegrationTargetSelect.innerHTML = config.options
+    .map((option) => `<option value="${escapeHtmlWes(option.value)}">${escapeHtmlWes(option.label)}</option>`)
+    .join('');
+  if (campaignIntegrationTargetIcon) campaignIntegrationTargetIcon.textContent = config.icon;
+  if (campaignIntegrationTargetHint) campaignIntegrationTargetHint.textContent = config.hint;
+}
+
+function getSelectedCampaignIntegrationTargetLabel() {
+  const selectedOption = campaignIntegrationTargetSelect?.options[campaignIntegrationTargetSelect.selectedIndex];
+  return selectedOption?.textContent?.trim() || 'Não selecionado';
+}
+
+function getCampaignRecipientsCount() {
+  const recipients = String(campaignRecipientsInput?.value || '').trim();
+  if (!recipients) return 0;
+  return recipients.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).length;
+}
+
+function formatCampaignSchedule(value) {
+  if (!value) return 'Não agendado';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date);
+}
+
+function parseCampaignScheduleToInputValue(value) {
+  const normalized = String(value || '').trim();
+  if (!normalized || normalized === 'Não agendado') return '';
+  const match = normalized.match(/^(\d{2})\/(\d{2})\/(\d{4}),\s*(\d{2}):(\d{2})$/);
+  if (!match) return '';
+  const [, day, month, year, hour, minute] = match;
+  return `${year}-${month}-${day}T${hour}:${minute}`;
+}
+
+function ensureCampaignAgentOption(agentLabel) {
+  if (!campaignAgentSelect || !agentLabel || agentLabel === 'Não selecionado') return;
+  const existing = Array.from(campaignAgentSelect.options).find((option) => option.textContent?.trim() === agentLabel);
+  if (existing) return;
+  const option = document.createElement('option');
+  option.value = `custom-${agentLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+  option.textContent = agentLabel;
+  campaignAgentSelect.appendChild(option);
+}
+
+function setCampaignFormMode(mode = 'create') {
+  campaignFormMode = mode === 'edit' ? 'edit' : 'create';
+  if (campaignCreatePageTitle) campaignCreatePageTitle.textContent = campaignFormMode === 'edit' ? 'Editar campanha' : 'Nova campanha';
+  if (campaignCreatePageSubtitle) {
+    campaignCreatePageSubtitle.textContent = campaignFormMode === 'edit'
+      ? 'Revise os dados da campanha, ajuste os campos necessários e salve as alterações.'
+      : 'Configure uma campanha de mensagens no Telegram usando um agente de IA e um canal integrado.';
+  }
+  if (campaignCreateReviewBtn) campaignCreateReviewBtn.textContent = campaignFormMode === 'edit' ? 'Salvar alterações' : 'Criar';
+  if (campaignReviewConfirmBtn) campaignReviewConfirmBtn.textContent = campaignFormMode === 'edit' ? 'Salvar alterações' : 'Criar campanha';
+}
+
+function resetCampaignCreateForm() {
+  setCampaignFormMode('create');
+  activeCampaignEditId = '';
+  if (campaignNameInput) campaignNameInput.value = '';
+  if (campaignDescriptionInput) campaignDescriptionInput.value = '';
+  if (campaignAgentSelect) campaignAgentSelect.value = '';
+  if (campaignScheduleInput) campaignScheduleInput.value = '';
+  if (campaignScriptInput) campaignScriptInput.value = '';
+  if (campaignRecipientsInput) campaignRecipientsInput.value = '';
+  if (campaignCsvInput) campaignCsvInput.value = '';
+  if (campaignCsvHint) campaignCsvHint.textContent = 'Cole uma linha por destinatário ou importe um CSV com nome e contato.';
+  const telegramRadio = document.querySelector('input[name="campaignIntegration"][value="telegram"]');
+  if (telegramRadio) telegramRadio.checked = true;
+  syncCampaignIntegrationTarget();
+}
+
+function populateCampaignCreateForm(data = {}) {
+  resetCampaignCreateForm();
+  setCampaignFormMode('edit');
+  if (campaignNameInput) campaignNameInput.value = String(data.name || '').trim();
+  if (campaignDescriptionInput) campaignDescriptionInput.value = String(data.description || '').trim();
+  ensureCampaignAgentOption(String(data.agent || '').trim());
+  if (campaignAgentSelect) {
+    const option = Array.from(campaignAgentSelect.options).find((item) => item.textContent?.trim() === String(data.agent || '').trim());
+    if (option) campaignAgentSelect.value = option.value;
+  }
+  const integrationValue = String(data.integration || '').trim().toLowerCase();
+  const integrationRadio = document.querySelector(`input[name="campaignIntegration"][value="${integrationValue}"]`);
+  if (integrationRadio) integrationRadio.checked = true;
+  syncCampaignIntegrationTarget();
+  if (campaignIntegrationTargetSelect) {
+    const targetOption = Array.from(campaignIntegrationTargetSelect.options).find((item) => item.textContent?.trim() === String(data.integrationTarget || '').trim());
+    if (targetOption) campaignIntegrationTargetSelect.value = targetOption.value;
+  }
+  if (campaignScheduleInput) campaignScheduleInput.value = parseCampaignScheduleToInputValue(data.schedule);
+  if (campaignScriptInput) campaignScriptInput.value = String(data.script || '').trim();
+  if (campaignRecipientsInput) campaignRecipientsInput.value = String(data.recipients || '').trim();
+}
+
+function closeCampaignReviewModal() {
+  if (!campaignReviewModal) return;
+  campaignReviewModal.classList.remove('open');
+  campaignReviewModal.setAttribute('aria-hidden', 'true');
+}
+
+function closeCampaignDetailsModal() {
+  if (!campaignDetailsModal) return;
+  campaignDetailsModal.classList.remove('open');
+  campaignDetailsModal.setAttribute('aria-hidden', 'true');
+}
+
+function validateCampaignCreateForm() {
+  const requiredFields = [
+    campaignNameInput,
+    campaignAgentSelect,
+    campaignIntegrationTargetSelect,
+    campaignScriptInput,
+    campaignRecipientsInput,
+  ].filter(Boolean);
+
+  const invalidField = requiredFields.find((field) => typeof field.checkValidity === 'function' && !field.checkValidity());
+  if (invalidField) {
+    invalidField.reportValidity?.();
+    invalidField.focus?.();
+    return false;
+  }
+
+  return true;
+}
+
+function readCampaignCreateData() {
+  const selectedAgent = campaignAgentSelect?.options[campaignAgentSelect.selectedIndex];
+  return {
+    campaignId: activeCampaignEditId || '',
+    name: String(campaignNameInput?.value || '').trim() || 'Não informado',
+    description: String(campaignDescriptionInput?.value || '').trim() || 'Não informado',
+    agent: selectedAgent?.textContent?.trim() || 'Não selecionado',
+    integration: getSelectedCampaignIntegrationLabel(),
+    integrationTarget: getSelectedCampaignIntegrationTargetLabel(),
+    schedule: formatCampaignSchedule(String(campaignScheduleInput?.value || '').trim()),
+    script: String(campaignScriptInput?.value || '').trim() || 'Não informado',
+    recipients: String(campaignRecipientsInput?.value || '').trim() || 'Não informado',
+    recipientsCount: getCampaignRecipientsCount(),
+  };
+}
+
+function renderCampaignReview(data) {
+  if (!campaignReviewList) return;
+  const recipientsPreview = String(data.recipients || '').trim() || 'Não informado';
+  campaignReviewList.innerHTML = `
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Nome da campanha</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.name)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Descrição</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.description)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agente de IA</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.agent)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Integração</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.integration)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Bot ou número</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.integrationTarget)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agendamento</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.schedule)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Destinatários</span><span class="hybrid-flow-review-value">${escapeHtmlWes(String(data.recipientsCount))}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Lista de destinatários</span><span class="hybrid-flow-review-value">${escapeHtmlWes(recipientsPreview)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Roteiro</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.script)}</span></div>
+  `;
+}
+
+function renderCampaignDetails(data) {
+  if (!campaignDetailsList) return;
+  const statusMeta = getCampaignStatusMeta(data);
+  const recipientsPreview = String(data.recipients || '').trim() || 'Não informado';
+  const scriptPreview = String(data.script || '').trim() || 'Não informado';
+  campaignDetailsList.innerHTML = `
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Nome da campanha</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.name)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agendar envio</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.schedule)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Descrição</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.description)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Agente de IA</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.agent)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Integração</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.integration)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Bot ou número da integração</span><span class="hybrid-flow-review-value">${escapeHtmlWes(data.integrationTarget)}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Lista de destinatários</span><span class="hybrid-flow-review-value hybrid-flow-review-value--rich"><span class="campaign-details-content-block">${escapeHtmlWes(recipientsPreview)}</span></span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Quantidade de destinatários</span><span class="hybrid-flow-review-value">${escapeHtmlWes(String(data.recipientsCount))}</span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Roteiro</span><span class="hybrid-flow-review-value hybrid-flow-review-value--rich"><span class="campaign-details-content-block campaign-details-content-block--script">${escapeHtmlWes(scriptPreview)}</span></span></div>
+    <div class="hybrid-flow-review-item"><span class="hybrid-flow-review-label">Status atual</span><span class="hybrid-flow-review-value">${escapeHtmlWes(statusMeta.label)}</span></div>
+  `;
+}
+
+const INITIAL_CAMPAIGNS = [
+  {
+    name: 'Boas-vindas onboarding',
+    description: 'Sequência inicial para novos contatos que ainda não receberam a primeira abordagem.',
+    status: 'Rascunho',
+    statusValue: 'draft',
+    agent: 'WES AI Voice Agent',
+    integration: 'Telegram',
+    integrationTarget: 'wes_hub_bot',
+    schedule: 'Não agendado',
+    script: 'Olá {{nome}}, seja bem-vindo(a) à WES Hub360. Responda esta mensagem para iniciarmos seu onboarding.',
+    recipients: 'Maria Silva, @maria_silva\nJoão Souza, @joao_souza',
+    recipientsCount: 32,
+  },
+  {
+    name: 'Reativacao de leads frios',
+    description: 'Disparo segmentado para leads sem interação nos últimos 30 dias.',
+    status: 'Agendada',
+    statusValue: 'scheduled',
+    agent: 'WES AI Voice Agent',
+    integration: 'Telegram',
+    integrationTarget: 'wes_hub_bot',
+    schedule: '24/06/2026, 09:30',
+    script: 'Olá {{nome}}, notamos que sua conversa ficou em aberto. Posso te ajudar a retomar o atendimento agora?',
+    recipients: 'Camila Rocha, @camila_rocha\nBruno Lima, @bruno_lima',
+    recipientsCount: 184,
+  },
+  {
+    name: 'Lembrete de renovacao premium',
+    description: 'Campanha focada em clientes com plano próximo do vencimento.',
+    status: 'Em execução',
+    statusValue: 'running',
+    agent: 'Agente Comercial BR',
+    integration: 'WhatsApp',
+    integrationTarget: 'Comercial WhatsApp Bot',
+    schedule: '19/06/2026, 10:00',
+    script: 'Olá {{nome}}, seu plano premium está perto do vencimento. Posso te apresentar as condições de renovação?',
+    recipients: 'Patricia Melo, +55 11 98888-4567\nCarlos Nunes, +55 21 97777-1122',
+    recipientsCount: 57,
+  },
+  {
+    name: 'Follow-up comercial Q2',
+    description: 'Fluxo pausado temporariamente para revisão da copy comercial e da segmentação.',
+    status: 'Pausada',
+    statusValue: 'paused',
+    agent: 'Agente Comercial BR',
+    integration: 'WhatsApp',
+    integrationTarget: 'Atendimento WhatsApp Bot',
+    schedule: '18/06/2026, 15:00',
+    script: 'Olá {{nome}}, temos uma condição especial válida até o fim da semana para sua empresa.',
+    recipients: 'Fernanda Costa, +55 31 96666-7788\nRafael Dias, +55 41 95555-3344',
+    recipientsCount: 91,
+  },
+  {
+    name: 'Renovacao anual enterprise',
+    description: 'Campanha concluída com clientes enterprise que tinham vencimento neste mês.',
+    status: 'Concluída',
+    statusValue: 'completed',
+    agent: 'Agente CS Premium',
+    integration: 'SMS',
+    integrationTarget: '+55 11 99999-1234',
+    schedule: '17/06/2026, 11:00',
+    script: 'Olá {{nome}}, sua renovação anual foi processada. Caso precise, nossa equipe está disponível para suporte.',
+    recipients: 'Empresa Atlas, +55 11 94444-2211\nGrupo Prisma, +55 21 93333-8899',
+    recipientsCount: 43,
+  },
+  {
+    name: 'Alerta de instabilidade crítica',
+    description: 'Tentativa encerrada após falha na entrega para a base de contatos prioritária.',
+    status: 'Falhou',
+    statusValue: 'failed',
+    agent: 'Agente Operacoes 24x7',
+    integration: 'Telegram',
+    integrationTarget: 'operacoes_bot',
+    schedule: '19/06/2026, 08:15',
+    script: 'Alerta: identificamos instabilidade crítica no ambiente monitorado. Confirme o recebimento desta mensagem.',
+    recipients: 'Time SRE, @sre_plantao\nGestao Infra, @infra_gestao',
+    recipientsCount: 18,
+  },
+];
+
+function getActiveCampaignStatusFilter() {
+  const active = campaignsFilterMenu?.querySelector('.filter-option[data-filter="status"].active');
+  return String(active?.dataset.value || '').trim();
+}
+
+function getCampaignStatusMeta(data = {}) {
+  const explicitValue = String(data.statusValue || '').trim();
+  if (explicitValue && CAMPAIGN_STATUS_META[explicitValue]) {
+    return { value: explicitValue, ...CAMPAIGN_STATUS_META[explicitValue] };
+  }
+
+  const normalizedStatus = String(data.status || '').trim().toLowerCase();
+  const matchByLabel = Object.entries(CAMPAIGN_STATUS_META)
+    .find(([, meta]) => meta.label.toLowerCase() === normalizedStatus);
+  if (matchByLabel) {
+    const [value, meta] = matchByLabel;
+    return { value, ...meta };
+  }
+
+  const scheduleLabel = String(data.schedule || '').trim();
+  const fallbackValue = scheduleLabel && scheduleLabel !== 'Não agendado' ? 'scheduled' : 'draft';
+  return { value: fallbackValue, ...CAMPAIGN_STATUS_META[fallbackValue] };
+}
+
+function updateCampaignFilterButtonLabel() {
+  if (!campaignsFilterBtnLabel) return;
+  const active = campaignsFilterMenu?.querySelector('.filter-option[data-filter="status"].active');
+  const label = active?.textContent?.trim() || 'Todos';
+  campaignsFilterBtnLabel.textContent = `Status: ${label}`;
+}
+
+function applyCampaignFilters() {
+  if (!campaignsTable) return;
+  const searchTerm = String(campaignsSearchInput?.value || '').trim().toLowerCase();
+  const selectedStatus = getActiveCampaignStatusFilter();
+  const rows = campaignsTable.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])');
+
+  rows.forEach((row) => {
+    const rowStatus = String(row.dataset.campaignStatus || '').trim();
+    const searchable = String(row.dataset.campaignSearch || '').trim().toLowerCase();
+    const matchesStatus = !selectedStatus || rowStatus === selectedStatus;
+    const matchesSearch = !searchTerm || searchable.includes(searchTerm);
+    row.hidden = !(matchesStatus && matchesSearch);
+  });
+
+  scheduleTableEmptyStateSync(campaignsTable);
+}
+
+function createCampaignRowElement(data) {
+  const campaignData = {
+    ...data,
+    campaignId: String(data.campaignId || '').trim() || generateCampaignId(),
+  };
+  const statusMeta = getCampaignStatusMeta(campaignData);
+  const isEditable = CAMPAIGN_EDITABLE_STATUSES.has(statusMeta.value);
+  const executionAction = getCampaignExecutionAction(statusMeta.value);
+  const row = document.createElement('div');
+  row.className = 'data-row';
+  row.dataset.campaignCreated = 'true';
+  row.dataset.campaignId = campaignData.campaignId;
+  row.dataset.campaignStatus = statusMeta.value;
+  row.dataset.campaignPayload = JSON.stringify({
+    ...campaignData,
+    schedule: String(campaignData.schedule || '').trim() || 'Não agendado',
+    recipients: String(campaignData.recipients || '').trim() || 'Não informado',
+    script: String(campaignData.script || '').trim() || 'Não informado',
+    statusValue: statusMeta.value,
+    status: statusMeta.label,
+  });
+  row.dataset.campaignSearch = [
+    campaignData.name,
+    campaignData.description,
+    campaignData.agent,
+    campaignData.integration,
+    campaignData.integrationTarget,
+    statusMeta.label,
+  ].filter(Boolean).join(' ');
+  row.innerHTML = `
+    <span><strong>${escapeHtmlWes(campaignData.name)}</strong><small>${escapeHtmlWes(campaignData.description === 'Não informado' ? '\u00a0' : campaignData.description)}</small></span>
+    <span>${escapeHtmlWes(campaignData.agent)}</span>
+    <span><strong>${escapeHtmlWes(campaignData.integration)}</strong><small>${escapeHtmlWes(campaignData.integrationTarget)}</small></span>
+    <span>${escapeHtmlWes(String(campaignData.recipientsCount))}</span>
+    <span><span class="chip ${escapeHtmlWes(statusMeta.chipClass)}">${escapeHtmlWes(statusMeta.label)}</span></span>
+    <span class="row-actions hybrid-flows-row-actions">
+      <button class="icon-btn action-icon${executionAction.enabled ? '' : ' muted-icon'}" type="button" aria-label="${escapeHtmlWes(executionAction.label)}"${executionAction.enabled ? '' : ' disabled'}>
+        <span class="material-symbols-rounded">${escapeHtmlWes(executionAction.icon)}</span>
+      </button>
+      <button class="icon-btn action-icon${isEditable ? '' : ' muted-icon'}" type="button" aria-label="Editar campanha"${isEditable ? '' : ' disabled'}>
+        <span class="material-symbols-rounded">edit</span>
+      </button>
+      <button class="icon-btn action-icon danger" type="button" aria-label="Excluir">
+        <span class="material-symbols-rounded">delete</span>
+      </button>
+      <button class="icon-btn action-icon campaign-details-trigger" type="button" aria-label="Ver detalhes">
+        <span class="material-symbols-rounded">more_vert</span>
+      </button>
+    </span>
+  `;
+  return row;
+}
+
+function appendCampaignRow(data) {
+  if (!campaignsTable) return;
+  const row = createCampaignRowElement(data);
+  const emptyRow = campaignsTable.querySelector('[data-table-empty-state="true"]');
+  if (emptyRow) {
+    emptyRow.insertAdjacentElement('beforebegin', row);
+  } else {
+    campaignsTable.append(row);
+  }
+}
+
+function replaceCampaignRow(row, data) {
+  if (!row) return;
+  const nextRow = createCampaignRowElement(data);
+  row.replaceWith(nextRow);
+}
+
+function replaceCampaignRowById(campaignId, data) {
+  if (!campaignId || !campaignsTable) return;
+  const row = campaignsTable.querySelector(`.data-row[data-campaign-id="${campaignId}"]`);
+  if (!row) return;
+  replaceCampaignRow(row, data);
+}
+
+function seedInitialCampaignRows() {
+  if (!campaignsTable) return;
+  const existingRows = campaignsTable.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])');
+  if (existingRows.length > 0) return;
+  INITIAL_CAMPAIGNS.forEach((campaign) => appendCampaignRow(campaign));
+  applyCampaignFilters();
+}
+
+seedInitialCampaignRows();
+updateCampaignFilterButtonLabel();
+
+campaignsSearchInput?.addEventListener('input', applyCampaignFilters);
+
+campaignsCreateBackBtn?.addEventListener('click', () => {
+  resetCampaignCreateForm();
+  window.location.hash = '#/dashboard/campaigns';
+});
+
+campaignsCreateCancelBtn?.addEventListener('click', () => {
+  resetCampaignCreateForm();
+  window.location.hash = '#/dashboard/campaigns';
+});
+
+campaignIntegrationRadios.forEach((radio) => {
+  radio.addEventListener('change', syncCampaignIntegrationTarget);
+});
+syncCampaignIntegrationTarget();
+
+campaignOptimizeScriptBtn?.addEventListener('click', () => {
+  const currentScript = String(campaignScriptInput?.value || '').trim();
+  if (campaignScriptInput) {
+    campaignScriptInput.value = currentScript
+      ? `${currentScript}\n\nPara confirmar o interesse, responda esta mensagem e nossa equipe dará continuidade ao atendimento.`
+      : 'Olá {{nome}}, tudo bem? Aqui é a WES Hub360. Temos uma atualização importante sobre seu atendimento. Para continuar, responda esta mensagem e nossa equipe dará continuidade.';
+    campaignScriptInput.focus();
+  }
+});
+
+campaignImportCsvBtn?.addEventListener('click', () => {
+  campaignCsvInput?.click();
+});
+
+campaignCsvInput?.addEventListener('change', () => {
+  const file = campaignCsvInput.files?.[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.addEventListener('load', () => {
+    const content = String(reader.result || '').trim();
+    if (campaignRecipientsInput && content) campaignRecipientsInput.value = content;
+    if (campaignCsvHint) campaignCsvHint.textContent = `CSV importado: ${file.name}`;
+  });
+  reader.readAsText(file);
+});
+
+campaignCreateReviewBtn?.addEventListener('click', () => {
+  if (!validateCampaignCreateForm() || !campaignReviewModal) return;
+  const data = readCampaignCreateData();
+  campaignReviewModal.dataset.campaignReviewPayload = JSON.stringify(data);
+  renderCampaignReview(data);
+  const reviewTitle = document.getElementById('campaignReviewTitle');
+  const reviewSubtitle = campaignReviewModal.querySelector('.voice-messaging-review-subtitle');
+  if (reviewTitle) reviewTitle.textContent = campaignFormMode === 'edit' ? 'Revisar alterações da campanha' : 'Revisar campanha';
+  if (reviewSubtitle) {
+    reviewSubtitle.textContent = campaignFormMode === 'edit'
+      ? 'Confira os dados antes de salvar as alterações da campanha.'
+      : 'Confira os dados antes de criar a campanha.';
+  }
+  campaignReviewModal.classList.add('open');
+  campaignReviewModal.setAttribute('aria-hidden', 'false');
+});
+
+campaignReviewModal?.addEventListener('click', (event) => {
+  if (event.target.closest('[data-campaign-review-close]')) closeCampaignReviewModal();
+});
+
+campaignDetailsModal?.addEventListener('click', (event) => {
+  if (event.target.closest('[data-campaign-details-close]')) closeCampaignDetailsModal();
+});
+
+campaignsTable?.addEventListener('click', (event) => {
+  const editButton = event.target.closest('.action-icon[aria-label="Editar campanha"]');
+  if (editButton) {
+    if (editButton.disabled || editButton.getAttribute('disabled') !== null || editButton.classList.contains('muted-icon')) return;
+    const row = editButton.closest('.data-row');
+    if (!row || row.classList.contains('header')) return;
+    let data = null;
+    try {
+      data = JSON.parse(row.dataset.campaignPayload || 'null');
+    } catch {
+      data = null;
+    }
+    if (!data) return;
+    populateCampaignCreateForm(data);
+    activeCampaignEditId = row.dataset.campaignId || data.campaignId || '';
+    window.location.hash = '#/dashboard/campaigns/new';
+    return;
+  }
+
+  const detailsButton = event.target.closest('.campaign-details-trigger[aria-label="Ver detalhes"]');
+  if (!detailsButton) return;
+  const row = detailsButton.closest('.data-row');
+  if (!row || row.classList.contains('header') || !campaignDetailsModal) return;
+
+  let data = null;
+  try {
+    data = JSON.parse(row.dataset.campaignPayload || 'null');
+  } catch {
+    data = null;
+  }
+  if (!data) return;
+
+  renderCampaignDetails(data);
+  campaignDetailsModal.classList.add('open');
+  campaignDetailsModal.setAttribute('aria-hidden', 'false');
+});
+
+campaignReviewConfirmBtn?.addEventListener('click', () => {
+  const isEditMode = campaignFormMode === 'edit';
+  const editCampaignId = activeCampaignEditId;
+  let data = null;
+  try {
+    data = JSON.parse(campaignReviewModal?.dataset.campaignReviewPayload || 'null');
+  } catch {
+    data = null;
+  }
+  if (!data) return;
+  if (isEditMode && editCampaignId) {
+    replaceCampaignRowById(editCampaignId, data);
+  } else {
+    appendCampaignRow(data);
+  }
+  applyCampaignFilters();
+  closeCampaignReviewModal();
+  resetCampaignCreateForm();
+  window.location.hash = '#/dashboard/campaigns';
+  showAppToast(isEditMode ? 'Campanha atualizada' : 'Campanha criada');
 });
 
 openVoiceMessagingInsightsPage?.addEventListener('click', () => {
@@ -4035,6 +4908,14 @@ bindStaticTableDeleteConfirmation(document.querySelector('#page-channels .channe
     return `o canal "${name}"`;
   },
   getSuccessMessage: () => 'Canal excluído',
+});
+
+bindStaticTableDeleteConfirmation(document.querySelector('#page-campaigns .campaigns-data-table'), {
+  getTargetLabel: (row) => {
+    const name = row.querySelector('span:first-child strong')?.textContent?.trim() || 'esta campanha';
+    return `a campanha "${name}"`;
+  },
+  getSuccessMessage: () => 'Campanha excluída',
 });
 
 bindStaticTableDeleteConfirmation(document.querySelector('#page-credentials .credentials-table'), {
@@ -6000,6 +6881,10 @@ if (hybridFlowCreatePage) {
     if (!hybridFlowDiscardModal) return;
     hybridFlowDiscardModal.classList.add('open');
     hybridFlowDiscardModal.setAttribute('aria-hidden', 'false');
+  });
+
+  hybridFlowCreateBackBtn?.addEventListener('click', () => {
+    window.location.hash = '#/dashboard/hybrid-flows';
   });
 
   hybridFlowDiscardModal?.addEventListener('click', (event) => {
@@ -10972,6 +11857,7 @@ const routeMap = {
   'dashboard/voice-messaging/insights': 'page-voice-messaging-insights',
   'dashboard/voice-messaging/new': 'page-voice-messaging-create',
   'dashboard/campaigns': 'page-campaigns',
+  'dashboard/campaigns/new': 'page-campaigns-create',
   'dashboard/hybrid-flows': 'page-hybrid-flows',
   'dashboard/hybrid-flows/new': 'page-hybrid-flows-create',
   'dashboard/hybrid-flows/history': 'page-hybrid-flows-history',
@@ -11006,6 +11892,7 @@ const sectionMap = {
   'dashboard/voice-messaging/insights': 'Atendimento dinâmico',
   'dashboard/voice-messaging/new': 'Atendimento dinâmico',
   'dashboard/campaigns': 'Atendimento dinâmico',
+  'dashboard/campaigns/new': 'Atendimento dinâmico',
   'dashboard/hybrid-flows': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/new': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history': 'Atendimento dinâmico',
@@ -11177,6 +12064,8 @@ const updateActivePage = () => {
     ? 'dashboard/agents'
     : routeKey.startsWith('dashboard/voice-messaging/')
       ? 'dashboard/voice-messaging'
+    : routeKey.startsWith('dashboard/campaigns/')
+      ? 'dashboard/campaigns'
     : routeKey.startsWith('dashboard/channels/')
       ? 'dashboard/channels'
       : routeKey;

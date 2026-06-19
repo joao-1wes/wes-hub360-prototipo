@@ -3389,28 +3389,232 @@
 
           <div class="page" id="page-campaigns" data-title="Campanhas">
             <div class="section">
-              <div class="page-header">
+              <div class="page-header campaigns-page-header">
                 <div>
                   <h2>Campanhas</h2>
-                  <p class="page-subtitle">Centralize criação, acompanhamento e performance das campanhas dentro da área de Automação.</p>
+                  <p class="page-subtitle">Crie e gerencie campanhas de mensagens no Telegram usando um agente de IA e um canal já integrado.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary campaigns-create-btn" type="button">
+                    <span class="btn-label">Nova campanha</span>
+                  </button>
                 </div>
               </div>
-              <div class="info-banner">
-                Estrutura inicial criada para manter consistência com o restante do painel. O conteúdo detalhado pode ser adicionado depois.
+
+              <div class="filters-grid">
+                <div class="form-field campaigns-search-field-wrap">
+                  <div class="search-field campaigns-search-field">
+                    <span class="material-symbols-rounded">search</span>
+                    <input id="campaignsSearchInput" type="search" placeholder="Filtre por nome, agente ou integração..." aria-label="Buscar campanhas por nome, agente ou integração" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="campaignsFilterBtn" type="button">
+                    <span class="material-symbols-rounded">filter_list</span><span id="campaignsFilterBtnLabel">Status: Todos</span>
+                  </button>
+                  <div class="menu" id="campaignsFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group">
+                      <span>Status</span>
+                      <button class="filter-option active" data-filter="status" data-value="">Todos</button>
+                      <button class="filter-option" data-filter="status" data-value="draft">Rascunho</button>
+                      <button class="filter-option" data-filter="status" data-value="scheduled">Agendada</button>
+                      <button class="filter-option" data-filter="status" data-value="running">Em execução</button>
+                      <button class="filter-option" data-filter="status" data-value="paused">Pausada</button>
+                      <button class="filter-option" data-filter="status" data-value="completed">Concluída</button>
+                      <button class="filter-option" data-filter="status" data-value="failed">Falhou</button>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="panel-row">
-                <div class="panel panel-wide">
-                  <div class="panel-header">
-                    <h3>Painel principal</h3>
-                  </div>
-                  <div class="panel-empty">Espaço reservado para lista de campanhas, filtros, status e ações da página.</div>
+
+              <div
+                class="data-table campaigns-data-table"
+                aria-label="Lista de campanhas"
+                data-empty-icon="campaign"
+                data-empty-title="Nenhuma campanha criada"
+                data-empty-description="Crie a primeira campanha para preparar comunicação em escala pelo Telegram."
+                data-empty-action-label="Nova campanha"
+                data-empty-action-target="#page-campaigns .page-header .campaigns-create-btn"
+              >
+                <div class="data-row header">
+                  <span>Nome</span>
+                  <span>Agente</span>
+                  <span>Canal</span>
+                  <span>Destinatários</span>
+                  <span>Status</span>
+                  <span>Ações</span>
                 </div>
-                <div class="panel panel-mid">
-                  <div class="panel-header">
-                    <h3>Resumo</h3>
-                  </div>
-                  <div class="panel-empty">Área pronta para métricas, cards laterais ou fluxos complementares.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-campaigns-create" data-title="Nova campanha">
+            <div class="section voice-messaging-create-page campaigns-create-page">
+              <div class="telegram-page-topbar">
+                <button class="hybrid-history-top-link" id="campaignsCreateBackBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  Voltar para Campanhas
+                </button>
+              </div>
+              <div class="page-header voice-messaging-create-head">
+                <div class="voice-messaging-create-title-wrap">
+                  <h2 id="campaignCreatePageTitle">Nova campanha</h2>
+                  <p class="page-subtitle" id="campaignCreatePageSubtitle">Configure uma campanha de mensagens no Telegram usando um agente de IA e um canal integrado.</p>
                 </div>
+              </div>
+
+              <div class="voice-messaging-create-card campaigns-create-card">
+                <div class="campaigns-create-grid">
+                  <div class="form-field">
+                    <label class="modal-label modal-label--required" for="campaignNameInput">Nome da campanha</label>
+                    <input class="modal-input" id="campaignNameInput" type="text" placeholder="Digite o nome da campanha" required />
+                    <p class="page-subtitle">Use um nome claro para reconhecer esta campanha na listagem.</p>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="modal-label" for="campaignScheduleInput">Agendar envio <span class="modal-optional-label">(opcional)</span></label>
+                    <input class="modal-input" id="campaignScheduleInput" type="datetime-local" />
+                    <p class="page-subtitle">Deixe vazio para criar sem agendamento definido.</p>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="modal-label" for="campaignDescriptionInput">Descrição</label>
+                  <textarea class="modal-textarea" id="campaignDescriptionInput" rows="4" placeholder="Descreva o objetivo da campanha"></textarea>
+                </div>
+
+                <div class="campaigns-create-grid">
+                  <div class="form-field">
+                    <label class="modal-label modal-label--required" for="campaignAgentSelect">Agente de IA</label>
+                    <div class="hub-select-wrap hub-select-wrap--block">
+                      <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">smart_toy</span>
+                      <select class="hub-select" id="campaignAgentSelect" aria-label="Selecionar agente de IA" required>
+                        <option value="" selected>Selecione um agente</option>
+                        <option value="atlas-core">Atlas Core</option>
+                        <option value="nimbus-ops">Nimbus Ops</option>
+                        <option value="pulse-finance">Pulse Finance</option>
+                        <option value="wes-ai-agent">WES AI Agent</option>
+                      </select>
+                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                    </div>
+                  </div>
+
+                  <div class="form-field">
+                    <label class="modal-label modal-label--required">Integração</label>
+                    <div class="voice-messaging-provider-tabs campaigns-integration-tabs" role="radiogroup" aria-label="Selecionar integração da campanha">
+                      <label class="voice-messaging-provider-option">
+                        <input class="campaign-integration-radio" type="radio" name="campaignIntegration" value="telegram" checked />
+                        <span class="voice-messaging-provider-tab">Telegram</span>
+                      </label>
+                      <label class="voice-messaging-provider-option">
+                        <input class="campaign-integration-radio" type="radio" name="campaignIntegration" value="whatsapp" />
+                        <span class="voice-messaging-provider-tab">WhatsApp</span>
+                      </label>
+                      <label class="voice-messaging-provider-option">
+                        <input class="campaign-integration-radio" type="radio" name="campaignIntegration" value="sms" />
+                        <span class="voice-messaging-provider-tab">SMS</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-field">
+                  <label class="modal-label modal-label--required" for="campaignIntegrationTargetSelect">Bot ou número da integração</label>
+                  <div class="hub-select-wrap hub-select-wrap--block">
+                    <span class="material-symbols-rounded hub-select-icon" id="campaignIntegrationTargetIcon" aria-hidden="true">smart_toy</span>
+                    <select class="hub-select" id="campaignIntegrationTargetSelect" aria-label="Selecionar bot ou número da integração" required></select>
+                    <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                  </div>
+                  <p class="page-subtitle" id="campaignIntegrationTargetHint">Escolha qual bot do Telegram será usado no envio.</p>
+                </div>
+
+                <div class="form-field">
+                  <div class="modal-label-row voice-messaging-message-header">
+                    <label class="modal-label modal-label--required" for="campaignScriptInput">Roteiro</label>
+                    <button class="auth-link voice-messaging-inline-link" id="campaignOptimizeScriptBtn" type="button">Otimizar roteiro com IA</button>
+                  </div>
+                  <div class="voice-messaging-message-hint-row">
+                    <div class="modal-field-hint voice-messaging-message-hint">
+                      <span>Use variáveis entre chaves duplas, como <code>{{nome}}</code>, <code>{{empresa}}</code> ou <code>{{protocolo}}</code>, para personalizar cada envio.</span>
+                      <details class="voice-messaging-hint-popover">
+                        <summary aria-label="Ver exemplos de variáveis">
+                          <span class="material-symbols-rounded" aria-hidden="true">info</span>
+                        </summary>
+                        <div class="voice-messaging-hint-popover-card">
+                          <strong>Exemplos de variáveis</strong>
+                          <ul>
+                            <li><code>{{nome}}</code> para o nome do destinatário</li>
+                            <li><code>{{empresa}}</code> para a empresa vinculada</li>
+                            <li><code>{{protocolo}}</code> para um protocolo ou identificador</li>
+                            <li><code>{{vencimento}}</code> para datas e prazos</li>
+                          </ul>
+                        </div>
+                      </details>
+                    </div>
+                  </div>
+                  <textarea class="modal-textarea voice-messaging-message-input" id="campaignScriptInput" rows="7" placeholder="Ex.: Olá {{nome}}, tudo bem? Temos uma atualização importante sobre seu atendimento." required></textarea>
+                </div>
+
+                <div class="form-field">
+                  <div class="modal-label-row voice-messaging-message-header">
+                    <label class="modal-label modal-label--required" for="campaignRecipientsInput">Lista de destinatários</label>
+                    <button class="auth-link voice-messaging-inline-link" id="campaignImportCsvBtn" type="button">Importar CSV</button>
+                  </div>
+                  <p class="modal-field-hint" id="campaignCsvHint">Cole uma linha por destinatário ou importe um CSV com nome e contato.</p>
+                  <textarea class="modal-textarea voice-messaging-message-input voice-messaging-recipients-input" id="campaignRecipientsInput" rows="7" placeholder="Ex.:\nMaria Silva, @maria_silva\nJoão Souza, +55 11 98888-4567" required></textarea>
+                  <input id="campaignCsvInput" type="file" accept=".csv,text/csv" hidden />
+                </div>
+
+                <div class="voice-messaging-create-actions">
+                  <button class="btn outline" id="campaignsCreateCancelBtn" type="button">Cancelar</button>
+                  <button class="btn primary" id="campaignCreateReviewBtn" type="button">Criar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="campaignReviewModal" aria-hidden="true">
+            <div class="modal-backdrop" data-campaign-review-close></div>
+            <div class="modal-dialog voice-messaging-review-dialog" role="dialog" aria-modal="true" aria-labelledby="campaignReviewTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="campaignReviewTitle">Revisar campanha</h3>
+                  <p class="voice-messaging-review-subtitle">Confira os dados antes de criar a campanha.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-campaign-review-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="hybrid-flow-review-list" id="campaignReviewList"></div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-campaign-review-close>Cancelar</button>
+                <button class="btn primary" type="button" id="campaignReviewConfirmBtn">Criar campanha</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="campaignDetailsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-campaign-details-close></div>
+            <div class="modal-dialog voice-messaging-review-dialog campaign-details-dialog" role="dialog" aria-modal="true" aria-labelledby="campaignDetailsTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="campaignDetailsTitle">Detalhes da campanha</h3>
+                  <p class="voice-messaging-review-subtitle">Visualize os dados configurados para esta campanha.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-campaign-details-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="hybrid-flow-review-list" id="campaignDetailsList"></div>
+              </div>
+              <div class="modal-footer">
+                <button class="btn primary" type="button" data-campaign-details-close>Fechar</button>
               </div>
             </div>
           </div>
@@ -3549,13 +3753,21 @@
           </div>
 
           <div class="page" id="page-hybrid-flows-create" data-title="Novo fluxo híbrido">
-            <div class="section">
-              <div class="page-header">
-                <div>
+            <div class="section voice-messaging-create-page hybrid-flow-create-page">
+              <div class="telegram-page-topbar">
+                <button class="hybrid-history-top-link" id="hybridFlowCreateBackBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  Voltar para Fluxos híbridos
+                </button>
+              </div>
+              <div class="page-header voice-messaging-create-head">
+                <div class="voice-messaging-create-title-wrap">
                   <h2>Novo fluxo híbrido</h2>
+                  <p class="page-subtitle">Configure um atendimento que combina coleta por voz e confirmação no Telegram.</p>
                 </div>
               </div>
 
+              <div class="voice-messaging-create-card hybrid-flow-create-card">
               <div class="hybrid-flow-initial-section">
                 <h3>Dados iniciais</h3>
                 <div class="hybrid-flow-basic-grid">
@@ -3637,9 +3849,10 @@
                 </div>
               </div>
 
-              <div class="hybrid-flow-create-actions">
+              <div class="voice-messaging-create-actions hybrid-flow-create-actions">
                 <button class="btn outline" id="hybridFlowCancelBtn" type="button">Cancelar</button>
-                <button class="btn primary" id="hybridFlowNextBtn" type="button">Continuar</button>
+                <button class="btn primary" id="hybridFlowNextBtn" type="button">Criar</button>
+              </div>
               </div>
 
             </div>
@@ -4214,54 +4427,51 @@
               <div class="data-table channels-table">
                 <div class="data-row header">
                   <span>Canal</span>
+                  <span>Tipo</span>
                   <span>Nome</span>
                   <span>Identificador</span>
                   <span>Status</span>
-                  <span>Uso principal</span>
+                  <span>Descrição</span>
                   <span>Ações</span>
                 </div>
                 <div class="data-row">
                   <span class="channel-cell">
-                    <span class="channel-icon">
-                      <span class="material-symbols-rounded">send</span>
-                    </span>
-                    <span>
-                      <strong>Telegram</strong>
-                      <span class="muted">Mensageria oficial</span>
+                    <span class="channel-tooltip-stack">
+                      <strong class="channel-tooltip-target">Telegram</strong>
+                      <span class="muted channel-tooltip-target">Mensageria oficial</span>
                     </span>
                   </span>
-                  <span>Conexão padrão</span>
-                  <span class="channel-code">@wes_hub_bot</span>
-                  <span class="chip success">Ativa</span>
-                  <span class="muted">Lembretes, confirmações e retomada pós-voz</span>
+                  <span class="channel-tooltip-target">Telegram</span>
+                  <span class="channel-tooltip-target">Conexão padrão</span>
+                  <span class="channel-code channel-tooltip-target">@wes_hub_bot</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span class="muted channel-tooltip-target">Lembretes, confirmações e retomada pós-voz</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar canal">
+                    <button class="icon-btn action-icon" aria-label="Editar canal" type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir canal">
+                    <button class="icon-btn action-icon danger" aria-label="Excluir canal" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
                   </span>
                 </div>
                 <div class="data-row">
                   <span class="channel-cell">
-                    <span class="channel-icon">
-                      <span class="material-symbols-rounded">call</span>
-                    </span>
-                    <span>
-                      <strong>Voz externa</strong>
-                      <span class="muted">Fluxo híbrido</span>
+                    <span class="channel-tooltip-stack">
+                      <strong class="channel-tooltip-target">Atendimento comercial</strong>
+                      <span class="muted channel-tooltip-target">Canal prioritário</span>
                     </span>
                   </span>
-                  <span>URA inicial</span>
-                  <span class="channel-code">voice://entrada-principal</span>
-                  <span class="chip success">Ativa</span>
-                  <span class="muted">Triagem inicial antes da continuidade no chat</span>
+                  <span class="channel-tooltip-target">WhatsApp</span>
+                  <span class="channel-tooltip-target">Conta oficial</span>
+                  <span class="channel-code channel-tooltip-target">+55 11 99999-1234</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span class="muted channel-tooltip-target">Triagem inicial antes da continuidade no chat</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar canal">
+                    <button class="icon-btn action-icon" aria-label="Editar canal" type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
-                    <button class="icon-btn action-icon danger" aria-label="Excluir canal">
+                    <button class="icon-btn action-icon danger" aria-label="Excluir canal" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
                   </span>

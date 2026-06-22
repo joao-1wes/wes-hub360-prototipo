@@ -110,6 +110,38 @@ const manageRolesSubmit = document.getElementById('manageRolesSubmit');
 const openCreateUserModal = document.getElementById('openCreateUserModal');
 const usersTable = document.querySelector('#page-users .users-table');
 const companiesTable = document.querySelector('#page-companies .companies-table');
+const historyTabs = document.querySelectorAll('#page-agent-history .tab');
+const historyPanels = document.querySelectorAll('#page-agent-history .tab-panel');
+const historyAuditPanel = document.getElementById('historyAuditPanel');
+const auditLegacyPage = document.getElementById('page-audit');
+const agentHistoryPage = document.getElementById('page-agent-history');
+const agentHistorySearchInput = document.getElementById('agentHistorySearchInput');
+const agentHistoryClientViewToggle = document.getElementById('agentHistoryClientViewToggle');
+const agentHistoryViewToggleTitle = document.getElementById('agentHistoryViewToggleTitle');
+const agentHistoryViewToggleLabel = document.getElementById('agentHistoryViewToggleLabel');
+const agentHistoryMetricsFilterField = document.getElementById('agentHistoryMetricsFilterField');
+const agentHistoryFilterBtn = document.getElementById('agentHistoryFilterBtn');
+const agentHistoryFilterBtnLabel = document.getElementById('agentHistoryFilterBtnLabel');
+const agentHistoryFilterMenu = document.getElementById('agentHistoryFilterMenu');
+const agentHistoryPeriodBtn = document.getElementById('agentHistoryPeriodBtn');
+const agentHistoryPeriodMenu = document.getElementById('agentHistoryPeriodMenu');
+const agentHistoryPeriodOptions = Array.from(document.querySelectorAll('#agentHistoryPeriodMenu .audit-period-option'));
+const agentHistoryRangeFields = Array.from(document.querySelectorAll('#agentHistoryPeriodMenu .audit-range-only'));
+const agentHistorySingleField = document.querySelector('#agentHistoryPeriodMenu .audit-single-only');
+const agentHistoryStartDateInput = document.getElementById('agentHistoryStartDate');
+const agentHistoryEndDateInput = document.getElementById('agentHistoryEndDate');
+const agentHistorySingleDateInput = document.getElementById('agentHistorySingleDate');
+const agentHistoryApplyPeriodBtn = document.getElementById('agentHistoryApplyPeriodBtn');
+const agentHistoryTable = document.getElementById('agentHistoryTable');
+const agentHistoryConversationModal = document.getElementById('agentHistoryConversationModal');
+const agentHistoryConversationSubtitle = document.getElementById('agentHistoryConversationSubtitle');
+const agentHistoryConversationBody = document.getElementById('agentHistoryConversationBody');
+const agentHistoryDetailsModal = document.getElementById('agentHistoryDetailsModal');
+const agentHistoryDetailsSubtitle = document.getElementById('agentHistoryDetailsSubtitle');
+const agentHistoryDetailsGrid = document.getElementById('agentHistoryDetailsGrid');
+const agentHistoryKnowledgeCount = document.getElementById('agentHistoryKnowledgeCount');
+const agentHistoryKnowledgeList = document.getElementById('agentHistoryKnowledgeList');
+const agentHistoryOpenConversationBtn = document.getElementById('agentHistoryOpenConversationBtn');
 const companyUsersModal = document.getElementById('companyUsersModal');
 const companyUsersModalTitle = document.getElementById('companyUsersModalTitle');
 const companyUserSelect = document.getElementById('companyUserSelect');
@@ -5666,6 +5698,41 @@ const parseAuditDate = (value) => {
 const getActiveAuditFilterValue = (menuEl, filterName) =>
   menuEl?.querySelector(`.filter-option.active[data-filter="${filterName}"]`)?.dataset.value || '';
 
+if (historyAuditPanel && auditLegacyPage) {
+  const legacyAuditSection = auditLegacyPage.querySelector('.section');
+  if (legacyAuditSection) {
+    Array.from(legacyAuditSection.children).forEach((child) => {
+      if (child.classList?.contains('page-header')) return;
+      historyAuditPanel.appendChild(child);
+    });
+    auditLegacyPage.classList.add('is-hidden');
+    auditLegacyPage.hidden = true;
+  }
+}
+
+if (historyTabs.length && historyPanels.length) {
+  historyTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const target = tab.dataset.tab;
+      historyTabs.forEach((item) => item.classList.remove('active'));
+      tab.classList.add('active');
+      historyPanels.forEach((panel) => {
+        panel.classList.toggle('active', panel.dataset.panel === target);
+      });
+    });
+  });
+}
+
+function setActiveHistoryTab(tabKey = 'history-audit') {
+  if (!historyTabs.length || !historyPanels.length) return;
+  historyTabs.forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.tab === tabKey);
+  });
+  historyPanels.forEach((panel) => {
+    panel.classList.toggle('active', panel.dataset.panel === tabKey);
+  });
+}
+
 const renderAuditPagination = () => {
   if (!auditPagePagination || !auditPageNumbers) return;
   const matchedRows = auditTableRows.filter((row) => row.dataset.auditFilterMatch === '1');
@@ -5722,8 +5789,8 @@ const applyAuditTableFilters = () => {
   const singleDate = singleDateValue ? new Date(`${singleDateValue}T00:00:00`) : null;
   auditTableRows.forEach((row) => {
     const cells = row.querySelectorAll('span');
-    const dateText = cells[0]?.textContent || '';
-    const userText = (cells[1]?.textContent || '').trim().toLowerCase();
+    const userText = (cells[0]?.textContent || '').trim().toLowerCase();
+    const dateText = cells[1]?.textContent || '';
     const ipText = (cells[3]?.textContent || '').trim().toLowerCase();
     const typeText = String(row.dataset.auditType || '').trim().toLowerCase();
     const rowDate = parseAuditDate(dateText);
@@ -8490,8 +8557,8 @@ if (auditTableRows.length && auditDetailsModal) {
   const fillAuditDetailsModal = (row) => {
     if (!row) return;
     const cells = row.querySelectorAll('span');
-    auditDetailsDate.textContent = cells[0]?.textContent?.trim() || '-';
-    auditDetailsUser.textContent = cells[1]?.textContent?.trim() || '-';
+    auditDetailsUser.textContent = cells[0]?.textContent?.trim() || '-';
+    auditDetailsDate.textContent = cells[1]?.textContent?.trim() || '-';
     auditDetailsAction.textContent = cells[2]?.textContent?.trim() || '-';
     auditDetailsIp.textContent = cells[3]?.textContent?.trim() || '-';
     const kind = String(row.dataset.auditTargetKind || '').trim();
@@ -10177,6 +10244,541 @@ function escapeHtmlWes(text) {
   const d = document.createElement('div');
   d.textContent = String(text);
   return d.innerHTML;
+}
+
+const AGENT_HISTORY_ITEMS = [
+  {
+    id: 'hist-001',
+    userName: 'Mariana Costa',
+    userEmail: 'mariana.costa@avas.com',
+    occurredAt: '2026-06-22T09:14:00-03:00',
+    agentName: 'Atlas Core',
+    agentContext: 'Operações integradas',
+    tokens: 18432,
+    costUsd: 0.37,
+    costBrl: 2.03,
+    sourceLabel: 'Web + interno',
+    sourceType: 'web',
+    sourceDescription: 'O agente consultou a web e cruzou o resultado com arquivos do conhecimento interno.',
+    agentIp: '34.117.182.91',
+    userIp: '187.54.22.104',
+    knowledgeFiles: [
+      { name: 'playbook-operacoes-v3.pdf', path: '/knowledge/operacoes/playbook-operacoes-v3.pdf' },
+      { name: 'sla-clientes-enterprise.xlsx', path: '/knowledge/operacoes/sla-clientes-enterprise.xlsx' },
+    ],
+    conversation: [
+      { role: 'Usuário', at: '09:14', text: 'Quais clientes enterprise estão com SLA crítico hoje e quais passos devo seguir?' },
+      { role: 'Agente', at: '09:14', text: 'Cruzei o playbook interno com a busca web de incidentes do dia. Há 3 clientes críticos e o procedimento prioritário é acionar a célula de contingência, validar backlog e disparar atualização preventiva.' },
+      { role: 'Usuário', at: '09:16', text: 'Resuma em tópicos e informe quais fontes você utilizou.' },
+      { role: 'Agente', at: '09:16', text: 'Usei os arquivos internos playbook-operacoes-v3.pdf e sla-clientes-enterprise.xlsx, além de pesquisa web para confirmar incidentes e janelas de manutenção.' },
+    ],
+  },
+  {
+    id: 'hist-002',
+    userName: 'Carlos Henrique',
+    userEmail: 'carlos.henrique@techcorp.com',
+    occurredAt: '2026-06-22T10:02:00-03:00',
+    agentName: 'Ledger AI',
+    agentContext: 'Controladoria e fechamento',
+    tokens: 9230,
+    costUsd: 0.18,
+    costBrl: 0.99,
+    sourceLabel: 'Somente interno',
+    sourceType: 'internal',
+    sourceDescription: 'A resposta foi construída apenas com base no conhecimento interno do agente.',
+    agentIp: '34.117.182.97',
+    userIp: '179.189.44.211',
+    knowledgeFiles: [
+      { name: 'fechamento-mensal-checklist.docx', path: '/knowledge/controladoria/fechamento-mensal-checklist.docx' },
+      { name: 'politica-contabil-2026.pdf', path: '/knowledge/controladoria/politica-contabil-2026.pdf' },
+      { name: 'centros-de-custo.csv', path: '/knowledge/controladoria/centros-de-custo.csv' },
+    ],
+    conversation: [
+      { role: 'Usuário', at: '10:02', text: 'Liste o passo a passo para fechamento do mês e valide o centro de custo de marketing.' },
+      { role: 'Agente', at: '10:03', text: 'Segui exclusivamente o checklist interno e a política contábil. O centro de custo de marketing permanece ativo e deve entrar na conciliação da rodada 2.' },
+    ],
+  },
+  {
+    id: 'hist-003',
+    userName: 'Juliana Prado',
+    userEmail: 'juliana.prado@avas.com',
+    occurredAt: '2026-06-22T11:28:00-03:00',
+    agentName: 'Nexus Sales',
+    agentContext: 'CRM e campanhas',
+    tokens: 15108,
+    costUsd: 0.29,
+    costBrl: 1.59,
+    sourceLabel: 'Web + interno',
+    sourceType: 'web',
+    sourceDescription: 'O agente pesquisou benchmarks públicos na web e combinou com playbooks internos de campanha.',
+    agentIp: '34.117.182.103',
+    userIp: '201.48.92.17',
+    knowledgeFiles: [
+      { name: 'roteiro-campanha-q3.md', path: '/knowledge/marketing/roteiro-campanha-q3.md' },
+    ],
+    conversation: [
+      { role: 'Usuário', at: '11:28', text: 'Monte uma recomendação de abordagem para leads frios do segmento industrial.' },
+      { role: 'Agente', at: '11:29', text: 'Usei o roteiro interno da campanha Q3 e referências web de benchmark B2B. Recomendo sequência em 3 contatos com CTA financeiro e prova operacional.' },
+    ],
+  },
+  {
+    id: 'hist-004',
+    userName: 'Roberto Lima',
+    userEmail: 'roberto.lima@techcorp.com',
+    occurredAt: '2026-06-22T14:07:00-03:00',
+    agentName: 'Support Sentinel',
+    agentContext: 'Suporte e integrações',
+    tokens: 6734,
+    costUsd: 0.13,
+    costBrl: 0.71,
+    sourceLabel: 'Somente interno',
+    sourceType: 'internal',
+    sourceDescription: 'A interação foi resolvida apenas com base no repositório interno de suporte técnico.',
+    agentIp: '34.117.182.120',
+    userIp: '45.167.121.55',
+    knowledgeFiles: [
+      { name: 'runbook-api-clientes.pdf', path: '/knowledge/suporte/runbook-api-clientes.pdf' },
+      { name: 'faq-erros-webhook.txt', path: '/knowledge/suporte/faq-erros-webhook.txt' },
+    ],
+    conversation: [
+      { role: 'Usuário', at: '14:07', text: 'Como tratar falha 401 no webhook do cliente Delta?' },
+      { role: 'Agente', at: '14:08', text: 'O runbook interno orienta verificar rotação do token, sincronismo do relógio do servidor e a whitelist do endpoint antes de reprocessar o webhook.' },
+    ],
+  },
+];
+
+let agentHistoryTokensFilter = '';
+let agentHistoryUsdFilter = '';
+let agentHistoryBrlFilter = '';
+let activeAgentHistoryItemId = '';
+let agentHistoryAudienceMode = 'internal';
+
+function formatAgentHistoryDateTime(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return '-';
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
+}
+
+function formatAgentHistoryTokens(value) {
+  return new Intl.NumberFormat('pt-BR').format(Number(value) || 0);
+}
+
+function formatAgentHistoryCurrency(value, currency) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  }).format(Number(value) || 0);
+}
+
+function getAgentHistorySourceChipClass(item) {
+  return item?.sourceType === 'internal'
+    ? 'agent-history-source-chip agent-history-source-chip--internal'
+    : 'agent-history-source-chip';
+}
+
+function updateAgentHistoryFilterButtonLabel() {
+  if (!agentHistoryFilterBtnLabel) return;
+  const parts = [];
+  if (agentHistoryTokensFilter) parts.push('Tokens');
+  if (agentHistoryUsdFilter) parts.push('USD');
+  if (agentHistoryBrlFilter) parts.push('BRL');
+  agentHistoryFilterBtnLabel.textContent = parts.length ? parts.join(' • ') : 'Filtros';
+}
+
+function resetAgentHistoryMetricFilters() {
+  agentHistoryTokensFilter = '';
+  agentHistoryUsdFilter = '';
+  agentHistoryBrlFilter = '';
+  agentHistoryFilterMenu
+    ?.querySelectorAll('.filter-option')
+    .forEach((item) => item.classList.remove('active'));
+  agentHistoryFilterMenu
+    ?.querySelectorAll('.filter-option[data-value=""]')
+    .forEach((item) => item.classList.add('active'));
+  updateAgentHistoryFilterButtonLabel();
+}
+
+function syncAgentHistoryAudienceMode() {
+  const isClientView = agentHistoryAudienceMode === 'client';
+  if (agentHistoryPage) agentHistoryPage.dataset.agentHistoryView = agentHistoryAudienceMode;
+  if (agentHistoryClientViewToggle) agentHistoryClientViewToggle.checked = isClientView;
+  if (agentHistoryViewToggleTitle) {
+    agentHistoryViewToggleTitle.textContent = isClientView ? 'Versão do cliente' : 'Versão interna';
+  }
+  if (agentHistoryViewToggleLabel) {
+    agentHistoryViewToggleLabel.textContent = isClientView
+      ? 'Oculta tokens e custos'
+      : 'Exibe tokens e custos';
+  }
+  if (isClientView) {
+    agentHistoryFilterMenu?.classList.remove('open');
+    resetAgentHistoryMetricFilters();
+  }
+  if (agentHistoryMetricsFilterField) agentHistoryMetricsFilterField.hidden = isClientView;
+  applyAgentHistoryFilters();
+  if (agentHistoryDetailsModal?.classList.contains('open')) {
+    const item = AGENT_HISTORY_ITEMS.find((entry) => String(entry.id || '') === activeAgentHistoryItemId);
+    if (item) renderAgentHistoryDetails(item);
+  }
+}
+
+function matchesAgentHistoryNumericRange(value, filterValue) {
+  if (!filterValue) return true;
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return false;
+  const [operator, rawStart, rawEnd] = String(filterValue).split(':');
+  const start = Number(rawStart);
+  const end = Number(rawEnd);
+  if (operator === 'lte' && Number.isFinite(start)) return numericValue <= start;
+  if (operator === 'gte' && Number.isFinite(start)) return numericValue >= start;
+  if (operator === 'between' && Number.isFinite(start) && Number.isFinite(end)) {
+    return numericValue >= start && numericValue <= end;
+  }
+  return true;
+}
+
+function applyAgentHistoryFilters() {
+  if (!agentHistoryTable) return;
+  const query = String(agentHistorySearchInput?.value || '').trim().toLowerCase();
+  const activePeriodMode = agentHistoryPeriodMenu?.dataset.mode === 'single' ? 'single' : 'range';
+  const startDateValue = String(agentHistoryStartDateInput?.value || '').trim();
+  const endDateValue = String(agentHistoryEndDateInput?.value || '').trim();
+  const singleDateValue = String(agentHistorySingleDateInput?.value || '').trim();
+  const startDate = startDateValue ? new Date(`${startDateValue}T00:00:00`) : null;
+  const endDate = endDateValue ? new Date(`${endDateValue}T23:59:59`) : null;
+  const singleDate = singleDateValue ? new Date(`${singleDateValue}T00:00:00`) : null;
+  agentHistoryTable.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])').forEach((row) => {
+    const text = String(row.dataset.agentHistorySearch || '').toLowerCase();
+    const occurredAt = String(row.dataset.agentHistoryOccurredAt || '').trim();
+    const tokens = Number(row.dataset.agentHistoryTokens || 0);
+    const costUsd = Number(row.dataset.agentHistoryCostUsd || 0);
+    const costBrl = Number(row.dataset.agentHistoryCostBrl || 0);
+    const rowDate = occurredAt ? new Date(occurredAt) : null;
+    const matchesQuery = !query || text.includes(query);
+    const matchesTokens = matchesAgentHistoryNumericRange(tokens, agentHistoryTokensFilter);
+    const matchesUsd = matchesAgentHistoryNumericRange(costUsd, agentHistoryUsdFilter);
+    const matchesBrl = matchesAgentHistoryNumericRange(costBrl, agentHistoryBrlFilter);
+
+    let matchesPeriod = true;
+    if (rowDate && !Number.isNaN(rowDate.getTime())) {
+      if (activePeriodMode === 'single' && singleDate) {
+        matchesPeriod = rowDate >= singleDate && rowDate < new Date(singleDate.getTime() + 86400000);
+      } else if (activePeriodMode === 'range') {
+        if (startDate && endDate) matchesPeriod = rowDate >= startDate && rowDate <= endDate;
+        else if (startDate) matchesPeriod = rowDate >= startDate;
+        else if (endDate) matchesPeriod = rowDate <= endDate;
+      }
+    } else if (activePeriodMode === 'single' && singleDate) {
+      matchesPeriod = false;
+    } else if ((activePeriodMode === 'range' && startDate) || (activePeriodMode === 'range' && endDate)) {
+      matchesPeriod = false;
+    }
+
+    row.hidden = !(matchesQuery && matchesTokens && matchesUsd && matchesBrl && matchesPeriod);
+  });
+  if (typeof syncTableEmptyState === 'function') syncTableEmptyState(agentHistoryTable);
+}
+
+function openAgentHistoryModal(modal) {
+  if (!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeAgentHistoryModal(modal) {
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function renderAgentHistoryConversation(item) {
+  if (!agentHistoryConversationBody || !agentHistoryConversationSubtitle || !item) return;
+  agentHistoryConversationSubtitle.textContent = `${item.userName} • ${item.agentName} • ${formatAgentHistoryDateTime(item.occurredAt)}`;
+  const sourceChipClass = getAgentHistorySourceChipClass(item);
+  agentHistoryConversationBody.innerHTML = `
+    <section class="agent-history-conversation-meta">
+      <div class="agent-history-conversation-meta-copy">
+        <strong>${escapeHtmlWes(item.agentName)}</strong>
+        <small>${escapeHtmlWes(item.agentContext)} • ${escapeHtmlWes(item.userEmail)}</small>
+      </div>
+      <span class="${sourceChipClass}">${escapeHtmlWes(item.sourceLabel)}</span>
+    </section>
+    <section class="agent-history-message-list">
+      ${item.conversation.map((message) => `
+        <article class="agent-history-message${String(message.role).toLowerCase() === 'agente' ? ' agent-history-message--assistant' : ''}">
+          <div class="agent-history-message-head">
+            <span class="agent-history-message-role">${escapeHtmlWes(message.role)}</span>
+            <span class="agent-history-message-time">${escapeHtmlWes(message.at || '')}</span>
+          </div>
+          <p class="agent-history-message-text">${escapeHtmlWes(message.text || '')}</p>
+        </article>
+      `).join('')}
+    </section>
+  `;
+  openAgentHistoryModal(agentHistoryConversationModal);
+}
+
+function renderAgentHistoryDetails(item) {
+  if (!agentHistoryDetailsGrid || !agentHistoryKnowledgeList || !agentHistoryKnowledgeCount || !agentHistoryDetailsSubtitle || !item) return;
+  activeAgentHistoryItemId = String(item.id || '');
+  agentHistoryDetailsSubtitle.textContent = `${item.userName} • ${item.agentName} • ${formatAgentHistoryDateTime(item.occurredAt)}`;
+  agentHistoryDetailsGrid.classList.toggle('agent-history-details-grid--client', agentHistoryAudienceMode === 'client');
+  const usageCardMarkup = agentHistoryAudienceMode === 'client'
+    ? ''
+    : `
+    <article class="agent-history-detail-card">
+      <span>Consumo e custo</span>
+      <strong>${escapeHtmlWes(formatAgentHistoryTokens(item.tokens))} tokens</strong>
+      <small>${escapeHtmlWes(formatAgentHistoryCurrency(item.costUsd, 'USD'))} • ${escapeHtmlWes(formatAgentHistoryCurrency(item.costBrl, 'BRL'))}</small>
+    </article>
+  `;
+  agentHistoryDetailsGrid.innerHTML = `
+    <article class="agent-history-detail-card">
+      <span>Origem da resposta</span>
+      <strong>${escapeHtmlWes(item.sourceLabel)}</strong>
+      <small>${escapeHtmlWes(item.sourceDescription)}</small>
+    </article>
+    <article class="agent-history-detail-card">
+      <span>Endereço IP do usuário</span>
+      <strong>${escapeHtmlWes(item.userIp)}</strong>
+      <small>IP capturado no momento em que a conversa foi iniciada.</small>
+    </article>
+    <article class="agent-history-detail-card">
+      <span>Endereço IP do agente</span>
+      <strong>${escapeHtmlWes(item.agentIp)}</strong>
+      <small>Origem da infraestrutura que processou a execução do agente.</small>
+    </article>
+    ${usageCardMarkup}
+  `;
+  const files = Array.isArray(item.knowledgeFiles) ? item.knowledgeFiles : [];
+  agentHistoryKnowledgeCount.textContent = `${files.length} ${files.length === 1 ? 'arquivo' : 'arquivos'}`;
+  agentHistoryKnowledgeList.innerHTML = files.length
+    ? files.map((file) => `
+        <article class="agent-history-knowledge-item">
+          <span class="material-symbols-rounded" aria-hidden="true">description</span>
+          <div class="agent-history-knowledge-item-copy">
+            <strong>${escapeHtmlWes(file.name || '-')}</strong>
+            <small>${escapeHtmlWes(file.path || '-')}</small>
+          </div>
+        </article>
+      `).join('')
+    : '<p class="agent-history-knowledge-empty">Nenhum arquivo interno foi utilizado nesta execução.</p>';
+  openAgentHistoryModal(agentHistoryDetailsModal);
+}
+
+function renderAgentHistoryTable() {
+  if (!agentHistoryTable) return;
+  agentHistoryTable.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])').forEach((row) => row.remove());
+  const frag = document.createDocumentFragment();
+  AGENT_HISTORY_ITEMS.forEach((item, index) => {
+    const row = document.createElement('div');
+    row.className = 'data-row';
+    row.dataset.agentHistoryIndex = String(index);
+    row.dataset.agentHistoryOccurredAt = String(item.occurredAt || '');
+    row.dataset.agentHistoryTokens = String(Number(item.tokens) || 0);
+    row.dataset.agentHistoryCostUsd = String(Number(item.costUsd) || 0);
+    row.dataset.agentHistoryCostBrl = String(Number(item.costBrl) || 0);
+    row.dataset.agentHistorySearch = [
+      item.userName,
+      item.userEmail,
+      item.agentName,
+      item.agentContext,
+      item.userIp,
+      item.sourceLabel,
+    ].filter(Boolean).join(' ');
+    row.innerHTML = `
+      <span class="agent-history-user-cell">
+        <strong>${escapeHtmlWes(item.userName)}</strong>
+        <small>${escapeHtmlWes(item.userEmail)}</small>
+      </span>
+      <span>${escapeHtmlWes(formatAgentHistoryDateTime(item.occurredAt))}</span>
+      <span class="agent-history-agent-cell">
+        <strong>${escapeHtmlWes(item.agentName)}</strong>
+        <small>${escapeHtmlWes(item.agentContext)}</small>
+      </span>
+      <span class="agent-history-ip-cell">${escapeHtmlWes(item.userIp)}</span>
+      <span class="agent-history-token-cell">${escapeHtmlWes(formatAgentHistoryTokens(item.tokens))}</span>
+      <span class="agent-history-currency-cell">${escapeHtmlWes(formatAgentHistoryCurrency(item.costUsd, 'USD'))}</span>
+      <span class="agent-history-currency-cell">${escapeHtmlWes(formatAgentHistoryCurrency(item.costBrl, 'BRL'))}</span>
+      <span class="row-actions">
+        <button class="icon-btn action-icon" type="button" data-agent-history-action="conversation" data-agent-history-index="${escapeHtmlWes(index)}" aria-label="Visualizar conversa completa" title="Visualizar conversa completa">
+          <span class="material-symbols-rounded">chat</span>
+        </button>
+        <button class="icon-btn action-icon audit-view-btn" type="button" data-agent-history-action="details" data-agent-history-index="${escapeHtmlWes(index)}" aria-label="Ver detalhes" title="Ver detalhes">
+          <span class="material-symbols-rounded">more_vert</span>
+        </button>
+      </span>
+    `;
+    frag.appendChild(row);
+  });
+  agentHistoryTable.appendChild(frag);
+  applyAgentHistoryFilters();
+  if (typeof syncTableEmptyState === 'function') syncTableEmptyState(agentHistoryTable);
+}
+
+if (agentHistoryPage && agentHistoryTable) {
+  syncAgentHistoryAudienceMode();
+  updateAgentHistoryFilterButtonLabel();
+  renderAgentHistoryTable();
+
+  agentHistoryTable.addEventListener('click', (event) => {
+    const actionBtn = event.target.closest('[data-agent-history-action]');
+    if (!actionBtn || !agentHistoryTable.contains(actionBtn)) return;
+    const index = Number(actionBtn.dataset.agentHistoryIndex);
+    const item = AGENT_HISTORY_ITEMS[index];
+    if (!item) return;
+    if (actionBtn.dataset.agentHistoryAction === 'conversation') {
+      renderAgentHistoryConversation(item);
+      return;
+    }
+    if (actionBtn.dataset.agentHistoryAction === 'details') {
+      renderAgentHistoryDetails(item);
+    }
+  });
+}
+
+if (agentHistoryClientViewToggle) {
+  agentHistoryClientViewToggle.addEventListener('change', () => {
+    agentHistoryAudienceMode = agentHistoryClientViewToggle.checked ? 'client' : 'internal';
+    syncAgentHistoryAudienceMode();
+  });
+}
+
+if (agentHistorySearchInput) {
+  agentHistorySearchInput.addEventListener('input', () => {
+    applyAgentHistoryFilters();
+  });
+}
+
+if (agentHistoryFilterBtn && agentHistoryFilterMenu) {
+  agentHistoryFilterBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    agentHistoryPeriodMenu?.classList.remove('open');
+    agentHistoryFilterMenu.classList.toggle('open');
+  });
+
+  agentHistoryFilterMenu.addEventListener('click', (event) => {
+    const button = event.target.closest('.filter-option');
+    if (button) {
+      const group = button.dataset.filter;
+      agentHistoryFilterMenu
+        .querySelectorAll(`.filter-option[data-filter="${group}"]`)
+        .forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      if (group === 'tokens') agentHistoryTokensFilter = String(button.dataset.value || '').trim();
+      if (group === 'usd') agentHistoryUsdFilter = String(button.dataset.value || '').trim();
+      if (group === 'brl') agentHistoryBrlFilter = String(button.dataset.value || '').trim();
+      agentHistoryFilterMenu.classList.remove('open');
+      updateAgentHistoryFilterButtonLabel();
+      applyAgentHistoryFilters();
+      return;
+    }
+
+    const clearButton = event.target.closest('.filter-clear');
+    if (!clearButton) return;
+    agentHistoryTokensFilter = '';
+    agentHistoryUsdFilter = '';
+    agentHistoryBrlFilter = '';
+    agentHistoryFilterMenu
+      .querySelectorAll('.filter-option')
+      .forEach((item) => item.classList.remove('active'));
+    agentHistoryFilterMenu
+      .querySelectorAll('.filter-option[data-value=""]')
+      .forEach((item) => item.classList.add('active'));
+    agentHistoryFilterMenu.classList.remove('open');
+    updateAgentHistoryFilterButtonLabel();
+    applyAgentHistoryFilters();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!agentHistoryFilterMenu.contains(event.target) && !agentHistoryFilterBtn.contains(event.target)) {
+      agentHistoryFilterMenu.classList.remove('open');
+    }
+  });
+}
+
+if (agentHistoryPeriodBtn && agentHistoryPeriodMenu) {
+  if (!agentHistoryPeriodMenu.dataset.mode) agentHistoryPeriodMenu.dataset.mode = 'range';
+
+  const syncAgentHistoryPeriodMode = () => {
+    const isSingle = agentHistoryPeriodMenu.dataset.mode === 'single';
+    agentHistoryRangeFields.forEach((field) => field.classList.toggle('is-hidden', isSingle));
+    if (agentHistorySingleField) agentHistorySingleField.classList.toggle('is-hidden', !isSingle);
+  };
+
+  agentHistoryPeriodBtn.addEventListener('click', (event) => {
+    event.stopPropagation();
+    agentHistoryFilterMenu?.classList.remove('open');
+    agentHistoryPeriodMenu.classList.toggle('open');
+  });
+
+  document.addEventListener('click', () => {
+    agentHistoryPeriodMenu.classList.remove('open');
+  });
+
+  const clearButton = agentHistoryPeriodMenu.querySelector('.filter-clear');
+
+  agentHistoryPeriodOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      agentHistoryPeriodOptions.forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      agentHistoryPeriodMenu.dataset.mode = button.dataset.mode === 'single' ? 'single' : 'range';
+      syncAgentHistoryPeriodMode();
+      applyAgentHistoryFilters();
+    });
+  });
+
+  [agentHistoryStartDateInput, agentHistoryEndDateInput, agentHistorySingleDateInput].forEach((input) => {
+    input?.addEventListener('change', () => {
+      applyAgentHistoryFilters();
+    });
+  });
+
+  agentHistoryApplyPeriodBtn?.addEventListener('click', () => {
+    applyAgentHistoryFilters();
+    agentHistoryPeriodMenu.classList.remove('open');
+  });
+
+  if (clearButton) {
+    clearButton.addEventListener('click', () => {
+      agentHistoryStartDateInput.value = '';
+      agentHistoryEndDateInput.value = '';
+      agentHistorySingleDateInput.value = '';
+      agentHistoryPeriodMenu.dataset.mode = 'range';
+      agentHistoryPeriodOptions.forEach((item) => item.classList.remove('active'));
+      const defaultOption = agentHistoryPeriodOptions.find((item) => item.dataset.mode === 'range');
+      if (defaultOption) defaultOption.classList.add('active');
+      syncAgentHistoryPeriodMode();
+      applyAgentHistoryFilters();
+    });
+  }
+
+  syncAgentHistoryPeriodMode();
+}
+
+if (agentHistoryOpenConversationBtn) {
+  agentHistoryOpenConversationBtn.addEventListener('click', () => {
+    const item = AGENT_HISTORY_ITEMS.find((entry) => String(entry.id || '') === activeAgentHistoryItemId);
+    if (!item) return;
+    closeAgentHistoryModal(agentHistoryDetailsModal);
+    renderAgentHistoryConversation(item);
+  });
+}
+
+if (agentHistoryConversationModal) {
+  agentHistoryConversationModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeAgentHistoryModal(agentHistoryConversationModal);
+  });
+}
+
+if (agentHistoryDetailsModal) {
+  agentHistoryDetailsModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeAgentHistoryModal(agentHistoryDetailsModal);
+  });
 }
 
 function hashAgentsPageEnvironmentSeed(value) {
@@ -11872,7 +12474,7 @@ const routeMap = {
   'dashboard/users': 'page-users',
   'dashboard/mcps': 'page-mcps',
   'dashboard/skills': 'page-skills',
-  'dashboard/audit': 'page-audit',
+  'dashboard/audit': 'page-agent-history',
   'dashboard/agent-history': 'page-agent-history',
   'dashboard/companies': 'page-companies',
   // 'dashboard/organization': 'page-organization',
@@ -12010,13 +12612,12 @@ const normalizeVisiblePortugueseLabels = () => {
 
   const replacements = [
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
-    ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
+    ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Auditoria'],
     ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'Conex\u00f5es'],
-    ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
-    ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Hist\u00f3rico de a\u00e7\u00f5es'],
-    ['#submenu-administration a[href="#/dashboard/agent-history"] .submenu-label', 'Hist\u00f3rico de agentes'],
     ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
+    ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
+    ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
     ['#wesProjectDescription', null],
   ];
 
@@ -12056,6 +12657,9 @@ const updateActivePage = () => {
   if (page) {
     page.classList.add('is-active');
     page.tabIndex = -1;
+  }
+  if (pageId === 'page-agent-history') {
+    setActiveHistoryTab(routeKey === 'dashboard/agent-history' ? 'history-agents' : 'history-audit');
   }
   forceRouteScrollTop(routeKey);
   window.requestAnimationFrame(() => forceRouteScrollTop(routeKey));

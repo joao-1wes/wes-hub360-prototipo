@@ -3047,6 +3047,190 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   text-align: left;
 }
 
+.agent-history-table .data-row {
+  grid-template-columns: 1.15fr 0.95fr 1.1fr 0.95fr 0.68fr 0.8fr 0.8fr 0.55fr;
+  min-width: 1320px;
+}
+
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row {
+  grid-template-columns: 1.25fr 0.95fr 1.15fr 1fr 0.55fr;
+  min-width: 980px;
+}
+
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(5),
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(6),
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(7) {
+  display: none;
+}
+
+.agent-history-table .data-row > span:last-child {
+  justify-self: stretch;
+}
+
+.agent-history-user-cell,
+.agent-history-agent-cell {
+  display: grid;
+  gap: 2px;
+}
+
+.agent-history-user-cell strong,
+.agent-history-agent-cell strong {
+  color: #0f172a;
+}
+
+.agent-history-user-cell small,
+.agent-history-agent-cell small {
+  color: var(--muted);
+}
+
+.agent-history-token-cell {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.agent-history-currency-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.agent-history-ip-cell {
+  font-variant-numeric: tabular-nums;
+}
+
+.agent-history-source-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(1, 111, 244, 0.1);
+  color: #016ff4;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.agent-history-source-chip--internal {
+  background: rgba(15, 118, 110, 0.12);
+  color: #0f766e;
+}
+
+.agent-history-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.agent-history-search-field-wrap {
+  flex: 1 1 420px;
+  min-width: 240px;
+  max-width: 520px;
+}
+
+.agent-history-filters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  align-items: center;
+  justify-content: start;
+  column-gap: 8px;
+  margin-bottom: 0;
+}
+
+.agent-history-view-panel {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.agent-history-view-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-width: 280px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.agent-history-view-toggle-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.agent-history-view-toggle-copy strong {
+  color: #0f172a;
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+.agent-history-view-toggle-copy small {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+#page-agent-history[data-agent-history-view="client"] #agentHistoryMetricsFilterField {
+  display: none;
+}
+
+#page-agent-history .form-field {
+  position: relative;
+}
+
+#page-agent-history .filter-btn {
+  min-width: 132px;
+  justify-content: center;
+}
+
+.agent-history-filter-menu {
+  top: calc(100% + 8px);
+  left: auto;
+  right: 0;
+  width: 560px;
+  max-width: min(560px, calc(100vw - 48px));
+  display: none;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+}
+
+.agent-history-filter-menu.open {
+  display: grid !important;
+}
+
+.agent-history-filter-menu .filter-footer {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.agent-history-filter-menu .filter-group {
+  min-width: 0;
+}
+
+.agent-history-filter-menu .filter-group + .filter-group {
+  border-top: none;
+  border-left: 1px solid var(--border);
+}
+
+#agentHistoryPeriodMenu {
+  width: 300px;
+  left: auto !important;
+  right: 0 !important;
+}
+
+.agent-history-details-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .row-actions {
   display: flex;
   justify-content: flex-end;
@@ -4824,6 +5008,202 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   border: 1px solid var(--border);
   border-radius: 12px;
   background: #ffffff;
+}
+
+.agent-history-conversation-dialog,
+.agent-history-details-dialog {
+  width: min(960px, calc(100vw - 32px));
+}
+
+.agent-history-conversation-body,
+.agent-history-details-body {
+  display: grid;
+  gap: 18px;
+}
+
+.agent-history-conversation-body {
+  max-height: min(70vh, 760px);
+  overflow-y: auto;
+}
+
+.agent-history-conversation-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid rgba(1, 111, 244, 0.12);
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(1, 111, 244, 0.08), rgba(1, 111, 244, 0.02));
+}
+
+.agent-history-conversation-meta-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.agent-history-conversation-meta-copy strong {
+  color: #0f172a;
+  font-size: 16px;
+}
+
+.agent-history-conversation-meta-copy small {
+  color: var(--muted);
+}
+
+.agent-history-message-list {
+  display: grid;
+  gap: 12px;
+}
+
+.agent-history-message {
+  display: grid;
+  gap: 8px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.agent-history-message--assistant {
+  background: #f8fbff;
+  border-color: rgba(1, 111, 244, 0.16);
+}
+
+.agent-history-message-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agent-history-message-role {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #016ff4;
+}
+
+.agent-history-message-time {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.agent-history-message-text {
+  margin: 0;
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.agent-history-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.agent-history-details-grid--client .agent-history-detail-card:nth-child(3) {
+  grid-column: 1 / -1;
+}
+
+.agent-history-detail-card {
+  display: grid;
+  gap: 8px;
+  min-height: 112px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #ffffff;
+}
+
+.agent-history-detail-card span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.agent-history-detail-card strong {
+  color: #0f172a;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.agent-history-detail-card small {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.agent-history-knowledge-panel {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: #f8fafc;
+}
+
+.agent-history-knowledge-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.agent-history-knowledge-panel-head strong {
+  color: #0f172a;
+}
+
+.agent-history-knowledge-count {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.agent-history-knowledge-list {
+  display: grid;
+  gap: 10px;
+}
+
+.agent-history-knowledge-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border: 1px solid rgba(1, 111, 244, 0.12);
+  border-radius: 16px;
+  background: #ffffff;
+}
+
+.agent-history-knowledge-item .material-symbols-rounded {
+  color: #016ff4;
+}
+
+.agent-history-knowledge-item-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.agent-history-knowledge-item-copy strong,
+.agent-history-knowledge-item-copy small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agent-history-knowledge-item-copy small {
+  color: var(--muted);
+}
+
+.agent-history-knowledge-empty {
+  padding: 12px 0;
+  color: var(--muted);
+  font-size: 14px;
 }
 
 .channel-picker-icon {
@@ -12545,6 +12925,33 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   .audit-table .data-row {
     min-width: 980px;
   }
+
+  .agent-history-details-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .agent-history-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .agent-history-filters-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-content: stretch;
+    margin-bottom: 0;
+  }
+
+  .agent-history-filter-menu {
+    width: min(560px, calc(100vw - 48px));
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .agent-history-filter-menu .filter-group + .filter-group {
+    border-left: none;
+    border-top: 1px solid var(--border);
+  }
+
 }
 
 @media (max-width: 720px) {
@@ -12576,6 +12983,17 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   }
 
   .search-field input {
+    min-width: 0;
+  }
+
+  .agent-history-conversation-meta,
+  .agent-history-knowledge-panel-head,
+  .agent-history-message-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .agent-history-view-toggle {
     min-width: 0;
   }
 

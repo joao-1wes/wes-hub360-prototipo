@@ -3048,8 +3048,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .agent-history-table .data-row {
-  grid-template-columns: 1.15fr 0.95fr 1.1fr 0.95fr 0.68fr 0.8fr 0.8fr 0.55fr;
-  min-width: 1320px;
+  grid-template-columns: 1.15fr 0.95fr 0.9fr 1.1fr 0.95fr 0.68fr 0.8fr 0.8fr 0.55fr;
+  min-width: 1440px;
 }
 
 #page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row {
@@ -3057,9 +3057,10 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   min-width: 980px;
 }
 
-#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(5),
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(2),
 #page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(6),
-#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(7) {
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(7),
+#page-agent-history[data-agent-history-view="client"] .agent-history-table .data-row > span:nth-child(8) {
   display: none;
 }
 
@@ -3075,6 +3076,11 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .agent-history-user-cell strong,
 .agent-history-agent-cell strong {
+  color: #0f172a;
+}
+
+.agent-history-company-cell {
+  font-weight: 700;
   color: #0f172a;
 }
 

@@ -10251,6 +10251,7 @@ const AGENT_HISTORY_ITEMS = [
     id: 'hist-001',
     userName: 'Mariana Costa',
     userEmail: 'mariana.costa@avas.com',
+    companyName: 'Avas Energia',
     occurredAt: '2026-06-22T09:14:00-03:00',
     agentName: 'Atlas Core',
     agentContext: 'Operações integradas',
@@ -10277,6 +10278,7 @@ const AGENT_HISTORY_ITEMS = [
     id: 'hist-002',
     userName: 'Carlos Henrique',
     userEmail: 'carlos.henrique@techcorp.com',
+    companyName: 'TechCorp Brasil',
     occurredAt: '2026-06-22T10:02:00-03:00',
     agentName: 'Ledger AI',
     agentContext: 'Controladoria e fechamento',
@@ -10302,6 +10304,7 @@ const AGENT_HISTORY_ITEMS = [
     id: 'hist-003',
     userName: 'Juliana Prado',
     userEmail: 'juliana.prado@avas.com',
+    companyName: 'Avas Energia',
     occurredAt: '2026-06-22T11:28:00-03:00',
     agentName: 'Nexus Sales',
     agentContext: 'CRM e campanhas',
@@ -10325,6 +10328,7 @@ const AGENT_HISTORY_ITEMS = [
     id: 'hist-004',
     userName: 'Roberto Lima',
     userEmail: 'roberto.lima@techcorp.com',
+    companyName: 'TechCorp Brasil',
     occurredAt: '2026-06-22T14:07:00-03:00',
     agentName: 'Support Sentinel',
     agentContext: 'Suporte e integrações',
@@ -10585,6 +10589,7 @@ function renderAgentHistoryTable() {
     row.dataset.agentHistorySearch = [
       item.userName,
       item.userEmail,
+      item.companyName,
       item.agentName,
       item.agentContext,
       item.userIp,
@@ -10595,6 +10600,7 @@ function renderAgentHistoryTable() {
         <strong>${escapeHtmlWes(item.userName)}</strong>
         <small>${escapeHtmlWes(item.userEmail)}</small>
       </span>
+      <span class="agent-history-company-cell">${escapeHtmlWes(item.companyName || '-')}</span>
       <span>${escapeHtmlWes(formatAgentHistoryDateTime(item.occurredAt))}</span>
       <span class="agent-history-agent-cell">
         <strong>${escapeHtmlWes(item.agentName)}</strong>

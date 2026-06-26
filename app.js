@@ -384,6 +384,10 @@ const environmentUsersSummary = document.getElementById('environmentUsersSummary
 const environmentProjectsList = document.getElementById('environmentProjectsList');
 const environmentAgentsList = document.getElementById('environmentAgentsList');
 const environmentUsersList = document.getElementById('environmentUsersList');
+const dashboardQuickActionsEditButtons = document.querySelectorAll('.dashboard-quick-actions-edit');
+const dashboardQuickActionsContainers = document.querySelectorAll('[data-dashboard-quick-actions]');
+const dashboardQuickActionsModal = document.getElementById('dashboardQuickActionsModal');
+const dashboardQuickActionsList = document.getElementById('dashboardQuickActionsList');
 const keysFilterBtn = document.getElementById('keysFilterBtn');
 const keysFilterMenu = document.getElementById('keysFilterMenu');
 const settingsTabs = document.querySelectorAll('#page-settings .settings-tab');
@@ -406,9 +410,34 @@ const orgActionButtons = document.querySelectorAll('#page-organization .org-acti
 
 const HYBRID_FLOWS_STORAGE_KEY = 'hybridFlowsCreated';
 const VOICE_MESSAGING_STORAGE_KEY = 'voiceMessagingCreated';
+const DASHBOARD_QUICK_ACTIONS_STORAGE_KEY = 'dashboardQuickActionsSelection';
 const MCP_VIEW_MODE_STORAGE_KEY = 'mcpsViewMode';
 const MCP_CONNECTIONS_STATE_STORAGE_KEY = 'mcpsConnectionsState';
 const MCP_CUSTOM_CONNECTIONS_STORAGE_KEY = 'mcpsCustomConnections';
+const DASHBOARD_QUICK_ACTIONS_CATALOG = Object.freeze([
+  { id: 'run-automation', label: 'Rodar automação', icon: 'bolt', variant: 'outline', route: '#/dashboard/automations', description: 'Abrir a área de automações para executar ou criar novos fluxos.' },
+  { id: 'create-schedule', label: 'Criar horário', icon: 'calendar_month', variant: 'outline', route: '#/dashboard/schedules', triggerId: 'openCriarAgendamentoModal', description: 'Ir para agendamentos e abrir a criação de um novo horário.' },
+  { id: 'upload-package', label: 'Subir pacote', icon: 'upload_file', variant: 'outline', route: '#/dashboard/packages', description: 'Acessar pacotes para publicar novas versões de automação.' },
+  { id: 'register-executor', label: 'Registrar executor', icon: 'computer', variant: 'outline', route: '#/dashboard/executors', triggerId: 'openExecutorModal', description: 'Abrir a gestão de executores para cadastrar uma nova máquina.' },
+  { id: 'create-agent', label: 'Criar agente', icon: 'smart_toy', variant: 'outline', route: '#/dashboard/agents', triggerId: 'openAgentModal', description: 'Abrir o modal de criação de agente.' },
+  { id: 'create-automation', label: 'Criar automação', icon: 'bolt', variant: 'outline', route: '#/dashboard/automations', triggerId: 'openAutomationModal', description: 'Abrir o modal de criação de automação.' },
+  { id: 'view-agents', label: 'Ver agentes', icon: 'groups', variant: 'outline', route: '#/dashboard/agents', description: 'Acessar a lista de agentes e projetos.' },
+  { id: 'view-automations', label: 'Ver automações', icon: 'list_alt', variant: 'outline', route: '#/dashboard/automations', description: 'Acessar a lista de automações e execuções.' },
+  { id: 'access-project', label: 'Acessar projeto', icon: 'folder_open', variant: 'outline', route: '#/dashboard/agents', description: 'Acessar a área de agentes e projetos.' },
+  { id: 'manage-skills', label: 'Gerenciar habilidades', icon: 'psychology', variant: 'outline', route: '#/dashboard/skills', description: 'Abrir a tela de habilidades do painel.' },
+  { id: 'manage-connections', label: 'Gerenciar conexões', icon: 'hub', variant: 'outline', route: '#/dashboard/mcps', description: 'Abrir a tela de conexões e MCPs.' },
+  { id: 'view-projects', label: 'Ver projetos', icon: 'folder', variant: 'outline', route: '#/dashboard/agents', description: 'Acessar a área com os projetos vinculados aos agentes.' },
+  { id: 'view-executors', label: 'Ver executores', icon: 'desktop_windows', variant: 'outline', route: '#/dashboard/executors', description: 'Abrir a lista de executores cadastrados.' },
+  { id: 'view-packages', label: 'Ver pacotes', icon: 'inventory_2', variant: 'outline', route: '#/dashboard/packages', description: 'Abrir a lista de pacotes publicados.' },
+]);
+const DASHBOARD_QUICK_ACTIONS_DEFAULT = Object.freeze([
+  'run-automation',
+  'create-schedule',
+  'upload-package',
+  'register-executor',
+]);
+const DASHBOARD_QUICK_ACTIONS_LIMIT = 4;
+let dashboardQuickActionsSelection = [...DASHBOARD_QUICK_ACTIONS_DEFAULT];
 const MCP_CONNECTIONS_CATALOG = Object.freeze([
   { id: 'filesystem-mcp', name: 'Filesystem', description: 'Acessa arquivos e diretórios do workspace com segurança para leitura, escrita e automações internas.', accent: '#2563eb', mark: 'FS', connected: false, updatedAt: '16/06/2026' },
   { id: 'google-drive-mcp', name: 'Google Drive', description: 'Conecta documentos e pastas do Google Drive para leitura, organização e uso pelos agentes.', accent: '#16a34a', mark: 'GD', connected: true, updatedAt: '14/06/2026' },
@@ -2115,6 +2144,238 @@ function showAppToast(message) {
       if (!appToast.classList.contains('is-visible')) appToast.hidden = true;
     }, 220);
   }, 2200);
+}
+
+function getDashboardQuickActionById(actionId) {
+  return DASHBOARD_QUICK_ACTIONS_CATALOG.find((action) => action.id === actionId) || null;
+}
+
+function saveDashboardQuickActionsSelection() {
+  try {
+    window.localStorage.setItem(DASHBOARD_QUICK_ACTIONS_STORAGE_KEY, JSON.stringify(dashboardQuickActionsSelection));
+  } catch (error) {
+    console.warn('Nao foi possivel salvar as acoes rapidas do painel.', error);
+  }
+}
+
+function normalizeDashboardQuickActionsSelection(value) {
+  if (!Array.isArray(value)) return [...DASHBOARD_QUICK_ACTIONS_DEFAULT];
+  const unique = [];
+  value.forEach((item) => {
+    const actionId = String(item || '').trim();
+    if (!actionId || unique.includes(actionId) || !getDashboardQuickActionById(actionId)) return;
+    unique.push(actionId);
+  });
+  return unique.slice(0, DASHBOARD_QUICK_ACTIONS_LIMIT);
+}
+
+function loadDashboardQuickActionsSelection() {
+  try {
+    const raw = window.localStorage.getItem(DASHBOARD_QUICK_ACTIONS_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = normalizeDashboardQuickActionsSelection(JSON.parse(raw));
+    dashboardQuickActionsSelection =
+      parsed.length === DASHBOARD_QUICK_ACTIONS_DEFAULT.length
+        ? parsed
+        : [...DASHBOARD_QUICK_ACTIONS_DEFAULT];
+  } catch (error) {
+    dashboardQuickActionsSelection = [...DASHBOARD_QUICK_ACTIONS_DEFAULT];
+  }
+}
+
+function buildDashboardQuickActionButton(action) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = `btn ${action.variant || 'outline'}`;
+  button.dataset.quickActionId = action.id;
+
+  const label = document.createElement('span');
+  label.textContent = action.label;
+
+  button.append(label);
+  button.addEventListener('click', () => {
+    if (action.route) window.location.hash = action.route;
+    if (action.triggerId) {
+      window.setTimeout(() => {
+        document.getElementById(action.triggerId)?.click();
+      }, 120);
+    }
+  });
+  return button;
+}
+
+function renderDashboardQuickActions() {
+  if (!dashboardQuickActionsContainers.length) return;
+  const actions = normalizeDashboardQuickActionsSelection(dashboardQuickActionsSelection)
+    .map((actionId) => getDashboardQuickActionById(actionId))
+    .filter(Boolean);
+
+  dashboardQuickActionsContainers.forEach((container) => {
+    container.replaceChildren(...actions.map((action) => buildDashboardQuickActionButton(action)));
+  });
+}
+
+function persistDashboardQuickActionsSelection() {
+  dashboardQuickActionsSelection = normalizeDashboardQuickActionsSelection(dashboardQuickActionsSelection);
+  saveDashboardQuickActionsSelection();
+  renderDashboardQuickActions();
+  renderDashboardQuickActionsModal();
+}
+
+function removeDashboardQuickAction(actionId) {
+  dashboardQuickActionsSelection = dashboardQuickActionsSelection.filter((id) => id !== actionId);
+  persistDashboardQuickActionsSelection();
+  showAppToast('Ação rápida removida');
+}
+
+function addDashboardQuickAction(actionId) {
+  if (!actionId || dashboardQuickActionsSelection.includes(actionId)) return;
+  if (dashboardQuickActionsSelection.length >= DASHBOARD_QUICK_ACTIONS_LIMIT) {
+    showAppToast('Remova uma ação rápida antes de adicionar outra');
+    return;
+  }
+  dashboardQuickActionsSelection = [...dashboardQuickActionsSelection, actionId];
+  persistDashboardQuickActionsSelection();
+  showAppToast('Ação rápida adicionada');
+}
+
+function createDashboardQuickActionDraggable(action, index) {
+  const item = document.createElement('article');
+  item.className = 'dashboard-quick-actions-selected-item';
+  item.dataset.quickActionId = action.id;
+  item.dataset.quickActionIndex = String(index);
+
+  const content = document.createElement('div');
+  content.className = 'dashboard-quick-actions-selected-content';
+
+  const title = document.createElement('p');
+  title.className = 'dashboard-quick-actions-selected-title';
+  title.textContent = action.label;
+
+  const description = document.createElement('p');
+  description.className = 'dashboard-quick-actions-selected-desc';
+  description.textContent = action.description;
+
+  content.append(title, description);
+
+  const removeButton = document.createElement('button');
+  removeButton.type = 'button';
+  removeButton.className = 'icon-btn dashboard-quick-actions-remove';
+  removeButton.setAttribute('aria-label', `Remover ${action.label}`);
+  removeButton.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">close</span>';
+  removeButton.addEventListener('click', () => removeDashboardQuickAction(action.id));
+
+  item.append(content, removeButton);
+  return item;
+}
+
+function createDashboardQuickActionAvailableCard(action) {
+  const card = document.createElement('button');
+  card.type = 'button';
+  card.className = `btn ${action.variant || 'outline'} dashboard-quick-actions-available-btn`;
+  card.dataset.quickActionId = action.id;
+  card.textContent = action.label;
+
+  card.addEventListener('click', () => addDashboardQuickAction(action.id));
+  return card;
+}
+
+function renderDashboardQuickActionsModal() {
+  if (!dashboardQuickActionsList) return;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'dashboard-quick-actions-editor';
+
+  const selectedSection = document.createElement('section');
+  selectedSection.className = 'dashboard-quick-actions-panel';
+
+  const selectedHeader = document.createElement('div');
+  selectedHeader.className = 'dashboard-quick-actions-panel-header';
+  selectedHeader.innerHTML = `
+    <div>
+      <p class="dashboard-quick-actions-slot-label">Selecionados</p>
+      <p class="dashboard-quick-actions-panel-desc">Use o X para remover uma ação rápida.</p>
+    </div>
+    <span class="dashboard-quick-actions-current-badge">${dashboardQuickActionsSelection.length}/${DASHBOARD_QUICK_ACTIONS_LIMIT}</span>
+  `;
+
+  const selectedList = document.createElement('div');
+  selectedList.className = 'dashboard-quick-actions-selected-list';
+
+  if (dashboardQuickActionsSelection.length) {
+    dashboardQuickActionsSelection
+      .map((actionId) => getDashboardQuickActionById(actionId))
+      .filter(Boolean)
+      .forEach((action, index) => {
+        selectedList.append(createDashboardQuickActionDraggable(action, index));
+      });
+  } else {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'dashboard-quick-actions-empty';
+    emptyState.textContent = 'Clique em um botão da lista abaixo para começar.';
+    selectedList.append(emptyState);
+  }
+
+  selectedSection.append(selectedHeader, selectedList);
+
+  const availableSection = document.createElement('section');
+  availableSection.className = 'dashboard-quick-actions-panel';
+
+  const availableHeader = document.createElement('div');
+  availableHeader.className = 'dashboard-quick-actions-panel-header';
+  availableHeader.innerHTML = `
+    <div>
+      <p class="dashboard-quick-actions-slot-label">Disponíveis</p>
+      <p class="dashboard-quick-actions-panel-desc">Clique para adicionar uma ação rápida.</p>
+    </div>
+  `;
+
+  const availableGrid = document.createElement('div');
+  availableGrid.className = 'dashboard-quick-actions-options';
+
+  DASHBOARD_QUICK_ACTIONS_CATALOG
+    .filter((action) => !dashboardQuickActionsSelection.includes(action.id))
+    .forEach((action) => {
+      availableGrid.append(createDashboardQuickActionAvailableCard(action));
+    });
+
+  if (!availableGrid.children.length) {
+    const emptyState = document.createElement('div');
+    emptyState.className = 'dashboard-quick-actions-empty';
+    emptyState.textContent = 'Todas as ações disponíveis já foram selecionadas.';
+    availableGrid.append(emptyState);
+  }
+
+  availableSection.append(availableHeader, availableGrid);
+
+  wrapper.append(selectedSection, availableSection);
+  dashboardQuickActionsList.replaceChildren(wrapper);
+}
+
+function closeDashboardQuickActionsModal() {
+  if (!dashboardQuickActionsModal) return;
+  dashboardQuickActionsModal.classList.remove('open');
+  dashboardQuickActionsModal.setAttribute('aria-hidden', 'true');
+}
+
+function openDashboardQuickActionsModal() {
+  if (!dashboardQuickActionsModal) return;
+  renderDashboardQuickActionsModal();
+  dashboardQuickActionsModal.classList.add('open');
+  dashboardQuickActionsModal.setAttribute('aria-hidden', 'false');
+}
+
+loadDashboardQuickActionsSelection();
+saveDashboardQuickActionsSelection();
+renderDashboardQuickActions();
+
+if (dashboardQuickActionsEditButtons.length && dashboardQuickActionsModal) {
+  dashboardQuickActionsEditButtons.forEach((button) => {
+    button.addEventListener('click', openDashboardQuickActionsModal);
+  });
+
+  dashboardQuickActionsModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeDashboardQuickActionsModal();
+  });
 }
 
 function confirmDeletionAction(targetLabel = 'este item') {
@@ -12495,8 +12756,10 @@ const sectionMap = {
   'dashboard': 'Painel',
   'dashboard/automations': 'Automa\u00e7\u00e3o',
   'dashboard/document-analysis': 'Automa\u00e7\u00e3o',
+  'dashboard/input-files': 'Automa\u00e7\u00e3o',
   'dashboard/schedules': 'Automa\u00e7\u00e3o',
-  'dashboard/agents': 'Automa\u00e7\u00e3o',
+  'dashboard/credentials': 'Automa\u00e7\u00e3o',
+  'dashboard/agents': 'Painel',
   'dashboard/voice-messaging': 'Atendimento dinâmico',
   'dashboard/voice-messaging/insights': 'Atendimento dinâmico',
   'dashboard/voice-messaging/new': 'Atendimento dinâmico',
@@ -12511,8 +12774,6 @@ const sectionMap = {
   'dashboard/channels': 'Atendimento dinâmico',
   'dashboard/channels/telegram': 'Atendimento dinâmico',
   'dashboard/channels/telegram/botfather': 'Atendimento dinâmico',
-  'dashboard/credentials': 'Armazenamento',
-  'dashboard/input-files': 'Armazenamento',
   'dashboard/users': 'Administração',
   'dashboard/mcps': 'Administração',
   'dashboard/skills': 'Administração',
@@ -12721,11 +12982,9 @@ const updateActivePage = () => {
   });
   document.querySelectorAll('.submenu').forEach((menu) => menu.classList.remove('open'));
 
-  if (navRouteKey === 'dashboard') {
-    const dashboardLink = document.querySelector('.nav-item[data-route="dashboard"]');
-    if (dashboardLink) {
-      dashboardLink.classList.add('active');
-    }
+  const directNavLink = document.querySelector(`.nav-item[data-route="${navRouteKey}"]`);
+  if (directNavLink) {
+    directNavLink.classList.add('active');
   } else {
     const activeLink = document.querySelector(`.submenu-item[href="#/${navRouteKey}"]`);
     if (activeLink) {

@@ -200,18 +200,20 @@
         </div>
         <nav class="nav" id="sideNav">
           <a class="nav-item active" href="#/dashboard" data-route="dashboard"><span class="material-symbols-rounded">grid_view</span><span class="nav-label">Painel</span></a>
+          <a class="nav-item" href="#/dashboard/agents" data-route="dashboard/agents"><span class="material-symbols-rounded">smart_toy</span><span class="nav-label">Agentes</span></a>
 
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="automation" data-route="dashboard/automations" type="button">
-              <span class="material-symbols-rounded">smart_toy</span>
+              <span class="material-symbols-rounded">automation</span>
               <span class="nav-label">Automação</span>
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-automation">
               <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
-              <a class="submenu-item" href="#/dashboard/agents"><span class="submenu-label">Agentes</span></a>
               <a class="submenu-item" href="#/dashboard/document-analysis"><span class="submenu-label">Análise de documentos</span></a>
+              <a class="submenu-item" href="#/dashboard/input-files"><span class="submenu-label">Arquivos de entrada</span></a>
               <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
+              <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a>
               <a class="submenu-item" href="#/dashboard/bpmn"><span class="submenu-label">Processos</span></a>
             </div>
           </div>
@@ -239,18 +241,6 @@
               <a class="submenu-item" href="#/dashboard/channels"><span class="submenu-label">Canais</span></a>
               <a class="submenu-item" href="#/dashboard/hybrid-flows"><span class="submenu-label">Fluxos híbridos</span></a>
               <a class="submenu-item" href="#/dashboard/voice-messaging"><span class="submenu-label">Mensageria por voz</span></a>
-            </div>
-          </div>
-
-          <div class="nav-group">
-            <button class="nav-item nav-trigger" data-menu="storage" type="button">
-              <span class="material-symbols-rounded">storage</span>
-              <span class="nav-label">Armazenamento</span>
-              <span class="nav-caret">▾</span>
-            </button>
-            <div class="submenu" id="submenu-storage">
-              <a class="submenu-item" href="#/dashboard/input-files"><span class="submenu-label">Arquivos de entrada</span></a>
-              <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a>
             </div>
           </div>
 
@@ -383,13 +373,13 @@
         <section class="content">
           <div class="page is-active" id="page-dashboard" data-title="Painel">
             <div class="section" id="dashboardViewDefault">
-            <h2>Ações rápidas</h2>
-            <div class="quick-actions">
-              <button class="btn primary">Rodar automação</button>
-              <button class="btn outline">Criar horário</button>
-              <button class="btn outline">Subir pacote</button>
-              <button class="btn outline">Registrar executor</button>
+            <div class="section-heading">
+              <h2>Ações rápidas</h2>
+              <button class="icon-btn action-icon dashboard-quick-actions-edit" type="button" aria-label="Editar ações rápidas">
+                <span class="material-symbols-rounded">edit</span>
+              </button>
             </div>
+            <div class="quick-actions" data-dashboard-quick-actions></div>
 
             <div class="stats-cards">
               <div class="stat-card">
@@ -556,13 +546,13 @@
           </div>
 
             <div class="section is-hidden" id="dashboardViewDetail">
-            <h2>Ações rápidas</h2>
-            <div class="quick-actions">
-              <button class="btn primary">Rodar automação</button>
-              <button class="btn outline">Criar horário</button>
-              <button class="btn outline">Subir pacote</button>
-              <button class="btn outline">Registrar executor</button>
+            <div class="section-heading">
+              <h2>Ações rápidas</h2>
+              <button class="icon-btn action-icon dashboard-quick-actions-edit" type="button" aria-label="Editar ações rápidas">
+                <span class="material-symbols-rounded">edit</span>
+              </button>
             </div>
+            <div class="quick-actions" data-dashboard-quick-actions></div>
 
             <div class="stats-cards">
               <div class="stat-card">
@@ -1260,7 +1250,7 @@
                   <button class="icon-btn" aria-label="Baixar agendamentos">
                     <span class="material-symbols-rounded">download</span>
                   </button>
-                  <button class="btn primary">Criar agendamento</button>
+                  <button class="btn primary" id="openCriarAgendamentoModal" type="button">Criar agendamento</button>
                 </div>
               </div>
               <div class="info-banner dismissible">
@@ -3862,7 +3852,7 @@
                     <span class="material-symbols-rounded">download</span>
                     Baixar executor
                   </button>
-                  <button class="btn primary">Criar executor</button>
+                  <button class="btn primary" id="openExecutorModal" type="button">Criar executor</button>
                 </div>
               </div>
               <div class="info-banner dismissible" id="firstTimeBanner">
@@ -4797,23 +4787,20 @@
               <div class="page-header">
                 <div>
                   <h2>Credenciais</h2>
-                  <p class="page-subtitle">Armazene segredos e conexões seguras.</p>
+                  <p class="page-subtitle">Todas as credenciais são criptografadas e podem ser usadas em automações.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn primary">Adicionar credencial</button>
                 </div>
               </div>
-              <div class="info-banner">
-                Todas as credenciais são criptografadas e podem ser usadas em automações.
-              </div>
               <div class="data-table credentials-table">
-                <div class="data-row header cols-5">
+                <div class="data-row header">
                   <span>Nome</span>
                   <span>Tipo</span>
                   <span>Atualizado</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row cols-5">
+                <div class="data-row">
                   <span>DB Produção</span>
                   <span class="chip">Database</span>
                   <span>Há 2 dias</span>
@@ -4826,7 +4813,7 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row cols-5">
+                <div class="data-row">
                   <span>Cobrança AWS</span>
                   <span class="chip">AWS</span>
                   <span>Hoje</span>
@@ -5805,6 +5792,25 @@
               <div class="modal-footer">
                 <button type="button" class="btn outline" data-modal-close>Cancelar</button>
                 <button type="submit" form="environmentModalForm" class="btn primary" id="environmentModalSubmit">Salvar alterações</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="dashboardQuickActionsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog dashboard-quick-actions-dialog" role="dialog" aria-modal="true" aria-labelledby="dashboardQuickActionsTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="dashboardQuickActionsTitle">Editar ações rápidas</h3>
+                  <p class="modal-subtitle">Troque os atalhos padrão do painel pelas opções disponíveis abaixo.</p>
+                </div>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body dashboard-quick-actions-body" id="dashboardQuickActionsList"></div>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Fechar</button>
               </div>
             </div>
           </div>

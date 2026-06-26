@@ -7881,6 +7881,13 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   font-size: var(--md-title-large);
 }
 
+.modal-subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
 .modal-body {
   display: grid;
   gap: 12px;
@@ -9478,6 +9485,162 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   justify-content: flex-end;
   gap: 10px;
 }
+
+.dashboard-quick-actions-dialog {
+  width: min(880px, 94vw);
+}
+
+.dashboard-quick-actions-body {
+  gap: 16px;
+}
+
+.dashboard-quick-actions-editor {
+  display: grid;
+  gap: 16px;
+}
+
+.dashboard-quick-actions-panel {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(207, 216, 228, 0.92);
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.dashboard-quick-actions-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dashboard-quick-actions-slot-label {
+  margin: 0 0 4px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.dashboard-quick-actions-current-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(1, 111, 244, 0.1);
+  color: #016ff4;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dashboard-quick-actions-panel-desc {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #64748b;
+}
+
+.dashboard-quick-actions-selected-list {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 14px;
+  min-height: 52px;
+  padding: 4px;
+  border: 1px dashed rgba(1, 111, 244, 0.22);
+  border-radius: 18px;
+  background: rgba(248, 251, 255, 0.72);
+}
+
+.dashboard-quick-actions-selected-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 36px 10px 16px;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  background: #ffffff;
+  min-height: 44px;
+  color: var(--primary);
+  flex: 0 0 auto;
+  min-width: 0;
+  font-weight: 600;
+  font-size: var(--md-label-large);
+  line-height: 20px;
+}
+
+.dashboard-quick-actions-selected-content {
+  min-width: 0;
+  flex: 0 1 auto;
+  width: auto;
+}
+
+.dashboard-quick-actions-selected-title {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+  color: currentColor;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
+
+.dashboard-quick-actions-selected-desc {
+  display: none;
+}
+
+.dashboard-quick-actions-remove {
+  position: absolute;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  flex-shrink: 0;
+  color: currentColor;
+}
+
+.dashboard-quick-actions-remove:hover {
+  background: transparent;
+}
+
+.dashboard-quick-actions-remove .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.dashboard-quick-actions-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  padding: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.8);
+  color: #64748b;
+  font-size: 13px;
+  text-align: center;
+}
+
+.dashboard-quick-actions-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.dashboard-quick-actions-available-btn {
+  flex: 0 0 auto;
+  cursor: grab;
+}
+
 
 .chat-dialog {
   width: min(840px, 92vw);
@@ -11592,6 +11755,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   text-align: center;
 }
 
+#page-credentials .data-table .data-row > .chip {
+  width: calc(8ch + 16px);
+  min-width: 0;
+  text-align: center;
+}
+
 #page-companies .data-table .data-row > .chip {
   width: calc(8ch + 16px);
   min-width: 0;
@@ -12136,11 +12305,31 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   font-weight: 600;
 }
 
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.section-heading h2 {
+  margin-bottom: 0;
+}
+
 .quick-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
+}
+
+.dashboard-quick-actions-edit {
+  flex-shrink: 0;
+  margin-left: 0;
+}
+
+.quick-actions .btn .material-symbols-rounded {
+  font-size: 20px;
 }
 
 .btn {

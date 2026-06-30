@@ -19,6 +19,38 @@ const filterBtnAlt = document.getElementById('alertFilterBtnAlt');
 const filterMenuAlt = document.getElementById('alertFilterMenuAlt');
 const agentsFilterBtn = document.getElementById('agentsFilterBtn');
 const agentsFilterMenu = document.getElementById('agentsFilterMenu');
+agentsFilterMenu?.classList.remove('two-col');
+const FILTER_MENU_LAYOUT_CLASSES = [
+  'filter-menu--groups-1',
+  'filter-menu--groups-2',
+  'filter-menu--groups-3',
+  'filter-menu--groups-4',
+  'filter-menu--groups-many',
+];
+
+function syncFilterMenuLayout(menu) {
+  if (!menu) return;
+  const filterGroups = Array.from(menu.children).filter((child) => (
+    child.classList?.contains('filter-group') && !child.hidden
+  ));
+  if (!filterGroups.length) return;
+
+  menu.classList.add('filter-menu', 'filter-menu--standard');
+  menu.classList.remove(...FILTER_MENU_LAYOUT_CLASSES);
+  menu.dataset.filterGroupCount = String(filterGroups.length);
+
+  if (filterGroups.length >= 1 && filterGroups.length <= 4) {
+    menu.classList.add(`filter-menu--groups-${filterGroups.length}`);
+  } else {
+    menu.classList.add('filter-menu--groups-many');
+  }
+}
+
+function syncFilterMenuLayouts(root = document) {
+  root.querySelectorAll('.menu').forEach((menu) => syncFilterMenuLayout(menu));
+}
+
+syncFilterMenuLayouts();
 const languageSwitcher = document.querySelector('[data-language-switcher]');
 const languageToggle = document.querySelector('[data-language-toggle]');
 const languageMenu = document.querySelector('[data-language-menu]');

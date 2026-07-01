@@ -101,14 +101,14 @@
         </div>
       </section>
 
-      <section class="public-screen org-select-screen" id="organizationSelectScreen" data-public-route="select-organization" aria-label="Seleção de empresa">
+      <section class="public-screen org-select-screen" id="organizationSelectScreen" data-public-route="select-organization" aria-label="Seleção de organização">
         <main class="org-select-main">
           <div class="org-select-brand" aria-label="WES HUB 360">
             <img src="./assets/WES_LOGO_8.svg" alt="WES HUB 360" />
           </div>
           <div class="org-select-heading">
-            <h1>Selecione uma empresa</h1>
-            <p>Escolha qual empresa deseja acessar</p>
+            <h1>Selecione uma organização</h1>
+            <p>Escolha qual organização deseja administrar</p>
           </div>
           <div class="org-select-grid">
             <a class="org-choice-card" href="#/dashboard" data-org-choice="adm-wes" data-org-name="ADM WES">
@@ -118,33 +118,33 @@
                 <span>Padrão</span>
                 <span>admin</span>
               </span>
-              <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+              <span class="org-access">Acessar organização <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
-            <a class="org-choice-card" href="#/dashboard" data-org-choice="cedae" data-org-name="CEDAE">
+            <a class="org-choice-card" href="#/dashboard" data-org-choice="cedae" data-org-name="ADM Cliente">
               <span class="org-avatar org-avatar-red">C</span>
-              <strong>CEDAE</strong>
+              <strong>ADM Cliente</strong>
               <span class="org-tags">
-                <span>Padrão</span>
-                <span>Membro</span>
+                <span>Cliente</span>
+                <span>ADM</span>
               </span>
-              <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+              <span class="org-access">Acessar organização <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
-            <a class="org-choice-card" href="#/dashboard" data-org-choice="user-cedae" data-org-name="USER CEDAE">
+            <a class="org-choice-card" href="#/dashboard" data-org-choice="user-cedae" data-org-name="Usuário Cliente">
               <span class="org-avatar org-avatar-blue">UC</span>
-              <strong>USER CEDAE</strong>
+              <strong>Usuário Cliente</strong>
               <span class="org-tags">
-                <span>Padrão</span>
+                <span>Cliente</span>
                 <span>Membro</span>
               </span>
-              <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+              <span class="org-access">Acessar organização <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
-            <button class="org-choice-card org-create-card" id="openCreateCompanyModal" data-open-create-company-modal type="button">
+            <button class="org-choice-card org-create-card" id="openCreateCompanyModal" data-open-create-company-modal data-create-context="organization" type="button">
               <span class="org-create-icon">
                 <span class="material-symbols-rounded" aria-hidden="true">add_business</span>
               </span>
-              <strong>Criar empresa</strong>
-              <span class="org-create-copy">Cadastre uma nova empresa para acessar no HUB 360.</span>
-              <span class="org-access">Criar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+              <strong>Criar organização</strong>
+              <span class="org-create-copy">Cadastre uma nova organização para administrar empresas no HUB 360.</span>
+              <span class="org-access">Criar organização <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </button>
           </div>
           <a class="org-logout" href="#/login">
@@ -175,6 +175,158 @@
               <span>E-mail do ADM da empresa</span>
               <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
             </label>
+            <fieldset class="organization-sections-picker" id="organizationSectionsPicker" hidden>
+              <legend>Seções disponíveis</legend>
+              <p>Marque as áreas e subseções que ficarão disponíveis para esta organização.</p>
+              <div class="organization-sections-list">
+                <div class="organization-section-row organization-section-row--single">
+                  <label class="organization-section-check organization-section-check--parent">
+                    <input type="checkbox" name="organization_sections" value="dashboard" checked />
+                    <span class="material-symbols-rounded" aria-hidden="true">grid_view</span>
+                    <strong>Painel</strong>
+                  </label>
+                </div>
+                <div class="organization-section-row organization-section-row--single">
+                  <label class="organization-section-check organization-section-check--parent">
+                    <input type="checkbox" name="organization_sections" value="agents" checked />
+                    <span class="material-symbols-rounded" aria-hidden="true">smart_toy</span>
+                    <strong>Agentes</strong>
+                  </label>
+                </div>
+
+                <div class="organization-section-group">
+                  <div class="organization-section-head">
+                    <label class="organization-section-check organization-section-check--parent">
+                      <input type="checkbox" name="organization_sections" value="automation" checked />
+                      <span class="material-symbols-rounded" aria-hidden="true">automation</span>
+                      <strong>Fluxos de Trabalho</strong>
+                    </label>
+                    <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Fluxos de Trabalho">
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                  </div>
+                  <div class="organization-subsections">
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="schedules" checked />
+                      <span>Agendamentos</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="document-analysis" checked />
+                      <span>Análise de documentos</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="input-files" checked />
+                      <span>Arquivos de entrada</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="automations" checked />
+                      <span>Automações</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="credentials" checked />
+                      <span>Credenciais</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="processes" checked />
+                      <span>Processos</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="organization-section-group">
+                  <div class="organization-section-head">
+                    <label class="organization-section-check organization-section-check--parent">
+                      <input type="checkbox" name="organization_sections" value="infrastructure" checked />
+                      <span class="material-symbols-rounded" aria-hidden="true">computer</span>
+                      <strong>Infraestrutura</strong>
+                    </label>
+                    <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Infraestrutura">
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                  </div>
+                  <div class="organization-subsections">
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="executors" checked />
+                      <span>Executores</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="packages" checked />
+                      <span>Pacotes</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="organization-section-group">
+                  <div class="organization-section-head">
+                    <label class="organization-section-check organization-section-check--parent">
+                      <input type="checkbox" name="organization_sections" value="dynamic-service" checked />
+                      <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
+                      <strong>Atendimento dinâmico</strong>
+                    </label>
+                    <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Atendimento dinâmico">
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                  </div>
+                  <div class="organization-subsections">
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="campaigns" checked />
+                      <span>Campanhas</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="channels" checked />
+                      <span>Canais</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="hybrid-flows" checked />
+                      <span>Fluxos híbridos</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="voice-messaging" checked />
+                      <span>Mensageria por voz</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="organization-section-group">
+                  <div class="organization-section-head">
+                    <label class="organization-section-check organization-section-check--parent">
+                      <input type="checkbox" name="organization_sections" value="administration" checked />
+                      <span class="material-symbols-rounded" aria-hidden="true">admin_panel_settings</span>
+                      <strong>Administração</strong>
+                    </label>
+                    <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Administração">
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                  </div>
+                  <div class="organization-subsections">
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="audit" checked />
+                      <span>Auditoria</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="mcps" checked />
+                      <span>Conexões</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="companies" checked />
+                      <span>Empresas</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="skills" checked />
+                      <span>Habilidades</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="environments" checked />
+                      <span>Setores</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="users" checked />
+                      <span>Usuários</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </fieldset>
             <button class="auth-link public-modal-admin-link" id="createCompanyAdminUserLink" type="button">
               Não criou o ADM da empresa ainda?
             </button>
@@ -203,9 +355,9 @@
           <a class="nav-item" href="#/dashboard/agents" data-route="dashboard/agents"><span class="material-symbols-rounded">smart_toy</span><span class="nav-label">Agentes</span></a>
 
           <div class="nav-group">
-            <button class="nav-item nav-trigger" data-menu="automation" data-route="dashboard/automations" type="button">
+            <button class="nav-item nav-trigger" data-menu="automation" type="button">
               <span class="material-symbols-rounded">automation</span>
-              <span class="nav-label">Automação</span>
+              <span class="nav-label">Fluxos de Trabalho</span>
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-automation">
@@ -253,6 +405,7 @@
             <div class="submenu" id="submenu-administration">
               <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Auditoria</span></a>
               <a class="submenu-item" href="#/dashboard/mcps"><span class="submenu-label">Conexões</span></a>
+              <a class="submenu-item" href="#/dashboard/organizations" data-access-item="organizations"><span class="submenu-label">Organizações</span></a>
               <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
               <a class="submenu-item" href="#/dashboard/skills"><span class="submenu-label">Habilidades</span></a>
               <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
@@ -355,7 +508,7 @@
                 </button>
                 <a href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization" data-access-item="switch-organization">
                   <span class="material-symbols-rounded">business</span>
-                  Trocar de empresa
+                  Trocar de organização
                 </a>
                 <a href="#/dashboard/settings">
                   <span class="material-symbols-rounded">settings</span>
@@ -929,7 +1082,7 @@
                     <span>12/03/2025 • 08:00</span>
                     <span>12/03/2025 • 08:30</span>
                     <span>30 min</span>
-                    <span class="chip success">Completa</span>
+                    <span><span class="chip success">Completa</span></span>
                     <span class="row-actions">
                       <button class="icon-btn action-icon execution-details-trigger" aria-label="Ver detalhes" type="button">
                         <span class="material-symbols-rounded">info</span>
@@ -950,7 +1103,7 @@
                     <span>11/03/2025 • 18:00</span>
                     <span>11/03/2025 • 18:10</span>
                     <span>10 min</span>
-                    <span class="chip warning">Interrompida</span>
+                    <span><span class="chip warning">Interrompida</span></span>
                     <span class="row-actions">
                       <button class="icon-btn action-icon execution-details-trigger" aria-label="Ver detalhes" type="button">
                         <span class="material-symbols-rounded">info</span>
@@ -1438,33 +1591,27 @@
                       <div class="filter-footer">
                         <button class="filter-clear" type="button">Limpar filtros</button>
                       </div>
-                      <div class="filter-group">
+                      <div class="filter-group agents-filter-group--sector">
+                        <span>Setor</span>
+                        <button class="filter-option" data-filter="sector" data-value="operacoes">Operações</button>
+                        <button class="filter-option" data-filter="sector" data-value="financeiro">Financeiro</button>
+                        <button class="filter-option" data-filter="sector" data-value="marketing">Marketing</button>
+                        <button class="filter-option" data-filter="sector" data-value="rh">RH</button>
+                      </div>
+                      <select class="hub-select agents-page-org-select-native" id="agentsPageOrgSelect" aria-hidden="true" tabindex="-1" hidden>
+                        <option value="">Carregando organizações</option>
+                      </select>
+                      <div class="filter-group agents-filter-group--rag">
                         <span>RAG</span>
                         <button class="filter-option" data-filter="rag" data-value="sim">Sim</button>
                         <button class="filter-option" data-filter="rag" data-value="nao">Não</button>
                       </div>
-                      <div class="filter-group">
+                      <div class="filter-group agents-filter-group--visibility">
                         <span>Visibilidade</span>
                         <button class="filter-option" data-filter="visibility" data-value="publico">Público</button>
                         <button class="filter-option" data-filter="visibility" data-value="privado">Privado</button>
                       </div>
                     </div>
-                  </div>
-                  <div class="agents-environment-toolbar-controls" id="agentsScopeControls">
-                    <div class="hub-select-wrap agents-environment-select-wrap">
-                      <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="layers-3"></i></span>
-                      <select class="hub-select" id="agentsPageEnvironmentSelect" aria-label="Filtrar agentes por ambiente">
-                        <option value="">Todos os ambientes</option>
-                        <option value="operacoes">Operações</option>
-                        <option value="financeiro">Financeiro</option>
-                        <option value="marketing">Marketing</option>
-                        <option value="rh">RH</option>
-                      </select>
-                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                    </div>
-                    <select class="hub-select agents-page-org-select-native" id="agentsPageOrgSelect" aria-hidden="true" tabindex="-1" hidden>
-                      <option value="">Carregando organizações</option>
-                    </select>
                   </div>
                 </div>
               </div>
@@ -1475,7 +1622,7 @@
                     <span>Descrição</span>
                     <span>ID</span>
                     <span class="agents-header-tooltip" data-tooltip="Conhecimento interno">RAG</span>
-                    <span>Ambiente</span>
+                    <span>Setor</span>
                     <span>Visibilidade</span>
                     <span>Ações</span>
                   </div>
@@ -1488,7 +1635,7 @@
                     <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                     <span class="row-actions">
                       <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
-                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-1024" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/agent-chat?agent=AGT-1024" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1550,7 +1697,7 @@
                     <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                     <span class="row-actions">
                       <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
-                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-3310" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/agent-chat?agent=AGT-3310" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1581,7 +1728,7 @@
                     <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                     <span class="row-actions">
                       <button type="button" class="icon-btn action-icon agent-edit-toggle" aria-label="Editar agente"><span class="material-symbols-rounded">edit</span></button>
-                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-8841" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
+                      <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/agent-chat?agent=AGT-8841" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                       <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                         <span class="material-symbols-rounded">add</span>
                       </button>
@@ -1661,7 +1808,7 @@
                         <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
-                        <span>Ambiente</span>
+                        <span>Setor</span>
                         <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
@@ -1673,7 +1820,7 @@
                         <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                         <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                         <span class="row-actions">
-                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-1024" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/agent-chat?agent=AGT-1024" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1752,7 +1899,7 @@
                         <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
-                        <span>Ambiente</span>
+                        <span>Setor</span>
                         <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
@@ -1764,7 +1911,7 @@
                         <span class="agents-row-environment"><span class="agents-environment-badge">Financeiro</span></span>
                         <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                         <span class="row-actions">
-                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-3310" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/agent-chat?agent=AGT-3310" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1816,7 +1963,7 @@
                         <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
-                        <span>Ambiente</span>
+                        <span>Setor</span>
                         <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
@@ -1828,7 +1975,7 @@
                         <span class="agents-row-environment"><span class="agents-environment-badge">Operações</span></span>
                         <span class="agents-row-visibility"><span class="agents-visibility-badge agents-visibility-badge--public">Público</span></span>
                         <span class="row-actions">
-                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/dashboard/agents?agent=AGT-8841" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
+                          <button type="button" class="icon-btn action-icon agents-copy-link-btn" data-agent-public-link="#/agent-chat?agent=AGT-8841" aria-label="Compartilhar agente"><i data-lucide="share"></i></button>
                           <button class="icon-btn action-icon add-toggle" aria-label="Adicionar">
                             <span class="material-symbols-rounded">add</span>
                           </button>
@@ -1877,7 +2024,7 @@
                         <span>Descrição</span>
                         <span>ID</span>
                         <span>Conhecimento</span>
-                        <span>Ambiente</span>
+                        <span>Setor</span>
                         <span>Visibilidade</span>
                         <span>Ações</span>
                       </div>
@@ -2008,15 +2155,15 @@
 
                   <div class="modal-row">
                     <div>
-                      <label class="modal-label" for="agentModalEnvironment">Ambiente</label>
+                      <label class="modal-label" for="agentModalEnvironment">Setor</label>
                       <div class="hub-select-wrap hub-select-wrap--block">
                         <span class="hub-select-icon hub-select-icon--lucide" aria-hidden="true"><i data-lucide="folder"></i></span>
-                        <select class="hub-select" id="agentModalEnvironment" aria-label="Ambiente do agente">
-                          <option value="">Sem ambiente</option>
+                        <select class="hub-select" id="agentModalEnvironment" aria-label="Setor do agente">
+                          <option value="">Sem setor</option>
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
-                      <p class="modal-field-hint">Opcional, defina o ambiente principal em que esse agente vai operar.</p>
+                      <p class="modal-field-hint">Opcional, defina o setor principal em que esse agente vai operar.</p>
                     </div>
                     <div>
                       <label class="modal-label" for="agentModalProject">Projeto</label>
@@ -2182,10 +2329,13 @@
                 </div>
                 <div class="agent-share-link-card">
                   <label class="modal-label" for="agentShareLink">Link para compartilhar</label>
-                  <div class="modal-input-action-wrap">
+                  <div class="modal-input-action-wrap modal-input-action-wrap--double">
                     <input class="modal-input modal-input--with-action" id="agentShareLink" type="text" readonly />
-                    <button class="icon-btn modal-input-action" id="agentShareCopyBtn" type="button" aria-label="Copiar link">
+                    <button class="icon-btn modal-input-action modal-input-action--copy" id="agentShareCopyBtn" type="button" aria-label="Copiar link">
                       <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                    <button class="icon-btn modal-input-action modal-input-action--open" id="agentShareOpenBtn" type="button" aria-label="Abrir link em nova aba">
+                      <span class="material-symbols-rounded">open_in_new</span>
                     </button>
                   </div>
                   <p class="modal-field-hint">Copie o link ou ajuste os acessos abaixo.</p>
@@ -2220,11 +2370,11 @@
                   autocomplete="off"
                   placeholder="Ex.: Operações integradas"
                 />
-                <label class="modal-label modal-label--required" for="projectModalEnvironment">Ambiente</label>
+                <label class="modal-label modal-label--required" for="projectModalEnvironment">Setor</label>
                 <div class="hub-select-wrap hub-select-wrap--block">
                   <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">layers</span>
-                  <select id="projectModalEnvironment" name="project_environment" class="hub-select" required aria-label="Ambiente do projeto">
-                    <option value="">Selecione o ambiente</option>
+                  <select id="projectModalEnvironment" name="project_environment" class="hub-select" required aria-label="Setor do projeto">
+                    <option value="">Selecione o setor</option>
                   </select>
                   <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                 </div>
@@ -3392,7 +3542,7 @@
                 </div>
                 <div class="form-field">
                   <button class="btn filter-btn" id="campaignsFilterBtn" type="button">
-                    <span class="material-symbols-rounded">filter_list</span><span id="campaignsFilterBtnLabel">Status: Todos</span>
+                    <span class="material-symbols-rounded">filter_list</span><span id="campaignsFilterBtnLabel">Filtros</span>
                   </button>
                   <div class="menu" id="campaignsFilterMenu">
                     <div class="filter-footer">
@@ -4734,12 +4884,7 @@
                 <div class="channel-picker-grid">
                   <button class="channel-picker-card" type="button" aria-label="Selecionar Telegram" id="openTelegramConfigModal">
                     <span class="channel-picker-icon channel-picker-icon--telegram" aria-hidden="true">
-                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path
-                          fill="currentColor"
-                          d="M21.5 4.2 3.9 11c-1.2.5-1.2 1.2-.2 1.5l4.5 1.4 1.7 5.4c.2.6.1.9.8.9.5 0 .7-.2 1-.5l2.5-2.4 5.2 3.8c1 .6 1.6.3 1.9-.9l3.2-14.9c.4-1.5-.5-2.2-1.8-1.7ZM9 13.6l10.3-6.5c.5-.3 1-.1.6.3l-8.5 7.7-.3 3.2L9 13.6Z"
-                        />
-                      </svg>
+                      <img src="./assets/telegram.svg" alt="" />
                     </span>
                     <span class="channel-picker-copy">
                       <span class="channel-picker-title">Telegram</span>
@@ -4790,22 +4935,22 @@
                   <p class="page-subtitle">Todas as credenciais são criptografadas e podem ser usadas em automações.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary">Adicionar credencial</button>
+                  <button class="btn primary" id="openCredentialModalBtn" type="button">Adicionar credencial</button>
                 </div>
               </div>
-              <div class="data-table credentials-table">
+              <div class="data-table credentials-table" id="credentialsTable">
                 <div class="data-row header">
                   <span>Nome</span>
                   <span>Tipo</span>
                   <span>Atualizado</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row">
+                <div class="data-row" data-credential-name="DB Produção" data-credential-type="Banco de Dados" data-credential-description="Credencial usada para acesso ao banco de dados de produção." data-credential-updated-at="29/06/2026 • 14:20">
                   <span>DB Produção</span>
-                  <span class="chip">Database</span>
-                  <span>Há 2 dias</span>
+                  <span class="chip">Banco de Dados</span>
+                  <span>29/06/2026 • 14:20</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar">
+                    <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -4813,12 +4958,12 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row">
+                <div class="data-row" data-credential-name="Cobrança AWS" data-credential-type="AWS" data-credential-description="Credencial usada para integrações de cobrança e consulta de recursos AWS." data-credential-updated-at="01/07/2026 • 09:10">
                   <span>Cobrança AWS</span>
                   <span class="chip">AWS</span>
-                  <span>Hoje</span>
+                  <span>01/07/2026 • 09:10</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar">
+                    <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -4830,6 +4975,59 @@
             </div>
           </div>
 
+          <div class="modal" id="credentialModal" aria-hidden="true">
+            <div class="modal-backdrop" data-credential-modal-close></div>
+            <div class="modal-dialog credential-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="credentialModalTitle">
+              <form id="credentialModalForm">
+                <div class="modal-header">
+                  <h3 id="credentialModalTitle">Adicionar credencial</h3>
+                  <button class="icon-btn" aria-label="Fechar" data-credential-modal-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body credential-modal-body">
+                  <div class="credential-security-notice" role="note">
+                    <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                    <p>As credenciais são criptografadas e armazenadas com segurança. Elas podem ser acessadas em scripts Python usando a API de credenciais do WES HUB 360.</p>
+                  </div>
+
+                  <section class="users-modal-section">
+                    <div>
+                      <label class="modal-label modal-label--required" for="credentialNameInput">Nome da credencial</label>
+                      <input class="modal-input" id="credentialNameInput" name="name" type="text" placeholder="Ex.: DB Produção" autocomplete="off" required />
+                      <p class="modal-field-hint">Nome usado para identificar a credencial nas automações e scripts.</p>
+                    </div>
+
+                    <div>
+                      <label class="modal-label" for="credentialDescriptionInput">Descrição</label>
+                      <textarea class="modal-textarea" id="credentialDescriptionInput" name="description" rows="4" placeholder="Descreva onde esta credencial será usada"></textarea>
+                      <p class="modal-field-hint">Opcional, ajuda a contextualizar uso, ambiente e responsáveis.</p>
+                    </div>
+
+                    <div>
+                      <label class="modal-label modal-label--required" for="credentialTypeSelect">Tipo de credencial</label>
+                      <select class="modal-input" id="credentialTypeSelect" name="type" required>
+                        <option value="AWS">AWS</option>
+                        <option value="Banco de Dados">Banco de Dados</option>
+                        <option value="Chave de API">Chave de API</option>
+                        <option value="Chave SSH">Chave SSH</option>
+                        <option value="Token OAuth">Token OAuth</option>
+                        <option value="Personalizada">Personalizada</option>
+                      </select>
+                      <p class="modal-field-hint">Selecione a categoria que melhor representa o segredo armazenado.</p>
+                    </div>
+
+                    <div class="credential-dynamic-fields" id="credentialDynamicFields" aria-live="polite"></div>
+                  </section>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-credential-modal-close type="button">Cancelar</button>
+                  <button class="btn primary" id="credentialModalSubmitBtn" type="submit">Salvar credencial</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
           <div class="page" id="page-input-files" data-title="Arquivos de entrada">
             <div class="section">
               <div class="page-header">
@@ -4838,7 +5036,8 @@
                   <p class="page-subtitle">Gerencie arquivos usados em automações.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary">Enviar arquivo</button>
+                  <input id="inputFilesUploadInput" type="file" accept=".csv,.json,.txt,.xlsx,.xls,.pdf,text/csv,application/json,text/plain,application/pdf" hidden />
+                  <button class="btn primary" id="inputFilesUploadButton" type="button">Enviar arquivo</button>
                 </div>
               </div>
               <div class="data-table">
@@ -4853,7 +5052,7 @@
                   <span>clientes.csv</span>
                   <span class="chip">CSV</span>
                   <span>Público</span>
-                  <span>Hoje</span>
+                  <span>01/07/2026 • 08:30</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" aria-label="Baixar">
                       <span class="material-symbols-rounded">download</span>
@@ -4867,7 +5066,7 @@
                   <span>config.json</span>
                   <span class="chip">JSON</span>
                   <span>Privado</span>
-                  <span>Ontem</span>
+                  <span>30/06/2026 • 17:45</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" aria-label="Baixar">
                       <span class="material-symbols-rounded">download</span>
@@ -5313,6 +5512,41 @@
             </div>
           </div>
 
+          <div class="modal" id="mcpAuthModal" aria-hidden="true">
+            <div class="modal-backdrop" data-mcp-auth-close></div>
+            <div class="modal-dialog mcp-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="mcpAuthModalTitle">
+              <div id="mcpAuthForm">
+                <div class="modal-header">
+                  <div>
+                    <h3 id="mcpAuthModalTitle">Autenticar MCP</h3>
+                    <p class="page-subtitle mcp-auth-modal-subtitle" id="mcpAuthModalSubtitle">Mockup de abertura do fluxo de autenticação.</p>
+                  </div>
+                  <button class="icon-btn" aria-label="Fechar" data-mcp-auth-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body mcp-auth-modal-body">
+                  <div class="mcp-auth-modal-summary">
+                    <img class="mcp-auth-modal-logo" id="mcpAuthModalLogo" alt="" />
+                    <div class="mcp-auth-modal-copy">
+                      <strong id="mcpAuthModalName">Conexão</strong>
+                      <span id="mcpAuthModalDescription">Autenticação MCP</span>
+                    </div>
+                  </div>
+
+                  <p class="mcp-auth-modal-label" id="mcpAuthModalNotice">O modal de autenticação desta conexão será aberto.</p>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-mcp-auth-close type="button">Cancelar</button>
+                  <button class="btn primary" id="mcpAuthSubmitBtn" type="button">
+                    <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
+                    Abrir autenticação
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="modal" id="mcpCreateModal" aria-hidden="true">
             <div class="modal-backdrop" data-mcp-create-close></div>
             <div class="modal-dialog mcp-create-dialog" role="dialog" aria-modal="true" aria-labelledby="mcpCreateModalTitle">
@@ -5583,9 +5817,10 @@
                     <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">business</span>
                     <select id="environmentsCompanySelect" class="hub-select" aria-label="Selecionar empresa dos setores">
                       <option value="all">Todas as empresas</option>
-                      <option value="adm-wes">ADM WES</option>
-                      <option value="cedae">CEDAE</option>
-                      <option value="user-cedae">USER CEDAE</option>
+                      <option value="avas" data-organization="avas-group">AVAS Energia</option>
+                      <option value="techcorp" data-organization="avas-group">TechCorp Brasil</option>
+                      <option value="aguas-rio" data-organization="cedae">Águas Rio</option>
+                      <option value="cedae-saneamento" data-organization="cedae">CEDAE Saneamento</option>
                     </select>
                     <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                   </div>
@@ -5603,14 +5838,14 @@
                   <span>Usuários</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row environment-row" data-environment-company="adm-wes" data-environment-name="Operações" data-environment-code="env-operacoes" data-environment-description="Rotinas de atendimento, backoffice e acompanhamento de filas." data-environment-owner="ops@1wes.com" data-environment-projects="6" data-environment-agents="14" data-environment-users="3">
+                <div class="data-row environment-row" data-environment-company="avas" data-environment-organization="avas-group" data-environment-name="Operações" data-environment-code="env-operacoes" data-environment-description="Rotinas de atendimento, backoffice e acompanhamento de filas." data-environment-owner="ops@1wes.com" data-environment-projects="6" data-environment-agents="14" data-environment-users="3">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Operações</strong>
                     </span>
                   </span>
                   <span class="environment-description-cell">Rotinas de atendimento, backoffice e acompanhamento de filas.</span>
-                  <span class="environment-company-cell">ADM WES</span>
+                  <span class="environment-company-cell">AVAS Energia</span>
                   <span class="environment-owner-cell">ops@1wes.com</span>
                   <span class="environment-projects-cell">6</span>
                   <span class="environment-agents-cell">14</span>
@@ -5624,14 +5859,14 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row environment-row" data-environment-company="adm-wes" data-environment-name="Financeiro" data-environment-code="env-financeiro" data-environment-description="Conciliação, fechamento mensal e relatórios financeiros." data-environment-owner="financeiro@1wes.com" data-environment-projects="4" data-environment-agents="8" data-environment-users="2">
+                <div class="data-row environment-row" data-environment-company="avas" data-environment-organization="avas-group" data-environment-name="Financeiro" data-environment-code="env-financeiro" data-environment-description="Conciliação, fechamento mensal e relatórios financeiros." data-environment-owner="financeiro@1wes.com" data-environment-projects="4" data-environment-agents="8" data-environment-users="2">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Financeiro</strong>
                     </span>
                   </span>
                   <span class="environment-description-cell">Conciliação, fechamento mensal e relatórios financeiros.</span>
-                  <span class="environment-company-cell">ADM WES</span>
+                  <span class="environment-company-cell">AVAS Energia</span>
                   <span class="environment-owner-cell">financeiro@1wes.com</span>
                   <span class="environment-projects-cell">4</span>
                   <span class="environment-agents-cell">8</span>
@@ -5645,14 +5880,14 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row environment-row" data-environment-company="cedae" data-environment-name="Marketing" data-environment-code="env-marketing" data-environment-description="Campanhas, segmentações e análise de performance." data-environment-owner="marketing@1wes.com" data-environment-projects="3" data-environment-agents="5" data-environment-users="2">
+                <div class="data-row environment-row" data-environment-company="aguas-rio" data-environment-organization="cedae" data-environment-name="Marketing" data-environment-code="env-marketing" data-environment-description="Campanhas, segmentações e análise de performance." data-environment-owner="marketing@1wes.com" data-environment-projects="3" data-environment-agents="5" data-environment-users="2">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Marketing</strong>
                     </span>
                   </span>
                   <span class="environment-description-cell">Campanhas, segmentações e análise de performance.</span>
-                  <span class="environment-company-cell">CEDAE</span>
+                  <span class="environment-company-cell">Águas Rio</span>
                   <span class="environment-owner-cell">marketing@1wes.com</span>
                   <span class="environment-projects-cell">3</span>
                   <span class="environment-agents-cell">5</span>
@@ -5666,14 +5901,14 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row environment-row" data-environment-company="user-cedae" data-environment-name="RH" data-environment-code="env-rh" data-environment-description="Admissões, comunicações internas e trilhas de pessoas." data-environment-owner="rh@1wes.com" data-environment-projects="2" data-environment-agents="4" data-environment-users="2">
+                <div class="data-row environment-row" data-environment-company="cedae-saneamento" data-environment-organization="cedae" data-environment-name="RH" data-environment-code="env-rh" data-environment-description="Admissões, comunicações internas e trilhas de pessoas." data-environment-owner="rh@1wes.com" data-environment-projects="2" data-environment-agents="4" data-environment-users="2">
                   <span class="environment-name-cell">
                     <span>
                       <strong>RH</strong>
                     </span>
                   </span>
                   <span class="environment-description-cell">Admissões, comunicações internas e trilhas de pessoas.</span>
-                  <span class="environment-company-cell">USER CEDAE</span>
+                  <span class="environment-company-cell">CEDAE Saneamento</span>
                   <span class="environment-owner-cell">rh@1wes.com</span>
                   <span class="environment-projects-cell">2</span>
                   <span class="environment-agents-cell">4</span>
@@ -6254,18 +6489,74 @@
             </div>
           </div>
 
+          <div class="page" id="page-organizations" data-title="Organizações">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Organizações</h2>
+                  <p class="page-subtitle">Gerencie organizações cliente. Cada organização pode ter várias empresas e cada empresa pode ter seus próprios setores.</p>
+                </div>
+                <div class="page-actions">
+                  <a class="btn outline" href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization">
+                    <span class="material-symbols-rounded">business</span>
+                    Trocar organização
+                  </a>
+                  <button class="btn primary" type="button" data-open-create-company-modal data-create-context="organization">
+                    Criar organização
+                  </button>
+                </div>
+              </div>
+              <div class="data-table organizations-table">
+                <div class="data-row header">
+                  <span>Organização</span>
+                  <span>ADM responsável</span>
+                  <span>Empresas</span>
+                  <span>Setores</span>
+                  <span>Status</span>
+                  <span>Ações</span>
+                </div>
+                <div class="data-row" data-organization-row data-organization-id="cedae" data-organization-name="ADM Cliente" data-organization-admin="admin@cedae.com">
+                  <span class="environment-name-cell"><span><strong>ADM Cliente</strong><small>Organização cliente</small></span></span>
+                  <span>admin@cedae.com</span>
+                  <span>3</span>
+                  <span>9</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar organização" data-organization-edit>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir organização">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-organization-row data-organization-id="avas-group" data-organization-name="Grupo AVAS" data-organization-admin="admin@avas.com">
+                  <span class="environment-name-cell"><span><strong>Grupo AVAS</strong><small>Organização cliente</small></span></span>
+                  <span>admin@avas.com</span>
+                  <span>2</span>
+                  <span>6</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar organização" data-organization-edit>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir organização">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-companies" data-title="Empresas">
             <div class="section">
               <div class="page-header">
                 <div>
                   <h2>Empresas</h2>
-                  <p class="page-subtitle">Gerencie empresas cadastradas e o acesso administrativo de cada tenant.</p>
+                  <p class="page-subtitle">Gerencie as empresas da organização ativa. O ADM cliente acessa todas as empresas daqui, sem alternar contexto global.</p>
                 </div>
                 <div class="page-actions">
-                  <a class="btn outline" href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization">
-                    <span class="material-symbols-rounded">business</span>
-                    Trocar de empresa
-                  </a>
                   <button class="btn primary" type="button" data-open-create-company-modal>
                     Criar empresa
                   </button>
@@ -6274,22 +6565,24 @@
               <div class="data-table companies-table">
                 <div class="data-row header">
                   <span>Empresa</span>
+                  <span>Organização</span>
                   <span>Administrador</span>
                   <span>Status</span>
+                  <span>Setores</span>
                   <span>Usuários</span>
-                  <span>Criada em</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row" data-company-row data-company-id="avas" data-company-name="AVAS">
+                <div class="data-row" data-company-row data-company-id="avas" data-company-name="AVAS Energia" data-company-organization="avas-group">
                   <span class="environment-name-cell">
                     <span>
-                      <strong>AVAS</strong>
+                      <strong>AVAS Energia</strong>
                     </span>
                   </span>
-                  <span>admin@1wes.com</span>
-                  <span class="chip success">Ativa</span>
-                  <span data-company-user-count>42</span>
-                  <span>14/03/2026</span>
+                  <span>Grupo AVAS</span>
+                  <span>admin@avas.com</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span>4</span>
+                  <span data-company-user-count>4</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Editar empresa" data-company-edit>
                       <span class="material-symbols-rounded">edit</span>
@@ -6299,16 +6592,57 @@
                     </button>
                   </span>
                 </div>
-                <div class="data-row" data-company-row data-company-id="techcorp" data-company-name="TechCorp">
+                <div class="data-row" data-company-row data-company-id="techcorp" data-company-name="TechCorp Brasil" data-company-organization="avas-group">
                   <span class="environment-name-cell">
                     <span>
-                      <strong>TechCorp</strong>
+                      <strong>TechCorp Brasil</strong>
                     </span>
                   </span>
+                  <span>Grupo AVAS</span>
                   <span>admin@techcorp.com</span>
-                  <span class="chip success">Ativa</span>
-                  <span data-company-user-count>18</span>
-                  <span>09/01/2026</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span>3</span>
+                  <span data-company-user-count>3</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar empresa" data-company-edit>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-company-row data-company-id="aguas-rio" data-company-name="Águas Rio" data-company-organization="cedae">
+                  <span class="environment-name-cell">
+                    <span>
+                      <strong>Águas Rio</strong>
+                    </span>
+                  </span>
+                  <span>ADM Cliente</span>
+                  <span>admin@aguasrio.com</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span>5</span>
+                  <span data-company-user-count>5</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Editar empresa" data-company-edit>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                  </span>
+                </div>
+                <div class="data-row" data-company-row data-company-id="cedae-saneamento" data-company-name="CEDAE Saneamento" data-company-organization="cedae">
+                  <span class="environment-name-cell">
+                    <span>
+                      <strong>CEDAE Saneamento</strong>
+                    </span>
+                  </span>
+                  <span>ADM Cliente</span>
+                  <span>admin@saneamento.cedae.com</span>
+                  <span><span class="chip success">Ativa</span></span>
+                  <span>4</span>
+                  <span data-company-user-count>4</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Editar empresa" data-company-edit>
                       <span class="material-symbols-rounded">edit</span>
@@ -7307,7 +7641,7 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./assets/chart.umd.min.js"></script>
-    <script src="./auth.js"></script>
-    <script src="./app.js?v=20260630-filter-layout-rules"></script>
+    <script src="./auth.js?v=20260701-hybrid-flow-voice-page"></script>
+    <script src="./app.js?v=20260701-hybrid-flow-voice-page"></script>
   </body>
 </html>

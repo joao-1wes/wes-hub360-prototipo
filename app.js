@@ -69,6 +69,16 @@ const packagesFilterBtn = document.getElementById('packagesFilterBtn');
 const packagesFilterMenu = document.getElementById('packagesFilterMenu');
 const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
+const openCredentialModalBtn = document.getElementById('openCredentialModalBtn');
+const credentialsTable = document.getElementById('credentialsTable');
+const credentialModal = document.getElementById('credentialModal');
+const credentialModalForm = document.getElementById('credentialModalForm');
+const credentialModalTitle = document.getElementById('credentialModalTitle');
+const credentialNameInput = document.getElementById('credentialNameInput');
+const credentialDescriptionInput = document.getElementById('credentialDescriptionInput');
+const credentialTypeSelect = document.getElementById('credentialTypeSelect');
+const credentialDynamicFields = document.getElementById('credentialDynamicFields');
+const credentialModalSubmitBtn = document.getElementById('credentialModalSubmitBtn');
 const voiceMessagingFilterBtn = document.getElementById('voiceMessagingFilterBtn');
 const voiceMessagingFilterMenu = document.getElementById('voiceMessagingFilterMenu');
 const openVoiceMessagingInsightsPage = document.getElementById('openVoiceMessagingInsightsPage');
@@ -120,6 +130,8 @@ const campaignRecipientsInput = document.getElementById('campaignRecipientsInput
 const campaignImportCsvBtn = document.getElementById('campaignImportCsvBtn');
 const campaignCsvInput = document.getElementById('campaignCsvInput');
 const campaignCsvHint = document.getElementById('campaignCsvHint');
+const inputFilesUploadButton = document.getElementById('inputFilesUploadButton');
+const inputFilesUploadInput = document.getElementById('inputFilesUploadInput');
 const campaignOptimizeScriptBtn = document.getElementById('campaignOptimizeScriptBtn');
 const campaignCreatePageTitle = document.getElementById('campaignCreatePageTitle');
 const campaignCreatePageSubtitle = document.getElementById('campaignCreatePageSubtitle');
@@ -141,6 +153,7 @@ const manageRolesName = document.getElementById('manageRolesName');
 const manageRolesSubmit = document.getElementById('manageRolesSubmit');
 const openCreateUserModal = document.getElementById('openCreateUserModal');
 const usersTable = document.querySelector('#page-users .users-table');
+const organizationsTable = document.querySelector('#page-organizations .organizations-table');
 const companiesTable = document.querySelector('#page-companies .companies-table');
 const historyTabs = document.querySelectorAll('#page-agent-history .tab');
 const historyPanels = document.querySelectorAll('#page-agent-history .tab-panel');
@@ -223,6 +236,13 @@ const mcpConnectionModalStatus = document.getElementById('mcpConnectionModalStat
 const mcpConnectionModalDescription = document.getElementById('mcpConnectionModalDescription');
 const mcpConnectionDisconnectBtn = document.getElementById('mcpConnectionDisconnectBtn');
 const mcpConnectionReconnectBtn = document.getElementById('mcpConnectionReconnectBtn');
+const mcpAuthModal = document.getElementById('mcpAuthModal');
+const mcpAuthForm = document.getElementById('mcpAuthForm');
+const mcpAuthModalLogo = document.getElementById('mcpAuthModalLogo');
+const mcpAuthModalName = document.getElementById('mcpAuthModalName');
+const mcpAuthModalDescription = document.getElementById('mcpAuthModalDescription');
+const mcpAuthModalNotice = document.getElementById('mcpAuthModalNotice');
+const mcpAuthSubmitBtn = document.getElementById('mcpAuthSubmitBtn');
 const mcpCreateModal = document.getElementById('mcpCreateModal');
 const mcpCreateForm = document.getElementById('mcpCreateForm');
 const mcpCreateName = document.getElementById('mcpCreateName');
@@ -390,6 +410,8 @@ const hybridFlowReviewConfirmBtn = document.getElementById('hybridFlowReviewConf
 const hybridFlowDiscardModal = document.getElementById('hybridFlowDiscardModal');
 const hybridFlowDiscardConfirmBtn = document.getElementById('hybridFlowDiscardConfirmBtn');
 const hybridFlowsTable = document.getElementById('hybridFlowsTable');
+const hybridFlowCreatePageTitle = document.querySelector('#page-hybrid-flows-create .voice-messaging-create-title-wrap h2');
+const hybridFlowCreatePageSubtitle = document.querySelector('#page-hybrid-flows-create .voice-messaging-create-title-wrap .page-subtitle');
 const voiceMessagingTable = document.getElementById('voiceMessagingTable');
 const voiceMessagingCreatePage = document.getElementById('page-voice-messaging-create');
 const voiceMessagingCreatePageTitle = voiceMessagingCreatePage?.querySelector('.voice-messaging-create-title-wrap h2');
@@ -629,12 +651,305 @@ const createHybridFlowActionsHtml = () => `
     </button>
   </span>
 `;
+const slugifyHybridFlowValue = (value = '') => String(value || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '');
+
+const getHybridFlowRowPublicId = (row) => {
+  if (!row) return '';
+  const flowId = String(row.dataset.hybridFlowId || '').trim();
+  if (flowId) return flowId;
+  return slugifyHybridFlowValue(row.querySelector('strong')?.textContent || '');
+};
+
+const getHybridFlowPublicLink = (row) => {
+  if (!row) return '';
+  const explicitLink = String(row.dataset.hybridFlowPublicLink || row.dataset.publicLink || '').trim();
+  if (explicitLink) return explicitLink;
+
+  const publicId = getHybridFlowRowPublicId(row);
+  if (!publicId) return '';
+
+  const url = new URL(window.location.href);
+  url.hash = `#/hybrid-flow?flow=${encodeURIComponent(publicId)}`;
+  return url.toString();
+};
+
+const findHybridFlowRowByPublicId = (flowId = '') => {
+  const normalizedId = String(flowId || '').trim();
+  if (!normalizedId || !hybridFlowsTable) return null;
+  return Array.from(hybridFlowsTable.querySelectorAll('.data-row:not(.header)')).find((row) => {
+    return getHybridFlowRowPublicId(row) === normalizedId;
+  }) || null;
+};
+
+const buildHybridFlowVoicePayload = (row, fallbackFlowId = '') => {
+  const flowId = getHybridFlowRowPublicId(row) || String(fallbackFlowId || '').trim();
+  const fallbackName = flowId ? flowId.replace(/[-_]+/g, ' ') : 'Fluxo híbrido';
+  const flowName = String(row?.querySelector('strong')?.textContent || fallbackName).trim() || 'Fluxo híbrido';
+  return {
+    agentName: flowName,
+    agentId: flowId,
+    rowCtxId: `hybrid-flow-${flowId || 'voice'}`,
+    environmentSlug: String(hubOrgId || '').trim(),
+    projectId: '',
+    projectSlug: '',
+    projectTitle: 'Fluxo híbrido',
+    voiceEnabled: true,
+    subtitle: 'Fluxo híbrido de voz • Voz pronta'
+  };
+};
+let activeHybridFlowEditId = '';
+let activeHybridFlowEditRow = null;
+
+const HYBRID_FLOW_TYPE_LABEL_MAP = {
+  text: 'Texto livre',
+  phone: 'Telefone',
+  cpf: 'CPF',
+  email: 'Email',
+  number: 'Número',
+  boolean: 'Sim/Não'
+};
+
+const parseHybridFlowPayload = (row) => {
+  if (!row?.dataset.hybridFlowPayload) return {};
+  try {
+    const payload = JSON.parse(row.dataset.hybridFlowPayload);
+    return payload && typeof payload === 'object' ? payload : {};
+  } catch {
+    return {};
+  }
+};
+
+const readHybridFlowRowData = (row) => {
+  if (!row) return null;
+  const payload = parseHybridFlowPayload(row);
+  const cells = row.querySelectorAll(':scope > span');
+  const title = cells[0]?.querySelector('strong')?.textContent?.trim() || payload.title || '';
+  const description = cells[0]?.querySelector('small')?.textContent?.trim() || payload.description || '';
+  const fieldsCount = Number(payload.fieldsCount || cells[2]?.textContent?.trim() || 0);
+  return {
+    ...payload,
+    id: String(payload.id || row.dataset.hybridFlowId || getHybridFlowRowPublicId(row) || '').trim(),
+    title,
+    description: description === '\u00a0' ? '' : description,
+    fieldsCount: Number.isFinite(fieldsCount) ? fieldsCount : 0,
+    fields: Array.isArray(payload.fields) ? payload.fields : [],
+    createdAt: payload.createdAt || row.dataset.hybridFlowCreatedAt || new Date().toISOString(),
+    updatedAt: payload.updatedAt || new Date().toISOString(),
+  };
+};
+
+const setHybridFlowPayload = (row, flow) => {
+  if (!row || !flow) return;
+  row.dataset.hybridFlowId = String(flow.id || '').trim();
+  row.dataset.hybridFlowCreatedAt = String(flow.createdAt || '');
+  row.dataset.hybridFlowPayload = JSON.stringify(flow);
+};
+
+const createHybridFlowFieldSummaryCard = (field = {}) => {
+  const fieldRow = document.createElement('div');
+  fieldRow.className = 'hybrid-flow-field-card';
+  fieldRow.dataset.fieldId = String(field.id || `field-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+  const data = {
+    name: String(field.name || '').trim(),
+    label: String(field.label || '').trim(),
+    type: String(field.type || 'text').trim() || 'text',
+    description: String(field.description || '').trim(),
+    required: field.required !== false,
+  };
+  fieldRow.dataset.fieldData = JSON.stringify(data);
+  const typeLabel = HYBRID_FLOW_TYPE_LABEL_MAP[data.type] || HYBRID_FLOW_TYPE_LABEL_MAP.text;
+  fieldRow.innerHTML = `
+    <div class="hybrid-flow-field-summary">
+      <button type="button" class="icon-btn hybrid-flow-drag-handle" aria-label="Mover campo">
+        <span class="material-symbols-rounded">drag_indicator</span>
+      </button>
+      <div class="hybrid-flow-field-summary-content">
+        <div class="hybrid-flow-summary-head">
+          <strong>${escapeHtmlWes(data.label || data.name || '-')}</strong>
+          <span class="hybrid-flow-summary-dot">•</span>
+          <span>${escapeHtmlWes(typeLabel)}</span>
+          ${data.required ? '<span class="hybrid-flow-summary-badge">Obrigatório</span>' : ''}
+        </div>
+        <div class="hybrid-flow-summary-subhead">${escapeHtmlWes(data.name || '-')}</div>
+        <p class="hybrid-flow-summary-description">${escapeHtmlWes(data.description || 'Sem descrição')}</p>
+      </div>
+      <div class="hybrid-flow-field-summary-actions">
+        <button type="button" class="icon-btn hybrid-flow-edit-btn" aria-label="Editar campo">
+          <span class="material-symbols-rounded">edit</span>
+        </button>
+        <button type="button" class="icon-btn hybrid-flow-delete-btn" aria-label="Remover campo">
+          <span class="material-symbols-rounded">delete</span>
+        </button>
+      </div>
+    </div>
+  `;
+  return fieldRow;
+};
+
+const syncHybridFlowCreateModeUi = () => {
+  const isEdit = Boolean(activeHybridFlowEditId || activeHybridFlowEditRow);
+  if (hybridFlowCreatePage) hybridFlowCreatePage.dataset.mode = isEdit ? 'edit' : 'create';
+  if (hybridFlowCreatePageTitle) hybridFlowCreatePageTitle.textContent = isEdit ? 'Editar fluxo híbrido' : 'Novo fluxo híbrido';
+  if (hybridFlowCreatePageSubtitle) {
+    hybridFlowCreatePageSubtitle.textContent = isEdit
+      ? 'Revise os dados do atendimento híbrido e salve as alterações.'
+      : 'Configure um atendimento que combina coleta por voz e confirmação no Telegram.';
+  }
+  if (hybridFlowNextBtn) hybridFlowNextBtn.textContent = isEdit ? 'Salvar alterações' : 'Criar';
+  if (hybridFlowReviewConfirmBtn) hybridFlowReviewConfirmBtn.textContent = isEdit ? 'Salvar alterações' : 'Salvar';
+};
+
+const getHybridFlowFormElements = () => ({
+  titleInput: document.getElementById('hybridFlowTitleInput'),
+  descriptionInput: document.getElementById('hybridFlowDescriptionInput'),
+  textAgentSelect: hybridFlowCreatePage?.querySelector('select[aria-label="Selecione o agente de texto"]') || null,
+  voiceAgentSelect: hybridFlowCreatePage?.querySelector('select[aria-label="Selecione o agente de voz"]') || null,
+  greetingInput: hybridFlowCreatePage?.querySelector('textarea[placeholder="Saudação inicial do agente de voz"]') || null,
+  telegramSelect: hybridFlowCreatePage?.querySelector('select[aria-label="Integração do Telegram"]') || null,
+  fieldsList: document.getElementById('hybridFlowFieldsList'),
+  fieldsEmpty: document.getElementById('hybridFlowFieldsEmpty'),
+});
+
+const setHybridFlowSelectValue = (select, value = '') => {
+  if (!select) return;
+  const normalizedValue = String(value || '').trim();
+  if (!normalizedValue) {
+    select.value = '';
+    return;
+  }
+  const option = Array.from(select.options).find((item) => {
+    return item.value === normalizedValue || item.textContent?.trim() === normalizedValue;
+  });
+  select.value = option?.value || '';
+};
+
+const syncHybridFlowFieldsEmptyState = () => {
+  const { fieldsList, fieldsEmpty } = getHybridFlowFormElements();
+  if (fieldsEmpty && fieldsList) fieldsEmpty.hidden = fieldsList.children.length > 0;
+};
+
+const resetHybridFlowCreateForm = () => {
+  activeHybridFlowEditId = '';
+  activeHybridFlowEditRow = null;
+  const { titleInput, descriptionInput, textAgentSelect, voiceAgentSelect, greetingInput, telegramSelect, fieldsList } = getHybridFlowFormElements();
+  if (titleInput) titleInput.value = '';
+  if (descriptionInput) descriptionInput.value = '';
+  if (textAgentSelect) textAgentSelect.value = '';
+  if (voiceAgentSelect) voiceAgentSelect.value = '';
+  if (greetingInput) greetingInput.value = '';
+  if (telegramSelect) telegramSelect.value = '';
+  if (fieldsList) fieldsList.innerHTML = '';
+  syncHybridFlowFieldsEmptyState();
+  syncHybridFlowCreateModeUi();
+};
+
+const populateHybridFlowCreateForm = (flow = {}) => {
+  const { titleInput, descriptionInput, textAgentSelect, voiceAgentSelect, greetingInput, telegramSelect, fieldsList } = getHybridFlowFormElements();
+  if (titleInput) titleInput.value = String(flow.title || '').trim();
+  if (descriptionInput) descriptionInput.value = String(flow.description || '').trim();
+  setHybridFlowSelectValue(textAgentSelect, flow.textAgent);
+  setHybridFlowSelectValue(voiceAgentSelect, flow.voiceAgent);
+  if (greetingInput) greetingInput.value = String(flow.greeting || '').trim();
+  setHybridFlowSelectValue(telegramSelect, flow.telegramIntegration);
+  if (fieldsList) {
+    fieldsList.innerHTML = '';
+    const savedFields = Array.isArray(flow.fields) ? flow.fields : [];
+    const fields = savedFields.length
+      ? savedFields
+      : Array.from({ length: Number(flow.fieldsCount || 0) }, (_, index) => ({
+        id: `field-${index + 1}`,
+        name: `campo_${index + 1}`,
+        label: `Campo ${index + 1}`,
+        type: 'text',
+        description: '',
+        required: true,
+      }));
+    fields.forEach((field) => {
+      fieldsList.appendChild(createHybridFlowFieldSummaryCard(field));
+    });
+  }
+  syncHybridFlowFieldsEmptyState();
+  syncHybridFlowCreateModeUi();
+};
+
+const readHybridFlowFieldsFromForm = () => {
+  const { fieldsList } = getHybridFlowFormElements();
+  if (!fieldsList) return [];
+  return Array.from(fieldsList.querySelectorAll('.hybrid-flow-field-card')).map((row) => {
+    try {
+      return row.dataset.fieldData ? JSON.parse(row.dataset.fieldData) : null;
+    } catch {
+      return null;
+    }
+  }).filter(Boolean);
+};
+
+const readHybridFlowFormData = () => {
+  const { titleInput, descriptionInput, textAgentSelect, voiceAgentSelect, greetingInput, telegramSelect } = getHybridFlowFormElements();
+  const fields = readHybridFlowFieldsFromForm();
+  return {
+    id: activeHybridFlowEditId || `hybrid-flow-${Date.now()}`,
+    title: String(titleInput?.value || '').trim() || 'Sem título',
+    description: String(descriptionInput?.value || '').trim(),
+    fieldsCount: fields.length,
+    fields,
+    textAgent: String(textAgentSelect?.value || '').trim(),
+    voiceAgent: String(voiceAgentSelect?.value || '').trim(),
+    greeting: String(greetingInput?.value || '').trim(),
+    telegramIntegration: String(telegramSelect?.value || '').trim(),
+    createdAt: readHybridFlowRowData(activeHybridFlowEditRow)?.createdAt || new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+};
+
+const updateHybridFlowRow = (row, flow) => {
+  if (!row || !flow) return;
+  const cells = row.querySelectorAll(':scope > span');
+  if (cells[0]) {
+    cells[0].innerHTML = `<strong>${escapeHtmlWes(flow.title || 'Sem título')}</strong><small>${escapeHtmlWes(flow.description || '\u00a0')}</small>`;
+  }
+  if (cells[2]) cells[2].textContent = String(Number(flow.fieldsCount || 0));
+  if (cells[4]) cells[4].textContent = escapeHtmlWes(formatHybridFlowDateTime(flow.updatedAt || new Date().toISOString()));
+  setHybridFlowPayload(row, flow);
+};
+
+const upsertHybridFlowInStorage = (flow) => {
+  const normalizedId = String(flow?.id || '').trim();
+  if (!normalizedId) return;
+  const current = getHybridFlowsFromStorage();
+  const index = current.findIndex((item) => String(item?.id || '').trim() === normalizedId);
+  if (index >= 0) {
+    current[index] = flow;
+  } else if (activeHybridFlowEditRow?.dataset.hybridFlowCreated === 'true') {
+    current.unshift(flow);
+  }
+  saveHybridFlowsToStorage(current);
+};
+
+const openHybridFlowCreateMode = (mode = 'create', flow = null, row = null) => {
+  if (mode === 'edit' && flow) {
+    activeHybridFlowEditId = String(flow.id || '').trim();
+    activeHybridFlowEditRow = row || null;
+    populateHybridFlowCreateForm(flow);
+  } else {
+    resetHybridFlowCreateForm();
+  }
+  window.location.hash = '#/dashboard/hybrid-flows/new';
+};
+
 const appendHybridFlowRow = (flow) => {
   if (!hybridFlowsTable) return;
   const row = document.createElement('div');
   row.className = 'data-row';
   row.dataset.hybridFlowId = flow.id;
   row.dataset.hybridFlowCreated = 'true';
+  row.dataset.hybridFlowCreatedAt = String(flow.createdAt || '');
+  row.dataset.hybridFlowPayload = JSON.stringify(flow);
   row.innerHTML = `
     <span>
       <strong>${escapeHtmlWes(flow.title || 'Sem título')}</strong>
@@ -1401,6 +1716,52 @@ function openMcpConnectionModal(connection) {
   mcpConnectionModal.setAttribute('aria-hidden', 'false');
 }
 
+function closeMcpAuthModal() {
+  if (!mcpAuthModal) return;
+  mcpAuthModal.classList.remove('open');
+  mcpAuthModal.setAttribute('aria-hidden', 'true');
+  delete mcpAuthModal.dataset.mcpId;
+  if (mcpAuthSubmitBtn) {
+    mcpAuthSubmitBtn.disabled = false;
+    mcpAuthSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>Abrir autenticação';
+  }
+}
+
+function openMcpAuthModal(connection) {
+  if (!mcpAuthModal || !connection) return;
+  const normalizedConnection = getMcpConnectionViewModel(connection);
+  mcpAuthModal.dataset.mcpId = normalizedConnection.id;
+  if (mcpAuthModalLogo) {
+    mcpAuthModalLogo.src = buildMcpLogoDataUri(normalizedConnection);
+    mcpAuthModalLogo.alt = `Logo ${normalizedConnection.name}`;
+  }
+  if (mcpAuthModalName) mcpAuthModalName.textContent = normalizedConnection.name;
+  if (mcpAuthModalDescription) {
+    mcpAuthModalDescription.textContent = normalizedConnection.url || normalizedConnection.description;
+  }
+  if (mcpAuthModalNotice) {
+    mcpAuthModalNotice.textContent = `O modal de autenticação de ${normalizedConnection.name} será aberto.`;
+  }
+  if (mcpAuthSubmitBtn) {
+    mcpAuthSubmitBtn.disabled = false;
+    mcpAuthSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>Abrir autenticação';
+  }
+  mcpAuthModal.classList.add('open');
+  mcpAuthModal.setAttribute('aria-hidden', 'false');
+}
+
+function triggerMcpAuthOpening(connection, shouldCloseModal = false) {
+  if (!connection) return;
+  if (shouldCloseModal && mcpAuthSubmitBtn) {
+    mcpAuthSubmitBtn.disabled = true;
+    mcpAuthSubmitBtn.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>Abrindo...';
+  }
+  if (shouldCloseModal) {
+    window.setTimeout(() => closeMcpAuthModal(), 350);
+  }
+  showAppToast(`O modal de autenticação de ${connection.name} será aberto`);
+}
+
 function setMcpCreateProgressVisible(isVisible) {
   if (!mcpCreateProgress) return;
   mcpCreateProgress.hidden = !isVisible;
@@ -1708,10 +2069,22 @@ if (mcpsGrid && mcpsTable) {
       openMcpConnectionModal(getMcpConnectionViewModel(connection));
       return;
     }
-    openMcpCreateModal(connection);
+    triggerMcpAuthOpening(connection);
   };
   mcpsGrid.addEventListener('click', handleMcpConnect);
   mcpsTable.addEventListener('click', handleMcpConnect);
+}
+
+if (mcpAuthModal && mcpAuthForm) {
+  mcpAuthModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-mcp-auth-close]')) closeMcpAuthModal();
+  });
+
+  mcpAuthSubmitBtn?.addEventListener('click', () => {
+    const connection = getMcpConnectionById(mcpAuthModal.dataset.mcpId);
+    if (!connection) return;
+    triggerMcpAuthOpening(connection, true);
+  });
 }
 
 if (mcpCreateModal && mcpCreateForm) {
@@ -1795,7 +2168,7 @@ if (mcpConnectionModal && mcpConnectionDisconnectBtn && mcpConnectionReconnectBt
     const connection = getMcpConnectionById(mcpConnectionModal.dataset.mcpId);
     if (!connection) return;
     closeMcpConnectionModal();
-    openMcpCreateModal(connection);
+    openMcpAuthModal(connection);
   });
 }
 
@@ -3680,9 +4053,7 @@ function getCampaignStatusMeta(data = {}) {
 
 function updateCampaignFilterButtonLabel() {
   if (!campaignsFilterBtnLabel) return;
-  const active = campaignsFilterMenu?.querySelector('.filter-option[data-filter="status"].active');
-  const label = active?.textContent?.trim() || 'Todos';
-  campaignsFilterBtnLabel.textContent = `Status: ${label}`;
+  campaignsFilterBtnLabel.textContent = 'Filtros';
 }
 
 function applyCampaignFilters() {
@@ -4974,6 +5345,20 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
   });
 }
 
+if (organizationsTable) {
+  organizationsTable.addEventListener('click', async (event) => {
+    const deleteButton = event.target.closest('.row-actions .action-icon.danger[aria-label="Excluir organização"]');
+    if (!deleteButton) return;
+    if (deleteButton.disabled || deleteButton.getAttribute('disabled') !== null || deleteButton.classList.contains('muted-icon')) return;
+    const row = deleteButton.closest('[data-organization-row]');
+    if (!row) return;
+    const organizationName = row.dataset.organizationName || row.querySelector('strong')?.textContent?.trim() || 'esta organização';
+    if (!(await confirmDeletionAction(`a organização "${organizationName}"`))) return;
+    row.remove();
+    showAppToast('Organização excluída');
+  });
+}
+
 if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect) {
   let activeCompanyRow = null;
   let activeCompanyId = '';
@@ -4993,6 +5378,13 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     ],
     techcorp: [
       { userId: 'admin@wes.com', active: false },
+      { userId: 'ana.silva@cedae.com', active: true },
+    ],
+    'aguas-rio': [
+      { userId: 'ana.silva@cedae.com', active: true },
+      { userId: 'carlos.santos@cedae.com', active: true },
+    ],
+    'cedae-saneamento': [
       { userId: 'ana.silva@cedae.com', active: true },
     ],
   };
@@ -5250,6 +5642,310 @@ bindStaticTableDeleteConfirmation(document.querySelector('#page-credentials .cre
   },
   getSuccessMessage: () => 'Credencial excluída',
 });
+
+const CREDENTIAL_TYPE_LABEL_MAP = {
+  Database: 'Banco de Dados',
+  'Banco de Dados': 'Banco de Dados',
+  AWS: 'AWS',
+  'Chave de API': 'Chave de API',
+  'Chave SSH': 'Chave SSH',
+  'Token OAuth': 'Token OAuth',
+  Personalizada: 'Personalizada',
+};
+
+let activeCredentialRow = null;
+
+function normalizeCredentialTypeLabel(type = '') {
+  const normalizedType = String(type || '').trim();
+  return CREDENTIAL_TYPE_LABEL_MAP[normalizedType] || 'Personalizada';
+}
+
+function getCredentialFieldDefinitions(type, values = {}) {
+  const normalizedType = normalizeCredentialTypeLabel(type);
+  const sshAuthMethod = values.auth_method || 'Chave privada';
+  const oauthGrantType = values.grant_type || 'Credenciais do cliente';
+  const fieldsByType = {
+    AWS: [
+      { name: 'access_key_id', label: 'ID da chave de acesso', required: true, placeholder: 'AKIA...', hint: 'Identificador público da chave AWS.' },
+      { name: 'secret_access_key', label: 'Chave de acesso secreta', required: true, sensitive: true, placeholder: 'Informe o segredo AWS' },
+      { name: 'region', label: 'Região', placeholder: 'us-east-1', hint: 'Opcional. Se vazio, o padrão será us-east-1.' },
+      { name: 'session_token', label: 'Token de sessão', sensitive: true, placeholder: 'Somente para credenciais temporárias STS', hint: 'Opcional, usado apenas em credenciais temporárias.' },
+    ],
+    'Banco de Dados': [
+      { name: 'engine', label: 'Mecanismo', required: true, kind: 'select', options: ['PostgreSQL', 'MySQL', 'SQL Server', 'Oracle', 'MongoDB'], hint: 'Define o driver e a porta padrão.' },
+      { name: 'host', label: 'Host', required: true, placeholder: 'db.exemplo.local' },
+      { name: 'port', label: 'Porta', required: true, placeholder: '5432', hint: 'PostgreSQL 5432, MySQL 3306, SQL Server 1433, Oracle 1521, MongoDB 27017.' },
+      { name: 'database', label: 'Banco de dados', required: true, placeholder: 'app_producao' },
+      { name: 'username', label: 'Usuário', required: true, placeholder: 'usuario_app' },
+      { name: 'password', label: 'Senha', required: true, sensitive: true, placeholder: 'Informe a senha' },
+      { name: 'ssl_mode', label: 'Modo SSL', kind: 'select', options: ['Desativado', 'Obrigatório', 'Verificação completa'], hint: 'Opcional. Use conforme a política do banco.' },
+      { name: 'connection_string', label: 'String de conexão', sensitive: true, placeholder: 'postgresql://...', hint: 'Opcional. Se preenchida, sobrescreve os campos discretos.' },
+    ],
+    'Chave de API': [
+      { name: 'api_key', label: 'Chave de API', required: true, sensitive: true, placeholder: 'Cole a chave de API' },
+      { name: 'base_url', label: 'URL base', placeholder: 'https://api.exemplo.com' },
+      { name: 'header_name', label: 'Nome do cabeçalho', placeholder: 'Authorization', hint: 'Opcional. Padrão Authorization ou X-API-Key.' },
+      { name: 'auth_scheme', label: 'Esquema de autenticação', placeholder: 'Bearer', hint: 'Opcional. Use "nenhum" para enviar a chave sem prefixo.' },
+    ],
+    'Chave SSH': [
+      { name: 'username', label: 'Usuário', required: true, placeholder: 'deploy' },
+      { name: 'auth_method', label: 'Método de autenticação', required: true, kind: 'select', options: ['Chave privada', 'Senha'], rerender: true, hint: 'Alterna os campos obrigatórios abaixo.' },
+      ...(sshAuthMethod === 'Senha'
+        ? [{ name: 'password', label: 'Senha', required: true, sensitive: true, placeholder: 'Informe a senha SSH' }]
+        : [
+          { name: 'private_key', label: 'Chave privada', required: true, sensitive: true, multiline: true, placeholder: '-----BEGIN OPENSSH PRIVATE KEY-----', hint: 'Cole a chave privada em formato PEM/OpenSSH.' },
+          { name: 'passphrase', label: 'Frase secreta', sensitive: true, placeholder: 'Opcional, para a chave privada' },
+        ]),
+      { name: 'host_port', label: 'Host / porta', placeholder: 'servidor.exemplo.com:22', hint: 'Opcional. Porta padrão 22; o host pode ser informado no uso.' },
+    ],
+    'Token OAuth': [
+      { name: 'grant_type', label: 'Tipo de concessão', required: true, kind: 'select', options: ['Credenciais do cliente', 'Token'], rerender: true },
+      ...(oauthGrantType === 'Token'
+        ? [
+          { name: 'access_token', label: 'Token de acesso', required: true, sensitive: true, placeholder: 'Cole o token de acesso' },
+          { name: 'refresh_token', label: 'Token de atualização', sensitive: true, placeholder: 'Opcional' },
+          { name: 'token_type_expires_at', label: 'Tipo do token / expira em', placeholder: 'Bearer · 2026-12-31T23:59:59Z', hint: 'Opcional. Padrão Bearer.' },
+        ]
+        : [
+          { name: 'client_id', label: 'ID do cliente', required: true, placeholder: 'id-do-cliente' },
+          { name: 'client_secret', label: 'Segredo do cliente', required: true, sensitive: true, placeholder: 'Informe o segredo do cliente' },
+          { name: 'token_url', label: 'URL do token', required: true, placeholder: 'https://auth.exemplo.com/oauth/token' },
+          { name: 'scope', label: 'Escopo', placeholder: 'leitura escrita', hint: 'Opcional.' },
+        ]),
+    ],
+    Personalizada: [
+      { name: 'custom_pairs', label: 'Pares dinâmicos', multiline: true, sensitive: true, placeholder: '{\n  "chave": "valor"\n}', hint: 'Informe pares de chave e valor. Valores sensíveis serão mascarados.' },
+    ],
+  };
+  return fieldsByType[normalizedType] || fieldsByType.Personalizada;
+}
+
+function collectCredentialDynamicValues() {
+  if (!credentialDynamicFields) return {};
+  return Array.from(credentialDynamicFields.querySelectorAll('[data-credential-field]')).reduce((acc, field) => {
+    acc[field.dataset.credentialField] = field.value;
+    return acc;
+  }, {});
+}
+
+function renderCredentialDynamicFields(type, values = {}) {
+  if (!credentialDynamicFields) return;
+  const normalizedType = normalizeCredentialTypeLabel(type);
+  const definitions = getCredentialFieldDefinitions(normalizedType, values);
+  const fieldsHtml = definitions.map((field) => {
+    const value = values[field.name] ?? '';
+    const requiredClass = field.required ? ' modal-label--required' : '';
+    const requiredAttr = field.required ? ' required' : '';
+    const hintHtml = field.hint
+      ? `<p class="modal-field-hint">${escapeHtmlWes(field.hint)}</p>`
+      : '<p class="modal-field-hint credential-field-hint-placeholder" aria-hidden="true">&nbsp;</p>';
+    const rerenderAttr = field.rerender ? ' data-credential-rerender' : '';
+    const inputId = `credentialField_${field.name}`;
+    let controlHtml = '';
+
+    if (field.kind === 'select') {
+      const optionsHtml = field.options.map((option) => (
+        `<option value="${escapeHtmlWes(option)}"${String(value || field.options[0]) === option ? ' selected' : ''}>${escapeHtmlWes(option)}</option>`
+      )).join('');
+      controlHtml = `<select class="modal-input" id="${escapeHtmlWes(inputId)}" data-credential-field="${escapeHtmlWes(field.name)}"${requiredAttr}${rerenderAttr}>${optionsHtml}</select>`;
+    } else if (field.multiline) {
+      const textareaType = field.sensitive ? ' data-credential-sensitive="true"' : '';
+      controlHtml = `
+        <div class="credential-sensitive-wrap">
+          <textarea class="modal-textarea${field.sensitive ? ' is-concealed' : ''}" id="${escapeHtmlWes(inputId)}" data-credential-field="${escapeHtmlWes(field.name)}"${textareaType}${requiredAttr} rows="4" placeholder="${escapeHtmlWes(field.placeholder || '')}">${escapeHtmlWes(value)}</textarea>
+          ${field.sensitive ? '<button class="icon-btn credential-secret-toggle" type="button" data-credential-secret-toggle aria-label="Mostrar valor"><span class="material-symbols-rounded">visibility</span></button>' : ''}
+        </div>
+      `;
+    } else {
+      const inputType = field.sensitive ? 'password' : 'text';
+      controlHtml = `
+        <div class="${field.sensitive ? 'credential-sensitive-wrap' : ''}">
+          <input class="modal-input" id="${escapeHtmlWes(inputId)}" data-credential-field="${escapeHtmlWes(field.name)}" type="${inputType}" value="${escapeHtmlWes(value)}" placeholder="${escapeHtmlWes(field.placeholder || '')}" autocomplete="off"${requiredAttr} />
+          ${field.sensitive ? '<button class="icon-btn credential-secret-toggle" type="button" data-credential-secret-toggle aria-label="Mostrar valor"><span class="material-symbols-rounded">visibility</span></button>' : ''}
+        </div>
+      `;
+    }
+
+    return `
+      <div class="credential-dynamic-field">
+        <label class="modal-label${requiredClass}" for="${escapeHtmlWes(inputId)}">${escapeHtmlWes(field.label)}</label>
+        ${controlHtml}
+        ${hintHtml}
+      </div>
+    `;
+  }).join('');
+
+  credentialDynamicFields.innerHTML = `
+    <div class="credential-dynamic-header">
+      <strong>Dados de ${escapeHtmlWes(normalizedType)}</strong>
+      <span>Campos obrigatórios são marcados no formulário. Campos sensíveis ficam mascarados.</span>
+    </div>
+    <div class="credential-dynamic-grid">${fieldsHtml}</div>
+  `;
+}
+
+function formatCredentialUpdatedAt(date = new Date()) {
+  const parts = new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(date).reduce((acc, part) => {
+    acc[part.type] = part.value;
+    return acc;
+  }, {});
+  return `${parts.day}/${parts.month}/${parts.year} • ${parts.hour}:${parts.minute}`;
+}
+
+function readCredentialRowData(row) {
+  if (!row) return null;
+  const cells = row.querySelectorAll(':scope > span');
+  let payload = {};
+  try {
+    payload = row.dataset.credentialPayload ? JSON.parse(row.dataset.credentialPayload) : {};
+  } catch (_) {
+    payload = {};
+  }
+  return {
+    name: String(row.dataset.credentialName || cells[0]?.textContent || '').trim(),
+    type: normalizeCredentialTypeLabel(row.dataset.credentialType || cells[1]?.textContent || ''),
+    description: String(row.dataset.credentialDescription || '').trim(),
+    updatedAt: String(row.dataset.credentialUpdatedAt || cells[2]?.textContent || '').trim(),
+    payload,
+  };
+}
+
+function setCredentialRowData(row, data) {
+  if (!row || !data) return;
+  const name = String(data.name || '').trim();
+  const type = normalizeCredentialTypeLabel(data.type);
+  const description = String(data.description || '').trim();
+  const updatedAt = String(data.updatedAt || formatCredentialUpdatedAt()).trim();
+  row.dataset.credentialName = name;
+  row.dataset.credentialType = type;
+  row.dataset.credentialDescription = description;
+  row.dataset.credentialUpdatedAt = updatedAt;
+  row.dataset.credentialPayload = JSON.stringify(data.payload || {});
+  row.innerHTML = `
+    <span>${escapeHtmlWes(name)}</span>
+    <span class="chip">${escapeHtmlWes(type)}</span>
+    <span>${escapeHtmlWes(updatedAt)}</span>
+    <span class="row-actions">
+      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+        <span class="material-symbols-rounded">edit</span>
+      </button>
+      <button class="icon-btn action-icon danger" aria-label="Excluir" type="button">
+        <span class="material-symbols-rounded">delete</span>
+      </button>
+    </span>
+  `;
+}
+
+function closeCredentialModal() {
+  if (!credentialModal || !credentialModalForm) return;
+  credentialModal.classList.remove('open');
+  credentialModal.setAttribute('aria-hidden', 'true');
+  credentialModalForm.reset();
+  if (credentialDynamicFields) credentialDynamicFields.innerHTML = '';
+  activeCredentialRow = null;
+}
+
+function openCredentialModal(row = null) {
+  if (!credentialModal || !credentialModalForm) return;
+  activeCredentialRow = row;
+  const isEdit = Boolean(row);
+  const rowData = readCredentialRowData(row);
+  if (credentialModalTitle) credentialModalTitle.textContent = isEdit ? 'Editar credencial' : 'Adicionar credencial';
+  if (credentialModalSubmitBtn) credentialModalSubmitBtn.textContent = isEdit ? 'Salvar alterações' : 'Salvar credencial';
+  if (credentialNameInput) credentialNameInput.value = rowData?.name || '';
+  if (credentialDescriptionInput) credentialDescriptionInput.value = rowData?.description || '';
+  if (credentialTypeSelect) credentialTypeSelect.value = rowData?.type || 'AWS';
+  renderCredentialDynamicFields(credentialTypeSelect?.value || 'AWS', rowData?.payload || {});
+  credentialModal.classList.add('open');
+  credentialModal.setAttribute('aria-hidden', 'false');
+  window.setTimeout(() => credentialNameInput?.focus(), 0);
+}
+
+if (credentialsTable && credentialModal && credentialModalForm) {
+  openCredentialModalBtn?.addEventListener('click', () => openCredentialModal());
+
+  credentialModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-credential-modal-close]')) closeCredentialModal();
+
+    const secretToggle = event.target.closest('[data-credential-secret-toggle]');
+    if (secretToggle) {
+      const wrap = secretToggle.closest('.credential-sensitive-wrap');
+      const field = wrap?.querySelector('[data-credential-field]');
+      const icon = secretToggle.querySelector('.material-symbols-rounded');
+      if (!field) return;
+      const isHidden = field.type === 'password' || field.classList.contains('is-concealed');
+      if (field.tagName === 'TEXTAREA') {
+        field.classList.toggle('is-concealed', !isHidden);
+      } else {
+        field.type = isHidden ? 'text' : 'password';
+      }
+      secretToggle.setAttribute('aria-label', isHidden ? 'Ocultar valor' : 'Mostrar valor');
+      if (icon) icon.textContent = isHidden ? 'visibility_off' : 'visibility';
+    }
+  });
+
+  credentialTypeSelect?.addEventListener('change', () => {
+    renderCredentialDynamicFields(credentialTypeSelect.value, {});
+  });
+
+  credentialDynamicFields?.addEventListener('change', (event) => {
+    if (!event.target.closest('[data-credential-rerender]')) return;
+    const values = collectCredentialDynamicValues();
+    renderCredentialDynamicFields(credentialTypeSelect?.value || 'AWS', values);
+  });
+
+  credentialsTable.addEventListener('click', (event) => {
+    const editButton = event.target.closest('[data-credential-edit]');
+    if (!editButton) return;
+    const row = editButton.closest('.data-row:not(.header)');
+    if (row) openCredentialModal(row);
+  });
+
+  credentialModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const payload = {
+      name: String(credentialNameInput?.value || '').trim(),
+      description: String(credentialDescriptionInput?.value || '').trim(),
+      type: normalizeCredentialTypeLabel(credentialTypeSelect?.value || ''),
+      payload: collectCredentialDynamicValues(),
+      updatedAt: formatCredentialUpdatedAt(),
+    };
+    if (!payload.name) return;
+
+    const isEdit = Boolean(activeCredentialRow);
+    const row = activeCredentialRow || document.createElement('div');
+    row.className = 'data-row';
+    setCredentialRowData(row, payload);
+    if (!isEdit) {
+      const headerRow = credentialsTable.querySelector('.data-row.header');
+      if (headerRow?.nextElementSibling) {
+        credentialsTable.insertBefore(row, headerRow.nextElementSibling);
+      } else {
+        credentialsTable.appendChild(row);
+      }
+    }
+    closeCredentialModal();
+    showAppToast(isEdit ? 'Credencial atualizada' : 'Credencial criada');
+  });
+}
+
+if (inputFilesUploadButton && inputFilesUploadInput) {
+  inputFilesUploadButton.addEventListener('click', () => {
+    inputFilesUploadInput.value = '';
+    inputFilesUploadInput.click();
+  });
+
+  inputFilesUploadInput.addEventListener('change', () => {
+    const fileName = inputFilesUploadInput.files?.[0]?.name;
+    if (fileName) showAppToast(`Arquivo selecionado: ${fileName}`);
+  });
+}
 
 bindStaticTableDeleteConfirmation(document.querySelector('#page-input-files .data-table'), {
   getTargetLabel: (row) => {
@@ -5713,7 +6409,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   };
 
   const applyEnvironmentCompanyFilter = () => {
-    const accessId = String(document.body.dataset.organizationAccess || 'adm-wes').trim();
+    const organizationScope = String(document.body.dataset.organizationScope || 'all').trim() || 'all';
     const selectorVisible = Boolean(
       environmentsCompanySelectWrap
       && !environmentsCompanySelectWrap.hidden
@@ -5721,9 +6417,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     );
     const selectedCompany = selectorVisible
       ? (environmentsCompanySelect?.value || 'all')
-      : ((accessId === 'cedae' || accessId === 'user-cedae') ? accessId : 'all');
+      : 'all';
     environmentsTable.querySelectorAll('.environment-row').forEach((row) => {
-      const showRow = selectedCompany === 'all' || row.dataset.environmentCompany === selectedCompany;
+      const inScope = organizationScope === 'all' || String(row.dataset.environmentOrganization || '').trim() === organizationScope;
+      const showRow = inScope && (selectedCompany === 'all' || row.dataset.environmentCompany === selectedCompany);
       row.hidden = !showRow;
       row.classList.toggle('is-hidden', !showRow);
     });
@@ -5894,7 +6591,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
         description,
         company: environmentsCompanySelect?.value && environmentsCompanySelect.value !== 'all'
           ? environmentsCompanySelect.value
-          : (String(document.body.dataset.organizationAccess || '').trim() || 'adm-wes'),
+          : (Array.from(environmentsCompanySelect?.options || []).find((option) => option.value !== 'all' && !option.disabled && !option.hidden)?.value || 'avas'),
       });
       const nextCode = String(createdRow?.dataset?.environmentCode || '').trim();
       if (sourceCode && nextCode && sourceCode !== nextCode && environmentRelations[sourceCode]) {
@@ -6842,34 +7539,66 @@ function getProjectBySlug(org, projectSlug) {
   return org.projects.find((project) => String(project.slug || '').trim() === normalizedSlug) || null;
 }
 
-function isAgentsDashboardRoute() {
-  const raw = String(window.location.hash || '').replace(/^#\/?/, '');
-  return raw === 'dashboard/agents' || raw.startsWith('dashboard/agents/project/');
+function getHashRouteInfo(hash = window.location.hash) {
+  const raw = String(hash || '').replace(/^#\/?/, '');
+  const queryStart = raw.indexOf('?');
+  const routeKey = (queryStart >= 0 ? raw.slice(0, queryStart) : raw) || 'dashboard';
+  const query = queryStart >= 0 ? raw.slice(queryStart + 1) : '';
+  return {
+    routeKey,
+    queryParams: new URLSearchParams(query),
+  };
 }
 
-function buildAgentChatPayloadFromButton(button) {
-  const row = button.closest('.agents-row');
+function isStandaloneAgentChatRoute(routeKey = getHashRouteInfo().routeKey) {
+  return routeKey === 'agent-chat' || routeKey === 'chat/agent';
+}
+
+function isStandaloneHybridFlowRoute(routeKey = getHashRouteInfo().routeKey) {
+  return routeKey === 'hybrid-flow';
+}
+
+function isStandaloneChatRoute(routeKey = getHashRouteInfo().routeKey) {
+  return isStandaloneAgentChatRoute(routeKey) || isStandaloneHybridFlowRoute(routeKey);
+}
+
+function isAgentsDashboardRoute() {
+  const { routeKey } = getHashRouteInfo();
+  return routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/');
+}
+
+function getAgentIdFromRow(row) {
+  if (!row) return '';
+  const uuid = String(row.dataset.agentUuid || '').trim();
+  if (uuid) return uuid;
+  const cells = Array.from(row.children).filter(
+    (child) => child.tagName === 'SPAN' && !child.classList.contains('row-actions')
+  );
+  return String(cells[2]?.textContent || cells[1]?.textContent || '').trim();
+}
+
+function findAgentRowById(agentId) {
+  const normalizedId = String(agentId || '').trim();
+  if (!normalizedId || !agentsPageForChat) return null;
+  return Array.from(agentsPageForChat.querySelectorAll('.agents-row')).find((row) => {
+    if (row.classList.contains('header')) return false;
+    return getAgentIdFromRow(row) === normalizedId;
+  }) || null;
+}
+
+function buildAgentChatPayloadFromRow(row, fallbackAgentId = '') {
   let agentName = 'Agente';
-  let agentId = '';
   let rowCtxId = '';
+  const agentId = getAgentIdFromRow(row) || String(fallbackAgentId || '').trim();
   const environmentSlug = String(row?.dataset.hubOrg || hubOrgId || '').trim();
   const projectId = String(row?.dataset.projectId || '').trim();
 
   if (row) {
     const nameStrong = row.querySelector('span strong');
     if (nameStrong) agentName = nameStrong.textContent.trim();
-    const uuid = row.dataset.agentUuid;
     rowCtxId = String(row.dataset.hubContext || '').trim();
     if (!rowCtxId) {
       rowCtxId = String(row.closest('.agents-context-block')?.dataset.hubContext || '').trim();
-    }
-    if (uuid) {
-      agentId = uuid;
-    } else {
-      const cells = Array.from(row.children).filter(
-        (child) => child.tagName === 'SPAN' && !child.classList.contains('row-actions')
-      );
-      if (cells[1]) agentId = cells[1].textContent.trim();
     }
   }
 
@@ -6885,6 +7614,10 @@ function buildAgentChatPayloadFromButton(button) {
     projectSlug: project?.slug || '',
     projectTitle: project?.title || ''
   };
+}
+
+function buildAgentChatPayloadFromButton(button) {
+  return buildAgentChatPayloadFromRow(button.closest('.agents-row'));
 }
 
 function applyAgentConversationMode(payload = {}) {
@@ -6974,12 +7707,16 @@ function openAgentChatModalWithPayload(payload) {
   const projectSlug = String(payload.projectSlug || getCurrentAgentsProjectSlugFromRoute() || '').trim();
   if (agentChatModal) {
     agentChatModal.dataset.projectSlug = projectSlug;
+    agentChatModal.classList.toggle('agent-chat-modal--standalone', isStandaloneChatRoute());
     applyAgentConversationMode(payload);
   }
   if (agentChatTitle && payload.agentName) {
     agentChatTitle.textContent = payload.voiceEnabled
       ? `Conversa por voz com ${payload.agentName}`
       : `Chat com ${payload.agentName}`;
+  }
+  if (agentChatSubtitle && payload.subtitle) {
+    agentChatSubtitle.textContent = payload.subtitle;
   }
   activeAgentChatSkillQuery = '';
   chatSkillSearchInputs.forEach((input) => {
@@ -6988,6 +7725,9 @@ function openAgentChatModalWithPayload(payload) {
   renderAgentChatSkillMenu();
   if (agentChatScopeLine) agentChatScopeLine.hidden = true;
   syncAgentChatHistoryScope();
+  if (agentChatSubtitle && payload.subtitle) {
+    agentChatSubtitle.textContent = payload.subtitle;
+  }
 }
 
 function openAgentChatModalFromToggle(button) {
@@ -6999,19 +7739,11 @@ function openAgentChatModalFromToggle(button) {
   if (row) {
     const nameStrong = row.querySelector('span strong');
     if (nameStrong) agentName = nameStrong.textContent.trim();
-    const uuid = row.dataset.agentUuid;
     rowCtxId = String(row.dataset.hubContext || '').trim();
     if (!rowCtxId) {
       rowCtxId = String(row.closest('.agents-context-block')?.dataset.hubContext || '').trim();
     }
-    if (uuid) {
-      agentId = uuid;
-    } else {
-      const cells = Array.from(row.children).filter(
-        (child) => child.tagName === 'SPAN' && !child.classList.contains('row-actions')
-      );
-      if (cells[1]) agentId = cells[1].textContent.trim();
-    }
+    agentId = getAgentIdFromRow(row);
   }
 
   if (agentChatTitle) {
@@ -7049,6 +7781,61 @@ function openAgentChatModalFromToggle(button) {
 }
 
 const agentsPageForChat = document.getElementById('page-agents');
+let lastAgentChatRouteOpenKey = '';
+
+function openAgentChatFromRouteParam() {
+  if (!agentChatModal || !agentsPageForChat) return;
+  const { routeKey, queryParams } = getHashRouteInfo();
+  const isStandaloneRoute = isStandaloneAgentChatRoute(routeKey);
+  const isHybridFlowRoute = isStandaloneHybridFlowRoute(routeKey);
+  const onAgentsPage = routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/');
+  if (!isStandaloneRoute && !isHybridFlowRoute && !onAgentsPage) {
+    lastAgentChatRouteOpenKey = '';
+    return;
+  }
+
+  if (isHybridFlowRoute) {
+    const flowId = String(queryParams.get('flow') || queryParams.get('id') || '').trim();
+    if (!flowId) {
+      lastAgentChatRouteOpenKey = '';
+      return;
+    }
+
+    const openKey = `${routeKey}?flow=${flowId}`;
+    const row = findHybridFlowRowByPublicId(flowId);
+    const isHydrated = agentChatModal.dataset.routeHybridFlowHydrated === 'true';
+    if (lastAgentChatRouteOpenKey === openKey && agentChatModal.classList.contains('open') && (isHydrated || !row)) return;
+
+    if (agentChatModal.parentElement !== document.body) {
+      document.body.appendChild(agentChatModal);
+    }
+    openAgentChatModalWithPayload(buildHybridFlowVoicePayload(row, flowId));
+    agentChatModal.classList.add('agent-chat-modal--standalone');
+    agentChatModal.dataset.routeHybridFlowHydrated = row ? 'true' : 'false';
+    lastAgentChatRouteOpenKey = openKey;
+    return;
+  }
+
+  const agentId = String(queryParams.get('agent') || queryParams.get('chat') || '').trim();
+  if (!agentId) {
+    lastAgentChatRouteOpenKey = '';
+    return;
+  }
+
+  const openKey = `${routeKey}?agent=${agentId}`;
+  const row = findAgentRowById(agentId);
+  const isHydrated = agentChatModal.dataset.routeAgentHydrated === 'true';
+  if (lastAgentChatRouteOpenKey === openKey && agentChatModal.classList.contains('open') && (isHydrated || !row)) return;
+
+  if (isStandaloneRoute && agentChatModal.parentElement !== document.body) {
+    document.body.appendChild(agentChatModal);
+  }
+  openAgentChatModalWithPayload(buildAgentChatPayloadFromRow(row, agentId));
+  agentChatModal.classList.toggle('agent-chat-modal--standalone', isStandaloneRoute);
+  agentChatModal.dataset.routeAgentHydrated = row ? 'true' : 'false';
+  lastAgentChatRouteOpenKey = openKey;
+}
+
 if (agentChatModal && agentsPageForChat) {
   agentsPageForChat.addEventListener('click', (event) => {
     const chatBtn = event.target.closest('.agent-chat-toggle');
@@ -7087,9 +7874,26 @@ if (hybridFlowsPage) {
   const openCreatePageBtn = hybridFlowsPage.querySelector('#openHybridFlowCreatePage');
   if (openCreatePageBtn) {
     openCreatePageBtn.addEventListener('click', () => {
-      window.location.hash = '#/dashboard/hybrid-flows/new';
+      openHybridFlowCreateMode('create');
     });
   }
+
+  hybridFlowsPage.addEventListener('click', async (event) => {
+    const copyLinkBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Copiar link"]');
+    if (!copyLinkBtn || !hybridFlowsPage.contains(copyLinkBtn)) return;
+    event.stopPropagation();
+    const link = getHybridFlowPublicLink(copyLinkBtn.closest('.data-row'));
+    const copied = await copyTextToClipboard(link);
+    if (copied) showAppToast('Link copiado');
+  });
+
+  hybridFlowsPage.addEventListener('click', (event) => {
+    const openLinkBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Abrir em nova guia"]');
+    if (!openLinkBtn || !hybridFlowsPage.contains(openLinkBtn)) return;
+    event.stopPropagation();
+    const link = getHybridFlowPublicLink(openLinkBtn.closest('.data-row'));
+    if (link) window.open(link, '_blank', 'noopener,noreferrer');
+  });
 
   hybridFlowsPage.addEventListener('click', async (event) => {
     const refreshLinkBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Atualizar link"]');
@@ -7123,6 +7927,16 @@ if (hybridFlowsPage) {
     const flowName = row?.querySelector('strong')?.textContent?.trim() || 'Fluxo';
     setHybridFlowHistoryFlowName(flowName);
     window.location.hash = '#/dashboard/hybrid-flows/history';
+  });
+
+  hybridFlowsPage.addEventListener('click', (event) => {
+    const editBtn = event.target.closest('.hybrid-flows-row-actions .action-icon[aria-label="Editar"]');
+    if (!editBtn || !hybridFlowsPage.contains(editBtn)) return;
+    event.stopPropagation();
+    const row = editBtn.closest('.data-row');
+    const flow = readHybridFlowRowData(row);
+    if (!row || !flow) return;
+    openHybridFlowCreateMode('edit', flow, row);
   });
 }
 
@@ -7282,20 +8096,19 @@ if (hybridFlowCreatePage) {
   });
 
   hybridFlowReviewConfirmBtn?.addEventListener('click', () => {
-    const title = String(document.getElementById('hybridFlowTitleInput')?.value || '').trim() || 'Sem título';
-    const description = String(document.getElementById('hybridFlowDescriptionInput')?.value || '').trim();
-    const fieldsCount = hybridFlowFieldsList ? hybridFlowFieldsList.children.length : 0;
-    const now = new Date().toISOString();
-    persistAndRenderHybridFlow({
-      id: `hybrid-flow-${Date.now()}`,
-      title,
-      description,
-      fieldsCount,
-      createdAt: now,
-      updatedAt: now
-    });
+    const isEditMode = Boolean(activeHybridFlowEditId || activeHybridFlowEditRow);
+    const flow = readHybridFlowFormData();
+    if (isEditMode && activeHybridFlowEditRow) {
+      updateHybridFlowRow(activeHybridFlowEditRow, flow);
+      upsertHybridFlowInStorage(flow);
+    } else {
+      persistAndRenderHybridFlow(flow);
+    }
     closeReviewModal();
-    showAppToast('Fluxo salvo com sucesso');
+    showAppToast(isEditMode ? 'Fluxo atualizado com sucesso' : 'Fluxo salvo com sucesso');
+    activeHybridFlowEditId = '';
+    activeHybridFlowEditRow = null;
+    syncHybridFlowCreateModeUi();
     window.location.hash = '#/dashboard/hybrid-flows';
   });
 }
@@ -7467,6 +8280,7 @@ if (hybridFlowAddFieldBtn && hybridFlowFieldsList && hybridFlowFieldsEmpty) {
 
 const agentShareModalEl = document.getElementById('agentShareModal');
 const agentShareCopyBtnEl = document.getElementById('agentShareCopyBtn');
+const agentShareOpenBtnEl = document.getElementById('agentShareOpenBtn');
 const agentShareSaveBtnEl = document.getElementById('agentShareSaveBtn');
 const agentSharePrivateToggleEl = document.getElementById('agentSharePrivateToggle');
 if (agentShareCopyBtnEl) {
@@ -7478,6 +8292,13 @@ if (agentShareCopyBtnEl) {
       agentShareCopyBtnEl.classList.add('is-copied');
       window.setTimeout(() => agentShareCopyBtnEl.classList.remove('is-copied'), 1200);
     }
+  });
+}
+if (agentShareOpenBtnEl) {
+  agentShareOpenBtnEl.addEventListener('click', () => {
+    const link = String(document.getElementById('agentShareLink')?.value || '').trim();
+    if (!link) return;
+    window.open(link, '_blank', 'noopener');
   });
 }
   if (agentShareSaveBtnEl && agentShareModalEl) {
@@ -7503,6 +8324,10 @@ if (agentShareModalEl) {
         const linkValue = String(document.getElementById('agentShareLink')?.value || '').trim();
         agentShareCopyBtnEl.disabled = isPrivate || !linkValue;
       }
+      if (agentShareOpenBtnEl) {
+        const linkValue = String(document.getElementById('agentShareLink')?.value || '').trim();
+        agentShareOpenBtnEl.disabled = isPrivate || !linkValue;
+      }
       linkCard?.classList.toggle('is-disabled', isPrivate);
     });
   }
@@ -7518,6 +8343,7 @@ if (agentChatModal) {
   agentChatModal.addEventListener('click', (event) => {
     const closeTarget = event.target.closest('[data-modal-close]');
     if (closeTarget) {
+      if (isStandaloneChatRoute()) return;
       agentChatModal.classList.remove('open');
       agentChatModal.classList.remove('voice-history-open');
       agentChatModal.setAttribute('aria-hidden', 'true');
@@ -10102,8 +10928,8 @@ function syncAgentsPageScopeSelects() {
 }
 
 function getCurrentAgentsProjectSlugFromRoute() {
-  const raw = (window.location.hash || '').replace(/^#\/?/, '');
-  const match = raw.match(/^dashboard\/agents\/project\/([^/?#]+)$/);
+  const { routeKey } = getHashRouteInfo();
+  const match = routeKey.match(/^dashboard\/agents\/project\/([^/?#]+)$/);
   return match ? decodeURIComponent(match[1]) : '';
 }
 
@@ -11140,26 +11966,33 @@ function getAgentsPageEnvironmentLabel(environmentId) {
 }
 
 function syncAgentsPageEnvironmentSelect() {
-  if (!agentsPageEnvironmentSelect) return;
   const currentValue = isValidAgentsPageEnvironmentId(agentsPageEnvironmentId)
     ? agentsPageEnvironmentId
     : '';
 
-  agentsPageEnvironmentSelect.innerHTML = '';
+  if (agentsPageEnvironmentSelect) {
+    agentsPageEnvironmentSelect.innerHTML = '';
 
-  const allOpt = document.createElement('option');
-  allOpt.value = '';
-  allOpt.textContent = 'Todos os ambientes';
-  agentsPageEnvironmentSelect.appendChild(allOpt);
+    const allOpt = document.createElement('option');
+    allOpt.value = '';
+    allOpt.textContent = 'Todos os setores';
+    agentsPageEnvironmentSelect.appendChild(allOpt);
 
-  AGENTS_PAGE_ENVIRONMENTS.forEach((item) => {
-    const opt = document.createElement('option');
-    opt.value = item.id;
-    opt.textContent = item.label;
-    agentsPageEnvironmentSelect.appendChild(opt);
-  });
+    AGENTS_PAGE_ENVIRONMENTS.forEach((item) => {
+      const opt = document.createElement('option');
+      opt.value = item.id;
+      opt.textContent = item.label;
+      agentsPageEnvironmentSelect.appendChild(opt);
+    });
 
-  agentsPageEnvironmentSelect.value = currentValue;
+    agentsPageEnvironmentSelect.value = currentValue;
+  }
+
+  document
+    .querySelectorAll('#agentsFilterMenu .filter-option[data-filter="sector"]')
+    .forEach((option) => {
+      option.classList.toggle('active', String(option.dataset.value || '').trim() === currentValue);
+    });
 }
 
 function syncAgentModalEnvironmentSelect(preferredEnvironmentId = '') {
@@ -11178,7 +12011,7 @@ function syncAgentModalEnvironmentSelect(preferredEnvironmentId = '') {
 
   const emptyOpt = document.createElement('option');
   emptyOpt.value = '';
-  emptyOpt.textContent = 'Sem ambiente';
+  emptyOpt.textContent = 'Sem setor';
   modalEnvironment.appendChild(emptyOpt);
 
   AGENTS_PAGE_ENVIRONMENTS.forEach((item) => {
@@ -11208,7 +12041,7 @@ function syncProjectModalEnvironmentSelect(preferredEnvironmentId = '') {
 
   const emptyOpt = document.createElement('option');
   emptyOpt.value = '';
-  emptyOpt.textContent = 'Selecione o ambiente';
+  emptyOpt.textContent = 'Selecione o setor';
   environmentSelect.appendChild(emptyOpt);
 
   AGENTS_PAGE_ENVIRONMENTS.forEach((item) => {
@@ -11356,16 +12189,30 @@ function getAgentVisibilityInfo(agent = {}) {
   };
 }
 
+function buildStandaloneAgentChatLink(agentId) {
+  const normalizedId = String(agentId || '').trim();
+  if (!normalizedId) return '';
+  const url = new URL(window.location.href);
+  url.hash = `#/agent-chat?agent=${encodeURIComponent(normalizedId)}`;
+  return url.toString();
+}
+
+function normalizeAgentPublicLink(link) {
+  const value = String(link || '').trim();
+  if (!value) return '';
+  const match = value.match(/#\/dashboard\/agents(?:\/project\/[^?/#]+)?\?[^#]*\bagent=([^&#]+)/);
+  if (!match) return value;
+  return buildStandaloneAgentChatLink(decodeURIComponent(match[1]));
+}
+
 function getAgentPublicLink(agent = {}) {
   const explicitLink = String(
     agent.public_url || agent.share_url || agent.public_link || agent.public_link_url || ''
   ).trim();
-  if (explicitLink) return explicitLink;
+  if (explicitLink) return normalizeAgentPublicLink(explicitLink);
   const agentId = String(agent.id || agent.agent_id || '').trim();
   if (!agentId || !getAgentVisibilityInfo(agent).isPublic) return '';
-  const url = new URL(window.location.href);
-  url.hash = `#/dashboard/agents?agent=${encodeURIComponent(agentId)}`;
-  return url.toString();
+  return buildStandaloneAgentChatLink(agentId);
 }
 
 function getAgentActionLabel(agent = {}) {
@@ -11375,21 +12222,30 @@ function getAgentActionLabel(agent = {}) {
 async function copyTextToClipboard(text) {
   const value = String(text || '').trim();
   if (!value) return false;
-  try {
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(value);
-      return true;
-    }
+  const copyWithTextarea = () => {
     const textarea = document.createElement('textarea');
     textarea.value = value;
     textarea.setAttribute('readonly', 'readonly');
     textarea.style.position = 'fixed';
     textarea.style.opacity = '0';
     document.body.appendChild(textarea);
+    textarea.focus();
     textarea.select();
+    textarea.setSelectionRange(0, value.length);
     const copied = document.execCommand('copy');
     textarea.remove();
     return copied;
+  };
+  try {
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(value);
+        return true;
+      } catch {
+        return copyWithTextarea();
+      }
+    }
+    return copyWithTextarea();
   } catch {
     return false;
   }
@@ -11418,6 +12274,7 @@ function setAgentShareModal(agent = {}) {
   const privateToggleEl = document.getElementById('agentSharePrivateToggle');
   const linkCardEl = document.querySelector('#agentShareModal .agent-share-link-card');
   const copyBtn = document.getElementById('agentShareCopyBtn');
+  const openBtn = document.getElementById('agentShareOpenBtn');
   if (!modal || !nameEl || !linkEl || !statusEl) return;
 
   const settings = getAgentShareSettings(agent);
@@ -11433,6 +12290,7 @@ function setAgentShareModal(agent = {}) {
   statusEl.classList.toggle('agents-visibility-badge--private', isPrivate);
   linkEl.disabled = isPrivate;
   if (copyBtn) copyBtn.disabled = isPrivate || !link;
+  if (openBtn) openBtn.disabled = isPrivate || !link;
   linkCardEl?.classList.toggle('is-disabled', isPrivate);
   modal.dataset.agentId = String(agent.id || '');
 }
@@ -11914,8 +12772,8 @@ function applyAgentsProjectRoute() {
   const agentsPage = document.getElementById('page-agents');
   if (!agentsPage || !agentsPage.classList.contains('is-active')) return;
 
-  const raw = (window.location.hash || '').replace(/^#\/?/, '');
-  const match = raw.match(/^dashboard\/agents\/project\/([^/?#]+)$/);
+  const { routeKey } = getHashRouteInfo();
+  const match = routeKey.match(/^dashboard\/agents\/project\/([^/?#]+)$/);
   const slug = match ? decodeURIComponent(match[1]) : null;
 
   const breadcrumb = document.getElementById('agentsProjectBreadcrumb');
@@ -12069,6 +12927,11 @@ if (agentsFilterBtn && agentsFilterMenu) {
 
       if (group === 'rag') agentsRagFilter = String(button.dataset.value || '').trim().toLowerCase();
       if (group === 'visibility') agentsVisibilityFilter = String(button.dataset.value || '').trim().toLowerCase();
+      if (group === 'sector') {
+        agentsPageEnvironmentId = String(button.dataset.value || '').trim();
+        syncAgentsProjectCardsEnvironmentFilter();
+        syncAgentsAllListScope();
+      }
       applyAgentsAdvancedFilters();
     });
   });
@@ -12076,7 +12939,10 @@ if (agentsFilterBtn && agentsFilterMenu) {
   clearButton?.addEventListener('click', () => {
     agentsRagFilter = '';
     agentsVisibilityFilter = '';
+    agentsPageEnvironmentId = '';
     agentsFilterMenu.querySelectorAll('.filter-option').forEach((option) => option.classList.remove('active'));
+    syncAgentsProjectCardsEnvironmentFilter();
+    syncAgentsAllListScope();
     applyAgentsAdvancedFilters();
   });
 
@@ -12148,8 +13014,7 @@ hubSyncFromState();
 (function wireAgentsAutoRefresh() {
   async function runAgentsAutoRefresh() {
     if (document.hidden) return;
-    const raw = window.location.hash.replace('#/', '');
-    const routeKey = raw || 'dashboard';
+    const { routeKey } = getHashRouteInfo();
     const onAgentsPage = routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/');
     if (!onAgentsPage) return;
     if (!window.WesDashboardAuth?.isAuthenticated?.()) return;
@@ -12166,8 +13031,7 @@ hubSyncFromState();
 
   function ensureAgentsAutoRefresh() {
     stopAgentsAutoRefresh();
-    const raw = window.location.hash.replace('#/', '');
-    const routeKey = raw || 'dashboard';
+    const { routeKey } = getHashRouteInfo();
     const onAgentsPage = routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/');
     if (!AGENTS_AUTO_REFRESH_ENABLED || !onAgentsPage || !window.WesDashboardAuth?.isAuthenticated?.()) return;
     agentsAutoRefreshTimer = window.setInterval(() => {
@@ -12663,10 +13527,6 @@ if (navTriggers.length) {
       if (targetMenu) {
         targetMenu.classList.toggle('open');
       }
-
-      if (trigger.dataset.menu === 'automation') {
-        window.location.hash = '#/dashboard/automations';
-      }
     });
   });
 }
@@ -12775,6 +13635,7 @@ const routeMap = {
   'dashboard/skills': 'page-skills',
   'dashboard/audit': 'page-agent-history',
   'dashboard/agent-history': 'page-agent-history',
+  'dashboard/organizations': 'page-organizations',
   'dashboard/companies': 'page-companies',
   // 'dashboard/organization': 'page-organization',
   'dashboard/environments': 'page-environments',
@@ -12786,11 +13647,11 @@ const routeMap = {
 
 const sectionMap = {
   'dashboard': 'Painel',
-  'dashboard/automations': 'Automa\u00e7\u00e3o',
-  'dashboard/document-analysis': 'Automa\u00e7\u00e3o',
-  'dashboard/input-files': 'Automa\u00e7\u00e3o',
-  'dashboard/schedules': 'Automa\u00e7\u00e3o',
-  'dashboard/credentials': 'Automa\u00e7\u00e3o',
+  'dashboard/automations': 'Fluxos de Trabalho',
+  'dashboard/document-analysis': 'Fluxos de Trabalho',
+  'dashboard/input-files': 'Fluxos de Trabalho',
+  'dashboard/schedules': 'Fluxos de Trabalho',
+  'dashboard/credentials': 'Fluxos de Trabalho',
   'dashboard/agents': 'Painel',
   'dashboard/voice-messaging': 'Atendimento dinâmico',
   'dashboard/voice-messaging/insights': 'Atendimento dinâmico',
@@ -12811,6 +13672,7 @@ const sectionMap = {
   'dashboard/skills': 'Administração',
   'dashboard/audit': 'Administração',
   'dashboard/agent-history': 'Administração',
+  'dashboard/organizations': 'Administração',
   'dashboard/companies': 'Administração',
   'dashboard/environments': 'Administração',
   // 'dashboard/organization': 'Organização',
@@ -12825,20 +13687,26 @@ const organizationAccessProfiles = {
     id: 'adm-wes',
     name: 'ADM WES',
     showAdministration: true,
+    organizationScope: 'all',
+    canManageOrganizations: true,
     canManageCompanies: true,
     canSwitchOrganization: true,
   },
   cedae: {
     id: 'cedae',
-    name: 'CEDAE',
+    name: 'ADM Cliente',
     showAdministration: true,
-    canManageCompanies: false,
+    organizationScope: 'cedae',
+    canManageOrganizations: false,
+    canManageCompanies: true,
     canSwitchOrganization: false,
   },
   'user-cedae': {
     id: 'user-cedae',
-    name: 'USER CEDAE',
+    name: 'Usuário Cliente',
     showAdministration: false,
+    organizationScope: 'cedae',
+    canManageOrganizations: false,
     canManageCompanies: false,
     canSwitchOrganization: false,
   },
@@ -12863,29 +13731,65 @@ const setAccessVisibility = (element, isVisible) => {
   element.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
 };
 
+const isInOrganizationScope = (organizationId, access) => {
+  const scope = String(access?.organizationScope || access?.id || '').trim();
+  if (!scope || scope === 'all') return true;
+  return String(organizationId || '').trim() === scope;
+};
+
+const applyCompaniesOrganizationScope = (access) => {
+  if (!companiesTable) return;
+  companiesTable.querySelectorAll('[data-company-row]').forEach((row) => {
+    const showRow = isInOrganizationScope(row.dataset.companyOrganization, access);
+    row.hidden = !showRow;
+    row.classList.toggle('is-hidden', !showRow);
+  });
+};
+
+const applyEnvironmentCompanyOptionsScope = (access) => {
+  if (!environmentsCompanySelect) return;
+  Array.from(environmentsCompanySelect.options).forEach((option) => {
+    const organizationId = option.dataset.organization || '';
+    const showOption = option.value === 'all' || isInOrganizationScope(organizationId, access);
+    option.hidden = !showOption;
+    option.disabled = !showOption;
+  });
+  const selected = environmentsCompanySelect.selectedOptions[0];
+  if (!selected || selected.disabled || selected.hidden) {
+    environmentsCompanySelect.value = 'all';
+  }
+};
+
 const applyOrganizationAccessControls = (routeKey) => {
   const access = getSelectedOrganizationAccess();
   const administrationGroup = document.querySelector('[data-access-section="administration"]');
+  const organizationsLink = document.querySelector('[data-access-item="organizations"]');
   const companiesLink = document.querySelector('[data-access-item="companies"]');
   const switchOrganizationLink = document.querySelector('[data-access-item="switch-organization"]');
   const tenantEl = document.querySelector('#userMenu .user-tenant');
 
   document.body.dataset.organizationAccess = access.id;
+  document.body.dataset.organizationScope = access.organizationScope || access.id || 'all';
   if (tenantEl) tenantEl.textContent = access.name;
 
   setAccessVisibility(administrationGroup, access.showAdministration);
+  setAccessVisibility(organizationsLink, access.showAdministration && access.canManageOrganizations);
   setAccessVisibility(companiesLink, access.showAdministration && access.canManageCompanies);
   setAccessVisibility(switchOrganizationLink, access.canSwitchOrganization);
-  setAccessVisibility(environmentsCompanySelectWrap, access.id === 'adm-wes');
+  setAccessVisibility(environmentsCompanySelectWrap, access.showAdministration && access.canManageCompanies);
+  applyCompaniesOrganizationScope(access);
+  applyEnvironmentCompanyOptionsScope(access);
   if (environmentsCompanySelect) {
-    environmentsCompanySelect.value = access.id === 'adm-wes' ? 'all' : access.id;
+    environmentsCompanySelect.value = 'all';
     environmentsCompanySelect.dispatchEvent(new Event('change'));
   }
 
   const isAdministrationRoute = sectionMap[routeKey] === 'Administração';
+  const isOrganizationsRoute = routeKey === 'dashboard/organizations';
   const isCompaniesRoute = routeKey === 'dashboard/companies';
   const blockedRoute =
     (!access.showAdministration && isAdministrationRoute) ||
+    (!access.canManageOrganizations && isOrganizationsRoute) ||
     (!access.canManageCompanies && isCompaniesRoute);
 
   if (blockedRoute) {
@@ -12898,7 +13802,7 @@ const applyOrganizationAccessControls = (routeKey) => {
 
 const normalizeAutomationLabels = () => {
   const automationTrigger = document.querySelector('.nav-trigger[data-menu="automation"] .nav-label');
-  if (automationTrigger) automationTrigger.textContent = 'Automa\u00e7\u00e3o';
+  if (automationTrigger) automationTrigger.textContent = 'Fluxos de Trabalho';
 
   const automationLink = document.querySelector('#submenu-automation a[href="#/dashboard/automations"] .submenu-label');
   if (automationLink) automationLink.textContent = 'Automa\u00e7\u00f5es';
@@ -12913,6 +13817,7 @@ const normalizeVisiblePortugueseLabels = () => {
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Auditoria'],
     ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'Conex\u00f5es'],
+    ['#submenu-administration a[href="#/dashboard/organizations"] .submenu-label', 'Organiza\u00e7\u00f5es'],
     ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
     ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
@@ -12928,7 +13833,7 @@ const normalizeVisiblePortugueseLabels = () => {
   const dashboardTitle = document.getElementById('dashboardToggle');
   if (dashboardTitle) {
     dashboardTitle.textContent = dashboardTitle.textContent
-      .replace(/Automa.+/i, 'Automa\u00e7\u00e3o')
+      .replace(/Automa.+/i, 'Fluxos de Trabalho')
       .replace(/Administra.+/i, 'Administra\u00e7\u00e3o')
       .replace(/Configura.+/i, 'Configura\u00e7\u00f5es');
   }
@@ -12942,8 +13847,13 @@ const normalizeVisiblePortugueseLabels = () => {
 
 const updateActivePage = () => {
   normalizeVisiblePortugueseLabels();
-  const hash = window.location.hash.replace('#/', '');
-  const routeKey = hash || 'dashboard';
+  const { routeKey } = getHashRouteInfo();
+  if (!isStandaloneChatRoute(routeKey) && agentChatModal?.classList.contains('agent-chat-modal--standalone')) {
+    agentChatModal.classList.remove('open', 'agent-chat-modal--standalone', 'voice-mode', 'voice-history-open', 'has-voice-transcript');
+    agentChatModal.setAttribute('aria-hidden', 'true');
+    agentChatModal.dataset.routeAgentHydrated = 'false';
+    agentChatModal.dataset.routeHybridFlowHydrated = 'false';
+  }
   if (!applyOrganizationAccessControls(routeKey)) return;
   let pageId = routeMap[routeKey];
   if (!pageId && routeKey.startsWith('dashboard/agents/project/')) {
@@ -13000,10 +13910,9 @@ const updateActivePage = () => {
     if (
       navRouteKey === 'dashboard/automations' ||
       navRouteKey === 'dashboard/document-analysis' ||
-      navRouteKey === 'dashboard/schedules' ||
-      navRouteKey === 'dashboard/agents'
+      navRouteKey === 'dashboard/schedules'
     ) {
-      dashboardToggle.textContent = 'Automação';
+      dashboardToggle.textContent = 'Fluxos de Trabalho';
     }
   }
 
@@ -13039,12 +13948,13 @@ const updateActivePage = () => {
   }
 
   applyAgentsProjectRoute();
+  openAgentChatFromRouteParam();
 
   if (window.WesDashboardAuth?.isAuthenticated?.()) {
     void refreshHubScopeFromApi();
   }
   if (navRouteKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/')) {
-    void refreshAgentsTableFromApi();
+    void refreshAgentsTableFromApi().then(() => openAgentChatFromRouteParam());
   }
   if (directChatFab) {
     const hideDirectChatFab = routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/');
@@ -13266,7 +14176,13 @@ document.addEventListener('click', (event) => {
     return option ? option.textContent.trim() : value.toUpperCase();
   };
 
-  const createEnvironmentRow = ({ name, owner, description, company = 'adm-wes', users = 0 }) => {
+  const getEnvironmentOrganizationId = (companyValue) => {
+    const value = String(companyValue || '').trim();
+    const option = value ? environmentsCompanySelect?.querySelector(`option[value="${CSS.escape(value)}"]`) : null;
+    return option?.dataset.organization || String(getSelectedOrganizationAccess().organizationScope || '').trim() || 'avas-group';
+  };
+
+  const createEnvironmentRow = ({ name, owner, description, company = 'avas', users = 0 }) => {
     const row = document.createElement('div');
     row.className = 'data-row environment-row';
 
@@ -13276,6 +14192,7 @@ document.addEventListener('click', (event) => {
     row.dataset.environmentDescription = description;
     row.dataset.environmentOwner = owner;
     row.dataset.environmentCompany = company;
+    row.dataset.environmentOrganization = getEnvironmentOrganizationId(company);
     row.dataset.environmentProjects = '0';
     row.dataset.environmentAgents = '0';
     row.dataset.environmentUsers = String(users);

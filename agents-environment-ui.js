@@ -243,7 +243,7 @@
       const orgSelect = document.createElement('select');
       orgSelect.id = 'agentsPageOrgSelect';
       orgSelect.className = 'hub-select';
-      orgSelect.setAttribute('aria-label', 'Ambiente');
+      orgSelect.setAttribute('aria-label', 'Setor');
       orgSelect.hidden = true;
       orgSelect.classList.add('wes-env-hidden');
       host.appendChild(orgSelect);
@@ -374,7 +374,10 @@
           Boolean(agent?.public_url || agent?.share_url || agent?.public_link) ||
           ['public', 'público', 'publico', 'shared', 'open', 'true', '1', 'yes'].includes(visibility) ||
           Boolean(agent?.is_public === true || agent?.public === true);
-        const publicLink = isPublic ? (String(agent?.public_url || agent?.share_url || agent?.public_link || '').trim() || `#/dashboard/agents?agent=${encodeURIComponent(String(agent?.id || '').trim())}`) : '';
+        const rawPublicLink = String(agent?.public_url || agent?.share_url || agent?.public_link || '').trim();
+        const publicLink = isPublic
+          ? (rawPublicLink || `#/agent-chat?agent=${encodeURIComponent(String(agent?.id || '').trim())}`)
+          : '';
         row = document.createElement('div');
         row.className = 'agents-row';
         row.dataset.fromApi = 'true';
@@ -406,7 +409,7 @@
         return;
       }
       if (typeof setAgentsApiStatus === 'function') {
-        setAgentsApiStatus('Carregando agentes de todos os ambientes...', false);
+        setAgentsApiStatus('Carregando agentes de todos os setores...', false);
       }
       const res = await window.wesApiFetch('/agents');
       const body = await res.json().catch(() => []);
@@ -432,7 +435,7 @@
       return;
     }
     if (typeof setAgentsApiStatus === 'function') {
-      setAgentsApiStatus('Carregando agentes dos ambientes selecionados...', false);
+      setAgentsApiStatus('Carregando agentes dos setores selecionados...', false);
     }
     const agents = [];
     const seenIds = new Set();
@@ -452,7 +455,7 @@
     }
     renderEnvironmentFilteredAgents(agents);
     if (typeof setAgentsApiStatus === 'function') {
-      setAgentsApiStatus(agents.length ? '' : 'Nenhum agente nos ambientes selecionados.', false);
+      setAgentsApiStatus(agents.length ? '' : 'Nenhum agente nos setores selecionados.', false);
     }
   }
 
@@ -511,16 +514,16 @@
     filter.innerHTML = `
       <button type="button" class="btn primary with-icon wes-env-filter-btn" id="wesEnvironmentFilterBtn" aria-expanded="false">
         <i data-lucide="funnel"></i>
-        Filtrar ambientes
+        Filtrar setores
       </button>
       <div class="wes-env-menu" id="wesEnvironmentMenu" hidden>
         <div class="wes-env-menu-top">
           <button type="button" class="wes-env-clear" id="wesEnvironmentClearBtn">Limpar filtros</button>
         </div>
-        <div class="wes-env-title">Ambiente</div>
+        <div class="wes-env-title">Setor</div>
         <div class="wes-env-options" id="wesEnvironmentOptions"></div>
         <div class="wes-env-create">
-          <button type="button" class="wes-env-create-btn" id="wesEnvironmentCreateBtn">Não encontrou o ambiente? Crie um novo ambiente</button>
+          <button type="button" class="wes-env-create-btn" id="wesEnvironmentCreateBtn">Não encontrou o setor? Crie um novo setor</button>
         </div>
       </div>
     `;
@@ -563,22 +566,22 @@
       <div class="modal-backdrop" data-wes-environment-close></div>
       <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="wesEnvironmentModalTitle">
         <div class="modal-header">
-          <h3 id="wesEnvironmentModalTitle">Criar ambiente</h3>
+          <h3 id="wesEnvironmentModalTitle">Criar setor</h3>
           <button type="button" class="icon-btn" aria-label="Fechar" data-wes-environment-close>
             <span class="material-symbols-rounded">close</span>
           </button>
         </div>
         <form id="wesEnvironmentForm" class="modal-body">
           <p id="wesEnvironmentError" class="modal-form-error" role="alert" hidden></p>
-          <label class="modal-label" for="wesEnvironmentName">Nome do ambiente</label>
+          <label class="modal-label" for="wesEnvironmentName">Nome do setor</label>
           <input class="modal-input" id="wesEnvironmentName" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: WES Brasil" required />
-          <label class="modal-label" for="wesEnvironmentSlug">Identificador interno do ambiente (opcional)</label>
+          <label class="modal-label" for="wesEnvironmentSlug">Identificador interno do setor (opcional)</label>
           <input class="modal-input" id="wesEnvironmentSlug" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: wes-brasil" />
-          <p class="wes-env-modal-note">Se você não preencher, o sistema gera esse identificador automaticamente a partir do nome do ambiente.</p>
+          <p class="wes-env-modal-note">Se você não preencher, o sistema gera esse identificador automaticamente a partir do nome do setor.</p>
         </form>
         <div class="modal-footer">
           <button type="button" class="btn outline" data-wes-environment-close>Cancelar</button>
-          <button type="submit" form="wesEnvironmentForm" class="btn primary">Criar ambiente</button>
+          <button type="submit" form="wesEnvironmentForm" class="btn primary">Criar setor</button>
         </div>
       </div>
     `;
@@ -616,7 +619,7 @@
       if (exists) {
         if (error) {
           error.hidden = false;
-          error.textContent = 'Ja existe um ambiente com esse identificador interno.';
+          error.textContent = 'Ja existe um setor com esse identificador interno.';
         }
         return;
       }
@@ -675,10 +678,10 @@
     const orgRow = scopeBox.querySelector('.modal-scope-row');
     if (orgRow) {
       orgRow.innerHTML = `
-        <label class="modal-scope-key" for="agentModalEnvironment">Ambiente</label>
+        <label class="modal-scope-key" for="agentModalEnvironment">Setor</label>
         <div class="hub-select-wrap hub-select-wrap--block">
           <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">corporate_fare</span>
-          <select class="hub-select" id="agentModalEnvironment" aria-label="Ambiente do agente"></select>
+          <select class="hub-select" id="agentModalEnvironment" aria-label="Setor do agente"></select>
           <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
         </div>
       `;
@@ -692,14 +695,14 @@
 
   function patchProjectModal() {
     const label = document.querySelector('label[for="projectModalOrg"]');
-    if (label) label.textContent = 'Ambiente';
+    if (label) label.textContent = 'Setor';
     const nameInput = byId('projectModalName');
     if (nameInput) {
       nameInput.placeholder = 'Ex.: Operações integradas';
     }
     const orgSelect = byId('projectModalOrg');
     if (orgSelect) {
-      orgSelect.setAttribute('aria-label', 'Ambiente do projeto');
+      orgSelect.setAttribute('aria-label', 'Setor do projeto');
     }
     const contextBlock = byId('projectModalContext')?.closest('.project-modal-context-block');
     contextBlock?.classList.add('wes-env-hidden');
@@ -975,7 +978,7 @@
 
     const placeholder = document.createElement('option');
     placeholder.value = '';
-    placeholder.textContent = 'Selecione um ambiente';
+    placeholder.textContent = 'Selecione um setor';
     envSel.appendChild(placeholder);
 
     let added = 0;

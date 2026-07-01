@@ -46,6 +46,10 @@
     return Object.prototype.hasOwnProperty.call(PUBLIC_ROUTE_SCREENS, routeKey);
   }
 
+  function isStandaloneAgentChatRoute(routeKey = getRouteKey()) {
+    return routeKey === 'agent-chat' || routeKey === 'chat/agent' || routeKey === 'hybrid-flow';
+  }
+
   function ensureAppVisible() {
     const shell = document.getElementById('appShell');
     const publicFlow = document.getElementById('publicFlow');
@@ -60,12 +64,22 @@
     if (shell) shell.hidden = true;
     if (publicFlow) publicFlow.hidden = false;
     document.body.classList.add('public-route');
+    document.body.classList.remove('agent-chat-standalone');
 
     document.querySelectorAll('[data-public-route]').forEach((screen) => {
       const isActive = screen.id === PUBLIC_ROUTE_SCREENS[routeKey];
       screen.classList.toggle('is-active', isActive);
       screen.toggleAttribute('hidden', !isActive);
     });
+  }
+
+  function ensureStandaloneAgentChatVisible() {
+    const shell = document.getElementById('appShell');
+    const publicFlow = document.getElementById('publicFlow');
+    if (shell) shell.hidden = true;
+    if (publicFlow) publicFlow.hidden = true;
+    document.body.classList.remove('public-route');
+    document.body.classList.add('agent-chat-standalone');
   }
 
   function ensureDemoSession() {
@@ -80,12 +94,16 @@
 
   function syncPublicRoute() {
     const routeKey = getRouteKey();
-    if (isPublicRoute(routeKey)) {
+    if (isStandaloneAgentChatRoute(routeKey)) {
+      ensureStandaloneAgentChatVisible();
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } else if (isPublicRoute(routeKey)) {
       ensurePublicVisible(routeKey);
       if (routeKey !== '') {
         window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
       }
     } else {
+      document.body.classList.remove('agent-chat-standalone');
       ensureDemoSession();
       ensureAppVisible();
       WesDashboardAuth.applyUserToUI();
@@ -205,9 +223,17 @@
     const openCreateCompanyModalButtons = Array.from(document.querySelectorAll('[data-open-create-company-modal], #openCreateCompanyModal'));
     const createCompanyModal = document.getElementById('createCompanyModal');
     const createCompanyForm = document.getElementById('createCompanyForm');
+    const createCompanyModalTitle = document.getElementById('createCompanyModalTitle');
+    const companyNameLabel = document.querySelector('label[for="companyName"] > span');
+    const companyAdminEmailLabel = document.querySelector('label[for="companyAdminEmail"] > span');
     const companyName = document.getElementById('companyName');
     const createCompanyAdminUserLink = document.getElementById('createCompanyAdminUserLink');
+    const organizationSectionsPicker = document.getElementById('organizationSectionsPicker');
+    const createCompanySubmitButton = createCompanyForm?.querySelector('button[type="submit"]');
     const orgChoices = document.querySelectorAll('[data-org-choice]');
+    let createCompanyContext = 'company';
+    let createCompanyMode = 'create';
+    let activeOrganizationEditRow = null;
     loginForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       window.location.hash = '#/select-organization';
@@ -229,12 +255,67 @@
       if (!createCompanyModal) return;
       createCompanyModal.classList.remove('is-open');
       createCompanyModal.classList.remove('public-modal--app');
+      createCompanyModal.classList.remove('public-modal--organization');
       createCompanyModal.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('public-modal-open');
+      activeOrganizationEditRow = null;
+      createCompanyMode = 'create';
     };
 
-    const showCreateCompanyModal = () => {
+    const syncCreateCompanyModalCopy = () => {
+      const isOrganization = createCompanyContext === 'organization';
+      const isEditingOrganization = isOrganization && createCompanyMode === 'edit';
+      if (createCompanyModalTitle) {
+        createCompanyModalTitle.textContent = isEditingOrganization
+          ? 'Editar organização'
+          : (isOrganization ? 'Criar organização' : 'Criar empresa');
+      }
+      createCompanyModal?.classList.toggle('public-modal--organization', isOrganization);
+      if (organizationSectionsPicker) organizationSectionsPicker.hidden = !isOrganization;
+      const subtitle = createCompanyModal?.querySelector('.public-modal-header p');
+      if (subtitle) {
+        subtitle.textContent = isEditingOrganization
+          ? 'Atualize os dados e seções disponíveis para esta organização.'
+          : (isOrganization ? 'Informe os dados iniciais da organização.' : 'Informe os dados iniciais da empresa.');
+      }
+      if (companyNameLabel) companyNameLabel.textContent = isOrganization ? 'Nome da organização' : 'Nome da empresa';
+      if (companyAdminEmailLabel) companyAdminEmailLabel.textContent = isOrganization ? 'E-mail do ADM da organização' : 'E-mail do ADM da empresa';
+      if (createCompanySubmitButton) createCompanySubmitButton.textContent = isEditingOrganization ? 'Salvar alterações' : 'Salvar';
+      if (createCompanyAdminUserLink) {
+        createCompanyAdminUserLink.hidden = isEditingOrganization;
+        createCompanyAdminUserLink.textContent = isOrganization
+          ? 'Não criou o ADM da organização ainda?'
+          : 'Não criou o ADM da empresa ainda?';
+      }
+    };
+
+    const showCreateCompanyModal = (event) => {
       if (!createCompanyModal) return;
+      createCompanyContext = event?.currentTarget?.dataset?.createContext || 'company';
+      createCompanyMode = 'create';
+      activeOrganizationEditRow = null;
+      createCompanyForm?.reset();
+      syncCreateCompanyModalCopy();
+      if (createCompanyModal.parentElement !== document.body) {
+        document.body.appendChild(createCompanyModal);
+      }
+      createCompanyModal.classList.toggle('public-modal--app', Boolean(appShell && !appShell.hidden));
+      createCompanyModal.classList.add('is-open');
+      createCompanyModal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('public-modal-open');
+      window.setTimeout(() => companyName?.focus(), 50);
+    };
+
+    const showEditOrganizationModal = (row) => {
+      if (!createCompanyModal || !row) return;
+      createCompanyContext = 'organization';
+      createCompanyMode = 'edit';
+      activeOrganizationEditRow = row;
+      syncCreateCompanyModalCopy();
+      if (companyName) companyName.value = row.dataset.organizationName || row.querySelector('strong')?.textContent?.trim() || '';
+      const adminEmail = row.dataset.organizationAdmin || row.children[1]?.textContent?.trim() || '';
+      const companyAdminEmail = document.getElementById('companyAdminEmail');
+      if (companyAdminEmail) companyAdminEmail.value = adminEmail;
       if (createCompanyModal.parentElement !== document.body) {
         document.body.appendChild(createCompanyModal);
       }
@@ -248,8 +329,33 @@
     openCreateCompanyModalButtons.forEach((button) => {
       button.addEventListener('click', showCreateCompanyModal);
     });
+    document.addEventListener('click', (event) => {
+      const editButton = event.target.closest('[data-organization-edit]');
+      if (!editButton) return;
+      const row = editButton.closest('[data-organization-row]');
+      if (!row) return;
+      showEditOrganizationModal(row);
+    });
     document.querySelectorAll('[data-create-company-close]').forEach((button) => {
       button.addEventListener('click', closeCreateCompanyModal);
+    });
+    organizationSectionsPicker?.addEventListener('change', (event) => {
+      const input = event.target.closest('.organization-section-check--parent input[type="checkbox"]');
+      if (!input) return;
+      const group = input.closest('.organization-section-group');
+      group?.querySelectorAll('.organization-subsections input[type="checkbox"]').forEach((checkbox) => {
+        checkbox.checked = input.checked;
+      });
+    });
+    organizationSectionsPicker?.addEventListener('click', (event) => {
+      const toggle = event.target.closest('.organization-section-toggle');
+      if (!toggle) return;
+      const group = toggle.closest('.organization-section-group');
+      if (!group) return;
+      const isOpen = group.classList.toggle('is-open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      const icon = toggle.querySelector('.material-symbols-rounded');
+      if (icon) icon.textContent = isOpen ? 'expand_less' : 'expand_more';
     });
     createCompanyAdminUserLink?.addEventListener('click', () => {
       if (createCompanyAdminUserLink.classList.contains('is-loading')) return;
@@ -276,9 +382,25 @@
     });
     createCompanyForm?.addEventListener('submit', (event) => {
       event.preventDefault();
+      if (createCompanyContext === 'organization' && createCompanyMode === 'edit' && activeOrganizationEditRow) {
+        const nextName = String(companyName?.value || '').trim();
+        const companyAdminEmail = document.getElementById('companyAdminEmail');
+        const nextAdmin = String(companyAdminEmail?.value || '').trim();
+        if (nextName) {
+          activeOrganizationEditRow.dataset.organizationName = nextName;
+          const nameEl = activeOrganizationEditRow.querySelector('strong');
+          if (nameEl) nameEl.textContent = nextName;
+        }
+        if (nextAdmin) {
+          activeOrganizationEditRow.dataset.organizationAdmin = nextAdmin;
+          if (activeOrganizationEditRow.children[1]) activeOrganizationEditRow.children[1].textContent = nextAdmin;
+        }
+        closeCreateCompanyModal();
+        return;
+      }
       createCompanyForm.reset();
       closeCreateCompanyModal();
-      window.location.hash = '#/select-organization';
+      window.location.hash = createCompanyContext === 'organization' ? '#/select-organization' : '#/dashboard/companies';
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && createCompanyModal?.classList.contains('is-open')) {

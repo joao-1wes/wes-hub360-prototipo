@@ -372,6 +372,7 @@ const telegramSummaryBotId = document.getElementById('telegramSummaryBotId');
 const telegramSummaryTestStatus = document.getElementById('telegramSummaryTestStatus');
 const appToast = document.getElementById('appToast');
 const appToastMessage = document.getElementById('appToastMessage');
+const profilePage = document.getElementById('page-profile');
 const openAutomationModal = document.getElementById('openAutomationModal');
 const automationModal = document.getElementById('automationModal');
 const automationModalForm = document.getElementById('automationModalForm');
@@ -1164,7 +1165,6 @@ const periodOptions = document.querySelectorAll('.period-option');
 const rangeFields = document.querySelectorAll('.period-field.range-only');
 const singleField = document.querySelector('.period-field.single-only');
 const addToggles = document.querySelectorAll('.add-toggle');
-const licenseToggles = document.querySelectorAll('.license-toggle');
 const dismissibleInfoBanners = document.querySelectorAll('.info-banner.dismissible');
 const settingsSaveBtn = document.getElementById('settingsSaveBtn');
 const settingsPage = document.getElementById('page-settings');
@@ -5673,8 +5673,8 @@ function getCredentialFieldDefinitions(type, values = {}) {
     ],
     'Banco de Dados': [
       { name: 'engine', label: 'Mecanismo', required: true, kind: 'select', options: ['PostgreSQL', 'MySQL', 'SQL Server', 'Oracle', 'MongoDB'], hint: 'Define o driver e a porta padrão.' },
-      { name: 'host', label: 'Host', required: true, placeholder: 'db.exemplo.local' },
       { name: 'port', label: 'Porta', required: true, placeholder: '5432', hint: 'PostgreSQL 5432, MySQL 3306, SQL Server 1433, Oracle 1521, MongoDB 27017.' },
+      { name: 'host', label: 'Host', required: true, placeholder: 'db.exemplo.local' },
       { name: 'database', label: 'Banco de dados', required: true, placeholder: 'app_producao' },
       { name: 'username', label: 'Usuário', required: true, placeholder: 'usuario_app' },
       { name: 'password', label: 'Senha', required: true, sensitive: true, placeholder: 'Informe a senha' },
@@ -5728,6 +5728,11 @@ function collectCredentialDynamicValues() {
   }, {});
 }
 
+function refreshCredentialSelectWraps(root = credentialModal) {
+  if (typeof hubEnhanceSelectWrap !== 'function') return;
+  root?.querySelectorAll('.credential-select-wrap').forEach(hubEnhanceSelectWrap);
+}
+
 function renderCredentialDynamicFields(type, values = {}) {
   if (!credentialDynamicFields) return;
   const normalizedType = normalizeCredentialTypeLabel(type);
@@ -5738,7 +5743,8 @@ function renderCredentialDynamicFields(type, values = {}) {
     const requiredAttr = field.required ? ' required' : '';
     const hintHtml = field.hint
       ? `<p class="modal-field-hint">${escapeHtmlWes(field.hint)}</p>`
-      : '<p class="modal-field-hint credential-field-hint-placeholder" aria-hidden="true">&nbsp;</p>';
+      : '';
+    const compactClass = field.hint ? '' : ' credential-dynamic-field--compact';
     const rerenderAttr = field.rerender ? ' data-credential-rerender' : '';
     const inputId = `credentialField_${field.name}`;
     let controlHtml = '';
@@ -5747,7 +5753,12 @@ function renderCredentialDynamicFields(type, values = {}) {
       const optionsHtml = field.options.map((option) => (
         `<option value="${escapeHtmlWes(option)}"${String(value || field.options[0]) === option ? ' selected' : ''}>${escapeHtmlWes(option)}</option>`
       )).join('');
-      controlHtml = `<select class="modal-input" id="${escapeHtmlWes(inputId)}" data-credential-field="${escapeHtmlWes(field.name)}"${requiredAttr}${rerenderAttr}>${optionsHtml}</select>`;
+      controlHtml = `
+        <div class="hub-select-wrap hub-select-wrap--block credential-select-wrap">
+          <select class="hub-select" id="${escapeHtmlWes(inputId)}" data-credential-field="${escapeHtmlWes(field.name)}"${requiredAttr}${rerenderAttr}>${optionsHtml}</select>
+          <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+        </div>
+      `;
     } else if (field.multiline) {
       const textareaType = field.sensitive ? ' data-credential-sensitive="true"' : '';
       controlHtml = `
@@ -5767,7 +5778,7 @@ function renderCredentialDynamicFields(type, values = {}) {
     }
 
     return `
-      <div class="credential-dynamic-field">
+      <div class="credential-dynamic-field${compactClass}">
         <label class="modal-label${requiredClass}" for="${escapeHtmlWes(inputId)}">${escapeHtmlWes(field.label)}</label>
         ${controlHtml}
         ${hintHtml}
@@ -5778,10 +5789,10 @@ function renderCredentialDynamicFields(type, values = {}) {
   credentialDynamicFields.innerHTML = `
     <div class="credential-dynamic-header">
       <strong>Dados de ${escapeHtmlWes(normalizedType)}</strong>
-      <span>Campos obrigatórios são marcados no formulário. Campos sensíveis ficam mascarados.</span>
     </div>
     <div class="credential-dynamic-grid">${fieldsHtml}</div>
   `;
+  refreshCredentialSelectWraps(credentialDynamicFields);
 }
 
 function formatCredentialUpdatedAt(date = new Date()) {
@@ -5861,6 +5872,7 @@ function openCredentialModal(row = null) {
   if (credentialNameInput) credentialNameInput.value = rowData?.name || '';
   if (credentialDescriptionInput) credentialDescriptionInput.value = rowData?.description || '';
   if (credentialTypeSelect) credentialTypeSelect.value = rowData?.type || 'AWS';
+  refreshCredentialSelectWraps();
   renderCredentialDynamicFields(credentialTypeSelect?.value || 'AWS', rowData?.payload || {});
   credentialModal.classList.add('open');
   credentialModal.setAttribute('aria-hidden', 'false');
@@ -9997,17 +10009,6 @@ if (agentsPagePagination) {
   });
 }
 
-if (licenseToggles.length) {
-  licenseToggles.forEach((toggle) => {
-    toggle.addEventListener('click', () => {
-      const card = toggle.closest('.license-card');
-      if (card) {
-        card.classList.toggle('is-collapsed');
-      }
-    });
-  });
-}
-
 if (dismissibleInfoBanners.length) {
   dismissibleInfoBanners.forEach((banner) => {
     const closeButton = banner.querySelector('.banner-close');
@@ -13488,6 +13489,217 @@ if (settingsPage && settingsSaveBtn) {
   updateSaveState();
 }
 
+if (profilePage) {
+  const auth = window.WesDashboardAuth?.read?.();
+  let currentEmail = auth?.userId || 'admin@1wes.com';
+  const displayName = auth?.displayName || document.querySelector('.user-name')?.textContent?.trim() || 'Usuário';
+  const tenantName = document.querySelector('.user-tenant')?.textContent?.trim() || 'AVAS';
+  const profileEmailModal = document.getElementById('profileEmailModal');
+  const profilePasswordModal = document.getElementById('profilePasswordModal');
+  const profileSummaryAvatar = document.getElementById('profileSummaryAvatar');
+  const profileSummaryName = document.getElementById('profileSummaryName');
+  const profileSummaryEmail = document.getElementById('profileSummaryEmail');
+  const profileSummaryTenant = document.getElementById('profileSummaryTenant');
+  const profileCurrentEmail = document.getElementById('profileCurrentEmail');
+  const profileCurrentEmailCode = document.getElementById('profileCurrentEmailCode');
+  const profileSendNewEmailCode = document.getElementById('profileSendNewEmailCode');
+  const profileEmailForm = document.getElementById('profileEmailForm');
+  const profilePasswordForm = document.getElementById('profilePasswordForm');
+  const profileNewEmail = document.getElementById('profileNewEmail');
+  const profileNewEmailCode = document.getElementById('profileNewEmailCode');
+  const profileEmailSubmit = document.getElementById('profileEmailSubmit');
+  const profileEmailFeedback = document.getElementById('profileEmailFeedback');
+  const profilePasswordEmail = document.getElementById('profilePasswordEmail');
+  const profileNewPassword = document.getElementById('profileNewPassword');
+  const profileConfirmPassword = document.getElementById('profileConfirmPassword');
+  const profilePasswordCode = document.getElementById('profilePasswordCode');
+  const profilePasswordSubmit = document.getElementById('profilePasswordSubmit');
+  const profilePasswordFeedback = document.getElementById('profilePasswordFeedback');
+  let currentEmailCodeSent = false;
+  let newEmailCodeSent = false;
+  let passwordCodeSent = false;
+
+  const setProfileFeedback = (el, message = '', isError = false) => {
+    if (!el) return;
+    el.textContent = message;
+    el.hidden = !message;
+    el.classList.toggle('is-error', Boolean(isError));
+  };
+
+  const normalizeCode = (input) => String(input?.value || '').replace(/\D/g, '').slice(0, 6);
+  const isValidProfileEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+
+  const syncProfileEmailDisplay = () => {
+    if (profileSummaryEmail) profileSummaryEmail.textContent = currentEmail;
+    if (profileCurrentEmail) profileCurrentEmail.value = currentEmail;
+    if (profilePasswordEmail) profilePasswordEmail.value = currentEmail;
+  };
+
+  const openProfileModal = (modal) => {
+    if (!modal) return;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    modal.querySelector('input, button')?.focus();
+  };
+
+  const closeProfileModal = (modal) => {
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  const resetProfileEmailForm = () => {
+    profileEmailForm?.reset();
+    currentEmailCodeSent = false;
+    newEmailCodeSent = false;
+    syncProfileEmailDisplay();
+    setProfileFeedback(profileEmailFeedback);
+    updateProfileEmailState();
+  };
+
+  const resetProfilePasswordForm = () => {
+    profilePasswordForm?.reset();
+    passwordCodeSent = false;
+    syncProfileEmailDisplay();
+    setProfileFeedback(profilePasswordFeedback);
+    updateProfilePasswordState();
+  };
+
+  const updateProfileEmailState = () => {
+    if (!profileEmailSubmit) return;
+    const typedCurrentEmail = String(profileCurrentEmail?.value || '').trim();
+    const nextEmail = String(profileNewEmail?.value || '').trim();
+    const currentCode = normalizeCode(profileCurrentEmailCode);
+    const nextCode = normalizeCode(profileNewEmailCode);
+    const currentEmailConfirmed = currentEmailCodeSent && typedCurrentEmail.toLowerCase() === currentEmail.toLowerCase() && currentCode.length === 6;
+    const nextEmailReady = isValidProfileEmail(nextEmail) && nextEmail.toLowerCase() !== currentEmail.toLowerCase();
+    if (profileSendNewEmailCode) profileSendNewEmailCode.disabled = !(currentEmailConfirmed && nextEmailReady);
+    profileEmailSubmit.disabled = !(currentEmailConfirmed && newEmailCodeSent && nextEmailReady && nextCode.length === 6);
+  };
+
+  const updateProfilePasswordState = () => {
+    if (!profilePasswordSubmit) return;
+    const passwordEmail = String(profilePasswordEmail?.value || '').trim();
+    const password = String(profileNewPassword?.value || '');
+    const confirmation = String(profileConfirmPassword?.value || '');
+    const code = normalizeCode(profilePasswordCode);
+    const emailReady = passwordEmail.toLowerCase() === currentEmail.toLowerCase();
+    profilePasswordSubmit.disabled = !(passwordCodeSent && emailReady && password.length >= 8 && password === confirmation && code.length === 6);
+  };
+
+  if (profileSummaryAvatar) profileSummaryAvatar.textContent = (displayName[0] || currentEmail[0] || 'U').toUpperCase();
+  if (profileSummaryName) profileSummaryName.textContent = displayName;
+  if (profileSummaryTenant) profileSummaryTenant.textContent = tenantName;
+  syncProfileEmailDisplay();
+
+  document.getElementById('openProfileEmailModal')?.addEventListener('click', () => {
+    resetProfileEmailForm();
+    openProfileModal(profileEmailModal);
+    profileCurrentEmail?.focus();
+  });
+
+  document.getElementById('openProfilePasswordModal')?.addEventListener('click', () => {
+    resetProfilePasswordForm();
+    openProfileModal(profilePasswordModal);
+    profilePasswordEmail?.focus();
+  });
+
+  document.querySelectorAll('[data-profile-modal-close]').forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      const modal = trigger.closest('.modal');
+      if (modal === profileEmailModal) resetProfileEmailForm();
+      if (modal === profilePasswordModal) resetProfilePasswordForm();
+      closeProfileModal(modal);
+    });
+  });
+
+  document.getElementById('profileSendCurrentEmailCode')?.addEventListener('click', () => {
+    const typedCurrentEmail = String(profileCurrentEmail?.value || '').trim();
+    if (typedCurrentEmail.toLowerCase() !== currentEmail.toLowerCase()) {
+      currentEmailCodeSent = false;
+      setProfileFeedback(profileEmailFeedback, 'Informe o email atual do usuário para receber o código.', true);
+      updateProfileEmailState();
+      return;
+    }
+    currentEmailCodeSent = true;
+    setProfileFeedback(profileEmailFeedback, `Código enviado para ${currentEmail}.`);
+    showAppToast('Código de verificação enviado ao email atual');
+    updateProfileEmailState();
+  });
+
+  profileSendNewEmailCode?.addEventListener('click', () => {
+    const nextEmail = String(profileNewEmail?.value || '').trim();
+    if (!isValidProfileEmail(nextEmail) || nextEmail.toLowerCase() === currentEmail.toLowerCase()) {
+      newEmailCodeSent = false;
+      setProfileFeedback(profileEmailFeedback, 'Informe um novo email válido para receber o código.', true);
+      updateProfileEmailState();
+      return;
+    }
+    newEmailCodeSent = true;
+    setProfileFeedback(profileEmailFeedback, `Código de confirmação enviado para ${nextEmail}.`);
+    showAppToast('Código enviado ao novo email');
+    updateProfileEmailState();
+  });
+
+  document.getElementById('profileSendPasswordCode')?.addEventListener('click', () => {
+    const passwordEmail = String(profilePasswordEmail?.value || '').trim();
+    if (passwordEmail.toLowerCase() !== currentEmail.toLowerCase()) {
+      passwordCodeSent = false;
+      setProfileFeedback(profilePasswordFeedback, 'Informe o email deste usuário para receber o código.', true);
+      updateProfilePasswordState();
+      return;
+    }
+    passwordCodeSent = true;
+    setProfileFeedback(profilePasswordFeedback, `Código enviado para ${currentEmail}.`);
+    showAppToast('Código de verificação enviado ao email atual');
+    updateProfilePasswordState();
+  });
+
+  [profileCurrentEmail, profileCurrentEmailCode, profileNewEmail, profileNewEmailCode].forEach((field) => {
+    field?.addEventListener('input', () => {
+      if (field === profileCurrentEmail) currentEmailCodeSent = false;
+      if (field === profileNewEmail) newEmailCodeSent = false;
+      if (field === profileCurrentEmailCode || field === profileNewEmailCode) field.value = normalizeCode(field);
+      updateProfileEmailState();
+    });
+  });
+
+  [profilePasswordEmail, profileNewPassword, profileConfirmPassword, profilePasswordCode].forEach((field) => {
+    field?.addEventListener('input', () => {
+      if (field === profilePasswordEmail) passwordCodeSent = false;
+      if (field === profilePasswordCode) field.value = normalizeCode(field);
+      updateProfilePasswordState();
+    });
+  });
+
+  profileEmailForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (profileEmailSubmit?.disabled) return;
+    const nextEmail = String(profileNewEmail?.value || '').trim();
+    currentEmail = nextEmail;
+    syncProfileEmailDisplay();
+    showAppToast('Email alterado com confirmação por código');
+    closeProfileModal(profileEmailModal);
+    profileEmailForm.reset();
+    currentEmailCodeSent = false;
+    newEmailCodeSent = false;
+    updateProfileEmailState();
+  });
+
+  profilePasswordForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (profilePasswordSubmit?.disabled) return;
+    showAppToast('Senha alterada com sucesso');
+    closeProfileModal(profilePasswordModal);
+    profilePasswordForm.reset();
+    passwordCodeSent = false;
+    updateProfilePasswordState();
+  });
+
+  updateProfileEmailState();
+  updateProfilePasswordState();
+}
+
 if (settingsTabs.length && settingsPanels.length) {
   settingsTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -13642,6 +13854,7 @@ const routeMap = {
   'dashboard/bpmn': 'page-bpmn',
   'dashboard/fluxos': 'page-fluxos',
   'dashboard/history': 'page-history',
+  'dashboard/profile': 'page-profile',
   'dashboard/settings': 'page-settings'
 };
 
@@ -13679,6 +13892,7 @@ const sectionMap = {
   'dashboard/bpmn': 'Processos',
   'dashboard/fluxos': 'Processos',
   'dashboard/history': 'Painel de histórico',
+  'dashboard/profile': 'Perfil',
   'dashboard/settings': 'Configurações'
 };
 
@@ -13964,6 +14178,7 @@ const updateActivePage = () => {
   document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
   document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
+  document.body.classList.toggle('route-profile', routeKey === 'dashboard/profile');
   syncVoiceMessagingInsightsChart(routeKey);
   if (typeof window.ensureAgentsAutoRefresh === 'function') {
     window.ensureAgentsAutoRefresh();

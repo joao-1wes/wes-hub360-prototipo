@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>WES HUB 360 - Painel (Estático)</title>
-    <link rel="stylesheet" href="./styles.css?v=20260630-filter-layout-rules" />
+    <link rel="stylesheet" href="./styles.css?v=20260702-credential-modal-selects" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
@@ -502,10 +502,10 @@
               </div>
               <span class="material-symbols-rounded user-caret">expand_more</span>
               <div class="user-dropdown" id="userDropdown">
-                <button>
+                <a href="#/dashboard/profile">
                   <span class="material-symbols-rounded">person</span>
                   Perfil
-                </button>
+                </a>
                 <a href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization" data-access-item="switch-organization">
                   <span class="material-symbols-rounded">business</span>
                   Trocar de organização
@@ -3995,7 +3995,7 @@
               <div class="page-header">
                 <div>
                   <h2>Executores</h2>
-                  <p class="page-subtitle">Gerencie executores, licenças e contas de serviço.</p>
+                  <p class="page-subtitle">Gerencie executores e contas de serviço.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn outline">
@@ -4011,49 +4011,7 @@
                   <span class="material-symbols-rounded">close</span>
                 </button>
               </div>
-              <div class="tabs tabs-underline">
-                <button class="tab active" data-tab="executors-main">Executores</button>
-                <button class="tab" data-tab="executors-status">Monitoramento</button>
-                <button class="tab" data-tab="executors-licenses">Licenças</button>
-                <button class="tab" data-tab="executors-service">Contas de serviço</button>
-              </div>
               <div class="tab-panel active" data-panel="executors-main">
-                <div class="license-card">
-                  <div class="license-header">
-                    <div class="license-title">
-                      <h3>Uso de licenças</h3>
-                      <span class="license-alert material-symbols-rounded">warning</span>
-                  </div>
-                  <div class="license-actions">
-                      <button class="icon-btn license-toggle" aria-label="Expandir">
-                        <span class="material-symbols-rounded">expand_more</span>
-                      </button>
-                    </div>
-                  </div>
-                  <div class="license-body">
-                    <div class="license-usage">
-                      <div class="license-count">
-                        <span class="license-count-main">1</span>
-                        <span class="license-count-total">/ 1</span>
-                      </div>
-                      <div class="license-util">
-                        <span>Utilização</span>
-                        <strong>100%</strong>
-                        <div class="license-bar">
-                          <span class="license-bar-fill"></span>
-                        </div>
-                      </div>
-                    </div>
-                  <div class="license-meta">
-                    <span class="license-label">Licenças ativas</span>
-                    <span class="license-pill">1 licença</span>
-                  </div>
-                  <div class="license-warning">
-                    <span class="material-symbols-rounded">warning</span>
-                    Nenhuma licença disponível. Faça upgrade do seu plano ou libere licenças sem uso para criar mais executores.
-                  </div>
-                </div>
-              </div>
                 <div class="filters-grid">
                   <div class="form-field">
                     <div class="search-field">
@@ -4098,7 +4056,7 @@
                   </div>
                   <div class="data-row">
                     <span>executor-prod-01</span>
-                    <span class="chip success">Online</span>
+                    <span><span class="chip success">Online</span></span>
                     <span>Produção</span>
                     <span>12/03/2025</span>
                     <span>Agora</span>
@@ -4124,7 +4082,7 @@
                   </div>
                   <div class="data-row">
                     <span>executor-stg-02</span>
-                    <span class="chip warning">Offline</span>
+                    <span><span class="chip warning">Offline</span></span>
                     <span>Homologação</span>
                     <span>28/02/2025</span>
                     <span>5 min atrás</span>
@@ -4251,121 +4209,18 @@
                     </div>
                     <div class="data-row">
                       <span>04d1f883...</span>
-                      <span class="chip success">Saudável</span>
-                      <span class="chip">production</span>
+                      <span><span class="chip success">Saudável</span></span>
+                      <span><span class="chip">Produção</span></span>
                       <span>22/01/2026, 13:57:07</span>
                       <span>11d 20h 3m</span>
-                      <span>-</span>
-                      <span>-</span>
-                      <span>-</span>
+                      <span class="muted">Sem leitura</span>
+                      <span class="muted">Sem leitura</span>
+                      <span class="muted">Sem leitura</span>
                       <span class="row-actions">
                         <button class="icon-btn action-icon" aria-label="Ver detalhes">
                           <span class="material-symbols-rounded">more_vert</span>
                         </button>
                       </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="tab-panel" data-panel="executors-licenses">
-                <div class="licenses-header">
-                  <div>
-                    <h3>Painel de licenças</h3>
-                    <p>Monitore uso, políticas e saúde do sistema.</p>
-                  </div>
-                  <div class="licenses-actions">
-                  </div>
-                </div>
-                <div class="license-metrics">
-                  <div class="metric-card">
-                    <strong>1</strong>
-                    <span>Licenças ativas</span>
-                    <span class="muted">de 1 disponível</span>
-                  </div>
-                  <div class="metric-card">
-                    <strong>0</strong>
-                    <span>Licenças disponíveis</span>
-                    <span class="muted">Prontas para novas máquinas</span>
-                  </div>
-                  <div class="metric-card alert">
-                    <strong>100%</strong>
-                    <span>Taxa de utilização</span>
-                    <div class="metric-bar"><span></span></div>
-                  </div>
-                  <div class="metric-card">
-                    <strong>1</strong>
-                    <span>Sessões totais</span>
-                    <span class="muted">Período ativo</span>
-                  </div>
-                </div>
-                <div class="license-policy">
-                  <h4>Política de licenças</h4>
-                  <div class="policy-grid">
-                    <div>
-                      <span>Concorrência máxima</span>
-                      <strong>1</strong>
-                    </div>
-                    <div>
-                      <span>Total máximo</span>
-                      <strong>Ilimitado</strong>
-                    </div>
-                    <div>
-                      <span>Timeout de sessão</span>
-                      <strong>60 minutos</strong>
-                    </div>
-                    <div>
-                      <span>Limite diário de execução</span>
-                      <strong>Ilimitado</strong>
-                    </div>
-                    <div class="policy-chip">
-                      <span>Vincular máquina</span>
-                      <strong class="chip">Obrigatório</strong>
-                    </div>
-                    <div class="policy-chip">
-                      <span>Multimáquina</span>
-                      <strong class="chip warning">Restrito</strong>
-                    </div>
-                  </div>
-                </div>
-                <div class="monitoring-panel">
-                  <div class="panel-header">
-                    <h4>Máquinas ativas (1)</h4>
-                  </div>
-                  <div class="data-table license-table">
-                    <div class="data-row header">
-                      <span>Máquina</span>
-                      <span>Alocado em</span>
-                      <span>Sessões</span>
-                      <span>Tempo de execução</span>
-                      <span>Última atividade</span>
-                    </div>
-                    <div class="data-row">
-                      <span>Desconhecido<br /><span class="muted">exec_9bc...</span></span>
-                      <span>14/01/2026, 20:59:46</span>
-                      <span class="chip">1</span>
-                      <span>0h 0m</span>
-                      <span>14/01/2026, 20:59:46</span>
-                    </div>
-                  </div>
-                </div>
-                <div class="monitoring-panel">
-                  <div class="panel-header">
-                    <h4>Atividade recente</h4>
-                  </div>
-                  <div class="data-table license-table">
-                    <div class="data-row header">
-                      <span>ID da máquina</span>
-                      <span>Ação</span>
-                      <span>Data</span>
-                      <span>Duração</span>
-                      <span>Motivo</span>
-                    </div>
-                    <div class="data-row">
-                      <span>exec_9bc...</span>
-                      <span class="chip">Alocado</span>
-                      <span>14/01/2026, 20:59:46</span>
-                      <span>Ativo</span>
-                      <span>-</span>
                     </div>
                   </div>
                 </div>
@@ -5006,14 +4861,17 @@
 
                     <div>
                       <label class="modal-label modal-label--required" for="credentialTypeSelect">Tipo de credencial</label>
-                      <select class="modal-input" id="credentialTypeSelect" name="type" required>
-                        <option value="AWS">AWS</option>
-                        <option value="Banco de Dados">Banco de Dados</option>
-                        <option value="Chave de API">Chave de API</option>
-                        <option value="Chave SSH">Chave SSH</option>
-                        <option value="Token OAuth">Token OAuth</option>
-                        <option value="Personalizada">Personalizada</option>
-                      </select>
+                      <div class="hub-select-wrap hub-select-wrap--block credential-select-wrap">
+                        <select class="hub-select" id="credentialTypeSelect" name="type" required>
+                          <option value="AWS">AWS</option>
+                          <option value="Banco de Dados">Banco de Dados</option>
+                          <option value="Chave de API">Chave de API</option>
+                          <option value="Chave SSH">Chave SSH</option>
+                          <option value="Token OAuth">Token OAuth</option>
+                          <option value="Personalizada">Personalizada</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
                       <p class="modal-field-hint">Selecione a categoria que melhor representa o segredo armazenado.</p>
                     </div>
 
@@ -7393,6 +7251,149 @@
             </div>
           </div>
 
+          <div class="page" id="page-profile" data-title="Perfil">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Perfil</h2>
+                  <p class="page-subtitle">Atualize seus dados de acesso com confirmação pelo email atual.</p>
+                </div>
+              </div>
+
+              <div class="profile-summary">
+                <span class="user-avatar profile-summary-avatar" id="profileSummaryAvatar">A</span>
+                <div class="profile-summary-copy">
+                  <strong id="profileSummaryName">Alfeu Vinicius Souza</strong>
+                  <span id="profileSummaryEmail">admin@1wes.com</span>
+                </div>
+                <span class="chip" id="profileSummaryTenant">AVAS</span>
+              </div>
+
+              <div class="profile-security-grid">
+                <div class="profile-security-card">
+                  <div class="profile-card-header">
+                    <span class="material-symbols-rounded" aria-hidden="true">alternate_email</span>
+                    <div>
+                      <h3>Alterar email</h3>
+                      <p>Confirme o email atual e valide o novo endereço por código.</p>
+                    </div>
+                  </div>
+                  <button class="btn primary profile-action-btn" id="openProfileEmailModal" type="button">
+                    <span class="material-symbols-rounded">alternate_email</span>
+                    Alterar email
+                  </button>
+                </div>
+
+                <div class="profile-security-card">
+                  <div class="profile-card-header">
+                    <span class="material-symbols-rounded" aria-hidden="true">lock_reset</span>
+                    <div>
+                      <h3>Alterar senha</h3>
+                      <p>Receba um código no email do usuário antes de criar uma nova senha.</p>
+                    </div>
+                  </div>
+                  <button class="btn primary profile-action-btn" id="openProfilePasswordModal" type="button">
+                    <span class="material-symbols-rounded">lock_reset</span>
+                    Alterar senha
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="profileEmailModal" aria-hidden="true">
+            <div class="modal-backdrop" data-profile-modal-close></div>
+            <div class="modal-dialog profile-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="profileEmailModalTitle">
+              <form id="profileEmailForm">
+                <div class="modal-header">
+                  <div>
+                    <h3 id="profileEmailModalTitle">Alterar email</h3>
+                    <p class="modal-subtitle">Confirme o endereço atual e valide o novo email antes de salvar.</p>
+                  </div>
+                  <button class="icon-btn" type="button" aria-label="Fechar" data-profile-modal-close>
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body profile-modal-body">
+                  <div class="profile-step">
+                    <span class="profile-step-number">1</span>
+                    <div>
+                      <h4>Email atual</h4>
+                      <p>Envie um código para confirmar que este email pertence ao usuário.</p>
+                    </div>
+                  </div>
+                  <label class="modal-label modal-label--required" for="profileCurrentEmail">Email atual</label>
+                  <input class="modal-input" id="profileCurrentEmail" type="email" value="admin@1wes.com" autocomplete="email" required />
+
+                  <label class="modal-label modal-label--required" for="profileCurrentEmailCode">Código do email atual</label>
+                  <div class="profile-code-row">
+                    <input class="modal-input profile-code-input" id="profileCurrentEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
+                    <button class="btn outline" id="profileSendCurrentEmailCode" type="button">Enviar código</button>
+                  </div>
+
+                  <div class="profile-step">
+                    <span class="profile-step-number">2</span>
+                    <div>
+                      <h4>Novo email</h4>
+                      <p>Depois confirme o novo endereço com outro código.</p>
+                    </div>
+                  </div>
+                  <label class="modal-label modal-label--required" for="profileNewEmail">Novo email</label>
+                  <div class="profile-code-row">
+                    <input class="modal-input" id="profileNewEmail" type="email" placeholder="novo.email@empresa.com" autocomplete="email" required />
+                    <button class="btn outline" id="profileSendNewEmailCode" type="button" disabled>Enviar código</button>
+                  </div>
+
+                  <label class="modal-label modal-label--required" for="profileNewEmailCode">Código do novo email</label>
+                  <input class="modal-input profile-code-input" id="profileNewEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
+                  <p class="profile-form-feedback" id="profileEmailFeedback" hidden></p>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" type="button" data-profile-modal-close>Cancelar</button>
+                  <button class="btn primary" id="profileEmailSubmit" type="submit" disabled>Salvar email</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="modal" id="profilePasswordModal" aria-hidden="true">
+            <div class="modal-backdrop" data-profile-modal-close></div>
+            <div class="modal-dialog profile-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="profilePasswordModalTitle">
+              <form id="profilePasswordForm">
+                <div class="modal-header">
+                  <div>
+                    <h3 id="profilePasswordModalTitle">Alterar senha</h3>
+                    <p class="modal-subtitle">O código chega no email do usuário antes da nova senha ser salva.</p>
+                  </div>
+                  <button class="icon-btn" type="button" aria-label="Fechar" data-profile-modal-close>
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body profile-modal-body">
+                  <label class="modal-label modal-label--required" for="profilePasswordEmail">Email do usuário</label>
+                  <input class="modal-input" id="profilePasswordEmail" type="email" value="admin@1wes.com" autocomplete="email" required />
+
+                  <label class="modal-label modal-label--required" for="profilePasswordCode">Código de verificação</label>
+                  <div class="profile-code-row">
+                    <input class="modal-input profile-code-input" id="profilePasswordCode" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
+                    <button class="btn outline" id="profileSendPasswordCode" type="button">Enviar código</button>
+                  </div>
+
+                  <label class="modal-label modal-label--required" for="profileNewPassword">Nova senha</label>
+                  <input class="modal-input" id="profileNewPassword" type="password" minlength="8" placeholder="Mínimo 8 caracteres" autocomplete="new-password" required />
+
+                  <label class="modal-label modal-label--required" for="profileConfirmPassword">Confirmar nova senha</label>
+                  <input class="modal-input" id="profileConfirmPassword" type="password" minlength="8" placeholder="Repita a nova senha" autocomplete="new-password" required />
+                  <p class="profile-form-feedback" id="profilePasswordFeedback" hidden></p>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" type="button" data-profile-modal-close>Cancelar</button>
+                  <button class="btn primary" id="profilePasswordSubmit" type="submit" disabled>Salvar senha</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
           <div class="page" id="page-settings" data-title="Configurações">
             <div class="section">
               <div class="page-header">
@@ -7642,6 +7643,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./assets/chart.umd.min.js"></script>
     <script src="./auth.js?v=20260701-hybrid-flow-voice-page"></script>
-    <script src="./app.js?v=20260701-hybrid-flow-voice-page"></script>
+    <script src="./app.js?v=20260702-profile-page"></script>
   </body>
 </html>

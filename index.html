@@ -193,12 +193,19 @@
                     <strong>Agentes</strong>
                   </label>
                 </div>
+                <div class="organization-section-row organization-section-row--single">
+                  <label class="organization-section-check organization-section-check--parent">
+                    <input type="checkbox" name="organization_sections" value="automation" checked />
+                    <span class="material-symbols-rounded" aria-hidden="true">bolt</span>
+                    <strong>Automação</strong>
+                  </label>
+                </div>
 
                 <div class="organization-section-group">
                   <div class="organization-section-head">
                     <label class="organization-section-check organization-section-check--parent">
-                      <input type="checkbox" name="organization_sections" value="automation" checked />
-                      <span class="material-symbols-rounded" aria-hidden="true">automation</span>
+                      <input type="checkbox" name="organization_sections" value="workflows" checked />
+                      <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
                       <strong>Fluxos de Trabalho</strong>
                     </label>
                     <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Fluxos de Trabalho">
@@ -217,10 +224,6 @@
                     <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="input-files" checked />
                       <span>Arquivos de entrada</span>
-                    </label>
-                    <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="automations" checked />
-                      <span>Automações</span>
                     </label>
                     <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="credentials" checked />
@@ -361,16 +364,16 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-automation">
-              <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a>
-              <a class="submenu-item" href="#/dashboard/document-analysis"><span class="submenu-label">Análise de documentos</span></a>
-              <a class="submenu-item" href="#/dashboard/input-files"><span class="submenu-label">Arquivos de entrada</span></a>
               <a class="submenu-item" href="#/dashboard/automations"><span class="submenu-label">Automações</span></a>
-              <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a>
+              <!-- <a class="submenu-item" href="#/dashboard/schedules"><span class="submenu-label">Agendamentos</span></a> -->
+              <a class="submenu-item" href="#/dashboard/document-analysis"><span class="submenu-label">Análise de documentos</span></a>
+              <!-- <a class="submenu-item" href="#/dashboard/input-files"><span class="submenu-label">Arquivos de entrada</span></a> -->
+              <!-- <a class="submenu-item" href="#/dashboard/credentials"><span class="submenu-label">Credenciais</span></a> -->
               <a class="submenu-item" href="#/dashboard/bpmn"><span class="submenu-label">Processos</span></a>
             </div>
           </div>
 
-          <div class="nav-group">
+          <!-- <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="infrastructure" type="button">
               <span class="material-symbols-rounded">computer</span>
               <span class="nav-label">Infraestrutura</span>
@@ -380,7 +383,7 @@
               <a class="submenu-item" href="#/dashboard/executors"><span class="submenu-label">Executores</span></a>
               <a class="submenu-item" href="#/dashboard/packages"><span class="submenu-label">Pacotes</span></a>
             </div>
-          </div>
+          </div> -->
 
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="integrations" type="button">
@@ -897,6 +900,9 @@
               <div class="tabs tabs-underline">
                 <button class="tab active" data-tab="automations">Automações</button>
                 <button class="tab" data-tab="executions">Execuções</button>
+                <button class="tab" data-tab="schedules">Agendamento</button>
+                <button class="tab" data-tab="files">Arquivos</button>
+                <button class="tab" data-tab="credentials">Credenciais</button>
               </div>
               <div class="tab-panel active" data-panel="automations">
                 <div class="filters-grid">
@@ -1127,6 +1133,479 @@
                   </button>
                 </div>
               </div>
+              <div class="tab-panel" data-panel="schedules">
+                <div class="filters-grid filters-single">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar agendamento" />
+                    </div>
+                  </div>
+                </div>
+                <div class="data-table">
+                  <div class="data-row header">
+                    <span>Agendamento</span>
+                    <span>Automação</span>
+                    <span>Agendamento</span>
+                    <span>Status</span>
+                    <span>Próxima execução</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>Relatório diário</span>
+                    <span>reports-v2.1</span>
+                    <span>Todos os dias às 09:00</span>
+                    <span><span class="chip success">Ativo</span></span>
+                    <span>Amanhã • 09:00</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon" aria-label="Pausar">
+                        <span class="material-symbols-rounded">pause</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes do agendamento</div>
+                        <div class="details-item"><span>Agendamento</span><strong>Relatório diário</strong></div>
+                        <div class="details-item"><span>Automação</span><strong>reports-v2.1</strong></div>
+                        <div class="details-item"><span>Frequência</span><strong>Todos os dias às 09:00</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
+                        <div class="details-item"><span>Próxima execução</span><strong>Amanhã • 09:00</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span>Monitorar filas</span>
+                    <span>queues-v1.4</span>
+                    <span>A cada 30 minutos</span>
+                    <span><span class="chip warning">Pausado</span></span>
+                    <span>—</span>
+                    <span class="row-actions has-details">
+                      <button class="icon-btn action-icon" aria-label="Ativar">
+                        <span class="material-symbols-rounded">play_arrow</span>
+                      </button>
+                      <button class="icon-btn action-icon" aria-label="Editar">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                      <button class="icon-btn action-icon details-toggle" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                      <div class="details-card">
+                        <div class="details-title">Detalhes do agendamento</div>
+                        <div class="details-item"><span>Agendamento</span><strong>Monitorar filas</strong></div>
+                        <div class="details-item"><span>Automação</span><strong>queues-v1.4</strong></div>
+                        <div class="details-item"><span>Frequência</span><strong>A cada 30 minutos</strong></div>
+                        <div class="details-item"><span>Status</span><strong>Pausado</strong></div>
+                        <div class="details-item"><span>Próxima execução</span><strong>—</strong></div>
+                      </div>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="files">
+                <div class="filters-grid filters-single automation-files-toolbar">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar arquivo" />
+                    </div>
+                  </div>
+                  <button class="btn outline agent-create-ai-btn automation-files-ai-btn" id="automationFilesAiImprove" type="button">
+                    Adicionar arquivo
+                  </button>
+                </div>
+                <div class="data-table">
+                  <div class="data-row header">
+                    <span>Arquivo</span>
+                    <span>Tipo</span>
+                    <span>Utilizado em</span>
+                    <span>Inserido</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>clientes.csv</span>
+                    <span><span class="chip automation-file-type-chip">CSV</span></span>
+                    <span class="automation-file-usage">
+                      <span>Relatório diário</span>
+                      <span class="tag-more" data-tags="Relatório diário&#10;Monitoramento de filas">+1</span>
+                    </span>
+                    <span>01/07/2026 • 08:30</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Baixar">
+                        <span class="material-symbols-rounded">download</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row">
+                    <span>config.json</span>
+                    <span><span class="chip automation-file-type-chip">JSON</span></span>
+                    <span class="automation-file-usage">
+                      <span>Monitoramento de filas</span>
+                      <span class="tag-more" data-tags="Monitoramento de filas&#10;Relatório diário&#10;Sincronização de clientes">+2</span>
+                    </span>
+                    <span>30/06/2026 • 17:45</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Baixar">
+                        <span class="material-symbols-rounded">download</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="tab-panel" data-panel="credentials">
+                <div class="filters-grid filters-single automation-files-toolbar">
+                  <div class="form-field">
+                    <div class="search-field">
+                      <span class="material-symbols-rounded">search</span>
+                      <input type="text" placeholder="Buscar credencial" />
+                    </div>
+                  </div>
+                  <button class="btn outline agent-create-ai-btn automation-files-ai-btn" id="automationCredentialsAddButton" type="button">
+                    Adicionar credencial
+                  </button>
+                </div>
+                <div class="data-table credentials-table automation-credentials-table">
+                  <div class="data-row header">
+                    <span>Nome</span>
+                    <span>Tipo</span>
+                    <span>Utilizada em</span>
+                    <span>Atualizado</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row" data-credential-name="DB Produção" data-credential-type="Banco de Dados" data-credential-description="Credencial usada para acesso ao banco de dados de produção." data-credential-updated-at="29/06/2026 • 14:20" data-credential-payload='{"engine":"PostgreSQL","port":"5432","host":"db.producao.local","database":"wes_operacoes","username":"wes_app","password":"senha-mascarada","ssl_mode":"Obrigatório","connection_string":""}'>
+                    <span>DB Produção</span>
+                    <span><span class="chip credential-type-chip">Banco de Dados</span></span>
+                    <span class="automation-file-usage">
+                      <span>Relatório diário</span>
+                      <span class="tag-more" data-tags="Relatório diário&#10;Monitoramento de filas">+1</span>
+                    </span>
+                    <span>29/06/2026 • 14:20</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row" data-credential-name="Cobrança AWS" data-credential-type="AWS" data-credential-description="Credencial usada para integrações de cobrança e consulta de recursos AWS." data-credential-updated-at="01/07/2026 • 09:10" data-credential-payload='{"access_key_id":"AKIA********EXAMPLE","secret_access_key":"segredo-mascarado","region":"us-east-1","session_token":""}'>
+                    <span>Cobrança AWS</span>
+                    <span><span class="chip credential-type-chip">AWS</span></span>
+                    <span class="automation-file-usage">
+                      <span>Monitoramento de filas</span>
+                      <span class="tag-more" data-tags="Monitoramento de filas&#10;Relatório diário&#10;Sincronização de clientes">+2</span>
+                    </span>
+                    <span>01/07/2026 • 09:10</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row" data-credential-name="OpenAI API" data-credential-type="Chave de API" data-credential-description="Chave usada por automações com chamadas a modelos externos." data-credential-updated-at="02/07/2026 • 10:35" data-credential-payload='{"api_key":"sk-********","base_url":"https://api.openai.com/v1","header_name":"Authorization","auth_scheme":"Bearer"}'>
+                    <span>OpenAI API</span>
+                    <span><span class="chip credential-type-chip">Chave de API</span></span>
+                    <span class="automation-file-usage">
+                      <span>Relatório diário</span>
+                      <span class="tag-more" data-tags="Relatório diário&#10;Sincronização de clientes">+1</span>
+                    </span>
+                    <span>02/07/2026 • 10:35</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row" data-credential-name="Deploy SSH" data-credential-type="Chave SSH" data-credential-description="Chave usada para acessar servidores de execução." data-credential-updated-at="03/07/2026 • 16:12" data-credential-payload='{"username":"deploy","auth_method":"Chave privada","private_key":"-----BEGIN OPENSSH PRIVATE KEY-----","passphrase":"","host_port":"executor.wes.local:22"}'>
+                    <span>Deploy SSH</span>
+                    <span><span class="chip credential-type-chip">Chave SSH</span></span>
+                    <span class="automation-file-usage">
+                      <span>Sincronização de clientes</span>
+                    </span>
+                    <span>03/07/2026 • 16:12</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row" data-credential-name="CRM OAuth" data-credential-type="Token OAuth" data-credential-description="Token usado para integrações autenticadas com o CRM." data-credential-updated-at="04/07/2026 • 11:05" data-credential-payload='{"grant_type":"Credenciais do cliente","client_id":"crm-client","client_secret":"segredo-mascarado","token_url":"https://crm.exemplo.com/oauth/token","scope":"leitura escrita"}'>
+                    <span>CRM OAuth</span>
+                    <span><span class="chip credential-type-chip">Token OAuth</span></span>
+                    <span class="automation-file-usage">
+                      <span>Monitoramento de filas</span>
+                      <span class="tag-more" data-tags="Monitoramento de filas&#10;Sincronização de clientes">+1</span>
+                    </span>
+                    <span>04/07/2026 • 11:05</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                  <div class="data-row" data-credential-name="Webhook interno" data-credential-type="Personalizada" data-credential-description="Segredo personalizado para automações internas." data-credential-updated-at="05/07/2026 • 09:45" data-credential-payload='{"custom_pairs":"{\n  \"webhook_secret\": \"segredo-mascarado\",\n  \"ambiente\": \"producao\"\n}"}'>
+                    <span>Webhook interno</span>
+                    <span><span class="chip credential-type-chip">Personalizada</span></span>
+                    <span class="automation-file-usage">
+                      <span>Sincronização de clientes</span>
+                      <span class="tag-more" data-tags="Sincronização de clientes&#10;Relatório diário&#10;Monitoramento de filas">+2</span>
+                    </span>
+                    <span>05/07/2026 • 09:45</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+                        <span class="material-symbols-rounded">edit</span>
+                      </button>
+                      <button class="icon-btn action-icon danger" aria-label="Excluir">
+                        <span class="material-symbols-rounded">delete</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-automations-create" data-title="Criar automação">
+            <div class="section voice-messaging-create-page automation-create-page">
+              <div class="telegram-page-topbar">
+                <button class="hybrid-history-top-link" id="automationCreateBackBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  Voltar para Automações
+                </button>
+              </div>
+              <div class="page-header voice-messaging-create-head">
+                <div class="voice-messaging-create-title-wrap">
+                  <h2>Criar automação</h2>
+                  <p class="page-subtitle">Configure os dados principais e gere uma automação por descrição ou arquivo.</p>
+                </div>
+              </div>
+
+              <form class="voice-messaging-create-card automation-create-card" id="automationCreateForm" novalidate>
+                <p id="automationCreateError" class="modal-form-error" role="alert" hidden></p>
+
+                <section class="automation-create-section">
+                  <h3>Dados iniciais</h3>
+                  <div class="automation-create-grid">
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="automationCreateName">Nome da automação</label>
+                      <input
+                        class="modal-input"
+                        id="automationCreateName"
+                        name="automation_create_name"
+                        type="text"
+                        maxlength="200"
+                        autocomplete="off"
+                        placeholder="Ex.: Wiki_teste"
+                        required
+                      />
+                      <p class="modal-field-hint">Introduza um nome descritivo para a automação.</p>
+                    </div>
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="automationCreatePriority">Prioridade</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">flag</span>
+                        <select id="automationCreatePriority" class="hub-select" aria-label="Prioridade da automação" required>
+                          <option value="medium" selected>Média</option>
+                          <option value="high">Alta</option>
+                          <option value="low">Baixa</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="automation-create-resource-grid">
+                    <div class="form-field">
+                      <label class="modal-label modal-label--required" for="automationCreateLanguage">Linguagem do código</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">code</span>
+                        <select id="automationCreateLanguage" class="hub-select" aria-label="Linguagem do código" required>
+                          <option value="csharp" selected>C#</option>
+                          <option value="java">Java</option>
+                          <option value="python">Python</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                      <p class="modal-field-hint">Escolha a linguagem usada para gerar ou manter o código da automação.</p>
+                    </div>
+
+                    <div class="form-field">
+                      <label class="modal-label" for="automationCreateInputFile">Arquivos</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">draft</span>
+                        <select id="automationCreateInputFile" class="hub-select" aria-label="Arquivos para a automação">
+                          <option value="" selected>Não usar arquivos</option>
+                          <option value="__existing__">Usar arquivo já existente</option>
+                          <option value="__new__">Adicionar novo arquivo</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                      <p class="modal-field-hint automation-resource-summary" id="automationCreateInputFileSummary" hidden></p>
+                    </div>
+
+                    <div class="form-field">
+                      <label class="modal-label" for="automationCreateCredential">Credenciais</label>
+                      <div class="hub-select-wrap hub-select-wrap--block">
+                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">key</span>
+                        <select id="automationCreateCredential" class="hub-select" aria-label="Credenciais para a automação">
+                          <option value="" selected>Não usar credenciais</option>
+                          <option value="__existing__">Usar credencial já existente</option>
+                          <option value="__new__">Adicionar nova credencial</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                      <p class="modal-field-hint automation-resource-summary" id="automationCreateCredentialSummary" hidden></p>
+                    </div>
+                    <p class="modal-field-hint automation-resource-help">Use arquivos para fornecer dados de entrada à automação e credenciais para liberar acessos seguros a sistemas, APIs e bancos durante a execução.</p>
+                  </div>
+
+                  <div class="automation-create-schedule-layout">
+                    <div class="automation-create-schedule-row">
+                      <div>
+                        <label class="modal-label" for="automationCreateScheduled">Agendada</label>
+                        <p class="modal-field-hint">Ative se esta automação deve rodar por agenda.</p>
+                      </div>
+                      <label class="switch" for="automationCreateScheduled">
+                        <input type="checkbox" id="automationCreateScheduled" name="automation_create_scheduled" aria-controls="automationCreateSchedulePanel" />
+                        <span class="switch-track"></span>
+                      </label>
+                    </div>
+
+                    <aside class="automation-create-schedule-panel" id="automationCreateSchedulePanel" aria-label="Configurações do agendamento" hidden>
+                      <div class="automation-create-schedule-panel-head">
+                        <span class="material-symbols-rounded" aria-hidden="true">event_repeat</span>
+                        <div>
+                          <h4>Configurar agenda</h4>
+                          <p>Defina quando a automação será executada.</p>
+                        </div>
+                      </div>
+
+                      <div class="automation-create-schedule-fields">
+                        <div class="form-field">
+                          <label class="modal-label modal-label--required" for="automationCreateScheduleTime">Horário</label>
+                          <input
+                            class="modal-input"
+                            id="automationCreateScheduleTime"
+                            name="automation_create_schedule_time"
+                            type="time"
+                            value="09:00"
+                            disabled
+                          />
+                        </div>
+
+                        <div class="form-field">
+                          <label class="modal-label modal-label--required" for="automationCreateScheduleFrequency">Repetição</label>
+                          <div class="hub-select-wrap hub-select-wrap--block">
+                            <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">repeat</span>
+                            <select id="automationCreateScheduleFrequency" class="hub-select" aria-label="Repetição do agendamento" aria-controls="automationCreateCustomDays" disabled>
+                              <option value="daily" selected>Diariamente</option>
+                              <option value="weekly">Semanalmente</option>
+                              <option value="monthly">Mensalmente</option>
+                              <option value="business_days">Dias úteis</option>
+                              <option value="custom">Personalizado</option>
+                            </select>
+                            <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                          </div>
+                        </div>
+
+                        <div class="form-field">
+                          <label class="modal-label modal-label--required" for="automationCreateScheduleStartDate">Data de início</label>
+                          <input
+                            class="modal-input"
+                            id="automationCreateScheduleStartDate"
+                            name="automation_create_schedule_start_date"
+                            type="date"
+                            disabled
+                          />
+                        </div>
+
+                        <div class="form-field">
+                          <label class="modal-label modal-label--required" for="automationCreateScheduleEndDate">Data de término</label>
+                          <input
+                            class="modal-input"
+                            id="automationCreateScheduleEndDate"
+                            name="automation_create_schedule_end_date"
+                            type="date"
+                            disabled
+                          />
+                        </div>
+                      </div>
+
+                      <fieldset class="automation-create-custom-days" id="automationCreateCustomDays" hidden>
+                        <legend class="modal-label modal-label--required">Dias da semana</legend>
+                        <div class="automation-create-weekday-grid">
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="monday" disabled /><span>Seg</span></label>
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="tuesday" disabled /><span>Ter</span></label>
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="wednesday" disabled /><span>Qua</span></label>
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="thursday" disabled /><span>Qui</span></label>
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="friday" disabled /><span>Sex</span></label>
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="saturday" disabled /><span>Sáb</span></label>
+                          <label class="automation-create-weekday"><input type="checkbox" name="automation_create_weekday" value="sunday" disabled /><span>Dom</span></label>
+                        </div>
+                      </fieldset>
+                    </aside>
+                  </div>
+
+                  <div class="automation-create-description-grid">
+                    <div class="form-field">
+                      <label class="modal-label" for="automationCreateDescription">Descrição</label>
+                      <textarea
+                        class="modal-textarea"
+                        id="automationCreateDescription"
+                        name="automation_create_description"
+                        rows="7"
+                        maxlength="4000"
+                        placeholder="Descreva brevemente o que esta automação faz"
+                      ></textarea>
+                    </div>
+                    <div class="automation-create-generator">
+                      <button class="btn primary automation-create-generate-btn" id="automationCreateGenerateBtn" type="button">
+                        <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+                        Gerar por descrição
+                      </button>
+                      <button class="btn outline automation-create-upload-btn" id="automationCreateUploadBtn" type="button">
+                        <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                        Fazer upload de arquivo
+                      </button>
+                      <input id="automationCreateUploadInput" type="file" accept=".py,.js,.ts,.json,.yaml,.yml,.txt,.csv,.xlsx,.xls,.pdf" hidden />
+                      <p class="modal-field-hint" id="automationCreateUploadHint">Use uma descrição detalhada ou envie um arquivo de referência para acelerar a criação.</p>
+                    </div>
+                  </div>
+                </section>
+
+                <div class="voice-messaging-create-actions automation-create-actions">
+                  <button class="btn outline" id="automationCreateCancelBtn" type="button">Cancelar</button>
+                  <button class="btn primary" type="submit" id="automationCreateSubmit">Criar automação</button>
+                </div>
+              </form>
             </div>
           </div>
 
@@ -4841,8 +5320,7 @@
                   </button>
                 </div>
                 <div class="modal-body credential-modal-body">
-                  <div class="credential-security-notice" role="note">
-                    <span class="material-symbols-rounded" aria-hidden="true">warning</span>
+                  <div class="credential-security-notice">
                     <p>As credenciais são criptografadas e armazenadas com segurança. Elas podem ser acessadas em scripts Python usando a API de credenciais do WES HUB 360.</p>
                   </div>
 
@@ -4898,7 +5376,7 @@
                   <button class="btn primary" id="inputFilesUploadButton" type="button">Enviar arquivo</button>
                 </div>
               </div>
-              <div class="data-table">
+              <div class="data-table" id="inputFilesTable">
                 <div class="data-row header cols-5">
                   <span>Arquivo</span>
                   <span>Tipo</span>
@@ -4934,6 +5412,78 @@
                     </button>
                   </span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="inputFileModal" aria-hidden="true">
+            <div class="modal-backdrop" data-input-file-modal-close></div>
+            <div class="modal-dialog credential-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="inputFileModalTitle">
+              <form id="inputFileModalForm">
+                <div class="modal-header">
+                  <h3 id="inputFileModalTitle">Criar arquivo de entrada</h3>
+                  <button class="icon-btn" aria-label="Fechar" data-input-file-modal-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body credential-modal-body">
+                  <section class="users-modal-section">
+                    <div>
+                      <label class="modal-label modal-label--required" for="inputFileNameInput">Nome do arquivo</label>
+                      <input class="modal-input" id="inputFileNameInput" name="name" type="text" placeholder="Ex.: entrada_clientes.csv" autocomplete="off" required />
+                      <p class="modal-field-hint">Use um nome claro com extensão para identificar o arquivo nas automações.</p>
+                    </div>
+
+                    <div>
+                      <label class="modal-label modal-label--required" for="inputFileTypeSelect">Tipo</label>
+                      <div class="hub-select-wrap hub-select-wrap--block credential-select-wrap">
+                        <select class="hub-select" id="inputFileTypeSelect" name="type" required>
+                          <option value="CSV">CSV</option>
+                          <option value="JSON">JSON</option>
+                          <option value="TXT">TXT</option>
+                          <option value="XLSX">XLSX</option>
+                          <option value="PDF">PDF</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+
+                    <div>
+                      <label class="modal-label modal-label--required" for="inputFileVisibilitySelect">Visibilidade</label>
+                      <div class="hub-select-wrap hub-select-wrap--block credential-select-wrap">
+                        <select class="hub-select" id="inputFileVisibilitySelect" name="visibility" required>
+                          <option value="Privado">Privado</option>
+                          <option value="Público">Público</option>
+                        </select>
+                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                    </div>
+                  </section>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-input-file-modal-close type="button">Cancelar</button>
+                  <button class="btn primary" id="inputFileModalSubmitBtn" type="submit">Salvar arquivo</button>
+                </div>
+              </form>
+            </div>
+          </div>
+
+          <div class="modal" id="automationResourcePickerModal" aria-hidden="true">
+            <div class="modal-backdrop" data-automation-resource-picker-close></div>
+            <div class="modal-dialog credential-modal-dialog automation-resource-picker-dialog" role="dialog" aria-modal="true" aria-labelledby="automationResourcePickerTitle">
+              <div class="modal-header">
+                <h3 id="automationResourcePickerTitle">Selecionar itens</h3>
+                <button class="icon-btn" aria-label="Fechar" data-automation-resource-picker-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body credential-modal-body">
+                <div class="automation-resource-picker-list" id="automationResourcePickerList"></div>
+                <p class="modal-field-hint" id="automationResourcePickerEmpty" hidden>Nenhum item disponível.</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" data-automation-resource-picker-close type="button">Cancelar</button>
+                <button class="btn primary" id="automationResourcePickerApply" type="button">Usar selecionados</button>
               </div>
             </div>
           </div>

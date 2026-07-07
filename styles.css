@@ -569,7 +569,7 @@ body {
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
 }
 
 .language-switcher {
@@ -2747,6 +2747,35 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   max-width: 520px;
 }
 
+.filters-grid.automation-files-toolbar {
+  display: grid;
+  grid-template-columns: minmax(280px, 520px) 1fr max-content;
+  gap: 16px;
+  align-items: center;
+  max-width: none;
+}
+
+.automation-files-ai-btn {
+  grid-column: 3;
+  align-self: center;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.btn.automation-files-ai-btn {
+  border: 0;
+}
+
+@media (max-width: 720px) {
+  .filters-grid.automation-files-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .automation-files-ai-btn {
+    justify-self: start;
+  }
+}
+
 .filters-header h3 {
   margin: 0 0 12px;
   font-size: var(--md-title-medium);
@@ -3193,12 +3222,47 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   overflow: visible;
 }
 
+.data-row:not(.header) > .automation-file-usage {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+}
+
+.automation-file-usage > span:first-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.automation-file-type-chip {
+  min-width: 0;
+  width: auto;
+  padding-inline: 10px;
+}
+
+.credential-type-chip {
+  min-width: 0;
+  width: auto;
+  padding-inline: 10px;
+  white-space: nowrap;
+}
+
+.automation-file-usage .tag-more {
+  font-weight: 700;
+}
+
 .data-row.cols-5 {
   grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
 .credentials-table .data-row {
   grid-template-columns: 1.6fr 1fr 1fr 0.6fr;
+}
+
+.automation-credentials-table .data-row {
+  grid-template-columns: 1.3fr 1fr 1.25fr 1fr 0.6fr;
 }
 
 .credential-modal-dialog {
@@ -3244,20 +3308,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .credential-security-notice {
-  display: grid;
-  grid-template-columns: 24px minmax(0, 1fr);
-  gap: 12px;
-  align-items: start;
-  padding: 14px 16px;
-  border: 1px solid rgba(245, 158, 11, 0.24);
-  border-radius: 14px;
-  background: #fff7ed;
-  color: #6b3f12;
-}
-
-.credential-security-notice .material-symbols-rounded {
-  color: #f59e0b;
-  font-size: 24px;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #64748b;
 }
 
 .credential-security-notice p {
@@ -4220,6 +4276,382 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .automation-row .row-actions {
   gap: 6px;
+}
+
+.automation-create-page {
+  max-width: 1160px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.automation-create-card {
+  gap: 16px;
+}
+
+.automation-create-section {
+  display: grid;
+  gap: 16px;
+}
+
+.automation-create-section h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: var(--md-title-medium);
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.automation-create-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.automation-create-card .form-field {
+  justify-content: flex-start;
+}
+
+.automation-create-description-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.automation-create-config-inline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(248px, 300px);
+  gap: 14px;
+  align-items: end;
+}
+
+.automation-create-resource-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.automation-create-generator {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding-top: 0;
+}
+
+.automation-create-generate-btn,
+.automation-create-upload-btn {
+  width: 100%;
+  justify-content: center;
+  min-height: 44px;
+  border-radius: 10px;
+  white-space: normal;
+  text-align: center;
+}
+
+.automation-create-generate-btn {
+  padding-inline: 14px;
+  font-size: var(--md-label-large);
+}
+
+.automation-create-upload-btn {
+  padding-inline: 14px;
+  background: #ffffff;
+  font-size: var(--md-label-large);
+}
+
+.automation-resource-summary {
+  min-height: 18px;
+}
+
+.automation-resource-help {
+  grid-column: 1 / -1;
+  margin: -2px 0 0;
+}
+
+.automation-resource-picker-dialog {
+  width: min(560px, 94vw);
+}
+
+.automation-resource-picker-list {
+  display: grid;
+  gap: 8px;
+}
+
+.automation-resource-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid rgba(1, 111, 244, 0.18);
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.automation-resource-picker-item:hover {
+  background: #f8fbff;
+  border-color: rgba(1, 111, 244, 0.36);
+}
+
+.automation-resource-picker-item input {
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  accent-color: #016ff4;
+}
+
+.automation-resource-picker-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.automation-resource-picker-name {
+  overflow: hidden;
+  color: #0f172a;
+  font-size: var(--md-body-medium);
+  font-weight: 700;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.automation-resource-picker-meta {
+  color: #64748b;
+  font-size: var(--md-body-small);
+  line-height: 16px;
+}
+
+.automation-create-schedule-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  align-items: start;
+  max-width: min(100%, 760px);
+}
+
+.automation-create-schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 24px;
+  min-height: 68px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.automation-create-schedule-row .modal-label,
+.automation-create-schedule-row .modal-field-hint {
+  margin: 0;
+}
+
+.automation-create-schedule-row .switch {
+  flex: 0 0 auto;
+}
+
+.automation-create-schedule-panel {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+  padding: 8px 0 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.automation-create-schedule-panel[hidden] {
+  display: none;
+}
+
+.automation-create-schedule-panel-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.automation-create-schedule-panel-head > .material-symbols-rounded {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #eaf3ff;
+  color: #016ff4;
+  font-size: 22px;
+}
+
+.automation-create-schedule-panel-head h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: var(--md-title-small);
+  font-weight: 700;
+  line-height: 20px;
+}
+
+.automation-create-schedule-panel-head p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: var(--md-body-small);
+  line-height: 16px;
+}
+
+.automation-create-schedule-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.automation-create-custom-days {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.automation-create-custom-days[hidden] {
+  display: none;
+}
+
+.automation-create-custom-days legend {
+  margin: 0;
+  padding: 0;
+}
+
+.automation-create-weekday-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.automation-create-weekday {
+  position: relative;
+  display: block;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.automation-create-weekday input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.automation-create-weekday span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  border: var(--field-outline-width) solid #016ff4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #0d47a1;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.automation-create-weekday input:checked + span {
+  background: #016ff4;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.14);
+}
+
+.automation-create-weekday input:focus-visible + span {
+  outline: 2px solid rgba(1, 111, 244, 0.28);
+  outline-offset: 2px;
+}
+
+.automation-create-card .modal-input,
+.automation-create-card .modal-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: var(--field-outline-width) solid #016ff4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: var(--md-body-medium);
+  line-height: 1.45;
+  box-shadow: none;
+}
+
+.automation-create-card .modal-input {
+  min-height: 44px;
+  padding: 10px 12px;
+}
+
+.automation-create-card .modal-textarea {
+  padding: 12px 14px;
+}
+
+.automation-create-card .hub-select-wrap {
+  border: var(--field-outline-width) solid #016ff4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgba(1, 111, 244, 0.08);
+}
+
+.automation-create-card .modal-input:focus,
+.automation-create-card .modal-textarea:focus,
+.automation-create-card .hub-select-wrap:focus-within {
+  outline: none;
+  border-color: #016ff4;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.14);
+}
+
+.automation-create-card .hub-select-icon,
+.automation-create-card .hub-select-chevron,
+.automation-create-card .hub-select-wrap:not(.hub-custom-select) .hub-select {
+  color: #016ff4 !important;
+}
+
+.automation-create-actions {
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  .automation-create-grid,
+  .automation-create-description-grid,
+  .automation-create-config-inline,
+  .automation-create-resource-grid,
+  .automation-create-schedule-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .automation-create-schedule-layout {
+    max-width: none;
+  }
+
+  .automation-create-weekday-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .automation-create-generator {
+    grid-template-columns: 1fr;
+  }
+
+  .automation-create-schedule-row {
+    width: 100%;
+  }
+
+  .automation-create-generator {
+    padding-top: 0;
+  }
 }
 
 .document-analysis-page {
@@ -14712,6 +15144,10 @@ body.route-agents #directChatFab {
 }
 
 body.route-profile #directChatFab {
+  display: none !important;
+}
+
+body.route-automation-create #directChatFab {
   display: none !important;
 }
 

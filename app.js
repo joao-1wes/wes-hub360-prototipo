@@ -70,6 +70,7 @@ const packagesFilterMenu = document.getElementById('packagesFilterMenu');
 const usersFilterBtn = document.getElementById('usersFilterBtn');
 const usersFilterMenu = document.getElementById('usersFilterMenu');
 const openCredentialModalBtn = document.getElementById('openCredentialModalBtn');
+const automationCredentialsAddButton = document.getElementById('automationCredentialsAddButton');
 const credentialsTable = document.getElementById('credentialsTable');
 const credentialModal = document.getElementById('credentialModal');
 const credentialModalForm = document.getElementById('credentialModalForm');
@@ -79,6 +80,12 @@ const credentialDescriptionInput = document.getElementById('credentialDescriptio
 const credentialTypeSelect = document.getElementById('credentialTypeSelect');
 const credentialDynamicFields = document.getElementById('credentialDynamicFields');
 const credentialModalSubmitBtn = document.getElementById('credentialModalSubmitBtn');
+const inputFilesTable = document.getElementById('inputFilesTable');
+const inputFileModal = document.getElementById('inputFileModal');
+const inputFileModalForm = document.getElementById('inputFileModalForm');
+const inputFileNameInput = document.getElementById('inputFileNameInput');
+const inputFileTypeSelect = document.getElementById('inputFileTypeSelect');
+const inputFileVisibilitySelect = document.getElementById('inputFileVisibilitySelect');
 const voiceMessagingFilterBtn = document.getElementById('voiceMessagingFilterBtn');
 const voiceMessagingFilterMenu = document.getElementById('voiceMessagingFilterMenu');
 const openVoiceMessagingInsightsPage = document.getElementById('openVoiceMessagingInsightsPage');
@@ -130,6 +137,7 @@ const campaignRecipientsInput = document.getElementById('campaignRecipientsInput
 const campaignImportCsvBtn = document.getElementById('campaignImportCsvBtn');
 const campaignCsvInput = document.getElementById('campaignCsvInput');
 const campaignCsvHint = document.getElementById('campaignCsvHint');
+const automationFilesAddButton = document.getElementById('automationFilesAiImprove');
 const inputFilesUploadButton = document.getElementById('inputFilesUploadButton');
 const inputFilesUploadInput = document.getElementById('inputFilesUploadInput');
 const campaignOptimizeScriptBtn = document.getElementById('campaignOptimizeScriptBtn');
@@ -387,6 +395,35 @@ const automationModalPackageHint = document.getElementById('automationModalPacka
 const automationModalVersion = document.getElementById('automationModalVersion');
 const automationModalParams = document.getElementById('automationModalParams');
 const automationModalSubmit = document.getElementById('automationModalSubmit');
+const automationCreateBackBtn = document.getElementById('automationCreateBackBtn');
+const automationCreateCancelBtn = document.getElementById('automationCreateCancelBtn');
+const automationCreateForm = document.getElementById('automationCreateForm');
+const automationCreateError = document.getElementById('automationCreateError');
+const automationCreateName = document.getElementById('automationCreateName');
+const automationCreatePriority = document.getElementById('automationCreatePriority');
+const automationCreateDescription = document.getElementById('automationCreateDescription');
+const automationCreateGenerateBtn = document.getElementById('automationCreateGenerateBtn');
+const automationCreateUploadBtn = document.getElementById('automationCreateUploadBtn');
+const automationCreateUploadInput = document.getElementById('automationCreateUploadInput');
+const automationCreateUploadHint = document.getElementById('automationCreateUploadHint');
+const automationCreateLanguage = document.getElementById('automationCreateLanguage');
+const automationCreateScheduled = document.getElementById('automationCreateScheduled');
+const automationCreateSchedulePanel = document.getElementById('automationCreateSchedulePanel');
+const automationCreateScheduleTime = document.getElementById('automationCreateScheduleTime');
+const automationCreateScheduleFrequency = document.getElementById('automationCreateScheduleFrequency');
+const automationCreateScheduleStartDate = document.getElementById('automationCreateScheduleStartDate');
+const automationCreateScheduleEndDate = document.getElementById('automationCreateScheduleEndDate');
+const automationCreateCustomDays = document.getElementById('automationCreateCustomDays');
+const automationCreateInputFile = document.getElementById('automationCreateInputFile');
+const automationCreateInputFileSummary = document.getElementById('automationCreateInputFileSummary');
+const automationCreateCredential = document.getElementById('automationCreateCredential');
+const automationCreateCredentialSummary = document.getElementById('automationCreateCredentialSummary');
+const automationCreateSubmit = document.getElementById('automationCreateSubmit');
+const automationResourcePickerModal = document.getElementById('automationResourcePickerModal');
+const automationResourcePickerTitle = document.getElementById('automationResourcePickerTitle');
+const automationResourcePickerList = document.getElementById('automationResourcePickerList');
+const automationResourcePickerEmpty = document.getElementById('automationResourcePickerEmpty');
+const automationResourcePickerApply = document.getElementById('automationResourcePickerApply');
 const executionDetailsModal = document.getElementById('executionDetailsModal');
 const executionDetailsId = document.getElementById('executionDetailsId');
 const executionDetailsStart = document.getElementById('executionDetailsStart');
@@ -475,7 +512,7 @@ const DASHBOARD_QUICK_ACTIONS_CATALOG = Object.freeze([
   { id: 'upload-package', label: 'Subir pacote', icon: 'upload_file', variant: 'outline', route: '#/dashboard/packages', description: 'Acessar pacotes para publicar novas versões de automação.' },
   { id: 'register-executor', label: 'Registrar executor', icon: 'computer', variant: 'outline', route: '#/dashboard/executors', triggerId: 'openExecutorModal', description: 'Abrir a gestão de executores para cadastrar uma nova máquina.' },
   { id: 'create-agent', label: 'Criar agente', icon: 'smart_toy', variant: 'outline', route: '#/dashboard/agents', triggerId: 'openAgentModal', description: 'Abrir o modal de criação de agente.' },
-  { id: 'create-automation', label: 'Criar automação', icon: 'bolt', variant: 'outline', route: '#/dashboard/automations', triggerId: 'openAutomationModal', description: 'Abrir o modal de criação de automação.' },
+  { id: 'create-automation', label: 'Criar automação', icon: 'bolt', variant: 'outline', route: '#/dashboard/automations/new', description: 'Abrir a página de criação de automação.' },
   { id: 'view-agents', label: 'Ver agentes', icon: 'groups', variant: 'outline', route: '#/dashboard/agents', description: 'Acessar a lista de agentes e projetos.' },
   { id: 'view-automations', label: 'Ver automações', icon: 'list_alt', variant: 'outline', route: '#/dashboard/automations', description: 'Acessar a lista de automações e execuções.' },
   { id: 'access-project', label: 'Acessar projeto', icon: 'folder_open', variant: 'outline', route: '#/dashboard/agents', description: 'Acessar a área de agentes e projetos.' },
@@ -2954,6 +2991,15 @@ function getAutomationPriorityClass(priority) {
   return 'priority-medium';
 }
 
+function getAutomationLanguageLabel(language) {
+  const labels = {
+    csharp: 'C#',
+    java: 'Java',
+    python: 'Python',
+  };
+  return labels[String(language || '').trim()] || String(language || '').trim() || 'Não definida';
+}
+
 function slugifyAutomationName(value) {
   return String(value || '')
     .normalize('NFD')
@@ -2981,13 +3027,26 @@ function formatAutomationParamsValue(rawValue) {
   }
 }
 
+function getTodayDateInputValue() {
+  const now = new Date();
+  const timezoneOffset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 10);
+}
+
+function getFutureDateInputValue(yearsAhead = 5) {
+  const now = new Date();
+  now.setFullYear(now.getFullYear() + yearsAhead);
+  const timezoneOffset = now.getTimezoneOffset() * 60000;
+  return new Date(now.getTime() - timezoneOffset).toISOString().slice(0, 10);
+}
+
 function createAutomationRow(data) {
   const row = document.createElement('div');
   const automationId = String(data.id || '').trim() || `automacao-${Date.now()}`;
   const status = data.status === 'inactive' ? 'inactive' : 'active';
   const switchId = `automationStatus${automationId.replace(/[^a-zA-Z0-9]+/g, '') || Date.now()}`;
   const priority = data.priority === 'high' || data.priority === 'low' ? data.priority : 'medium';
-  const packageDisplay = formatAutomationPackageDisplay(data.packageId, data.version);
+  const packageDisplay = String(data.packageDisplay || '').trim() || formatAutomationPackageDisplay(data.packageId, data.version);
 
   row.className = 'data-row automation-row';
   row.dataset.automationId = automationId;
@@ -2998,6 +3057,8 @@ function createAutomationRow(data) {
   row.dataset.automationPriority = priority;
   row.dataset.automationParams = JSON.stringify(data.paramsObject || {});
   row.dataset.automationStatus = status;
+  if (data.language) row.dataset.automationLanguage = data.language;
+  row.dataset.automationScheduled = data.scheduled ? 'true' : 'false';
 
   row.innerHTML = `
     <span>${escapeHtmlWes(data.name)}</span>
@@ -5654,6 +5715,9 @@ const CREDENTIAL_TYPE_LABEL_MAP = {
 };
 
 let activeCredentialRow = null;
+let activeCredentialSelectTarget = null;
+let activeInputFileSelectTarget = null;
+let activeAutomationResourcePickerType = null;
 
 function normalizeCredentialTypeLabel(type = '') {
   const normalizedType = String(type || '').trim();
@@ -5829,6 +5893,10 @@ function readCredentialRowData(row) {
 
 function setCredentialRowData(row, data) {
   if (!row || !data) return;
+  const isAutomationCredentialRow = Boolean(row.closest('.automation-credentials-table'));
+  const usageCellHtml = isAutomationCredentialRow
+    ? row.querySelector(':scope > span:nth-child(3)')?.innerHTML || '<span>-</span>'
+    : '';
   const name = String(data.name || '').trim();
   const type = normalizeCredentialTypeLabel(data.type);
   const description = String(data.description || '').trim();
@@ -5838,6 +5906,23 @@ function setCredentialRowData(row, data) {
   row.dataset.credentialDescription = description;
   row.dataset.credentialUpdatedAt = updatedAt;
   row.dataset.credentialPayload = JSON.stringify(data.payload || {});
+  if (isAutomationCredentialRow) {
+    row.innerHTML = `
+      <span>${escapeHtmlWes(name)}</span>
+      <span><span class="chip credential-type-chip">${escapeHtmlWes(type)}</span></span>
+      <span class="automation-file-usage">${usageCellHtml}</span>
+      <span>${escapeHtmlWes(updatedAt)}</span>
+      <span class="row-actions">
+        <button class="icon-btn action-icon" aria-label="Editar" data-credential-edit type="button">
+          <span class="material-symbols-rounded">edit</span>
+        </button>
+        <button class="icon-btn action-icon danger" aria-label="Excluir" type="button">
+          <span class="material-symbols-rounded">delete</span>
+        </button>
+      </span>
+    `;
+    return;
+  }
   row.innerHTML = `
     <span>${escapeHtmlWes(name)}</span>
     <span class="chip">${escapeHtmlWes(type)}</span>
@@ -5853,18 +5938,73 @@ function setCredentialRowData(row, data) {
   `;
 }
 
+function syncSingleHubSelect(select) {
+  if (typeof hubEnhanceSelectWrap === 'function') {
+    const wrap = select.closest('.hub-select-wrap');
+    if (wrap) hubEnhanceSelectWrap(wrap);
+  }
+}
+
+function readAutomationSelectedResources(select) {
+  if (!select) return [];
+  try {
+    const values = JSON.parse(select.dataset.selectedValues || '[]');
+    return Array.isArray(values) ? values.map((value) => String(value || '').trim()).filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeAutomationSelectedResources(select, values = []) {
+  if (!select) return;
+  const nextValues = Array.from(new Set(values.map((value) => String(value || '').trim()).filter(Boolean)));
+  select.dataset.selectedValues = JSON.stringify(nextValues);
+}
+
+function updateAutomationResourceSummary(select, summaryEl, singularLabel, pluralLabel) {
+  const values = readAutomationSelectedResources(select);
+  if (!summaryEl) return;
+  if (!values.length) {
+    summaryEl.textContent = '';
+    summaryEl.hidden = true;
+    return;
+  }
+  const label = values.length === 1 ? singularLabel : pluralLabel;
+  const selectedText = singularLabel === 'credencial'
+    ? `selecionada${values.length === 1 ? '' : 's'}`
+    : `selecionado${values.length === 1 ? '' : 's'}`;
+  summaryEl.textContent = `${values.length} ${label} ${selectedText}: ${values.join(', ')}`;
+  summaryEl.hidden = false;
+}
+
+function addAutomationSelectedResource(select, value, summaryEl, singularLabel, pluralLabel) {
+  if (!select || !value) return;
+  const values = readAutomationSelectedResources(select);
+  writeAutomationSelectedResources(select, [...values, value]);
+  select.value = '__existing__';
+  select.dataset.previousValue = '__existing__';
+  syncSingleHubSelect(select);
+  updateAutomationResourceSummary(select, summaryEl, singularLabel, pluralLabel);
+}
+
 function closeCredentialModal() {
   if (!credentialModal || !credentialModalForm) return;
+  if (activeCredentialSelectTarget && activeCredentialSelectTarget.value === '__new__') {
+    activeCredentialSelectTarget.value = readAutomationSelectedResources(activeCredentialSelectTarget).length ? '__existing__' : '';
+    syncSingleHubSelect(activeCredentialSelectTarget);
+  }
   credentialModal.classList.remove('open');
   credentialModal.setAttribute('aria-hidden', 'true');
   credentialModalForm.reset();
   if (credentialDynamicFields) credentialDynamicFields.innerHTML = '';
   activeCredentialRow = null;
+  activeCredentialSelectTarget = null;
 }
 
-function openCredentialModal(row = null) {
+function openCredentialModal(row = null, options = {}) {
   if (!credentialModal || !credentialModalForm) return;
   activeCredentialRow = row;
+  activeCredentialSelectTarget = options.targetSelect || null;
   const isEdit = Boolean(row);
   const rowData = readCredentialRowData(row);
   if (credentialModalTitle) credentialModalTitle.textContent = isEdit ? 'Editar credencial' : 'Adicionar credencial';
@@ -5881,6 +6021,7 @@ function openCredentialModal(row = null) {
 
 if (credentialsTable && credentialModal && credentialModalForm) {
   openCredentialModalBtn?.addEventListener('click', () => openCredentialModal());
+  automationCredentialsAddButton?.addEventListener('click', () => openCredentialModal());
 
   credentialModal.addEventListener('click', (event) => {
     if (event.target.closest('[data-credential-modal-close]')) closeCredentialModal();
@@ -5912,12 +6053,12 @@ if (credentialsTable && credentialModal && credentialModalForm) {
     renderCredentialDynamicFields(credentialTypeSelect?.value || 'AWS', values);
   });
 
-  credentialsTable.addEventListener('click', (event) => {
+  document.querySelectorAll('.credentials-table').forEach((table) => table.addEventListener('click', (event) => {
     const editButton = event.target.closest('[data-credential-edit]');
     if (!editButton) return;
     const row = editButton.closest('.data-row:not(.header)');
     if (row) openCredentialModal(row);
-  });
+  }));
 
   credentialModalForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -5932,6 +6073,7 @@ if (credentialsTable && credentialModal && credentialModalForm) {
 
     const isEdit = Boolean(activeCredentialRow);
     const row = activeCredentialRow || document.createElement('div');
+    const targetSelect = activeCredentialSelectTarget;
     row.className = 'data-row';
     setCredentialRowData(row, payload);
     if (!isEdit) {
@@ -5942,8 +6084,92 @@ if (credentialsTable && credentialModal && credentialModalForm) {
         credentialsTable.appendChild(row);
       }
     }
+    if (!isEdit && targetSelect) {
+      addAutomationSelectedResource(
+        targetSelect,
+        payload.name,
+        automationCreateCredentialSummary,
+        'credencial',
+        'credenciais',
+      );
+    }
     closeCredentialModal();
     showAppToast(isEdit ? 'Credencial atualizada' : 'Credencial criada');
+  });
+}
+
+function closeInputFileModal() {
+  if (!inputFileModal || !inputFileModalForm) return;
+  if (activeInputFileSelectTarget && activeInputFileSelectTarget.value === '__new__') {
+    activeInputFileSelectTarget.value = readAutomationSelectedResources(activeInputFileSelectTarget).length ? '__existing__' : '';
+    syncSingleHubSelect(activeInputFileSelectTarget);
+  }
+  inputFileModal.classList.remove('open');
+  inputFileModal.setAttribute('aria-hidden', 'true');
+  inputFileModalForm.reset();
+  activeInputFileSelectTarget = null;
+}
+
+function openInputFileModal(options = {}) {
+  if (!inputFileModal || !inputFileModalForm) return;
+  activeInputFileSelectTarget = options.targetSelect || null;
+  inputFileModalForm.reset();
+  if (inputFileTypeSelect) inputFileTypeSelect.value = 'CSV';
+  if (inputFileVisibilitySelect) inputFileVisibilitySelect.value = 'Privado';
+  refreshCredentialSelectWraps(inputFileModal);
+  inputFileModal.classList.add('open');
+  inputFileModal.setAttribute('aria-hidden', 'false');
+  window.setTimeout(() => inputFileNameInput?.focus(), 0);
+}
+
+if (inputFileModal && inputFileModalForm) {
+  inputFileModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-input-file-modal-close]')) closeInputFileModal();
+  });
+
+  inputFileModalForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = String(inputFileNameInput?.value || '').trim();
+    const type = String(inputFileTypeSelect?.value || '').trim() || 'CSV';
+    const visibility = String(inputFileVisibilitySelect?.value || '').trim() || 'Privado';
+    if (!name) return;
+
+    if (inputFilesTable) {
+      const row = document.createElement('div');
+      row.className = 'data-row cols-5';
+      row.innerHTML = `
+        <span>${escapeHtmlWes(name)}</span>
+        <span class="chip">${escapeHtmlWes(type)}</span>
+        <span>${escapeHtmlWes(visibility)}</span>
+        <span>${escapeHtmlWes(formatCredentialUpdatedAt())}</span>
+        <span class="row-actions">
+          <button class="icon-btn action-icon" aria-label="Baixar" type="button">
+            <span class="material-symbols-rounded">download</span>
+          </button>
+          <button class="icon-btn action-icon danger" aria-label="Excluir" type="button">
+            <span class="material-symbols-rounded">delete</span>
+          </button>
+        </span>
+      `;
+      const headerRow = inputFilesTable.querySelector('.data-row.header');
+      if (headerRow?.nextElementSibling) {
+        inputFilesTable.insertBefore(row, headerRow.nextElementSibling);
+      } else {
+        inputFilesTable.appendChild(row);
+      }
+    }
+
+    if (activeInputFileSelectTarget) {
+      addAutomationSelectedResource(
+        activeInputFileSelectTarget,
+        name,
+        automationCreateInputFileSummary,
+        'arquivo',
+        'arquivos',
+      );
+    }
+    closeInputFileModal();
+    showAppToast('Arquivo de entrada criado');
   });
 }
 
@@ -5953,11 +6179,117 @@ if (inputFilesUploadButton && inputFilesUploadInput) {
     inputFilesUploadInput.click();
   });
 
+  automationFilesAddButton?.addEventListener('click', () => {
+    inputFilesUploadInput.value = '';
+    inputFilesUploadInput.click();
+  });
+
   inputFilesUploadInput.addEventListener('change', () => {
     const fileName = inputFilesUploadInput.files?.[0]?.name;
     if (fileName) showAppToast(`Arquivo selecionado: ${fileName}`);
   });
 }
+
+function getAutomationResourcePickerItems(type) {
+  if (type === 'input-file') {
+    return Array.from(inputFilesTable?.querySelectorAll('.data-row:not(.header)') || [])
+      .map((row) => {
+        const cells = row.querySelectorAll(':scope > span');
+        const name = String(cells[0]?.textContent || '').trim();
+        const meta = String(cells[1]?.textContent || '').trim();
+        return name ? { value: name, label: name, meta } : null;
+      })
+      .filter(Boolean);
+  }
+
+  return Array.from(credentialsTable?.querySelectorAll('.data-row:not(.header)') || [])
+    .map((row) => {
+      const name = String(row.dataset.credentialName || row.querySelector(':scope > span:first-child')?.textContent || '').trim();
+      const meta = String(row.dataset.credentialType || row.querySelector(':scope > span:nth-child(2)')?.textContent || '').trim();
+      return name ? { value: name, label: name, meta } : null;
+    })
+    .filter(Boolean);
+}
+
+function getAutomationResourceControls(type) {
+  if (type === 'input-file') {
+    return {
+      select: automationCreateInputFile,
+      summary: automationCreateInputFileSummary,
+      singularLabel: 'arquivo',
+      pluralLabel: 'arquivos',
+      title: 'Selecionar arquivos',
+      emptyText: 'Nenhum arquivo salvo disponível.',
+    };
+  }
+
+  return {
+    select: automationCreateCredential,
+    summary: automationCreateCredentialSummary,
+    singularLabel: 'credencial',
+    pluralLabel: 'credenciais',
+    title: 'Selecionar credenciais',
+    emptyText: 'Nenhuma credencial salva disponível.',
+  };
+}
+
+function closeAutomationResourcePicker() {
+  automationResourcePickerModal?.classList.remove('open');
+  automationResourcePickerModal?.setAttribute('aria-hidden', 'true');
+  activeAutomationResourcePickerType = null;
+}
+
+function openAutomationResourcePicker(type) {
+  if (!automationResourcePickerModal || !automationResourcePickerList) return;
+  const controls = getAutomationResourceControls(type);
+  const items = getAutomationResourcePickerItems(type);
+  const selectedValues = readAutomationSelectedResources(controls.select);
+
+  activeAutomationResourcePickerType = type;
+  if (automationResourcePickerTitle) automationResourcePickerTitle.textContent = controls.title;
+  if (automationResourcePickerEmpty) {
+    automationResourcePickerEmpty.textContent = controls.emptyText;
+    automationResourcePickerEmpty.hidden = items.length > 0;
+  }
+  if (automationResourcePickerApply) automationResourcePickerApply.disabled = items.length === 0;
+
+  automationResourcePickerList.innerHTML = items.map((item) => {
+    const isChecked = selectedValues.includes(item.value);
+    return `
+      <label class="automation-resource-picker-item">
+        <input type="checkbox" value="${escapeHtmlWes(item.value)}" ${isChecked ? 'checked' : ''} />
+        <span class="automation-resource-picker-main">
+          <span class="automation-resource-picker-name">${escapeHtmlWes(item.label)}</span>
+          <span class="automation-resource-picker-meta">${escapeHtmlWes(item.meta || 'Disponível')}</span>
+        </span>
+      </label>
+    `;
+  }).join('');
+
+  automationResourcePickerModal.classList.add('open');
+  automationResourcePickerModal.setAttribute('aria-hidden', 'false');
+}
+
+automationResourcePickerModal?.addEventListener('click', (event) => {
+  if (event.target.closest('[data-automation-resource-picker-close]')) {
+    closeAutomationResourcePicker();
+  }
+});
+
+automationResourcePickerApply?.addEventListener('click', () => {
+  if (!activeAutomationResourcePickerType) return;
+  const controls = getAutomationResourceControls(activeAutomationResourcePickerType);
+  const values = Array.from(automationResourcePickerList?.querySelectorAll('input:checked') || [])
+    .map((input) => input.value)
+    .filter(Boolean);
+
+  writeAutomationSelectedResources(controls.select, values);
+  controls.select.value = values.length ? '__existing__' : '';
+  controls.select.dataset.previousValue = controls.select.value;
+  syncSingleHubSelect(controls.select);
+  updateAutomationResourceSummary(controls.select, controls.summary, controls.singularLabel, controls.pluralLabel);
+  closeAutomationResourcePicker();
+});
 
 bindStaticTableDeleteConfirmation(document.querySelector('#page-input-files .data-table'), {
   getTargetLabel: (row) => {
@@ -9380,54 +9712,110 @@ if (automationStatusSwitches.length) {
 }
 
 (function wireAutomationModal() {
-  if (
-    !openAutomationModal ||
-    !automationModal ||
-    !automationModalForm ||
-    !automationModalTitle ||
-    !automationModalName ||
-    !automationModalPriority ||
-    !automationModalDescription ||
-    !automationModalPackageSearch ||
-    !automationModalPackage ||
-    !automationModalPackageHint ||
-    !automationModalVersion ||
-    !automationModalParams ||
-    !automationModalSubmit ||
-    !automationsTable
-  ) {
+  const hasAutomationModalForm = Boolean(
+    automationModal &&
+    automationModalForm &&
+    automationModalTitle &&
+    automationModalName &&
+    automationModalPriority &&
+    automationModalDescription &&
+    automationModalPackageSearch &&
+    automationModalPackage &&
+    automationModalPackageHint &&
+    automationModalVersion &&
+    automationModalParams &&
+    automationModalSubmit
+  );
+  const hasAutomationCreateForm = Boolean(
+    automationCreateForm &&
+    automationCreateName &&
+    automationCreatePriority &&
+    automationCreateDescription &&
+    automationCreateLanguage &&
+    automationCreateScheduled &&
+    automationCreateScheduleTime &&
+    automationCreateScheduleFrequency &&
+    automationCreateScheduleStartDate &&
+    automationCreateScheduleEndDate &&
+    automationCreateInputFile &&
+    automationCreateCredential &&
+    automationCreateSubmit
+  );
+
+  if (!openAutomationModal || !automationsTable || (!hasAutomationModalForm && !hasAutomationCreateForm)) {
     return;
   }
 
   let activeAutomationRow = null;
 
-  function setAutomationModalError(message) {
-    if (!automationModalError) return;
+  function getAutomationModalControls() {
+    if (!hasAutomationModalForm) return null;
+    return {
+      form: automationModalForm,
+      error: automationModalError,
+      name: automationModalName,
+      priority: automationModalPriority,
+      description: automationModalDescription,
+      packageSearch: automationModalPackageSearch,
+      packageSelect: automationModalPackage,
+      packageHint: automationModalPackageHint,
+      version: automationModalVersion,
+      params: automationModalParams,
+      scrollTarget: automationModal?.querySelector('.modal-body'),
+    };
+  }
+
+  function getAutomationCreateControls() {
+    if (!hasAutomationCreateForm) return null;
+    return {
+      form: automationCreateForm,
+      error: automationCreateError,
+      name: automationCreateName,
+      priority: automationCreatePriority,
+      description: automationCreateDescription,
+      language: automationCreateLanguage,
+      scheduled: automationCreateScheduled,
+      schedulePanel: automationCreateSchedulePanel,
+      scheduleTime: automationCreateScheduleTime,
+      scheduleFrequency: automationCreateScheduleFrequency,
+      scheduleStartDate: automationCreateScheduleStartDate,
+      scheduleEndDate: automationCreateScheduleEndDate,
+      customDays: automationCreateCustomDays,
+      inputFile: automationCreateInputFile,
+      inputFileSummary: automationCreateInputFileSummary,
+      credential: automationCreateCredential,
+      credentialSummary: automationCreateCredentialSummary,
+      scrollTarget: document.getElementById('page-automations-create'),
+    };
+  }
+
+  function setAutomationFormError(controls, message) {
+    if (!controls?.error) return;
     if (message) {
-      automationModalError.textContent = message;
-      automationModalError.hidden = false;
-      const modalBody = automationModal.querySelector('.modal-body');
-      if (modalBody && typeof modalBody.scrollTo === 'function') {
-        modalBody.scrollTo({ top: 0, behavior: 'smooth' });
+      controls.error.textContent = message;
+      controls.error.hidden = false;
+      if (controls.scrollTarget && typeof controls.scrollTarget.scrollTo === 'function') {
+        controls.scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
       }
       return;
     }
 
-    automationModalError.textContent = '';
-    automationModalError.hidden = true;
+    controls.error.textContent = '';
+    controls.error.hidden = true;
   }
 
-  function renderAutomationVersionOptions(packageId, selectedVersion = '') {
+  function renderAutomationVersionOptions(versionSelect, packageId, selectedVersion = '') {
+    if (!versionSelect) return;
     const pkg = getAutomationPackageById(packageId);
-    automationModalVersion.innerHTML = '';
+    versionSelect.innerHTML = '';
 
     if (!pkg) {
       const option = document.createElement('option');
       option.value = '';
       option.textContent = 'Selecione o pacote primeiro';
-      automationModalVersion.appendChild(option);
-      automationModalVersion.value = '';
-      automationModalVersion.disabled = true;
+      versionSelect.appendChild(option);
+      versionSelect.value = '';
+      versionSelect.disabled = true;
       return;
     }
 
@@ -9435,18 +9823,19 @@ if (automationStatusSwitches.length) {
       const option = document.createElement('option');
       option.value = version;
       option.textContent = version;
-      automationModalVersion.appendChild(option);
+      versionSelect.appendChild(option);
     });
 
-    automationModalVersion.disabled = false;
+    versionSelect.disabled = false;
     if (selectedVersion && pkg.versions.includes(selectedVersion)) {
-      automationModalVersion.value = selectedVersion;
+      versionSelect.value = selectedVersion;
     } else {
-      automationModalVersion.value = pkg.versions[0] || '';
+      versionSelect.value = pkg.versions[0] || '';
     }
   }
 
-  function renderAutomationPackageOptions(searchText = '', selectedPackageId = '', selectedVersion = '') {
+  function renderAutomationPackageOptions(controls, searchText = '', selectedPackageId = '', selectedVersion = '') {
+    if (!controls?.packageSelect || !controls?.version) return;
     const matches = filterAutomationPackages(searchText);
     const hasSelectedOutsideFilter =
       selectedPackageId &&
@@ -9456,85 +9845,538 @@ if (automationStatusSwitches.length) {
       ? [getAutomationPackageById(selectedPackageId), ...matches]
       : matches;
 
-    automationModalPackage.innerHTML = '';
+    controls.packageSelect.innerHTML = '';
 
     const placeholder = document.createElement('option');
     placeholder.value = '';
     placeholder.textContent = packagesToRender.length ? 'Selecione o pacote' : 'Nenhum pacote encontrado';
-    automationModalPackage.appendChild(placeholder);
+    controls.packageSelect.appendChild(placeholder);
 
     packagesToRender.forEach((pkg) => {
       if (!pkg) return;
       const option = document.createElement('option');
       option.value = pkg.id;
       option.textContent = `${pkg.label} • ${pkg.description}`;
-      automationModalPackage.appendChild(option);
+      controls.packageSelect.appendChild(option);
     });
 
-    automationModalPackage.disabled = packagesToRender.length === 0;
-    automationModalPackageHint.textContent = `${matches.length} pacote${matches.length === 1 ? '' : 's'} disponível${matches.length === 1 ? '' : 'is'}.`;
-
-    if (selectedPackageId && packagesToRender.some((item) => item?.id === selectedPackageId)) {
-      automationModalPackage.value = selectedPackageId;
-    } else {
-      automationModalPackage.value = '';
+    controls.packageSelect.disabled = packagesToRender.length === 0;
+    if (controls.packageHint) {
+      const availabilityLabel = matches.length === 1 ? 'disponível' : 'disponíveis';
+      controls.packageHint.textContent = `${matches.length} pacote${matches.length === 1 ? '' : 's'} ${availabilityLabel}.`;
     }
 
-    renderAutomationVersionOptions(automationModalPackage.value, selectedVersion);
+    if (selectedPackageId && packagesToRender.some((item) => item?.id === selectedPackageId)) {
+      controls.packageSelect.value = selectedPackageId;
+    } else {
+      controls.packageSelect.value = '';
+    }
+
+    renderAutomationVersionOptions(controls.version, controls.packageSelect.value, selectedVersion);
+  }
+
+  function rememberAutomationSelectValue(select) {
+    if (!select || select.value === '__new__') return;
+    select.dataset.previousValue = select.value;
+  }
+
+  function syncAutomationCreateSelectLabels(controls = getAutomationCreateControls()) {
+    if (!controls?.form) return;
+    controls.form.querySelectorAll('.hub-select-wrap').forEach((wrap) => {
+      if (typeof hubEnhanceSelectWrap === 'function') {
+        hubEnhanceSelectWrap(wrap);
+      }
+    });
+  }
+
+  function getAutomationCustomDayInputs(controls = getAutomationCreateControls()) {
+    return Array.from(controls?.customDays?.querySelectorAll('input[name="automation_create_weekday"]') || []);
+  }
+
+  function syncAutomationScheduleDateBounds(controls = getAutomationCreateControls()) {
+    if (!controls?.scheduleStartDate || !controls.scheduleEndDate) return;
+    const startDate = controls.scheduleStartDate.value || getTodayDateInputValue();
+    controls.scheduleEndDate.min = startDate;
+    if (controls.scheduleEndDate.value && controls.scheduleEndDate.value < startDate) {
+      controls.scheduleEndDate.value = startDate;
+    }
+  }
+
+  function syncAutomationSchedulePanel(controls = getAutomationCreateControls(), options = {}) {
+    if (!controls?.scheduled || !controls.schedulePanel) return;
+    const isScheduled = controls.scheduled.checked;
+    const isCustomFrequency = isScheduled && controls.scheduleFrequency?.value === 'custom';
+    controls.schedulePanel.hidden = !isScheduled;
+    controls.scheduled.setAttribute('aria-expanded', String(isScheduled));
+
+    [controls.scheduleTime, controls.scheduleFrequency, controls.scheduleStartDate, controls.scheduleEndDate].forEach((field) => {
+      if (field) field.disabled = !isScheduled;
+    });
+
+    if (controls.customDays) {
+      controls.customDays.hidden = !isCustomFrequency;
+    }
+    getAutomationCustomDayInputs(controls).forEach((input) => {
+      input.disabled = !isCustomFrequency;
+      if (!isCustomFrequency) input.checked = false;
+    });
+
+    if (isScheduled) {
+      if (controls.scheduleTime && !controls.scheduleTime.value) controls.scheduleTime.value = '09:00';
+      if (controls.scheduleFrequency && !controls.scheduleFrequency.value) controls.scheduleFrequency.value = 'daily';
+      if (controls.scheduleStartDate && !controls.scheduleStartDate.value) controls.scheduleStartDate.value = getTodayDateInputValue();
+      if (controls.scheduleEndDate && !controls.scheduleEndDate.value) controls.scheduleEndDate.value = getFutureDateInputValue(5);
+      syncAutomationScheduleDateBounds(controls);
+      if (options.focus) {
+        window.setTimeout(() => controls.scheduleTime?.focus(), 0);
+      }
+    }
+
+    syncAutomationCreateSelectLabels(controls);
+  }
+
+  function handleAutomationResourceSelect(select, type) {
+    if (!select) return;
+    const controls = type === 'input-file'
+      ? getAutomationResourceControls('input-file')
+      : getAutomationResourceControls('credential');
+
+    if (!select.value) {
+      writeAutomationSelectedResources(select, []);
+      updateAutomationResourceSummary(select, controls.summary, controls.singularLabel, controls.pluralLabel);
+      return;
+    }
+
+    if (select.value === '__existing__') {
+      rememberAutomationSelectValue(select);
+      openAutomationResourcePicker(type);
+      return;
+    }
+
+    if (type === 'input-file') {
+      openInputFileModal({ targetSelect: select });
+      return;
+    }
+    openCredentialModal(null, { targetSelect: select });
+  }
+
+  function readAutomationCreateResources(controls) {
+    const resources = {};
+    if (!controls) return resources;
+
+    const inputFileValues = readAutomationSelectedResources(controls.inputFile);
+    const credentialValues = readAutomationSelectedResources(controls.credential);
+
+    if (inputFileValues.length) {
+      resources.input_file_mode = 'existing';
+      resources.input_files = inputFileValues;
+      resources.input_file = inputFileValues[0];
+    }
+
+    if (credentialValues.length) {
+      resources.credential_mode = 'existing';
+      resources.credentials = credentialValues;
+      resources.credential = credentialValues[0];
+    }
+
+    return resources;
+  }
+
+  function readAutomationScheduleConfig(controls, shouldValidate = false) {
+    if (!controls?.scheduled?.checked) return null;
+
+    const time = String(controls.scheduleTime?.value || '').trim();
+    const frequency = String(controls.scheduleFrequency?.value || '').trim();
+    const startDate = String(controls.scheduleStartDate?.value || '').trim();
+    const endDate = String(controls.scheduleEndDate?.value || '').trim();
+    const customWeekdays = getAutomationCustomDayInputs(controls)
+      .filter((input) => input.checked)
+      .map((input) => input.value);
+
+    if (shouldValidate && !time) {
+      setAutomationFormError(controls, 'Informe o horário do agendamento.');
+      controls.scheduleTime?.focus();
+      return false;
+    }
+
+    if (shouldValidate && !frequency) {
+      setAutomationFormError(controls, 'Selecione a repetição do agendamento.');
+      controls.scheduleFrequency?.focus();
+      return false;
+    }
+
+    if (shouldValidate && !startDate) {
+      setAutomationFormError(controls, 'Informe a data de início do agendamento.');
+      controls.scheduleStartDate?.focus();
+      return false;
+    }
+
+    if (shouldValidate && !endDate) {
+      setAutomationFormError(controls, 'Informe a data de término do agendamento.');
+      controls.scheduleEndDate?.focus();
+      return false;
+    }
+
+    if (shouldValidate && startDate && endDate && endDate < startDate) {
+      setAutomationFormError(controls, 'A data de término precisa ser igual ou posterior à data de início.');
+      controls.scheduleEndDate?.focus();
+      return false;
+    }
+
+    if (shouldValidate && frequency === 'custom' && customWeekdays.length === 0) {
+      setAutomationFormError(controls, 'Selecione pelo menos um dia da semana.');
+      getAutomationCustomDayInputs(controls)[0]?.focus();
+      return false;
+    }
+
+    return {
+      enabled: true,
+      time,
+      frequency,
+      start_date: startDate,
+      end_date: endDate,
+      weekdays: frequency === 'custom' ? customWeekdays : [],
+    };
+  }
+
+  function resetAutomationForm(controls, currentData = null) {
+    if (!controls?.form) return;
+    controls.form.reset();
+    setAutomationFormError(controls, '');
+
+    controls.priority.value = currentData?.priority || 'medium';
+    controls.name.value = currentData?.name || '';
+    controls.description.value = currentData?.description || '';
+    if (controls.language) controls.language.value = currentData?.language || 'csharp';
+    if (controls.scheduled) controls.scheduled.checked = Boolean(currentData?.scheduled);
+    if (controls.scheduleTime) controls.scheduleTime.value = currentData?.schedule?.time || '09:00';
+    if (controls.scheduleFrequency) controls.scheduleFrequency.value = currentData?.schedule?.frequency || 'daily';
+    if (controls.scheduleStartDate) controls.scheduleStartDate.value = currentData?.schedule?.startDate || getTodayDateInputValue();
+    if (controls.scheduleEndDate) controls.scheduleEndDate.value = currentData?.schedule?.endDate || getFutureDateInputValue(5);
+    getAutomationCustomDayInputs(controls).forEach((input) => {
+      input.checked = Boolean(currentData?.schedule?.weekdays?.includes(input.value));
+    });
+    if (controls.inputFile) {
+      controls.inputFile.value = '';
+      controls.inputFile.dataset.previousValue = '';
+      writeAutomationSelectedResources(controls.inputFile, []);
+    }
+    if (controls.credential) {
+      controls.credential.value = '';
+      controls.credential.dataset.previousValue = '';
+      writeAutomationSelectedResources(controls.credential, []);
+    }
+    if (controls.packageSearch) controls.packageSearch.value = '';
+    if (controls.params) controls.params.value = currentData?.params || '{}';
+    if (!currentData && controls.form) delete controls.form.dataset.generatedDraft;
+    if (!currentData && controls.form === automationCreateForm && automationCreateUploadHint) {
+      automationCreateUploadHint.textContent = 'Use uma descrição detalhada ou envie um arquivo de referência para acelerar a criação.';
+    }
+
+    if (controls.packageSelect && controls.version) {
+      renderAutomationPackageOptions(controls, '', currentData?.packageId || '', currentData?.version || '');
+    }
+
+    rememberAutomationSelectValue(controls.inputFile);
+    rememberAutomationSelectValue(controls.credential);
+    updateAutomationResourceSummary(controls.inputFile, controls.inputFileSummary, 'arquivo', 'arquivos');
+    updateAutomationResourceSummary(controls.credential, controls.credentialSummary, 'credencial', 'credenciais');
+    syncAutomationSchedulePanel(controls);
+    syncAutomationCreateSelectLabels(controls);
+  }
+
+  function readAutomationFormData(controls, row = null) {
+    if (!controls) return null;
+    setAutomationFormError(controls, '');
+
+    const name = String(controls.name.value || '').trim();
+    const priority = String(controls.priority.value || '').trim() || 'medium';
+    const description = String(controls.description.value || '').trim();
+    const packageId = String(controls.packageSelect?.value || '').trim();
+    const version = String(controls.version?.value || '').trim();
+    const language = String(controls.language?.value || '').trim();
+    const isScheduled = Boolean(controls.scheduled?.checked);
+    const paramsSource = String(controls.params?.value || controls.form?.dataset.generatedDraft || '').trim() || '{}';
+
+    if (!name) {
+      setAutomationFormError(controls, 'Informe o nome da automação.');
+      controls.name.focus();
+      return null;
+    }
+
+    if (controls.packageSelect && !packageId) {
+      setAutomationFormError(controls, 'Selecione um pacote para a automação.');
+      controls.packageSelect.focus();
+      return null;
+    }
+
+    if (controls.version && !version) {
+      setAutomationFormError(controls, 'Selecione uma versão para o pacote.');
+      controls.version.focus();
+      return null;
+    }
+
+    if (controls.language && !language) {
+      setAutomationFormError(controls, 'Selecione a linguagem do código.');
+      controls.language.focus();
+      return null;
+    }
+
+    let paramsObject;
+    try {
+      paramsObject = JSON.parse(paramsSource);
+    } catch {
+      setAutomationFormError(controls, 'Os parâmetros precisam estar em JSON válido.');
+      controls.params?.focus();
+      return null;
+    }
+
+    const resourceParams = readAutomationCreateResources(controls);
+    if (!resourceParams) return null;
+    paramsObject = { ...paramsObject, ...resourceParams };
+    if (!resourceParams.input_files) {
+      delete paramsObject.input_file_mode;
+      delete paramsObject.input_files;
+      delete paramsObject.input_file;
+    }
+    if (!resourceParams.credentials) {
+      delete paramsObject.credential_mode;
+      delete paramsObject.credentials;
+      delete paramsObject.credential;
+    }
+
+    const scheduleConfig = readAutomationScheduleConfig(controls, true);
+    if (scheduleConfig === false) return null;
+    if (scheduleConfig) {
+      paramsObject.schedule = scheduleConfig;
+      paramsObject.scheduled = true;
+      paramsObject.horario_agendamento = scheduleConfig.time;
+      paramsObject.repeticao = scheduleConfig.frequency;
+      paramsObject.periodicidade = scheduleConfig.frequency;
+      paramsObject.data_inicio = scheduleConfig.start_date;
+      paramsObject.data_termino = scheduleConfig.end_date;
+      paramsObject.dias_semana = scheduleConfig.weekdays;
+    } else {
+      delete paramsObject.schedule;
+      delete paramsObject.horario_agendamento;
+      delete paramsObject.repeticao;
+      delete paramsObject.periodicidade;
+      delete paramsObject.data_inicio;
+      delete paramsObject.data_termino;
+      delete paramsObject.dias_semana;
+      paramsObject.scheduled = false;
+    }
+
+    const currentRowData = row ? readAutomationRowData(row) : null;
+    return {
+      id:
+        currentRowData?.id ||
+        `${slugifyAutomationName(name) || 'automacao'}-${Date.now().toString(36).slice(-4)}`,
+      name,
+      description,
+      packageId: packageId || language,
+      version: version || language,
+      packageDisplay: controls.packageSelect
+        ? ''
+        : getAutomationLanguageLabel(language),
+      priority,
+      paramsObject,
+      language,
+      scheduled: isScheduled,
+      lastExecution: currentRowData?.lastExecution || 'Ainda não executada',
+      status: currentRowData?.status || 'active',
+    };
+  }
+
+  function persistAutomationData(rowData, row = null) {
+    const nextRow = createAutomationRow(rowData);
+    if (row) {
+      row.replaceWith(nextRow);
+      showAppToast('Automação atualizada com sucesso');
+      return;
+    }
+
+    const headerRow = automationsTable.querySelector('.data-row.header');
+    if (headerRow?.nextSibling) {
+      automationsTable.insertBefore(nextRow, headerRow.nextSibling);
+    } else {
+      automationsTable.appendChild(nextRow);
+    }
+    showAppToast('Automação criada com sucesso');
+  }
+
+  function openAutomationCreatePage() {
+    const controls = getAutomationCreateControls();
+    if (!controls) return;
+    activeAutomationRow = null;
+    resetAutomationForm(controls);
+    window.location.hash = '#/dashboard/automations/new';
+    window.setTimeout(() => controls.name.focus(), 0);
   }
 
   function openAutomationModalPanel(mode, row = null) {
+    if (!hasAutomationModalForm) return;
     activeAutomationRow = row;
     const isEdit = mode === 'edit' && row;
     const currentData = isEdit ? readAutomationRowData(row) : null;
+    const controls = getAutomationModalControls();
 
     automationModal.dataset.mode = isEdit ? 'edit' : 'create';
     automationModalTitle.textContent = isEdit ? 'Editar automação' : 'Criar automação';
     automationModalSubmit.textContent = isEdit ? 'Atualizar automação' : 'Criar automação';
 
-    automationModalForm.reset();
-    setAutomationModalError('');
-
-    automationModalPriority.value = currentData?.priority || 'medium';
-    automationModalName.value = currentData?.name || '';
-    automationModalDescription.value = currentData?.description || '';
-    automationModalPackageSearch.value = '';
-    automationModalParams.value = currentData?.params || '{}';
-
-    renderAutomationPackageOptions('', currentData?.packageId || '', currentData?.version || '');
+    resetAutomationForm(controls, currentData);
 
     automationModal.classList.add('open');
     automationModal.setAttribute('aria-hidden', 'false');
     automationModalName.focus();
   }
 
-  function closeAutomationModalPanel() {
-    activeAutomationRow = null;
-    automationModal.classList.remove('open');
-    automationModal.setAttribute('aria-hidden', 'true');
-    setAutomationModalError('');
-  }
-
   openAutomationModal.addEventListener('click', () => {
-    openAutomationModalPanel('create');
+    openAutomationCreatePage();
   });
 
-  automationModalPackageSearch.addEventListener('input', () => {
+  resetAutomationForm(getAutomationCreateControls());
+
+  function closeAutomationModalPanel() {
+    activeAutomationRow = null;
+    automationModal?.classList.remove('open');
+    automationModal?.setAttribute('aria-hidden', 'true');
+    setAutomationFormError(getAutomationModalControls(), '');
+  }
+
+  automationCreateBackBtn?.addEventListener('click', () => {
+    resetAutomationForm(getAutomationCreateControls());
+    window.location.hash = '#/dashboard/automations';
+  });
+
+  automationCreateCancelBtn?.addEventListener('click', () => {
+    resetAutomationForm(getAutomationCreateControls());
+    window.location.hash = '#/dashboard/automations';
+  });
+
+  automationCreateInputFile?.addEventListener('focus', () => {
+    rememberAutomationSelectValue(automationCreateInputFile);
+  });
+
+  automationCreateInputFile?.addEventListener('change', () => {
+    handleAutomationResourceSelect(automationCreateInputFile, 'input-file');
+  });
+
+  automationCreateCredential?.addEventListener('focus', () => {
+    rememberAutomationSelectValue(automationCreateCredential);
+  });
+
+  automationCreateCredential?.addEventListener('change', () => {
+    handleAutomationResourceSelect(automationCreateCredential, 'credential');
+  });
+
+  automationCreateScheduled?.addEventListener('change', () => {
+    syncAutomationSchedulePanel(getAutomationCreateControls(), { focus: automationCreateScheduled.checked });
+  });
+
+  automationCreateScheduleFrequency?.addEventListener('change', () => {
+    syncAutomationSchedulePanel(getAutomationCreateControls());
+  });
+
+  automationCreateScheduleStartDate?.addEventListener('change', () => {
+    syncAutomationScheduleDateBounds(getAutomationCreateControls());
+  });
+
+  automationCreateGenerateBtn?.addEventListener('click', () => {
+    const controls = getAutomationCreateControls();
+    const description = String(automationCreateDescription?.value || '').trim();
+    if (!description) {
+      setAutomationFormError(controls, 'Descreva a automação antes de gerar.');
+      automationCreateDescription?.focus();
+      return;
+    }
+
+    const resourceParams = readAutomationCreateResources(controls);
+    if (!resourceParams) return;
+    const scheduleConfig = readAutomationScheduleConfig(controls, true);
+    if (scheduleConfig === false) return;
+
+    const draftParams = {
+      source: 'description',
+      language: automationCreateLanguage?.value || 'csharp',
+      scheduled: Boolean(automationCreateScheduled?.checked),
+      description,
+      ...resourceParams,
+    };
+    if (scheduleConfig) {
+      draftParams.schedule = scheduleConfig;
+      draftParams.horario_agendamento = scheduleConfig.time;
+      draftParams.repeticao = scheduleConfig.frequency;
+      draftParams.periodicidade = scheduleConfig.frequency;
+      draftParams.data_inicio = scheduleConfig.start_date;
+      draftParams.data_termino = scheduleConfig.end_date;
+      draftParams.dias_semana = scheduleConfig.weekdays;
+    }
+    automationCreateForm.dataset.generatedDraft = JSON.stringify(draftParams);
+    setAutomationFormError(controls, '');
+    showAppToast('Rascunho da automação gerado pela descrição');
+  });
+
+  automationCreateUploadBtn?.addEventListener('click', () => {
+    automationCreateUploadInput?.click();
+  });
+
+  automationCreateUploadInput?.addEventListener('change', () => {
+    const file = automationCreateUploadInput.files?.[0];
+    if (!file) {
+      if (automationCreateUploadHint) {
+        automationCreateUploadHint.textContent = 'Use uma descrição detalhada ou envie um arquivo de referência para acelerar a criação.';
+      }
+      return;
+    }
+
+    if (automationCreateUploadHint) {
+      automationCreateUploadHint.textContent = `Arquivo selecionado: ${file.name}`;
+    }
+
+    let paramsObject = {};
+    try {
+      paramsObject = JSON.parse(automationCreateForm.dataset.generatedDraft || '{}');
+    } catch {
+      paramsObject = {};
+    }
+    paramsObject.source = 'file';
+    paramsObject.reference_file = file.name;
+    paramsObject.reference_file_type = file.type || 'desconhecido';
+    const controls = getAutomationCreateControls();
+    Object.assign(paramsObject, readAutomationCreateResources(controls));
+    const scheduleConfig = readAutomationScheduleConfig(controls, true);
+    if (scheduleConfig === false) return;
+    paramsObject.scheduled = Boolean(controls?.scheduled?.checked);
+    if (scheduleConfig) {
+      paramsObject.schedule = scheduleConfig;
+      paramsObject.horario_agendamento = scheduleConfig.time;
+      paramsObject.repeticao = scheduleConfig.frequency;
+      paramsObject.periodicidade = scheduleConfig.frequency;
+      paramsObject.data_inicio = scheduleConfig.start_date;
+      paramsObject.data_termino = scheduleConfig.end_date;
+      paramsObject.dias_semana = scheduleConfig.weekdays;
+    }
+    automationCreateForm.dataset.generatedDraft = JSON.stringify(paramsObject);
+  });
+
+  automationModalPackageSearch?.addEventListener('input', () => {
+    const controls = getAutomationModalControls();
     renderAutomationPackageOptions(
+      controls,
       automationModalPackageSearch.value,
       automationModalPackage.value,
       automationModalVersion.value,
     );
   });
 
-  automationModalPackage.addEventListener('change', () => {
-    renderAutomationVersionOptions(automationModalPackage.value);
+  automationModalPackage?.addEventListener('change', () => {
+    renderAutomationVersionOptions(automationModalVersion, automationModalPackage.value);
   });
 
-  automationModal.addEventListener('click', (event) => {
-    if (event.target.closest('[data-modal-close]')) {
-      closeAutomationModalPanel();
-    }
+  automationModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeAutomationModalPanel();
   });
 
   automationsTable.addEventListener('click', async (event) => {
@@ -9565,73 +10407,21 @@ if (automationStatusSwitches.length) {
     }
   });
 
-  automationModalForm.addEventListener('submit', (event) => {
+  automationCreateForm?.addEventListener('submit', (event) => {
     event.preventDefault();
-    setAutomationModalError('');
+    const controls = getAutomationCreateControls();
+    const rowData = readAutomationFormData(controls);
+    if (!rowData) return;
+    persistAutomationData(rowData);
+    resetAutomationForm(controls);
+    window.location.hash = '#/dashboard/automations';
+  });
 
-    const name = String(automationModalName.value || '').trim();
-    const priority = String(automationModalPriority.value || '').trim() || 'medium';
-    const description = String(automationModalDescription.value || '').trim();
-    const packageId = String(automationModalPackage.value || '').trim();
-    const version = String(automationModalVersion.value || '').trim();
-    const paramsSource = String(automationModalParams.value || '').trim() || '{}';
-
-    if (!name) {
-      setAutomationModalError('Informe o nome da automação.');
-      automationModalName.focus();
-      return;
-    }
-
-    if (!packageId) {
-      setAutomationModalError('Selecione um pacote para a automação.');
-      automationModalPackage.focus();
-      return;
-    }
-
-    if (!version) {
-      setAutomationModalError('Selecione uma versão para o pacote.');
-      automationModalVersion.focus();
-      return;
-    }
-
-    let paramsObject;
-    try {
-      paramsObject = JSON.parse(paramsSource);
-    } catch {
-      setAutomationModalError('Os parâmetros precisam estar em JSON válido.');
-      automationModalParams.focus();
-      return;
-    }
-
-    const currentRowData = activeAutomationRow ? readAutomationRowData(activeAutomationRow) : null;
-    const rowData = {
-      id:
-        currentRowData?.id ||
-        `${slugifyAutomationName(name) || 'automacao'}-${Date.now().toString(36).slice(-4)}`,
-      name,
-      description,
-      packageId,
-      version,
-      priority,
-      paramsObject,
-      lastExecution: currentRowData?.lastExecution || 'Ainda não executada',
-      status: currentRowData?.status || 'active',
-    };
-
-    const nextRow = createAutomationRow(rowData);
-    if (activeAutomationRow) {
-      activeAutomationRow.replaceWith(nextRow);
-      showAppToast('Automação atualizada com sucesso');
-    } else {
-      const headerRow = automationsTable.querySelector('.data-row.header');
-      if (headerRow?.nextSibling) {
-        automationsTable.insertBefore(nextRow, headerRow.nextSibling);
-      } else {
-        automationsTable.appendChild(nextRow);
-      }
-      showAppToast('Automação criada com sucesso');
-    }
-
+  automationModalForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const rowData = readAutomationFormData(getAutomationModalControls(), activeAutomationRow);
+    if (!rowData) return;
+    persistAutomationData(rowData, activeAutomationRow);
     closeAutomationModalPanel();
   });
 })();
@@ -13823,6 +14613,7 @@ if (dashboardToggle && dashboardViewDefault && dashboardViewDetail) {
 const routeMap = {
   'dashboard': 'page-dashboard',
   'dashboard/automations': 'page-automations',
+  'dashboard/automations/new': 'page-automations-create',
   'dashboard/document-analysis': 'page-document-analysis',
   'dashboard/schedules': 'page-schedules',
   'dashboard/agents': 'page-agents',
@@ -13861,6 +14652,7 @@ const routeMap = {
 const sectionMap = {
   'dashboard': 'Painel',
   'dashboard/automations': 'Fluxos de Trabalho',
+  'dashboard/automations/new': 'Fluxos de Trabalho',
   'dashboard/document-analysis': 'Fluxos de Trabalho',
   'dashboard/input-files': 'Fluxos de Trabalho',
   'dashboard/schedules': 'Fluxos de Trabalho',
@@ -14018,8 +14810,9 @@ const normalizeAutomationLabels = () => {
   const automationTrigger = document.querySelector('.nav-trigger[data-menu="automation"] .nav-label');
   if (automationTrigger) automationTrigger.textContent = 'Fluxos de Trabalho';
 
-  const automationLink = document.querySelector('#submenu-automation a[href="#/dashboard/automations"] .submenu-label');
-  if (automationLink) automationLink.textContent = 'Automa\u00e7\u00f5es';
+  const automationsLink = document.querySelector('#submenu-automation a[href="#/dashboard/automations"] .submenu-label');
+  if (automationsLink) automationsLink.textContent = 'Automa\u00e7\u00f5es';
+
   const documentAnalysisLink = document.querySelector('#submenu-automation a[href="#/dashboard/document-analysis"] .submenu-label');
   if (documentAnalysisLink) documentAnalysisLink.textContent = 'An\u00e1lise de documentos';
 };
@@ -14047,7 +14840,6 @@ const normalizeVisiblePortugueseLabels = () => {
   const dashboardTitle = document.getElementById('dashboardToggle');
   if (dashboardTitle) {
     dashboardTitle.textContent = dashboardTitle.textContent
-      .replace(/Automa.+/i, 'Fluxos de Trabalho')
       .replace(/Administra.+/i, 'Administra\u00e7\u00e3o')
       .replace(/Configura.+/i, 'Configura\u00e7\u00f5es');
   }
@@ -14092,6 +14884,8 @@ const updateActivePage = () => {
 
   const navRouteKey = routeKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
+    : routeKey.startsWith('dashboard/automations/')
+      ? 'dashboard/automations'
     : routeKey.startsWith('dashboard/voice-messaging/')
       ? 'dashboard/voice-messaging'
     : routeKey.startsWith('dashboard/campaigns/')
@@ -14176,6 +14970,7 @@ const updateActivePage = () => {
     directChatFab.setAttribute('aria-hidden', hideDirectChatFab ? 'true' : 'false');
   }
   document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
+  document.body.classList.toggle('route-automation-create', routeKey === 'dashboard/automations/new');
   document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
   document.body.classList.toggle('route-profile', routeKey === 'dashboard/profile');

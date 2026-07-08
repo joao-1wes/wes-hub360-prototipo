@@ -356,6 +356,7 @@
         <nav class="nav" id="sideNav">
           <a class="nav-item active" href="#/dashboard" data-route="dashboard"><span class="material-symbols-rounded">grid_view</span><span class="nav-label">Painel</span></a>
           <a class="nav-item" href="#/dashboard/agents" data-route="dashboard/agents"><span class="material-symbols-rounded">smart_toy</span><span class="nav-label">Agentes</span></a>
+          <a class="nav-item" href="#/dashboard/vm-monitoring" data-route="dashboard/vm-monitoring"><span class="material-symbols-rounded">desktop_windows</span><span class="nav-label">Máquinas virtuais</span></a>
 
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="automation" type="button">
@@ -598,23 +599,46 @@
                 <div class="panel-footer">Visão geral dos últimos 30 dias.</div>
               </div>
 
-              <div class="panel panel-wide">
-                <div class="panel-header">
+              <div class="panel panel-wide dashboard-vm-card">
+                <div class="panel-header dashboard-vm-header">
                   <div class="panel-title">
-                    <h3>Alertas</h3>
-                    <span class="badge">0</span>
+                    <h3>Máquinas virtuais</h3>
+                    <span class="badge">1 ativa</span>
                   </div>
-                  <div class="panel-actions">
-                    <button class="btn filter-btn" id="alertFilterBtn">
-                      <span class="material-symbols-rounded">filter_list</span>Filtro
-                    </button>
+                  <a href="#/dashboard/vm-monitoring">Ver mais</a>
+                </div>
+                <div class="dashboard-vm-status">
+                  <span class="material-symbols-rounded">check_circle</span>
+                  <div>
+                    <strong>Máquina saudável</strong>
+                    <span>Última atualização: 13:57:13</span>
                   </div>
                 </div>
-                <div class="panel-empty">Nenhum alerta aberto</div>
-                <div class="menu" id="alertFilterMenu">
-                  <button data-filter="">Todos</button>
-                  <button data-filter="critical">Críticos</button>
-                  <button data-filter="warning">Avisos</button>
+                <div class="dashboard-vm-grid">
+                  <div class="dashboard-vm-metric">
+                    <span class="material-symbols-rounded">desktop_windows</span>
+                    <span>CPU</span>
+                    <strong>0%</strong>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
+                  </div>
+                  <div class="dashboard-vm-metric">
+                    <span class="material-symbols-rounded">memory</span>
+                    <span>Memória</span>
+                    <strong>0%</strong>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
+                  </div>
+                  <div class="dashboard-vm-metric">
+                    <span class="material-symbols-rounded">storage</span>
+                    <span>Disco</span>
+                    <strong>0%</strong>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
+                  </div>
+                  <div class="dashboard-vm-metric is-network">
+                    <span class="material-symbols-rounded">network_check</span>
+                    <span>Rede</span>
+                    <strong>2 MB/s</strong>
+                    <div class="fleet-bar success"><span style="width: 20%"></span></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -814,59 +838,46 @@
                 <div class="panel-footer">Visão geral dos últimos 30 dias.</div>
               </div>
 
-              <div class="panel panel-wide">
-                <div class="panel-header">
+              <div class="panel panel-wide dashboard-vm-card">
+                <div class="panel-header dashboard-vm-header">
                   <div class="panel-title">
-                    <h3>Alertas</h3>
-                    <span class="badge">3</span>
+                    <h3>Máquinas virtuais</h3>
+                    <span class="badge">1 ativa</span>
                   </div>
-                  <div class="panel-actions">
-                    <button class="btn filter-btn" id="alertFilterBtnAlt">
-                      <span class="material-symbols-rounded">filter_list</span>Filtro
-                    </button>
+                  <a href="#/dashboard/vm-monitoring">Ver mais</a>
+                </div>
+                <div class="dashboard-vm-status">
+                  <span class="material-symbols-rounded">check_circle</span>
+                  <div>
+                    <strong>Máquina saudável</strong>
+                    <span>Última atualização: 13:57:13</span>
                   </div>
                 </div>
-                <div class="alert-list">
-                  <div class="alert-item">
-                    <span class="alert-badge critical">2</span>
-                    <div>
-                      <div class="alert-title">Possíveis conflitos de agendamento</div>
-                      <div class="alert-meta">Último: 10 min atrás</div>
-                    </div>
+                <div class="dashboard-vm-grid">
+                  <div class="dashboard-vm-metric">
+                    <span class="material-symbols-rounded">desktop_windows</span>
+                    <span>CPU</span>
+                    <strong>0%</strong>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
                   </div>
-                  <div class="alert-item">
-                    <span class="alert-badge warning">1</span>
-                    <div>
-                      <div class="alert-title">Executor com baixa disponibilidade</div>
-                      <div class="alert-meta">Último: 30 min atrás</div>
-                    </div>
+                  <div class="dashboard-vm-metric">
+                    <span class="material-symbols-rounded">memory</span>
+                    <span>Memória</span>
+                    <strong>0%</strong>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
                   </div>
-                  <div class="alert-item">
-                    <span class="alert-badge critical">1</span>
-                    <div>
-                      <div class="alert-title">Fila com atraso elevado</div>
-                      <div class="alert-meta">Último: 45 min atrás</div>
-                    </div>
+                  <div class="dashboard-vm-metric">
+                    <span class="material-symbols-rounded">storage</span>
+                    <span>Disco</span>
+                    <strong>0%</strong>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
                   </div>
-                  <div class="alert-item">
-                    <span class="alert-badge warning">1</span>
-                    <div>
-                      <div class="alert-title">Pacote aguardando publicação</div>
-                      <div class="alert-meta">Último: 1 hora atrás</div>
-                    </div>
+                  <div class="dashboard-vm-metric is-network">
+                    <span class="material-symbols-rounded">network_check</span>
+                    <span>Rede</span>
+                    <strong>2 MB/s</strong>
+                    <div class="fleet-bar success"><span style="width: 20%"></span></div>
                   </div>
-                  <div class="alert-item">
-                    <span class="alert-badge critical">1</span>
-                    <div>
-                      <div class="alert-title">Executor sem resposta</div>
-                      <div class="alert-meta">Último: 2 horas atrás</div>
-                    </div>
-                  </div>
-                </div>
-                <div class="menu" id="alertFilterMenuAlt">
-                  <button data-filter="">Todos</button>
-                  <button data-filter="critical">Críticos</button>
-                  <button data-filter="warning">Avisos</button>
                 </div>
               </div>
             </div>
@@ -883,6 +894,136 @@
               </div>
               <div class="insights-grid is-hidden" id="insightsGridAlt"></div>
             </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-vm-monitoring" data-title="Máquinas virtuais">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Máquinas virtuais</h2>
+                  <p class="page-subtitle">Acompanhe a saúde, consumo e disponibilidade das máquinas virtuais.</p>
+                </div>
+                <div class="page-actions">
+                  <a class="btn outline" href="#/dashboard">
+                    <span class="material-symbols-rounded">arrow_back</span>
+                    Voltar ao painel
+                  </a>
+                </div>
+              </div>
+              <div class="monitoring-header">
+                <div>
+                  <h3>Painel de status das máquinas</h3>
+                  <p>Monitoramento em tempo real e saúde de todas as máquinas.</p>
+                  <span class="monitoring-updated">Última atualização: 13:57:13</span>
+                </div>
+              </div>
+              <div class="status-cards">
+                <div class="status-card success">
+                  <span class="material-symbols-rounded">check_circle</span>
+                  <div>
+                    <strong>1</strong>
+                    <span>Máquinas saudáveis</span>
+                  </div>
+                </div>
+                <div class="status-card warning">
+                  <span class="material-symbols-rounded">warning</span>
+                  <div>
+                    <strong>0</strong>
+                    <span>Máquinas em alerta</span>
+                  </div>
+                </div>
+                <div class="status-card danger">
+                  <span class="material-symbols-rounded">error</span>
+                  <div>
+                    <strong>0</strong>
+                    <span>Máquinas críticas</span>
+                  </div>
+                </div>
+                <div class="status-card muted">
+                  <span class="material-symbols-rounded">schedule</span>
+                  <div>
+                    <strong>0</strong>
+                    <span>Máquinas offline</span>
+                  </div>
+                </div>
+              </div>
+              <div class="monitoring-panel">
+                <div class="panel-header">
+                  <h4>Visão geral da frota (1 máquina ativa)</h4>
+                </div>
+                <div class="fleet-grid">
+                  <div class="fleet-card">
+                    <span class="material-symbols-rounded">desktop_windows</span>
+                    <div class="fleet-info">
+                      <span>Uso de CPU</span>
+                      <strong>0%</strong>
+                    </div>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
+                  </div>
+                  <div class="fleet-card">
+                    <span class="material-symbols-rounded">memory</span>
+                    <div class="fleet-info">
+                      <span>Uso de memória</span>
+                      <strong>0%</strong>
+                    </div>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
+                  </div>
+                  <div class="fleet-card">
+                    <span class="material-symbols-rounded">storage</span>
+                    <div class="fleet-info">
+                      <span>Uso de disco</span>
+                      <strong>0%</strong>
+                    </div>
+                    <div class="fleet-bar"><span style="width: 10%"></span></div>
+                  </div>
+                  <div class="fleet-card is-network">
+                    <span class="material-symbols-rounded">network_check</span>
+                    <div class="fleet-info">
+                      <span>Carga de rede</span>
+                      <strong>2 MB/s</strong>
+                    </div>
+                    <div class="fleet-bar success"><span style="width: 20%"></span></div>
+                  </div>
+                </div>
+                <div class="trend">
+                  <h5>Tendência 24 horas</h5>
+                  <p>CPU média: 0% · Memória média: 0% · Disco médio: 0% · Rede média: 2 MB/s</p>
+                </div>
+              </div>
+              <div class="monitoring-panel">
+                <div class="panel-header">
+                  <h4>Status das máquinas (1 total)</h4>
+                </div>
+                <div class="data-table monitoring-table">
+                  <div class="data-row header">
+                    <span>Máquina</span>
+                    <span>Status</span>
+                    <span>Ambiente</span>
+                    <span>Última leitura</span>
+                    <span>Tempo ativo</span>
+                    <span>CPU</span>
+                    <span>Memória</span>
+                    <span>Disco</span>
+                    <span>Ações</span>
+                  </div>
+                  <div class="data-row">
+                    <span>04d1f883...</span>
+                    <span><span class="chip success">Saudável</span></span>
+                    <span><span class="chip">Produção</span></span>
+                    <span>22/01/2026, 13:57:07</span>
+                    <span>11d 20h 3m</span>
+                    <span class="muted">Sem leitura</span>
+                    <span class="muted">Sem leitura</span>
+                    <span class="muted">Sem leitura</span>
+                    <span class="row-actions">
+                      <button class="icon-btn action-icon" aria-label="Ver detalhes">
+                        <span class="material-symbols-rounded">more_vert</span>
+                      </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -940,8 +1081,8 @@
                   <div class="data-row header">
                     <span>Automação</span>
                     <span>Descrição</span>
-                    <span>Pacote</span>
                     <span>Última execução</span>
+                    <span>Linguagem</span>
                     <span>Prioridade</span>
                     <span>Status</span>
                     <span>Ações</span>
@@ -954,13 +1095,14 @@
                     data-automation-package="reports"
                     data-automation-version="v2.1.0"
                     data-automation-priority="medium"
+                    data-automation-language="csharp"
                     data-automation-params='{"periodicidade":"diaria","destino":"operacoes"}'
                     data-automation-status="active"
                   >
                     <span>Relatório diário</span>
                     <span class="muted">Gera relatórios operacionais diários.</span>
-                    <span>reports • v2.1.0</span>
                     <span>12/03/2025 • 08:30</span>
+                    <span><span class="chip automation-language-chip">C#</span></span>
                     <span><span class="chip priority-medium">Média</span></span>
                     <span class="automation-status-switch is-active">
                       <label class="switch small" for="automationStatusDaily">
@@ -989,13 +1131,14 @@
                     data-automation-package="queues"
                     data-automation-version="v1.4.0"
                     data-automation-priority="high"
+                    data-automation-language="csharp"
                     data-automation-params='{"fila":"critica","alerta":"imediato"}'
                     data-automation-status="inactive"
                   >
                     <span>Monitoramento de filas</span>
                     <span class="muted">Acompanha o volume das filas críticas.</span>
-                    <span>queues • v1.4.0</span>
                     <span>11/03/2025 • 18:10</span>
+                    <span><span class="chip automation-language-chip">C#</span></span>
                     <span><span class="chip priority-high">Alta</span></span>
                     <span class="automation-status-switch is-inactive">
                       <label class="switch small" for="automationStatusQueues">
@@ -1403,8 +1546,8 @@
               </div>
               <div class="page-header voice-messaging-create-head">
                 <div class="voice-messaging-create-title-wrap">
-                  <h2>Criar automação</h2>
-                  <p class="page-subtitle">Configure os dados principais e gere uma automação por descrição ou arquivo.</p>
+                  <h2 id="automationCreateTitle">Criar automação</h2>
+                  <p class="page-subtitle" id="automationCreateSubtitle">Configure os dados principais e gere uma automação por descrição ou arquivo.</p>
                 </div>
               </div>
 
@@ -1439,6 +1582,7 @@
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
+                      <p class="modal-field-hint">Defina a urgência usada para organizar e acompanhar a automação.</p>
                     </div>
                   </div>
 
@@ -1468,6 +1612,7 @@
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
+                      <p class="modal-field-hint">Use arquivos para fornecer dados de entrada à automação.</p>
                       <p class="modal-field-hint automation-resource-summary" id="automationCreateInputFileSummary" hidden></p>
                     </div>
 
@@ -1482,9 +1627,9 @@
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
+                      <p class="modal-field-hint">Use credenciais para liberar acessos seguros a sistemas, APIs e bancos durante a execução.</p>
                       <p class="modal-field-hint automation-resource-summary" id="automationCreateCredentialSummary" hidden></p>
                     </div>
-                    <p class="modal-field-hint automation-resource-help">Use arquivos para fornecer dados de entrada à automação e credenciais para liberar acessos seguros a sistemas, APIs e bancos durante a execução.</p>
                   </div>
 
                   <div class="automation-create-schedule-layout">
@@ -1501,7 +1646,6 @@
 
                     <aside class="automation-create-schedule-panel" id="automationCreateSchedulePanel" aria-label="Configurações do agendamento" hidden>
                       <div class="automation-create-schedule-panel-head">
-                        <span class="material-symbols-rounded" aria-hidden="true">event_repeat</span>
                         <div>
                           <h4>Configurar agenda</h4>
                           <p>Defina quando a automação será executada.</p>
@@ -1576,27 +1720,108 @@
 
                   <div class="automation-create-description-grid">
                     <div class="form-field">
-                      <label class="modal-label" for="automationCreateDescription">Descrição</label>
+                      <label class="modal-label" for="automationCreateDescription">Descrição ou pedido de mudança</label>
                       <textarea
                         class="modal-textarea"
                         id="automationCreateDescription"
                         name="automation_create_description"
                         rows="7"
                         maxlength="4000"
-                        placeholder="Descreva brevemente o que esta automação faz"
+                        placeholder="Descreva o que a automação faz ou peça uma mudança para a IA aplicar no código"
                       ></textarea>
                     </div>
                     <div class="automation-create-generator">
-                      <button class="btn primary automation-create-generate-btn" id="automationCreateGenerateBtn" type="button">
-                        <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
-                        Gerar por descrição
-                      </button>
-                      <button class="btn outline automation-create-upload-btn" id="automationCreateUploadBtn" type="button">
-                        <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
-                        Fazer upload de arquivo
-                      </button>
-                      <input id="automationCreateUploadInput" type="file" accept=".py,.js,.ts,.json,.yaml,.yml,.txt,.csv,.xlsx,.xls,.pdf" hidden />
-                      <p class="modal-field-hint" id="automationCreateUploadHint">Use uma descrição detalhada ou envie um arquivo de referência para acelerar a criação.</p>
+                      <div class="automation-code-preview" id="automationCreateCodePreview" aria-live="polite" hidden>
+                        <div class="automation-code-preview-head">
+                          <div>
+                            <h4>Pré-visualização do código com IA</h4>
+                            <p id="automationCreateCodeStatus">Revise o código gerado antes de criar a automação.</p>
+                          </div>
+                          <div class="automation-code-preview-head-actions">
+                            <span class="automation-code-preview-badge" id="automationCreateCodeBadge">Pendente</span>
+                            <button class="btn outline automation-code-history-toggle" id="automationCodeHistoryToggle" type="button" aria-expanded="false" aria-controls="automationCodeHistoryPanel">
+                              <span class="material-symbols-rounded" aria-hidden="true">history</span>
+                              Ver históricos de código
+                            </button>
+                          </div>
+                        </div>
+                        <pre class="automation-code-preview-block"><code id="automationCreateCodeContent"></code></pre>
+                        <div class="automation-code-history-panel" id="automationCodeHistoryPanel" hidden>
+                          <div class="automation-code-history-head">
+                            <h5>Histórico de versões</h5>
+                            <p>Todas as versões de código geradas ou enviadas para esta automação.</p>
+                          </div>
+                          <div class="automation-code-history-list" id="automationCodeHistoryList"></div>
+                          <p class="automation-code-history-empty" id="automationCodeHistoryEmpty" hidden>Nenhuma versão registrada ainda.</p>
+                        </div>
+                        <div class="automation-code-rejected-state" id="automationCreateCodeRejectedState" hidden>
+                          <i data-lucide="refresh-cw" aria-hidden="true"></i>
+                          <p>Revise a descrição ou peça uma mudança com mais detalhes sobre entrada, regras de negócio e saída esperada. Depois use a IA para criar uma nova versão mais próxima do que você precisa.</p>
+                        </div>
+                        <div class="automation-code-preview-actions">
+                          <button class="btn outline automation-code-reject-btn" id="automationCreateCodeRejectBtn" type="button">
+                            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                            Reprovar
+                          </button>
+                          <button class="btn primary automation-code-approve-btn" id="automationCreateCodeApproveBtn" type="button">
+                            <span class="material-symbols-rounded" aria-hidden="true">check</span>
+                            Aprovar
+                          </button>
+                        </div>
+                      </div>
+                      <div class="automation-code-edit-actions">
+                        <button class="btn primary automation-create-generate-btn" id="automationCreateGenerateBtn" type="button">
+                          <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+                          Gerar código com IA
+                        </button>
+                        <button class="btn outline automation-create-upload-btn" id="automationCreateUploadBtn" type="button">
+                          <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                          Fazer upload do código
+                        </button>
+                      </div>
+                      <div class="automation-upload-selected" id="automationUploadSelectedState" hidden>
+                        <div class="automation-upload-selected-head">
+                          <div class="automation-upload-selected-icon">
+                            <span class="material-symbols-rounded" aria-hidden="true">draft</span>
+                          </div>
+                          <div class="automation-upload-selected-copy">
+                            <strong id="automationUploadSelectedName">codigo.cs</strong>
+                            <span id="automationUploadSelectedMeta">Arquivo de código selecionado</span>
+                          </div>
+                          <button class="btn outline automation-upload-change-btn" id="automationUploadChangeBtn" type="button">
+                            <span class="material-symbols-rounded" aria-hidden="true">sync_alt</span>
+                            Trocar arquivo
+                          </button>
+                        </div>
+                        <div class="automation-upload-confirm">
+                          <span class="material-symbols-rounded" aria-hidden="true">verified</span>
+                          <p>Confirme se este é o código correto na pré-visualização abaixo antes de aprovar.</p>
+                        </div>
+                        <div class="automation-upload-zip" id="automationUploadZipSummary" hidden>
+                          <div class="automation-upload-zip-head">
+                            <span class="material-symbols-rounded" aria-hidden="true">folder_zip</span>
+                            <strong id="automationUploadZipTitle">Arquivos dentro do ZIP</strong>
+                          </div>
+                          <ul id="automationUploadZipList"></ul>
+                        </div>
+                      </div>
+                      <div class="automation-ai-edit-prompt" id="automationAiEditPrompt" hidden>
+                        <div class="automation-ai-input-shell">
+                          <input
+                            id="automationAiEditInput"
+                            class="automation-ai-input"
+                            type="text"
+                            maxlength="1000"
+                            autocomplete="off"
+                            placeholder="Peça a mudança que a IA deve aplicar no código"
+                          />
+                          <button class="automation-ai-send" id="automationAiEditSend" type="button" aria-label="Enviar pedido para IA" disabled>
+                            <span class="material-symbols-rounded" aria-hidden="true">arrow_upward</span>
+                          </button>
+                        </div>
+                      </div>
+                      <input id="automationCreateUploadInput" type="file" accept=".cs,.java,.py,.zip,application/zip,application/x-zip-compressed,text/plain" hidden />
+                      <p class="modal-field-hint" id="automationCreateUploadHint">Use a descrição para pedir mudanças com IA ou envie um arquivo .cs, .java, .py ou .zip.</p>
                     </div>
                   </div>
                 </section>
@@ -5421,7 +5646,7 @@
             <div class="modal-dialog credential-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="inputFileModalTitle">
               <form id="inputFileModalForm">
                 <div class="modal-header">
-                  <h3 id="inputFileModalTitle">Criar arquivo de entrada</h3>
+                  <h3 id="inputFileModalTitle">Adicionar arquivo</h3>
                   <button class="icon-btn" aria-label="Fechar" data-input-file-modal-close type="button">
                     <span class="material-symbols-rounded">close</span>
                   </button>
@@ -5449,14 +5674,16 @@
                     </div>
 
                     <div>
-                      <label class="modal-label modal-label--required" for="inputFileVisibilitySelect">Visibilidade</label>
-                      <div class="hub-select-wrap hub-select-wrap--block credential-select-wrap">
-                        <select class="hub-select" id="inputFileVisibilitySelect" name="visibility" required>
-                          <option value="Privado">Privado</option>
-                          <option value="Público">Público</option>
-                        </select>
-                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                      </div>
+                      <label class="modal-label modal-label--required" for="inputFileModalUploadInput">Arquivo</label>
+                      <input id="inputFileModalUploadInput" name="file" type="file" accept=".csv,.json,.txt,.xlsx,.xls,.pdf,text/csv,application/json,text/plain,application/pdf" hidden required />
+                      <button class="input-file-modal-upload" id="inputFileModalUploadButton" type="button">
+                        <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                        <span>
+                          <strong id="inputFileModalUploadTitle">Fazer upload do arquivo</strong>
+                          <small id="inputFileModalUploadMeta">CSV, JSON, TXT, XLSX ou PDF</small>
+                        </span>
+                      </button>
+                      <p class="modal-field-hint" id="inputFileModalUploadHint">Selecione o arquivo que será usado nas automações.</p>
                     </div>
                   </section>
                 </div>
@@ -7822,28 +8049,24 @@
               <div class="profile-security-grid">
                 <div class="profile-security-card">
                   <div class="profile-card-header">
-                    <span class="material-symbols-rounded" aria-hidden="true">alternate_email</span>
                     <div>
-                      <h3>Alterar email</h3>
-                      <p>Confirme o email atual e valide o novo endereço por código.</p>
+                      <h3>Alterar e-mail</h3>
+                      <p>Confirme o e-mail atual e valide o novo endereço por código.</p>
                     </div>
                   </div>
                   <button class="btn primary profile-action-btn" id="openProfileEmailModal" type="button">
-                    <span class="material-symbols-rounded">alternate_email</span>
-                    Alterar email
+                    Alterar e-mail
                   </button>
                 </div>
 
                 <div class="profile-security-card">
                   <div class="profile-card-header">
-                    <span class="material-symbols-rounded" aria-hidden="true">lock_reset</span>
                     <div>
                       <h3>Alterar senha</h3>
                       <p>Receba um código no email do usuário antes de criar uma nova senha.</p>
                     </div>
                   </div>
                   <button class="btn primary profile-action-btn" id="openProfilePasswordModal" type="button">
-                    <span class="material-symbols-rounded">lock_reset</span>
                     Alterar senha
                   </button>
                 </div>
@@ -7857,8 +8080,8 @@
               <form id="profileEmailForm">
                 <div class="modal-header">
                   <div>
-                    <h3 id="profileEmailModalTitle">Alterar email</h3>
-                    <p class="modal-subtitle">Confirme o endereço atual e valide o novo email antes de salvar.</p>
+                    <h3 id="profileEmailModalTitle">Alterar e-mail</h3>
+                    <p class="modal-subtitle">Confirme o endereço atual e valide o novo e-mail antes de salvar.</p>
                   </div>
                   <button class="icon-btn" type="button" aria-label="Fechar" data-profile-modal-close>
                     <span class="material-symbols-rounded">close</span>
@@ -7868,14 +8091,14 @@
                   <div class="profile-step">
                     <span class="profile-step-number">1</span>
                     <div>
-                      <h4>Email atual</h4>
-                      <p>Envie um código para confirmar que este email pertence ao usuário.</p>
+                      <h4>E-mail atual</h4>
+                      <p>Envie um código para confirmar que este e-mail pertence ao usuário.</p>
                     </div>
                   </div>
-                  <label class="modal-label modal-label--required" for="profileCurrentEmail">Email atual</label>
+                  <label class="modal-label modal-label--required" for="profileCurrentEmail">E-mail atual</label>
                   <input class="modal-input" id="profileCurrentEmail" type="email" value="admin@1wes.com" autocomplete="email" required />
 
-                  <label class="modal-label modal-label--required" for="profileCurrentEmailCode">Código do email atual</label>
+                  <label class="modal-label modal-label--required" for="profileCurrentEmailCode">Código do e-mail atual</label>
                   <div class="profile-code-row">
                     <input class="modal-input profile-code-input" id="profileCurrentEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
                     <button class="btn outline" id="profileSendCurrentEmailCode" type="button">Enviar código</button>
@@ -7884,23 +8107,23 @@
                   <div class="profile-step">
                     <span class="profile-step-number">2</span>
                     <div>
-                      <h4>Novo email</h4>
+                      <h4>Novo e-mail</h4>
                       <p>Depois confirme o novo endereço com outro código.</p>
                     </div>
                   </div>
-                  <label class="modal-label modal-label--required" for="profileNewEmail">Novo email</label>
+                  <label class="modal-label modal-label--required" for="profileNewEmail">Novo e-mail</label>
                   <div class="profile-code-row">
                     <input class="modal-input" id="profileNewEmail" type="email" placeholder="novo.email@empresa.com" autocomplete="email" required />
                     <button class="btn outline" id="profileSendNewEmailCode" type="button" disabled>Enviar código</button>
                   </div>
 
-                  <label class="modal-label modal-label--required" for="profileNewEmailCode">Código do novo email</label>
+                  <label class="modal-label modal-label--required" for="profileNewEmailCode">Código do novo e-mail</label>
                   <input class="modal-input profile-code-input" id="profileNewEmailCode" type="text" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="one-time-code" required />
                   <p class="profile-form-feedback" id="profileEmailFeedback" hidden></p>
                 </div>
                 <div class="modal-footer">
                   <button class="btn outline" type="button" data-profile-modal-close>Cancelar</button>
-                  <button class="btn primary" id="profileEmailSubmit" type="submit" disabled>Salvar email</button>
+                  <button class="btn primary" id="profileEmailSubmit" type="submit" disabled>Salvar e-mail</button>
                 </div>
               </form>
             </div>

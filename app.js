@@ -85,7 +85,11 @@ const inputFileModal = document.getElementById('inputFileModal');
 const inputFileModalForm = document.getElementById('inputFileModalForm');
 const inputFileNameInput = document.getElementById('inputFileNameInput');
 const inputFileTypeSelect = document.getElementById('inputFileTypeSelect');
-const inputFileVisibilitySelect = document.getElementById('inputFileVisibilitySelect');
+const inputFileModalUploadInput = document.getElementById('inputFileModalUploadInput');
+const inputFileModalUploadButton = document.getElementById('inputFileModalUploadButton');
+const inputFileModalUploadTitle = document.getElementById('inputFileModalUploadTitle');
+const inputFileModalUploadMeta = document.getElementById('inputFileModalUploadMeta');
+const inputFileModalUploadHint = document.getElementById('inputFileModalUploadHint');
 const voiceMessagingFilterBtn = document.getElementById('voiceMessagingFilterBtn');
 const voiceMessagingFilterMenu = document.getElementById('voiceMessagingFilterMenu');
 const openVoiceMessagingInsightsPage = document.getElementById('openVoiceMessagingInsightsPage');
@@ -399,6 +403,8 @@ const automationCreateBackBtn = document.getElementById('automationCreateBackBtn
 const automationCreateCancelBtn = document.getElementById('automationCreateCancelBtn');
 const automationCreateForm = document.getElementById('automationCreateForm');
 const automationCreateError = document.getElementById('automationCreateError');
+const automationCreateTitle = document.getElementById('automationCreateTitle');
+const automationCreateSubtitle = document.getElementById('automationCreateSubtitle');
 const automationCreateName = document.getElementById('automationCreateName');
 const automationCreatePriority = document.getElementById('automationCreatePriority');
 const automationCreateDescription = document.getElementById('automationCreateDescription');
@@ -406,6 +412,27 @@ const automationCreateGenerateBtn = document.getElementById('automationCreateGen
 const automationCreateUploadBtn = document.getElementById('automationCreateUploadBtn');
 const automationCreateUploadInput = document.getElementById('automationCreateUploadInput');
 const automationCreateUploadHint = document.getElementById('automationCreateUploadHint');
+const automationUploadSelectedState = document.getElementById('automationUploadSelectedState');
+const automationUploadSelectedName = document.getElementById('automationUploadSelectedName');
+const automationUploadSelectedMeta = document.getElementById('automationUploadSelectedMeta');
+const automationUploadChangeBtn = document.getElementById('automationUploadChangeBtn');
+const automationUploadZipSummary = document.getElementById('automationUploadZipSummary');
+const automationUploadZipTitle = document.getElementById('automationUploadZipTitle');
+const automationUploadZipList = document.getElementById('automationUploadZipList');
+const automationCreateCodePreview = document.getElementById('automationCreateCodePreview');
+const automationCreateCodeContent = document.getElementById('automationCreateCodeContent');
+const automationCreateCodeStatus = document.getElementById('automationCreateCodeStatus');
+const automationCreateCodeBadge = document.getElementById('automationCreateCodeBadge');
+const automationCreateCodeApproveBtn = document.getElementById('automationCreateCodeApproveBtn');
+const automationCreateCodeRejectBtn = document.getElementById('automationCreateCodeRejectBtn');
+const automationCreateCodeRejectedState = document.getElementById('automationCreateCodeRejectedState');
+const automationCodeHistoryToggle = document.getElementById('automationCodeHistoryToggle');
+const automationCodeHistoryPanel = document.getElementById('automationCodeHistoryPanel');
+const automationCodeHistoryList = document.getElementById('automationCodeHistoryList');
+const automationCodeHistoryEmpty = document.getElementById('automationCodeHistoryEmpty');
+const automationAiEditPrompt = document.getElementById('automationAiEditPrompt');
+const automationAiEditInput = document.getElementById('automationAiEditInput');
+const automationAiEditSend = document.getElementById('automationAiEditSend');
 const automationCreateLanguage = document.getElementById('automationCreateLanguage');
 const automationCreateScheduled = document.getElementById('automationCreateScheduled');
 const automationCreateSchedulePanel = document.getElementById('automationCreateSchedulePanel');
@@ -3027,6 +3054,26 @@ function formatAutomationParamsValue(rawValue) {
   }
 }
 
+function parseAutomationParams(rawValue) {
+  const sourceText = String(rawValue || '').trim();
+  if (!sourceText) return {};
+
+  try {
+    const parsed = JSON.parse(sourceText);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function normalizeAutomationArrayValue(value) {
+  if (Array.isArray(value)) {
+    return value.map((item) => String(item || '').trim()).filter(Boolean);
+  }
+  const singleValue = String(value || '').trim();
+  return singleValue ? [singleValue] : [];
+}
+
 function getTodayDateInputValue() {
   const now = new Date();
   const timezoneOffset = now.getTimezoneOffset() * 60000;
@@ -3046,7 +3093,7 @@ function createAutomationRow(data) {
   const status = data.status === 'inactive' ? 'inactive' : 'active';
   const switchId = `automationStatus${automationId.replace(/[^a-zA-Z0-9]+/g, '') || Date.now()}`;
   const priority = data.priority === 'high' || data.priority === 'low' ? data.priority : 'medium';
-  const packageDisplay = String(data.packageDisplay || '').trim() || formatAutomationPackageDisplay(data.packageId, data.version);
+  const language = String(data.language || data.paramsObject?.language || '').trim() || 'csharp';
 
   row.className = 'data-row automation-row';
   row.dataset.automationId = automationId;
@@ -3057,14 +3104,14 @@ function createAutomationRow(data) {
   row.dataset.automationPriority = priority;
   row.dataset.automationParams = JSON.stringify(data.paramsObject || {});
   row.dataset.automationStatus = status;
-  if (data.language) row.dataset.automationLanguage = data.language;
+  row.dataset.automationLanguage = language;
   row.dataset.automationScheduled = data.scheduled ? 'true' : 'false';
 
   row.innerHTML = `
     <span>${escapeHtmlWes(data.name)}</span>
     <span class="muted">${escapeHtmlWes(data.description)}</span>
-    <span>${escapeHtmlWes(packageDisplay)}</span>
     <span>${escapeHtmlWes(data.lastExecution || 'Ainda não executada')}</span>
+    <span><span class="chip automation-language-chip">${escapeHtmlWes(getAutomationLanguageLabel(language))}</span></span>
     <span><span class="chip ${getAutomationPriorityClass(priority)}">${getAutomationPriorityLabel(priority)}</span></span>
     <span class="automation-status-switch ${status === 'active' ? 'is-active' : 'is-inactive'}">
       <label class="switch small" for="${escapeHtmlWes(switchId)}">
@@ -3093,17 +3140,45 @@ function readAutomationRowData(row) {
   if (!row) return null;
   const cells = row.querySelectorAll(':scope > span');
   const paramsValue = formatAutomationParamsValue(row.dataset.automationParams);
+  const paramsObject = parseAutomationParams(paramsValue);
+  const scheduleParams = paramsObject.schedule && typeof paramsObject.schedule === 'object'
+    ? paramsObject.schedule
+    : {};
+  const packageId = String(row.dataset.automationPackage || '').trim();
+  const language = String(
+    row.dataset.automationLanguage ||
+    paramsObject.language ||
+    (['csharp', 'java', 'python'].includes(packageId) ? packageId : '') ||
+    'csharp'
+  ).trim();
+  const isScheduled = row.dataset.automationScheduled === 'true' ||
+    paramsObject.scheduled === true ||
+    Boolean(paramsObject.schedule) ||
+    Boolean(paramsObject.horario_agendamento);
   const statusInput = row.querySelector('.automation-status-switch input');
 
   return {
     id: String(row.dataset.automationId || '').trim(),
     name: String(row.dataset.automationName || cells[0]?.textContent || '').trim(),
     description: String(row.dataset.automationDescription || cells[1]?.textContent || '').trim(),
-    packageId: String(row.dataset.automationPackage || '').trim(),
+    packageId,
     version: String(row.dataset.automationVersion || '').trim(),
     priority: String(row.dataset.automationPriority || 'medium').trim(),
     params: paramsValue,
-    lastExecution: String(cells[3]?.textContent || '').trim(),
+    paramsObject,
+    language,
+    scheduled: isScheduled,
+    schedule: isScheduled ? {
+      time: String(scheduleParams.time || paramsObject.horario_agendamento || '09:00').trim(),
+      frequency: String(scheduleParams.frequency || paramsObject.repeticao || paramsObject.periodicidade || 'daily').trim(),
+      startDate: String(scheduleParams.start_date || paramsObject.data_inicio || getTodayDateInputValue()).trim(),
+      endDate: String(scheduleParams.end_date || paramsObject.data_termino || getFutureDateInputValue(5)).trim(),
+      weekdays: normalizeAutomationArrayValue(scheduleParams.weekdays || paramsObject.dias_semana),
+    } : null,
+    inputFiles: normalizeAutomationArrayValue(paramsObject.input_files || paramsObject.input_file),
+    credentials: normalizeAutomationArrayValue(paramsObject.credentials || paramsObject.credential),
+    generatedCode: String(paramsObject.generated_code || '').trim(),
+    lastExecution: String(cells[2]?.textContent || '').trim(),
     status: statusInput?.checked ? 'active' : 'inactive',
   };
 }
@@ -6110,12 +6185,57 @@ function closeInputFileModal() {
   activeInputFileSelectTarget = null;
 }
 
+function getInputFileTypeFromName(fileName = '') {
+  const extension = String(fileName || '').split('.').pop()?.toLowerCase() || '';
+  if (extension === 'csv') return 'CSV';
+  if (extension === 'json') return 'JSON';
+  if (extension === 'txt') return 'TXT';
+  if (extension === 'xlsx' || extension === 'xls') return 'XLSX';
+  if (extension === 'pdf') return 'PDF';
+  return '';
+}
+
+function resetInputFileModalUploadState() {
+  if (inputFileModalUploadInput) inputFileModalUploadInput.value = '';
+  if (inputFileModalUploadTitle) inputFileModalUploadTitle.textContent = 'Fazer upload do arquivo';
+  if (inputFileModalUploadMeta) inputFileModalUploadMeta.textContent = 'CSV, JSON, TXT, XLSX ou PDF';
+  if (inputFileModalUploadHint) {
+    inputFileModalUploadHint.textContent = 'Selecione o arquivo que será usado nas automações.';
+    inputFileModalUploadHint.classList.remove('is-error', 'is-success');
+  }
+}
+
+function syncInputFileModalUploadState(file) {
+  if (!file) {
+    resetInputFileModalUploadState();
+    return;
+  }
+  const detectedType = getInputFileTypeFromName(file.name);
+  if (detectedType && inputFileTypeSelect) {
+    inputFileTypeSelect.value = detectedType;
+  }
+  if (inputFileNameInput && !String(inputFileNameInput.value || '').trim()) {
+    inputFileNameInput.value = file.name;
+  }
+  if (inputFileModalUploadTitle) inputFileModalUploadTitle.textContent = file.name;
+  if (inputFileModalUploadMeta) {
+    const size = typeof formatAutomationFileSize === 'function' ? formatAutomationFileSize(file.size) : '';
+    inputFileModalUploadMeta.textContent = [detectedType || 'Arquivo', size].filter(Boolean).join(' · ');
+  }
+  if (inputFileModalUploadHint) {
+    inputFileModalUploadHint.textContent = 'Arquivo selecionado para upload.';
+    inputFileModalUploadHint.classList.remove('is-error');
+    inputFileModalUploadHint.classList.add('is-success');
+  }
+  refreshCredentialSelectWraps(inputFileModal);
+}
+
 function openInputFileModal(options = {}) {
   if (!inputFileModal || !inputFileModalForm) return;
   activeInputFileSelectTarget = options.targetSelect || null;
   inputFileModalForm.reset();
+  resetInputFileModalUploadState();
   if (inputFileTypeSelect) inputFileTypeSelect.value = 'CSV';
-  if (inputFileVisibilitySelect) inputFileVisibilitySelect.value = 'Privado';
   refreshCredentialSelectWraps(inputFileModal);
   inputFileModal.classList.add('open');
   inputFileModal.setAttribute('aria-hidden', 'false');
@@ -6127,12 +6247,30 @@ if (inputFileModal && inputFileModalForm) {
     if (event.target.closest('[data-input-file-modal-close]')) closeInputFileModal();
   });
 
+  inputFileModalUploadButton?.addEventListener('click', () => {
+    inputFileModalUploadInput?.click();
+  });
+
+  inputFileModalUploadInput?.addEventListener('change', () => {
+    syncInputFileModalUploadState(inputFileModalUploadInput.files?.[0] || null);
+  });
+
   inputFileModalForm.addEventListener('submit', (event) => {
     event.preventDefault();
     const name = String(inputFileNameInput?.value || '').trim();
     const type = String(inputFileTypeSelect?.value || '').trim() || 'CSV';
-    const visibility = String(inputFileVisibilitySelect?.value || '').trim() || 'Privado';
+    const file = inputFileModalUploadInput?.files?.[0] || null;
+    const visibility = 'Privado';
     if (!name) return;
+    if (!file) {
+      if (inputFileModalUploadHint) {
+        inputFileModalUploadHint.textContent = 'Faça upload de um arquivo para salvar.';
+        inputFileModalUploadHint.classList.add('is-error');
+        inputFileModalUploadHint.classList.remove('is-success');
+      }
+      inputFileModalUploadButton?.focus();
+      return;
+    }
 
     if (inputFilesTable) {
       const row = document.createElement('div');
@@ -9785,6 +9923,28 @@ if (automationStatusSwitches.length) {
       inputFileSummary: automationCreateInputFileSummary,
       credential: automationCreateCredential,
       credentialSummary: automationCreateCredentialSummary,
+      codePreview: automationCreateCodePreview,
+      codeContent: automationCreateCodeContent,
+      codeStatus: automationCreateCodeStatus,
+      codeBadge: automationCreateCodeBadge,
+      codeApprove: automationCreateCodeApproveBtn,
+      codeReject: automationCreateCodeRejectBtn,
+      codeRejectedState: automationCreateCodeRejectedState,
+      uploadSelectedState: automationUploadSelectedState,
+      uploadSelectedName: automationUploadSelectedName,
+      uploadSelectedMeta: automationUploadSelectedMeta,
+      uploadChange: automationUploadChangeBtn,
+      uploadZipSummary: automationUploadZipSummary,
+      uploadZipTitle: automationUploadZipTitle,
+      uploadZipList: automationUploadZipList,
+      historyToggle: automationCodeHistoryToggle,
+      historyPanel: automationCodeHistoryPanel,
+      historyList: automationCodeHistoryList,
+      historyEmpty: automationCodeHistoryEmpty,
+      aiPrompt: automationAiEditPrompt,
+      aiInput: automationAiEditInput,
+      aiSend: automationAiEditSend,
+      submit: automationCreateSubmit,
       scrollTarget: document.getElementById('page-automations-create'),
     };
   }
@@ -9891,6 +10051,637 @@ if (automationStatusSwitches.length) {
 
   function getAutomationCustomDayInputs(controls = getAutomationCreateControls()) {
     return Array.from(controls?.customDays?.querySelectorAll('input[name="automation_create_weekday"]') || []);
+  }
+
+  function getAutomationUploadDefaultHint() {
+    return 'Use a descrição para pedir mudanças com IA ou envie um arquivo .cs, .java, .py ou .zip.';
+  }
+
+  function setAutomationUploadHint(message = getAutomationUploadDefaultHint(), state = '') {
+    if (!automationCreateUploadHint) return;
+    automationCreateUploadHint.textContent = message;
+    automationCreateUploadHint.classList.toggle('is-error', state === 'error');
+    automationCreateUploadHint.classList.toggle('is-success', state === 'success');
+  }
+
+  function formatAutomationFileSize(size = 0) {
+    const bytes = Number(size || 0);
+    if (!Number.isFinite(bytes) || bytes <= 0) return '';
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  function getAutomationZipDisplayEntries(entryNames = []) {
+    const uniqueEntries = Array.from(new Set(
+      entryNames
+        .map((name) => String(name || '').trim())
+        .filter(Boolean),
+    ));
+    const fileEntries = uniqueEntries.filter((name) => !name.endsWith('/'));
+    return fileEntries.length ? fileEntries : uniqueEntries;
+  }
+
+  function clearAutomationUploadSelectedState(controls = getAutomationCreateControls()) {
+    if (controls?.uploadSelectedState) controls.uploadSelectedState.hidden = true;
+    if (controls?.uploadSelectedName) controls.uploadSelectedName.textContent = '';
+    if (controls?.uploadSelectedMeta) controls.uploadSelectedMeta.textContent = '';
+    if (controls?.uploadZipSummary) controls.uploadZipSummary.hidden = true;
+    if (controls?.uploadZipTitle) controls.uploadZipTitle.textContent = 'Arquivos dentro do ZIP';
+    if (controls?.uploadZipList) controls.uploadZipList.innerHTML = '';
+  }
+
+  function renderAutomationUploadSelectedState(controls, file, options = {}) {
+    if (!controls?.uploadSelectedState || !file) return;
+    const languageLabel = options.language
+      ? getAutomationLanguageLabel(options.language)
+      : 'Linguagem não detectada';
+    const fileSize = formatAutomationFileSize(file.size);
+    const fileKind = options.isZip ? 'Pacote ZIP selecionado' : 'Arquivo de código selecionado';
+    const metaParts = [fileKind, languageLabel, fileSize].filter(Boolean);
+
+    if (controls.uploadSelectedName) controls.uploadSelectedName.textContent = file.name;
+    if (controls.uploadSelectedMeta) controls.uploadSelectedMeta.textContent = metaParts.join(' · ');
+
+    const zipEntries = options.isZip ? getAutomationZipDisplayEntries(options.zipEntryNames || []) : [];
+    if (controls.uploadZipSummary && controls.uploadZipList) {
+      controls.uploadZipSummary.hidden = !options.isZip;
+      controls.uploadZipList.innerHTML = '';
+      if (options.isZip) {
+        const listedEntries = zipEntries.slice(0, 30);
+        if (controls.uploadZipTitle) {
+          controls.uploadZipTitle.textContent = zipEntries.length
+            ? `Arquivos dentro do ZIP (${zipEntries.length})`
+            : 'Arquivos dentro do ZIP';
+        }
+        if (listedEntries.length) {
+          controls.uploadZipList.innerHTML = listedEntries
+            .map((name) => `<li><span class="material-symbols-rounded" aria-hidden="true">description</span><span>${escapeHtmlWes(name)}</span></li>`)
+            .join('');
+          if (zipEntries.length > listedEntries.length) {
+            controls.uploadZipList.insertAdjacentHTML(
+              'beforeend',
+              `<li class="automation-upload-zip-more"><span class="material-symbols-rounded" aria-hidden="true">more_horiz</span><span>Mais ${zipEntries.length - listedEntries.length} arquivo(s)</span></li>`,
+            );
+          }
+        } else {
+          controls.uploadZipList.innerHTML = '<li><span class="material-symbols-rounded" aria-hidden="true">error</span><span>Não foi possível listar os arquivos deste ZIP.</span></li>';
+        }
+      }
+    }
+
+    controls.uploadSelectedState.hidden = false;
+  }
+
+  function detectAutomationLanguageFromNames(names = []) {
+    const scores = { csharp: 0, java: 0, python: 0 };
+    names.forEach((name) => {
+      const normalized = String(name || '').toLowerCase();
+      if (!normalized) return;
+      if (
+        normalized.endsWith('.cs') ||
+        normalized.endsWith('.csproj') ||
+        normalized.endsWith('.sln') ||
+        normalized.includes('csharp') ||
+        normalized.includes('c-sharp') ||
+        normalized.includes('dotnet') ||
+        normalized.includes('c#')
+      ) {
+        scores.csharp += 1;
+      }
+      if (
+        normalized.endsWith('.java') ||
+        normalized.endsWith('/pom.xml') ||
+        normalized === 'pom.xml' ||
+        normalized.endsWith('build.gradle') ||
+        normalized.endsWith('gradlew')
+      ) {
+        scores.java += 1;
+      }
+      if (
+        normalized.endsWith('.py') ||
+        normalized.endsWith('/requirements.txt') ||
+        normalized === 'requirements.txt' ||
+        normalized.endsWith('/pyproject.toml') ||
+        normalized === 'pyproject.toml' ||
+        normalized.endsWith('/setup.py') ||
+        normalized === 'setup.py'
+      ) {
+        scores.python += 1;
+      }
+    });
+
+    return Object.entries(scores)
+      .sort((a, b) => b[1] - a[1])
+      .find(([, score]) => score > 0)?.[0] || '';
+  }
+
+  function detectAutomationCodeFileLanguageFromNames(names = []) {
+    const scores = { csharp: 0, java: 0, python: 0 };
+    names.forEach((name) => {
+      const normalized = String(name || '').toLowerCase();
+      if (normalized.endsWith('.cs')) scores.csharp += 1;
+      if (normalized.endsWith('.java')) scores.java += 1;
+      if (normalized.endsWith('.py')) scores.python += 1;
+    });
+
+    return Object.entries(scores)
+      .sort((a, b) => b[1] - a[1])
+      .find(([, score]) => score > 0)?.[0] || '';
+  }
+
+  async function readAutomationZipEntryNames(file) {
+    const buffer = await file.arrayBuffer();
+    const view = new DataView(buffer);
+    const decoder = new TextDecoder();
+    const names = [];
+    for (let offset = 0; offset <= view.byteLength - 46 && names.length < 300; offset += 1) {
+      if (view.getUint32(offset, true) !== 0x02014b50) continue;
+      const nameLength = view.getUint16(offset + 28, true);
+      const extraLength = view.getUint16(offset + 30, true);
+      const commentLength = view.getUint16(offset + 32, true);
+      const nameStart = offset + 46;
+      const nameEnd = nameStart + nameLength;
+      if (nameEnd > view.byteLength) break;
+      names.push(decoder.decode(new Uint8Array(buffer, nameStart, nameLength)));
+      offset = nameEnd + extraLength + commentLength - 1;
+    }
+    return names;
+  }
+
+  async function detectAutomationUploadLanguage(file) {
+    const fromName = detectAutomationLanguageFromNames([file?.name]);
+    if (fromName) return fromName;
+    try {
+      return detectAutomationLanguageFromNames(await readAutomationZipEntryNames(file));
+    } catch {
+      return '';
+    }
+  }
+
+  function isAutomationZipUpload(file) {
+    return String(file?.name || '').toLowerCase().endsWith('.zip');
+  }
+
+  function isAutomationSourceCodeUpload(file) {
+    return /\.(cs|java|py)$/i.test(String(file?.name || ''));
+  }
+
+  async function readAutomationUploadedSourceCode(file) {
+    if (!file || !isAutomationSourceCodeUpload(file)) return '';
+    return file.text();
+  }
+
+  function getAutomationCodeLanguageMeta(language) {
+    if (language === 'java') {
+      return { label: 'Java', className: 'AutomacaoGerada', functionName: 'executar' };
+    }
+    if (language === 'python') {
+      return { label: 'Python', className: 'automacao_gerada', functionName: 'executar' };
+    }
+    return { label: 'C#', className: 'AutomacaoGerada', functionName: 'RunAsync' };
+  }
+
+  function toAutomationCodeIdentifier(value, fallback = 'AutomacaoGerada') {
+    const cleaned = String(value || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
+    return cleaned || fallback;
+  }
+
+  function buildAutomationGeneratedCode(controls, draftParams) {
+    const language = String(draftParams?.language || controls?.language?.value || 'csharp');
+    const meta = getAutomationCodeLanguageMeta(language);
+    const name = String(controls?.name?.value || 'Automação gerada').trim();
+    const description = String(draftParams?.description || controls?.description?.value || 'Sem descrição').trim();
+    const className = toAutomationCodeIdentifier(name, meta.className);
+    const scheduleLine = draftParams?.schedule
+      ? `${draftParams.schedule.frequency} às ${draftParams.schedule.time}`
+      : 'execução manual';
+    const resourceLines = [];
+    if (draftParams?.input_files?.length) resourceLines.push(`Arquivos: ${draftParams.input_files.join(', ')}`);
+    if (draftParams?.credentials?.length) resourceLines.push(`Credenciais: ${draftParams.credentials.join(', ')}`);
+    const resources = resourceLines.length ? resourceLines.join(' | ') : 'Sem recursos externos';
+
+    if (language === 'python') {
+      return [
+        'import json',
+        'from datetime import datetime',
+        '',
+        '',
+        `def ${meta.functionName}():`,
+        `    """${description.replace(/"/g, '\\"')}"""`,
+        '    contexto = {',
+        `        "nome": "${name.replace(/"/g, '\\"')}",`,
+        `        "agendamento": "${scheduleLine.replace(/"/g, '\\"')}",`,
+        `        "recursos": "${resources.replace(/"/g, '\\"')}",`,
+        '        "gerado_em": datetime.utcnow().isoformat(),',
+        '    }',
+        '    print(json.dumps(contexto, ensure_ascii=False))',
+        '    return contexto',
+        '',
+        '',
+        'if __name__ == "__main__":',
+        `    ${meta.functionName}()`,
+      ].join('\n');
+    }
+
+    if (language === 'java') {
+      return [
+        'import java.time.Instant;',
+        '',
+        `public class ${className} {`,
+        `    public void ${meta.functionName}() {`,
+        `        String nome = "${name.replace(/"/g, '\\"')}";`,
+        `        String descricao = "${description.replace(/"/g, '\\"')}";`,
+        `        String agendamento = "${scheduleLine.replace(/"/g, '\\"')}";`,
+        `        String recursos = "${resources.replace(/"/g, '\\"')}";`,
+        '        System.out.println("Executando " + nome);',
+        '        System.out.println(descricao);',
+        '        System.out.println("Agendamento: " + agendamento);',
+        '        System.out.println("Recursos: " + recursos);',
+        '        System.out.println("Gerado em: " + Instant.now());',
+        '    }',
+        '}',
+      ].join('\n');
+    }
+
+    return [
+      'using System;',
+      'using System.Threading.Tasks;',
+      '',
+      `public class ${className}`,
+      '{',
+      `    public async Task ${meta.functionName}()`,
+      '    {',
+      `        var nome = "${name.replace(/"/g, '\\"')}";`,
+      `        var descricao = "${description.replace(/"/g, '\\"')}";`,
+      `        var agendamento = "${scheduleLine.replace(/"/g, '\\"')}";`,
+      `        var recursos = "${resources.replace(/"/g, '\\"')}";`,
+      '        Console.WriteLine($"Executando {nome}");',
+      '        Console.WriteLine(descricao);',
+      '        Console.WriteLine($"Agendamento: {agendamento}");',
+      '        Console.WriteLine($"Recursos: {recursos}");',
+      '        await Task.CompletedTask;',
+      '    }',
+      '}',
+    ].join('\n');
+  }
+
+  function buildAutomationZipPreviewCode(file, entryNames = []) {
+    const listedEntries = entryNames.slice(0, 20);
+    const lines = [
+      `// Pacote de código enviado: ${file?.name || 'automacao.zip'}`,
+      '// O ZIP será usado como novo código da automação.',
+      '// Arquivos identificados no pacote:',
+      ...(
+        listedEntries.length
+          ? listedEntries.map((name) => `// - ${name}`)
+          : ['// - Não foi possível listar os arquivos do ZIP neste navegador.']
+      ),
+    ];
+    if (entryNames.length > listedEntries.length) {
+      lines.push(`// - ... mais ${entryNames.length - listedEntries.length} arquivo(s)`);
+    }
+    return lines.join('\n');
+  }
+
+  function getAutomationCodeHistory(paramsObject = {}) {
+    const history = Array.isArray(paramsObject.code_history) ? paramsObject.code_history : [];
+    return history
+      .map((entry, index) => ({
+        id: String(entry?.id || `version-${index + 1}`).trim(),
+        version: Number(entry?.version || index + 1),
+        title: String(entry?.title || `Versão ${index + 1}`).trim(),
+        source: String(entry?.source || 'Código').trim(),
+        description: String(entry?.description || '').trim(),
+        code: String(entry?.code || '').trim(),
+        createdAt: String(entry?.createdAt || '').trim(),
+      }))
+      .filter((entry) => entry.code || entry.description);
+  }
+
+  function formatAutomationHistoryTimestamp(value = '') {
+    const date = value ? new Date(value) : new Date();
+    if (Number.isNaN(date.getTime())) return 'Hoje';
+    return date.toLocaleString('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  }
+
+  function getAutomationHistorySourceLabel(paramsObject = {}) {
+    if (paramsObject.source === 'file') return 'Upload';
+    if (paramsObject.source === 'mock_ai') return 'IA';
+    if (paramsObject.source === 'saved_code') return 'Salvo';
+    return 'Criação';
+  }
+
+  function createAutomationCodeHistoryEntry(paramsObject, code, overrides = {}) {
+    const history = getAutomationCodeHistory(paramsObject);
+    const version = history.length + 1;
+    return {
+      id: `code-${Date.now().toString(36)}-${version}`,
+      version,
+      title: overrides.title || (version === 1 ? 'Código inicial' : `Versão ${version}`),
+      source: overrides.source || getAutomationHistorySourceLabel(paramsObject),
+      description: String(overrides.description || paramsObject.description || '').trim(),
+      code: String(code || paramsObject.generated_code || '').trim(),
+      createdAt: overrides.createdAt || new Date().toISOString(),
+    };
+  }
+
+  function ensureAutomationCodeHistory(paramsObject = {}, code = '') {
+    const nextParams = paramsObject && typeof paramsObject === 'object' ? paramsObject : {};
+    const history = getAutomationCodeHistory(nextParams);
+    if (history.length) {
+      nextParams.code_history = history;
+      return nextParams;
+    }
+    const initialCode = String(code || nextParams.generated_code || '').trim();
+    if (!initialCode) {
+      nextParams.code_history = [];
+      return nextParams;
+    }
+    nextParams.code_history = [
+      createAutomationCodeHistoryEntry(nextParams, initialCode, {
+        title: 'Código inicial',
+        source: nextParams.current_preview ? 'Criação' : getAutomationHistorySourceLabel(nextParams),
+        description: nextParams.description || 'Primeira versão registrada para esta automação.',
+      }),
+    ];
+    return nextParams;
+  }
+
+  function appendAutomationCodeHistory(paramsObject = {}, code = '', overrides = {}) {
+    const nextParams = ensureAutomationCodeHistory(paramsObject, paramsObject.generated_code || code);
+    const history = getAutomationCodeHistory(nextParams);
+    const entry = createAutomationCodeHistoryEntry(nextParams, code, overrides);
+    nextParams.code_history = [...history, entry].map((item, index) => ({
+      ...item,
+      version: index + 1,
+      title: item.title || `Versão ${index + 1}`,
+    }));
+    return nextParams;
+  }
+
+  function renderAutomationCodeHistory(controls = getAutomationCreateControls()) {
+    if (!controls?.form || !controls.historyList || !controls.historyEmpty) return;
+    let paramsObject = {};
+    try {
+      paramsObject = JSON.parse(controls.form.dataset.generatedDraft || '{}');
+    } catch {
+      paramsObject = {};
+    }
+    const history = getAutomationCodeHistory(paramsObject);
+    controls.historyEmpty.hidden = history.length > 0;
+    controls.historyList.innerHTML = history.length
+      ? history.slice().reverse().map((entry) => `
+        <article class="automation-code-history-item">
+          <div class="automation-code-history-item-head">
+            <div>
+              <h6 class="automation-code-history-item-title">Versão ${escapeHtmlWes(entry.version)} · ${escapeHtmlWes(entry.title)}</h6>
+              <p class="automation-code-history-item-meta">${escapeHtmlWes(formatAutomationHistoryTimestamp(entry.createdAt))}</p>
+            </div>
+            <span class="automation-code-history-source">${escapeHtmlWes(entry.source)}</span>
+          </div>
+          <p class="automation-code-history-description">${escapeHtmlWes(entry.description || 'Sem descrição registrada.')}</p>
+          <pre class="automation-code-history-code"><code>${escapeHtmlWes(entry.code || '// Código não disponível')}</code></pre>
+        </article>
+      `).join('')
+      : '';
+  }
+
+  function updateAutomationGeneratedDraftCode(controls, code, extraParams = {}) {
+    if (!controls?.form) return;
+    let draftParams = {};
+    try {
+      draftParams = JSON.parse(controls.form.dataset.generatedDraft || '{}');
+    } catch {
+      draftParams = {};
+    }
+    const shouldAppendHistory = Boolean(extraParams.appendHistory);
+    const historyTitle = extraParams.historyTitle;
+    const historySource = extraParams.historySource;
+    const historyDescription = extraParams.historyDescription;
+    draftParams = {
+      ...draftParams,
+      ...extraParams,
+      language: controls.language?.value || draftParams.language || 'csharp',
+      generated_code: code,
+    };
+    delete draftParams.appendHistory;
+    delete draftParams.historyTitle;
+    delete draftParams.historySource;
+    delete draftParams.historyDescription;
+
+    const currentHistory = getAutomationCodeHistory(draftParams);
+    if (shouldAppendHistory && currentHistory.length) {
+      draftParams.code_history = currentHistory;
+      draftParams = appendAutomationCodeHistory(draftParams, code, {
+        title: historyTitle,
+        source: historySource,
+        description: historyDescription || draftParams.description,
+      });
+    } else if (shouldAppendHistory && draftParams.previous_code) {
+      draftParams = ensureAutomationCodeHistory(draftParams, draftParams.previous_code);
+      draftParams = appendAutomationCodeHistory(draftParams, code, {
+        title: historyTitle,
+        source: historySource,
+        description: historyDescription || draftParams.description,
+      });
+    } else if (shouldAppendHistory) {
+      draftParams.code_history = [
+        createAutomationCodeHistoryEntry(draftParams, code, {
+          title: historyTitle || 'Código inicial',
+          source: historySource || getAutomationHistorySourceLabel(draftParams),
+          description: historyDescription || draftParams.description,
+        }),
+      ];
+    } else {
+      draftParams = ensureAutomationCodeHistory(draftParams, code);
+    }
+    controls.form.dataset.generatedDraft = JSON.stringify(draftParams);
+    renderAutomationCodeHistory(controls);
+  }
+
+  function setAutomationCodePreviewState(controls, state, code = '') {
+    if (!controls?.form || !controls.codePreview || !controls.codeContent) return;
+    const isRejected = state === 'rejected';
+    const hasCode = Boolean(code);
+    controls.codePreview.hidden = !hasCode && !isRejected;
+    controls.codeContent.textContent = code;
+    controls.form.dataset.codeApproval = hasCode || isRejected ? state : '';
+    if (!hasCode && !isRejected) {
+      delete controls.form.dataset.generatedCode;
+      controls.codePreview.removeAttribute('data-state');
+      if (controls.codeApprove) controls.codeApprove.hidden = false;
+      if (controls.codeReject) controls.codeReject.hidden = false;
+      if (controls.codeRejectedState) controls.codeRejectedState.hidden = true;
+      if (controls.submit) controls.submit.disabled = false;
+      return;
+    }
+
+    if (hasCode) {
+      controls.form.dataset.generatedCode = code;
+    } else {
+      delete controls.form.dataset.generatedCode;
+    }
+    controls.codePreview.dataset.state = state;
+    if (controls.submit) controls.submit.disabled = state === 'pending' || state === 'rejected';
+    if (controls.codeApprove) controls.codeApprove.hidden = state !== 'pending';
+    if (controls.codeReject) controls.codeReject.hidden = state !== 'pending';
+    if (controls.codeRejectedState) controls.codeRejectedState.hidden = state !== 'rejected';
+    if (state === 'rejected') scheduleLucideRefresh();
+    if (controls.codeStatus) {
+      if (state === 'current') {
+        controls.codeStatus.textContent = 'Código atual da automação. Use a descrição para pedir mudanças com IA ou envie um novo arquivo.';
+      } else if (state === 'approved') {
+        controls.codeStatus.textContent = 'Código aprovado. A automação já pode ser criada.';
+      } else if (state === 'uploaded') {
+        controls.codeStatus.textContent = 'Pacote ZIP selecionado. Revise os arquivos identificados e salve a automação para usar este código.';
+      } else if (state === 'rejected') {
+        controls.codeStatus.textContent = 'A primeira versão não ficou como esperado. Ajuste a descrição e gere uma nova tentativa.';
+      } else {
+        controls.codeStatus.textContent = 'Revise o código gerado antes de criar a automação.';
+      }
+    }
+    if (controls.codeBadge) {
+      controls.codeBadge.textContent = state === 'current'
+        ? 'Atual'
+        : state === 'approved'
+        ? 'Aprovado'
+        : state === 'uploaded'
+        ? 'Upload'
+        : state === 'rejected'
+          ? 'Reprovado'
+          : 'Pendente';
+    }
+    renderAutomationCodeHistory(controls);
+  }
+
+  function clearAutomationCodePreview(controls = getAutomationCreateControls()) {
+    if (!controls?.form) return;
+    delete controls.form.dataset.codeApproval;
+    delete controls.form.dataset.generatedCode;
+    clearAutomationUploadSelectedState(controls);
+    if (controls.historyPanel) controls.historyPanel.hidden = true;
+    if (controls.historyToggle) controls.historyToggle.setAttribute('aria-expanded', 'false');
+    if (controls.historyList) controls.historyList.innerHTML = '';
+    if (controls.historyEmpty) controls.historyEmpty.hidden = true;
+    setAutomationCodePreviewState(controls, '', '');
+  }
+
+  function closeAutomationAiEditPrompt(controls = getAutomationCreateControls()) {
+    if (controls?.aiPrompt) controls.aiPrompt.hidden = true;
+    if (controls?.aiInput) controls.aiInput.value = '';
+    if (controls?.aiSend) controls.aiSend.disabled = true;
+  }
+
+  function openAutomationAiEditPrompt(controls = getAutomationCreateControls()) {
+    if (!controls?.aiPrompt) return;
+    controls.aiPrompt.hidden = false;
+    if (controls.aiSend) controls.aiSend.disabled = !String(controls.aiInput?.value || '').trim();
+    window.setTimeout(() => controls.aiInput?.focus(), 0);
+  }
+
+  function loadAutomationCurrentCodePreview(controls, currentData) {
+    if (!controls?.form || !currentData) return;
+    const currentCode = currentData.generatedCode || buildAutomationGeneratedCode(controls, {
+      ...(currentData.paramsObject || {}),
+      source: currentData.generatedCode ? 'saved_code' : 'current_preview',
+      language: currentData.language || controls.language?.value || 'csharp',
+      scheduled: Boolean(currentData.scheduled),
+      description: currentData.description || controls.description?.value || '',
+      schedule: currentData.schedule ? {
+        time: currentData.schedule.time,
+        frequency: currentData.schedule.frequency,
+      } : null,
+    });
+    updateAutomationGeneratedDraftCode(controls, currentCode, {
+      ...(currentData.paramsObject || {}),
+      source: currentData.generatedCode ? (currentData.paramsObject?.source || 'saved_code') : 'current_preview',
+      current_preview: !currentData.generatedCode,
+      description: currentData.description || '',
+    });
+    setAutomationCodePreviewState(controls, 'current', currentCode);
+  }
+
+  function buildAutomationMockAiDescription(promptText, controls) {
+    const request = String(promptText || '').trim();
+    const name = String(controls?.name?.value || 'esta automação').trim();
+    const revisionTag = Date.now().toString(36).slice(-5).toUpperCase();
+    const requestSummary = request
+      ? `A mudança solicitada foi interpretada como: ${request}.`
+      : 'A mudança solicitada foi interpretada como uma revisão geral do fluxo.';
+    return [
+      `Versão IA ${revisionTag} para ${name}.`,
+      requestSummary,
+      'A automação passa a validar entradas, registrar logs de execução, tratar falhas esperadas e entregar um resumo operacional para acompanhamento.',
+    ].join(' ');
+  }
+
+  function generateAutomationCodeFromPrompt(controls, promptText = '') {
+    if (!controls?.form) return false;
+    const isEditMode = controls.form.dataset.mode === 'edit';
+    const rawPrompt = String(promptText || controls.description?.value || '').trim();
+    const description = isEditMode && rawPrompt
+      ? buildAutomationMockAiDescription(rawPrompt, controls)
+      : rawPrompt || 'Exemplo mockado: validar dados de entrada, registrar logs de execução e gerar um resumo operacional.';
+
+    if (controls.description) controls.description.value = description;
+
+    const resourceParams = readAutomationCreateResources(controls);
+    if (!resourceParams) return false;
+    const scheduleConfig = readAutomationScheduleConfig(controls, true);
+    if (scheduleConfig === false) return false;
+
+    let previousDraft = {};
+    try {
+      previousDraft = JSON.parse(controls.form.dataset.generatedDraft || '{}');
+    } catch {
+      previousDraft = {};
+    }
+    const previousHistory = getAutomationCodeHistory(previousDraft);
+    const draftParams = {
+      source: 'mock_ai',
+      mocked: true,
+      mock_description: isEditMode,
+      language: controls.language?.value || 'csharp',
+      scheduled: Boolean(controls.scheduled?.checked),
+      description,
+      ai_prompt: isEditMode ? rawPrompt : '',
+      change_request: isEditMode,
+      previous_code: isEditMode ? (controls.form.dataset.generatedCode || '') : '',
+      code_history: previousHistory,
+      ...resourceParams,
+    };
+    if (scheduleConfig) {
+      draftParams.schedule = scheduleConfig;
+      draftParams.horario_agendamento = scheduleConfig.time;
+      draftParams.repeticao = scheduleConfig.frequency;
+      draftParams.periodicidade = scheduleConfig.frequency;
+      draftParams.data_inicio = scheduleConfig.start_date;
+      draftParams.data_termino = scheduleConfig.end_date;
+      draftParams.dias_semana = scheduleConfig.weekdays;
+    }
+    const generatedCode = buildAutomationGeneratedCode(controls, draftParams);
+    draftParams.generated_code = generatedCode;
+    controls.form.dataset.generatedDraft = JSON.stringify(draftParams);
+    clearAutomationUploadSelectedState(controls);
+    setAutomationCodePreviewState(controls, 'pending', generatedCode);
+    setAutomationFormError(controls, '');
+    closeAutomationAiEditPrompt(controls);
+    showAppToast(isEditMode ? 'Prévia da mudança gerada com IA' : 'Código mockado gerado com IA');
+    return true;
   }
 
   function syncAutomationScheduleDateBounds(controls = getAutomationCreateControls()) {
@@ -10057,20 +10848,32 @@ if (automationStatusSwitches.length) {
       input.checked = Boolean(currentData?.schedule?.weekdays?.includes(input.value));
     });
     if (controls.inputFile) {
-      controls.inputFile.value = '';
+      const inputFiles = currentData?.inputFiles || [];
+      controls.inputFile.value = inputFiles.length ? '__existing__' : '';
       controls.inputFile.dataset.previousValue = '';
-      writeAutomationSelectedResources(controls.inputFile, []);
+      writeAutomationSelectedResources(controls.inputFile, inputFiles);
     }
     if (controls.credential) {
-      controls.credential.value = '';
+      const credentials = currentData?.credentials || [];
+      controls.credential.value = credentials.length ? '__existing__' : '';
       controls.credential.dataset.previousValue = '';
-      writeAutomationSelectedResources(controls.credential, []);
+      writeAutomationSelectedResources(controls.credential, credentials);
     }
     if (controls.packageSearch) controls.packageSearch.value = '';
     if (controls.params) controls.params.value = currentData?.params || '{}';
-    if (!currentData && controls.form) delete controls.form.dataset.generatedDraft;
-    if (!currentData && controls.form === automationCreateForm && automationCreateUploadHint) {
-      automationCreateUploadHint.textContent = 'Use uma descrição detalhada ou envie um arquivo de referência para acelerar a criação.';
+    if (controls.form === automationCreateForm) {
+      clearAutomationCodePreview(controls);
+      closeAutomationAiEditPrompt(controls);
+      if (currentData) {
+        controls.form.dataset.generatedDraft = JSON.stringify(currentData.paramsObject || {});
+        loadAutomationCurrentCodePreview(controls, currentData);
+        setAutomationUploadHint('Peça uma mudança na descrição para a IA ou envie um novo arquivo de código para substituir a versão atual.');
+      } else {
+        delete controls.form.dataset.generatedDraft;
+        setAutomationUploadHint();
+      }
+    } else if (!currentData && controls.form) {
+      delete controls.form.dataset.generatedDraft;
     }
 
     if (controls.packageSelect && controls.version) {
@@ -10130,6 +10933,8 @@ if (automationStatusSwitches.length) {
       controls.params?.focus();
       return null;
     }
+    paramsObject.language = language;
+    paramsObject = ensureAutomationCodeHistory(paramsObject, paramsObject.generated_code || controls.form?.dataset.generatedCode || controls.codeContent?.textContent || '');
 
     const resourceParams = readAutomationCreateResources(controls);
     if (!resourceParams) return null;
@@ -10174,8 +10979,8 @@ if (automationStatusSwitches.length) {
         `${slugifyAutomationName(name) || 'automacao'}-${Date.now().toString(36).slice(-4)}`,
       name,
       description,
-      packageId: packageId || language,
-      version: version || language,
+      packageId: packageId || currentRowData?.packageId || language,
+      version: version || currentRowData?.version || language,
       packageDisplay: controls.packageSelect
         ? ''
         : getAutomationLanguageLabel(language),
@@ -10205,13 +11010,86 @@ if (automationStatusSwitches.length) {
     showAppToast('Automação criada com sucesso');
   }
 
-  function openAutomationCreatePage() {
+  function setAutomationCreatePageMode(currentData = null) {
+    const isEdit = Boolean(currentData);
+    if (automationCreateForm) {
+      automationCreateForm.dataset.mode = isEdit ? 'edit' : 'create';
+      if (isEdit && currentData?.id) {
+        automationCreateForm.dataset.editingAutomationId = currentData.id;
+      } else {
+        delete automationCreateForm.dataset.editingAutomationId;
+      }
+    }
+    if (automationCreateTitle) automationCreateTitle.textContent = isEdit ? 'Editar automação' : 'Criar automação';
+    if (automationCreateSubtitle) {
+      automationCreateSubtitle.textContent = isEdit
+        ? 'Atualize os dados principais e edite o código por descrição ou upload.'
+        : 'Configure os dados principais e gere uma automação por descrição ou arquivo.';
+    }
+    if (automationCreateSubmit) automationCreateSubmit.textContent = isEdit ? 'Salvar alterações' : 'Criar automação';
+    if (automationCreateGenerateBtn) {
+      automationCreateGenerateBtn.innerHTML = `
+        <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
+        ${isEdit ? 'Editar com IA' : 'Gerar código com IA'}
+      `;
+    }
+    if (automationCreateUploadBtn) {
+      automationCreateUploadBtn.innerHTML = `
+        <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+        ${isEdit ? 'Fazer upload de novo código' : 'Fazer upload do código'}
+      `;
+    }
+    document.getElementById('page-automations-create')?.setAttribute('data-title', isEdit ? 'Editar automação' : 'Criar automação');
+  }
+
+  function findAutomationRowById(automationId) {
+    const normalizedId = String(automationId || '').trim();
+    if (!normalizedId) return null;
+    return Array.from(automationsTable.querySelectorAll('.automation-row'))
+      .find((row) => String(row.dataset.automationId || '').trim() === normalizedId) || null;
+  }
+
+  function openAutomationCreatePage(row = null, options = {}) {
     const controls = getAutomationCreateControls();
     if (!controls) return;
-    activeAutomationRow = null;
-    resetAutomationForm(controls);
-    window.location.hash = '#/dashboard/automations/new';
-    window.setTimeout(() => controls.name.focus(), 0);
+    activeAutomationRow = row;
+    const currentData = row ? readAutomationRowData(row) : null;
+    resetAutomationForm(controls, currentData);
+    setAutomationCreatePageMode(currentData);
+    const nextHash = currentData?.id
+      ? `#/dashboard/automations/new?edit=${encodeURIComponent(currentData.id)}`
+      : '#/dashboard/automations/new';
+    if (window.location.hash !== nextHash) {
+      window.location.hash = nextHash;
+    }
+    if (options.focus !== false) {
+      window.setTimeout(() => controls.name.focus(), 0);
+    }
+  }
+
+  function syncAutomationCreateRouteState() {
+    const { routeKey, queryParams } = getHashRouteInfo();
+    if (routeKey !== 'dashboard/automations/new') return;
+    const editId = queryParams.get('edit');
+    if (!editId) {
+      if (activeAutomationRow || automationCreateForm?.dataset.mode === 'edit') {
+        activeAutomationRow = null;
+        resetAutomationForm(getAutomationCreateControls());
+        setAutomationCreatePageMode(null);
+      }
+      return;
+    }
+    const row = findAutomationRowById(editId);
+    if (!row) {
+      activeAutomationRow = null;
+      resetAutomationForm(getAutomationCreateControls());
+      setAutomationCreatePageMode(null);
+      setAutomationFormError(getAutomationCreateControls(), 'Não foi possível encontrar a automação para edição.');
+      return;
+    }
+    if (row !== activeAutomationRow || automationCreateForm?.dataset.mode !== 'edit') {
+      openAutomationCreatePage(row, { focus: false });
+    }
   }
 
   function openAutomationModalPanel(mode, row = null) {
@@ -10237,6 +11115,9 @@ if (automationStatusSwitches.length) {
   });
 
   resetAutomationForm(getAutomationCreateControls());
+  setAutomationCreatePageMode(null);
+  syncAutomationCreateRouteState();
+  window.addEventListener('hashchange', syncAutomationCreateRouteState);
 
   function closeAutomationModalPanel() {
     activeAutomationRow = null;
@@ -10246,13 +11127,47 @@ if (automationStatusSwitches.length) {
   }
 
   automationCreateBackBtn?.addEventListener('click', () => {
+    activeAutomationRow = null;
+    setAutomationCreatePageMode(null);
     resetAutomationForm(getAutomationCreateControls());
     window.location.hash = '#/dashboard/automations';
   });
 
   automationCreateCancelBtn?.addEventListener('click', () => {
+    activeAutomationRow = null;
+    setAutomationCreatePageMode(null);
     resetAutomationForm(getAutomationCreateControls());
     window.location.hash = '#/dashboard/automations';
+  });
+
+  automationCodeHistoryToggle?.addEventListener('click', () => {
+    const controls = getAutomationCreateControls();
+    if (!controls?.historyPanel) return;
+    const shouldOpen = controls.historyPanel.hidden;
+    controls.historyPanel.hidden = !shouldOpen;
+    controls.historyToggle?.setAttribute('aria-expanded', String(shouldOpen));
+    if (shouldOpen) renderAutomationCodeHistory(controls);
+  });
+
+  automationAiEditInput?.addEventListener('input', () => {
+    const controls = getAutomationCreateControls();
+    if (controls?.aiSend) {
+      controls.aiSend.disabled = !String(controls.aiInput?.value || '').trim();
+    }
+  });
+
+  automationAiEditInput?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    const controls = getAutomationCreateControls();
+    const promptText = String(controls?.aiInput?.value || '').trim();
+    if (promptText) generateAutomationCodeFromPrompt(controls, promptText);
+  });
+
+  automationAiEditSend?.addEventListener('click', () => {
+    const controls = getAutomationCreateControls();
+    const promptText = String(controls?.aiInput?.value || '').trim();
+    if (promptText) generateAutomationCodeFromPrompt(controls, promptText);
   });
 
   automationCreateInputFile?.addEventListener('focus', () => {
@@ -10285,55 +11200,120 @@ if (automationStatusSwitches.length) {
 
   automationCreateGenerateBtn?.addEventListener('click', () => {
     const controls = getAutomationCreateControls();
-    const description = String(automationCreateDescription?.value || '').trim();
-    if (!description) {
-      setAutomationFormError(controls, 'Descreva a automação antes de gerar.');
-      automationCreateDescription?.focus();
+    if (controls?.form?.dataset.mode === 'edit') {
+      openAutomationAiEditPrompt(controls);
       return;
     }
+    generateAutomationCodeFromPrompt(controls);
+  });
 
-    const resourceParams = readAutomationCreateResources(controls);
-    if (!resourceParams) return;
-    const scheduleConfig = readAutomationScheduleConfig(controls, true);
-    if (scheduleConfig === false) return;
-
-    const draftParams = {
-      source: 'description',
-      language: automationCreateLanguage?.value || 'csharp',
-      scheduled: Boolean(automationCreateScheduled?.checked),
-      description,
-      ...resourceParams,
-    };
-    if (scheduleConfig) {
-      draftParams.schedule = scheduleConfig;
-      draftParams.horario_agendamento = scheduleConfig.time;
-      draftParams.repeticao = scheduleConfig.frequency;
-      draftParams.periodicidade = scheduleConfig.frequency;
-      draftParams.data_inicio = scheduleConfig.start_date;
-      draftParams.data_termino = scheduleConfig.end_date;
-      draftParams.dias_semana = scheduleConfig.weekdays;
+  automationCreateCodeApproveBtn?.addEventListener('click', () => {
+    const controls = getAutomationCreateControls();
+    const code = controls?.form?.dataset.generatedCode || controls?.codeContent?.textContent || '';
+    if (!code) return;
+    let draftParams = {};
+    try {
+      draftParams = JSON.parse(controls.form.dataset.generatedDraft || '{}');
+    } catch {
+      draftParams = {};
     }
-    automationCreateForm.dataset.generatedDraft = JSON.stringify(draftParams);
+    const isEditMode = controls.form.dataset.mode === 'edit';
+    const isUploadApproval = draftParams.source === 'file';
+    updateAutomationGeneratedDraftCode(controls, code, {
+      appendHistory: true,
+      historyTitle: isUploadApproval
+        ? 'Código enviado por upload'
+        : isEditMode
+          ? 'Alteração aprovada com IA'
+          : 'Código inicial',
+      historySource: isUploadApproval ? 'Upload' : 'IA',
+      historyDescription: draftParams.description || controls.description?.value || '',
+    });
+    setAutomationCodePreviewState(controls, 'approved', code);
     setAutomationFormError(controls, '');
-    showAppToast('Rascunho da automação gerado pela descrição');
+    showAppToast('Código aprovado');
+  });
+
+  automationCreateCodeRejectBtn?.addEventListener('click', () => {
+    const controls = getAutomationCreateControls();
+    if (controls?.form) {
+      try {
+        const draftParams = JSON.parse(controls.form.dataset.generatedDraft || '{}');
+        delete draftParams.generated_code;
+        controls.form.dataset.generatedDraft = JSON.stringify(draftParams);
+      } catch {
+        controls.form.dataset.generatedDraft = '{}';
+      }
+    }
+    setAutomationCodePreviewState(controls, 'rejected', '');
+    showAppToast('Código reprovado. Ajuste a descrição e gere novamente');
   });
 
   automationCreateUploadBtn?.addEventListener('click', () => {
     automationCreateUploadInput?.click();
   });
 
-  automationCreateUploadInput?.addEventListener('change', () => {
+  automationUploadChangeBtn?.addEventListener('click', () => {
+    automationCreateUploadInput?.click();
+  });
+
+  automationCreateUploadInput?.addEventListener('change', async () => {
     const file = automationCreateUploadInput.files?.[0];
+    const controls = getAutomationCreateControls();
     if (!file) {
-      if (automationCreateUploadHint) {
-        automationCreateUploadHint.textContent = 'Use uma descrição detalhada ou envie um arquivo de referência para acelerar a criação.';
-      }
+      clearAutomationUploadSelectedState(controls);
+      setAutomationUploadHint();
       return;
     }
 
-    if (automationCreateUploadHint) {
-      automationCreateUploadHint.textContent = `Arquivo selecionado: ${file.name}`;
+    const isZipUpload = isAutomationZipUpload(file);
+    const isSourceUpload = isAutomationSourceCodeUpload(file);
+    if (!isZipUpload && !isSourceUpload) {
+      automationCreateUploadInput.value = '';
+      clearAutomationUploadSelectedState(controls);
+      const message = 'Envie um arquivo .cs, .java, .py ou .zip com código C#, Java ou Python.';
+      setAutomationFormError(controls, message);
+      setAutomationUploadHint(message, 'error');
+      showAppToast(message);
+      return;
     }
+
+    setAutomationFormError(controls, '');
+    const zipEntryNames = isZipUpload ? await readAutomationZipEntryNames(file).catch(() => []) : [];
+    const zipDetectedLanguage = isZipUpload ? detectAutomationCodeFileLanguageFromNames(zipEntryNames) : '';
+    const detectedLanguage = isZipUpload
+      ? zipDetectedLanguage
+      : await detectAutomationUploadLanguage(file);
+    if (isZipUpload && !detectedLanguage) {
+      automationCreateUploadInput.value = '';
+      clearAutomationUploadSelectedState(controls);
+      const message = 'O ZIP precisa conter pelo menos um arquivo de código .cs, .java ou .py.';
+      setAutomationFormError(controls, message);
+      setAutomationUploadHint(message, 'error');
+      showAppToast(message);
+      return;
+    }
+    if (detectedLanguage && controls?.language && controls.language.value !== detectedLanguage) {
+      controls.language.value = detectedLanguage;
+      syncAutomationCreateSelectLabels(controls);
+      showAppToast(`Linguagem alterada para ${getAutomationLanguageLabel(detectedLanguage)}`);
+    }
+
+    renderAutomationUploadSelectedState(controls, file, {
+      isZip: isZipUpload,
+      language: controls?.language?.value || detectedLanguage,
+      zipEntryNames,
+    });
+
+    const languageLabel = detectedLanguage
+      ? ` Linguagem detectada: ${getAutomationLanguageLabel(detectedLanguage)}.`
+      : ' Não foi possível detectar a linguagem automaticamente.';
+    setAutomationUploadHint(
+      isZipUpload
+        ? `ZIP selecionado: ${file.name}.${languageLabel} Revise os arquivos listados antes de salvar.`
+        : `Código selecionado: ${file.name}.${languageLabel} Revise a pré-visualização e aprove se este for o código correto.`,
+      'success',
+    );
 
     let paramsObject = {};
     try {
@@ -10344,7 +11324,9 @@ if (automationStatusSwitches.length) {
     paramsObject.source = 'file';
     paramsObject.reference_file = file.name;
     paramsObject.reference_file_type = file.type || 'desconhecido';
-    const controls = getAutomationCreateControls();
+    paramsObject.reference_file_size = file.size || 0;
+    paramsObject.zip_entries = isZipUpload ? getAutomationZipDisplayEntries(zipEntryNames) : [];
+    paramsObject.language = controls?.language?.value || detectedLanguage || 'csharp';
     Object.assign(paramsObject, readAutomationCreateResources(controls));
     const scheduleConfig = readAutomationScheduleConfig(controls, true);
     if (scheduleConfig === false) return;
@@ -10358,7 +11340,12 @@ if (automationStatusSwitches.length) {
       paramsObject.data_termino = scheduleConfig.end_date;
       paramsObject.dias_semana = scheduleConfig.weekdays;
     }
+    const uploadedCode = isSourceUpload
+      ? await readAutomationUploadedSourceCode(file)
+      : buildAutomationZipPreviewCode(file, zipEntryNames);
+    paramsObject.generated_code = uploadedCode;
     automationCreateForm.dataset.generatedDraft = JSON.stringify(paramsObject);
+    setAutomationCodePreviewState(controls, isZipUpload ? 'uploaded' : 'pending', uploadedCode);
   });
 
   automationModalPackageSearch?.addEventListener('input', () => {
@@ -10383,7 +11370,7 @@ if (automationStatusSwitches.length) {
     const editButton = event.target.closest('.automation-edit-trigger');
     if (editButton) {
       const row = editButton.closest('.automation-row');
-      if (row) openAutomationModalPanel('edit', row);
+      if (row) openAutomationCreatePage(row);
       return;
     }
 
@@ -10410,9 +11397,21 @@ if (automationStatusSwitches.length) {
   automationCreateForm?.addEventListener('submit', (event) => {
     event.preventDefault();
     const controls = getAutomationCreateControls();
-    const rowData = readAutomationFormData(controls);
+    if (controls?.form?.dataset.codeApproval === 'pending') {
+      setAutomationFormError(controls, 'Aprove ou reprove o código gerado antes de criar a automação.');
+      controls.codePreview?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if (controls?.form?.dataset.codeApproval === 'rejected') {
+      setAutomationFormError(controls, 'Altere a descrição para gerar o código como deseja e gere novamente.');
+      controls.codePreview?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const rowData = readAutomationFormData(controls, activeAutomationRow);
     if (!rowData) return;
-    persistAutomationData(rowData);
+    persistAutomationData(rowData, activeAutomationRow);
+    activeAutomationRow = null;
+    setAutomationCreatePageMode(null);
     resetAutomationForm(controls);
     window.location.hash = '#/dashboard/automations';
   });
@@ -14626,6 +15625,7 @@ const routeMap = {
   'dashboard/hybrid-flows/new': 'page-hybrid-flows-create',
   'dashboard/hybrid-flows/history': 'page-hybrid-flows-history',
   'dashboard/hybrid-flows/history/details': 'page-hybrid-flows-history-details',
+  'dashboard/vm-monitoring': 'page-vm-monitoring',
   'dashboard/executors': 'page-executors',
   'dashboard/packages': 'page-packages',
   'dashboard/channels': 'page-channels',
@@ -14667,6 +15667,7 @@ const sectionMap = {
   'dashboard/hybrid-flows/new': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history/details': 'Atendimento dinâmico',
+  'dashboard/vm-monitoring': 'Máquinas virtuais',
   'dashboard/executors': 'Infraestrutura',
   'dashboard/packages': 'Infraestrutura',
   'dashboard/channels': 'Atendimento dinâmico',
@@ -14904,6 +15905,7 @@ const updateActivePage = () => {
       'dashboard/campaigns',
       'dashboard/hybrid-flows',
       'dashboard/agents',
+      'dashboard/vm-monitoring',
       'dashboard/environments'
     ];
     const hideHubScope = hideHubScopeRoutes.includes(navRouteKey);
@@ -14972,6 +15974,7 @@ const updateActivePage = () => {
   document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
   document.body.classList.toggle('route-automation-create', routeKey === 'dashboard/automations/new');
   document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
+  document.body.classList.toggle('route-vm-monitoring', routeKey === 'dashboard/vm-monitoring');
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
   document.body.classList.toggle('route-profile', routeKey === 'dashboard/profile');
   syncVoiceMessagingInsightsChart(routeKey);

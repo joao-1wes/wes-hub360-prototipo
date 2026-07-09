@@ -902,7 +902,7 @@
               <div class="page-header">
                 <div>
                   <h2>Máquinas virtuais</h2>
-                  <p class="page-subtitle">Acompanhe a saúde, consumo e disponibilidade das máquinas virtuais.</p>
+                  <p class="page-subtitle">Acompanhe a saúde, consumo e disponibilidade das máquinas virtuais. Selecione uma máquina para acompanhar as médias de consumo dela.</p>
                 </div>
                 <div class="page-actions">
                   <a class="btn outline" href="#/dashboard">
@@ -911,116 +911,79 @@
                   </a>
                 </div>
               </div>
-              <div class="monitoring-header">
-                <div>
-                  <h3>Painel de status das máquinas</h3>
-                  <p>Monitoramento em tempo real e saúde de todas as máquinas.</p>
-                  <span class="monitoring-updated">Última atualização: 13:57:13</span>
-                </div>
-              </div>
-              <div class="status-cards">
-                <div class="status-card success">
-                  <span class="material-symbols-rounded">check_circle</span>
-                  <div>
-                    <strong>1</strong>
-                    <span>Máquinas saudáveis</span>
+              <div class="vm-machines-list" id="vmMachinesList">
+                <div class="vm-machines-folder" id="vmMachinesBlock">
+                  <div class="vm-machines-folder-head">
+                    <span>Máquinas</span>
+                  </div>
+                  <div class="vm-machines-grid">
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring/machine/04d1f883" data-vm-machine="04d1f883" data-vm-machine-title="04d1f883..." data-vm-cpu="18%" data-vm-cpu-bar="18%" data-vm-memory="46%" data-vm-memory-bar="46%" data-vm-disk="32%" data-vm-disk-bar="32%" data-vm-network="2 MB/s" data-vm-network-bar="20%">
+                      <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">desktop_windows</span></span>
+                      <span class="vm-machine-card-kicker">Produção</span>
+                      <strong class="vm-machine-card-name">04d1f883...</strong>
+                      <span class="vm-machine-card-desc">CPU 18% · Memória 46% · Disco 32% · Rede 2 MB/s</span>
+                    </a>
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring/machine/vm-api-02" data-vm-machine="vm-api-02" data-vm-machine-title="vm-api-02" data-vm-cpu="74%" data-vm-cpu-bar="74%" data-vm-memory="68%" data-vm-memory-bar="68%" data-vm-disk="57%" data-vm-disk-bar="57%" data-vm-network="8 MB/s" data-vm-network-bar="58%">
+                      <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">dns</span></span>
+                      <span class="vm-machine-card-kicker">Produção</span>
+                      <strong class="vm-machine-card-name">vm-api-02</strong>
+                      <span class="vm-machine-card-desc">CPU 74% · Memória 68% · Disco 57% · Rede 8 MB/s</span>
+                    </a>
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring/machine/vm-worker-07" data-vm-machine="vm-worker-07" data-vm-machine-title="vm-worker-07" data-vm-cpu="41%" data-vm-cpu-bar="41%" data-vm-memory="52%" data-vm-memory-bar="52%" data-vm-disk="39%" data-vm-disk-bar="39%" data-vm-network="5 MB/s" data-vm-network-bar="44%">
+                      <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">terminal</span></span>
+                      <span class="vm-machine-card-kicker">Operações</span>
+                      <strong class="vm-machine-card-name">vm-worker-07</strong>
+                      <span class="vm-machine-card-desc">CPU 41% · Memória 52% · Disco 39% · Rede 5 MB/s</span>
+                    </a>
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring/machine/vm-db-01" data-vm-machine="vm-db-01" data-vm-machine-title="vm-db-01" data-vm-cpu="63%" data-vm-cpu-bar="63%" data-vm-memory="81%" data-vm-memory-bar="81%" data-vm-disk="91%" data-vm-disk-bar="91%" data-vm-network="11 MB/s" data-vm-network-bar="72%">
+                      <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">storage</span></span>
+                      <span class="vm-machine-card-kicker">Banco de dados</span>
+                      <strong class="vm-machine-card-name">vm-db-01</strong>
+                      <span class="vm-machine-card-desc">CPU 63% · Memória 81% · Disco 91% · Rede 11 MB/s</span>
+                    </a>
                   </div>
                 </div>
-                <div class="status-card warning">
-                  <span class="material-symbols-rounded">warning</span>
-                  <div>
-                    <strong>0</strong>
-                    <span>Máquinas em alerta</span>
+                <div class="monitoring-panel" id="vmMetricsPanel">
+                  <div class="panel-header">
+                    <h4 id="vmMetricsTitle">Visão geral da frota (4 máquinas)</h4>
                   </div>
-                </div>
-                <div class="status-card danger">
-                  <span class="material-symbols-rounded">error</span>
-                  <div>
-                    <strong>0</strong>
-                    <span>Máquinas críticas</span>
-                  </div>
-                </div>
-                <div class="status-card muted">
-                  <span class="material-symbols-rounded">schedule</span>
-                  <div>
-                    <strong>0</strong>
-                    <span>Máquinas offline</span>
-                  </div>
-                </div>
-              </div>
-              <div class="monitoring-panel">
-                <div class="panel-header">
-                  <h4>Visão geral da frota (1 máquina ativa)</h4>
-                </div>
-                <div class="fleet-grid">
-                  <div class="fleet-card">
-                    <span class="material-symbols-rounded">desktop_windows</span>
-                    <div class="fleet-info">
-                      <span>Uso de CPU</span>
-                      <strong>0%</strong>
+                  <div class="fleet-grid">
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">desktop_windows</span>
+                      <div class="fleet-info">
+                        <span id="vmCpuLabel">Uso médio de CPU</span>
+                        <strong id="vmCpuValue">49%</strong>
+                      </div>
+                      <div class="fleet-bar"><span id="vmCpuBar" style="width: 49%"></span></div>
                     </div>
-                    <div class="fleet-bar"><span style="width: 10%"></span></div>
-                  </div>
-                  <div class="fleet-card">
-                    <span class="material-symbols-rounded">memory</span>
-                    <div class="fleet-info">
-                      <span>Uso de memória</span>
-                      <strong>0%</strong>
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">memory</span>
+                      <div class="fleet-info">
+                        <span id="vmMemoryLabel">Uso médio de memória</span>
+                        <strong id="vmMemoryValue">62%</strong>
+                      </div>
+                      <div class="fleet-bar"><span id="vmMemoryBar" style="width: 62%"></span></div>
                     </div>
-                    <div class="fleet-bar"><span style="width: 10%"></span></div>
-                  </div>
-                  <div class="fleet-card">
-                    <span class="material-symbols-rounded">storage</span>
-                    <div class="fleet-info">
-                      <span>Uso de disco</span>
-                      <strong>0%</strong>
+                    <div class="fleet-card">
+                      <span class="material-symbols-rounded">storage</span>
+                      <div class="fleet-info">
+                        <span id="vmDiskLabel">Uso médio de disco</span>
+                        <strong id="vmDiskValue">55%</strong>
+                      </div>
+                      <div class="fleet-bar"><span id="vmDiskBar" style="width: 55%"></span></div>
                     </div>
-                    <div class="fleet-bar"><span style="width: 10%"></span></div>
-                  </div>
-                  <div class="fleet-card is-network">
-                    <span class="material-symbols-rounded">network_check</span>
-                    <div class="fleet-info">
-                      <span>Carga de rede</span>
-                      <strong>2 MB/s</strong>
+                    <div class="fleet-card is-network">
+                      <span class="material-symbols-rounded">network_check</span>
+                      <div class="fleet-info">
+                        <span id="vmNetworkLabel">Carga média de rede</span>
+                        <strong id="vmNetworkValue">6.5 MB/s</strong>
+                      </div>
+                      <div class="fleet-bar success"><span id="vmNetworkBar" style="width: 48%"></span></div>
                     </div>
-                    <div class="fleet-bar success"><span style="width: 20%"></span></div>
                   </div>
-                </div>
-                <div class="trend">
-                  <h5>Tendência 24 horas</h5>
-                  <p>CPU média: 0% · Memória média: 0% · Disco médio: 0% · Rede média: 2 MB/s</p>
-                </div>
-              </div>
-              <div class="monitoring-panel">
-                <div class="panel-header">
-                  <h4>Status das máquinas (1 total)</h4>
-                </div>
-                <div class="data-table monitoring-table">
-                  <div class="data-row header">
-                    <span>Máquina</span>
-                    <span>Status</span>
-                    <span>Ambiente</span>
-                    <span>Última leitura</span>
-                    <span>Tempo ativo</span>
-                    <span>CPU</span>
-                    <span>Memória</span>
-                    <span>Disco</span>
-                    <span>Ações</span>
-                  </div>
-                  <div class="data-row">
-                    <span>04d1f883...</span>
-                    <span><span class="chip success">Saudável</span></span>
-                    <span><span class="chip">Produção</span></span>
-                    <span>22/01/2026, 13:57:07</span>
-                    <span>11d 20h 3m</span>
-                    <span class="muted">Sem leitura</span>
-                    <span class="muted">Sem leitura</span>
-                    <span class="muted">Sem leitura</span>
-                    <span class="row-actions">
-                      <button class="icon-btn action-icon" aria-label="Ver detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                    </span>
+                  <div class="trend">
+                    <h5>Tendência 24 horas</h5>
+                    <p id="vmTrendText">CPU média: 49% · Memória média: 62% · Disco médio: 55% · Rede média: 6.5 MB/s</p>
                   </div>
                 </div>
               </div>
@@ -1219,19 +1182,26 @@
                   </div>
                   <div
                     class="data-row execution-row"
-                    data-execution-id="4c100b8b-534a-4b0c-bf9d-5c8f39d9b5a1"
-                    data-execution-automation="Relatório diário"
-                    data-execution-start="12/03/2025 • 08:00"
-                    data-execution-end="12/03/2025 • 08:30"
-                    data-execution-duration="30 min"
-                    data-execution-status="Completa"
+                    data-execution-id="7f40a853-7931-499c-8891-dcf17e981252"
+                    data-execution-automation="Auto_Wiki"
+                    data-execution-start="07/05/2026, 23:46:33"
+                    data-execution-end="07/05/2026, 23:48:06"
+                    data-execution-duration="1m 32s"
+                    data-execution-status="Concluída"
                     data-execution-recording="Sim"
+                    data-execution-recording-available="true"
+                    data-execution-recording-title="Auto_Wiki"
+                    data-execution-recording-mode="Automático (até conclusão)"
+                    data-execution-recording-size="~45,2 MB"
+                    data-execution-recording-storage="/recordings/7f40a853-7931-499c-8891-dcf17e981252"
+                    data-execution-recording-recorded-at="07/05/2026, 23:48:06"
+                    data-execution-recording-download="gravacao-auto-wiki.webm"
                   >
-                    <span>Relatório diário</span>
-                    <span>12/03/2025 • 08:00</span>
-                    <span>12/03/2025 • 08:30</span>
-                    <span>30 min</span>
-                    <span><span class="chip success">Completa</span></span>
+                    <span>Auto_Wiki</span>
+                    <span>07/05/2026, 23:46:33</span>
+                    <span>07/05/2026, 23:48:06</span>
+                    <span>1m 32s</span>
+                    <span><span class="chip success">Concluída</span></span>
                     <span class="row-actions">
                       <button class="icon-btn action-icon execution-details-trigger" aria-label="Ver detalhes" type="button">
                         <span class="material-symbols-rounded">info</span>
@@ -1247,6 +1217,13 @@
                     data-execution-duration="10 min"
                     data-execution-status="Interrompida"
                     data-execution-recording="Não"
+                    data-execution-recording-available="false"
+                    data-execution-recording-title="Monitoramento de filas"
+                    data-execution-recording-mode="Automático (até interrupção)"
+                    data-execution-recording-size="-"
+                    data-execution-recording-storage="-"
+                    data-execution-recording-recorded-at="-"
+                    data-execution-recording-download="gravacao-monitoramento-de-filas.webm"
                   >
                     <span>Monitoramento de filas</span>
                     <span>11/03/2025 • 18:00</span>
@@ -3742,7 +3719,7 @@
                     <span class="execution-details-label">ID da execução</span>
                     <strong id="executionDetailsId">-</strong>
                   </div>
-                  <div class="execution-details-item">
+                  <div class="execution-details-item execution-details-item--wide">
                     <span class="execution-details-label">Início</span>
                     <strong id="executionDetailsStart">-</strong>
                   </div>
@@ -3756,36 +3733,102 @@
                   </div>
                   <div class="execution-details-item">
                     <span class="execution-details-label">Estado</span>
-                    <strong id="executionDetailsStatus">-</strong>
+                    <strong id="executionDetailsStatus" class="execution-status-value">-</strong>
                   </div>
                   <div class="execution-details-item">
                     <span class="execution-details-label">Gravação</span>
-                    <strong id="executionDetailsRecording">-</strong>
+                    <button class="btn outline execution-recording-open-btn" id="executionDetailsRecordingButton" type="button" disabled>
+                      <span class="material-symbols-rounded" aria-hidden="true">play_circle</span>
+                      Ver gravação
+                    </button>
                   </div>
                 </section>
 
                 <section class="execution-logs-section">
-                  <h4 class="execution-logs-title">Registos (0 de 0)</h4>
+                  <h4 class="execution-logs-title" id="executionLogsTitle">Registros (0 de 0)</h4>
                   <div class="execution-logs-filters">
                     <div class="hub-select-wrap hub-select-wrap--block">
-                      <select class="hub-select" aria-label="Filtrar nível">
-                        <option>Nível</option>
+                      <select class="hub-select" id="executionLogsLevelFilter" aria-label="Filtrar nível">
+                        <option value="all" selected>Todos os níveis</option>
+                        <option value="debug">DEBUG</option>
+                        <option value="info">INFO</option>
+                        <option value="warning">WARNING</option>
+                        <option value="error">ERROR</option>
                       </select>
                       <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                     </div>
-                    <input class="modal-input" type="text" placeholder="Pesquisar mensagem" aria-label="Pesquisar mensagem" />
-                    <button class="btn outline" type="button" disabled>Limpar</button>
+                    <input class="modal-input" id="executionLogsSearch" type="text" placeholder="Pesquisar mensagem" aria-label="Pesquisar mensagem" />
+                    <button class="btn outline execution-logs-clear" id="executionLogsClear" type="button" disabled>
+                      <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                      Limpar
+                    </button>
                   </div>
-                  <div class="execution-logs-table">
-                    <div class="execution-logs-row execution-logs-row--head">
+                  <div class="data-table execution-logs-table" data-table-empty-state-disabled="true">
+                    <div class="data-row header execution-logs-row execution-logs-row--head">
                       <span>Data/Hora</span>
                       <span>Nível</span>
                       <span>Mensagem</span>
                       <span>Runtime (s)</span>
                     </div>
-                    <div class="execution-logs-empty">Sem registos disponíveis</div>
+                    <div id="executionLogsRows"></div>
                   </div>
                 </section>
+              </div>
+              <div class="modal-footer execution-details-footer">
+                <button class="btn primary" data-modal-close type="button">Fechar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="executionRecordingModal" aria-hidden="true">
+            <div class="modal-backdrop" data-recording-modal-close></div>
+            <div class="modal-dialog execution-recording-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="executionRecordingModalTitle">
+              <div class="modal-header execution-recording-header">
+                <div class="execution-recording-title-wrap">
+                  <span class="execution-recording-title-icon material-symbols-rounded" aria-hidden="true">play_arrow</span>
+                  <h3 id="executionRecordingModalTitle">Gravação</h3>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-recording-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body execution-recording-modal-body">
+                <div class="execution-recording-player" role="img" aria-label="Visualização da gravação">
+                  <button class="execution-recording-play-btn" type="button" aria-label="Reproduzir gravação">
+                    <span class="material-symbols-rounded" aria-hidden="true">play_arrow</span>
+                  </button>
+                  <div class="execution-recording-player-copy">
+                    <strong>Leitor de gravação</strong>
+                    <span>ID da execução: <span id="executionRecordingId">-</span></span>
+                    <span>Duração: <span id="executionRecordingDuration">-</span></span>
+                    <span>Gravado: <span id="executionRecordingRecordedAt">-</span></span>
+                  </div>
+                </div>
+                <div class="execution-recording-summary">
+                  <div>
+                    <span>Execução</span>
+                    <strong id="executionRecordingName">-</strong>
+                  </div>
+                  <div>
+                    <span>Modo de gravação</span>
+                    <strong id="executionRecordingMode">-</strong>
+                  </div>
+                  <div>
+                    <span>Tamanho do ficheiro</span>
+                    <strong id="executionRecordingSize">-</strong>
+                  </div>
+                  <div>
+                    <span>Localização de armazenamento</span>
+                    <strong id="executionRecordingStorage">-</strong>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer execution-recording-footer">
+                <button class="btn outline" type="button" data-recording-modal-close>Fechar</button>
+                <a class="btn primary" id="executionRecordingDownload" href="#" download="gravacao.webm">
+                  <span class="material-symbols-rounded" aria-hidden="true">download</span>
+                  Baixar
+                </a>
               </div>
             </div>
           </div>
@@ -7083,7 +7126,13 @@
             <div class="modal-dialog agent-history-conversation-dialog" role="dialog" aria-modal="true" aria-labelledby="agentHistoryConversationTitle">
               <div class="modal-header">
                 <div>
-                  <h3 id="agentHistoryConversationTitle">Conversa completa</h3>
+                  <div class="agent-history-conversation-title-row">
+                    <h3 id="agentHistoryConversationTitle">Chat com agente</h3>
+                    <div class="agent-history-conversation-status" aria-label="Visualização somente leitura">
+                      <span class="material-symbols-rounded" aria-hidden="true">extension</span>
+                      <span class="status-dot is-inactive" aria-hidden="true"></span>
+                    </div>
+                  </div>
                   <p class="modal-subtitle" id="agentHistoryConversationSubtitle">Detalhes da interação</p>
                 </div>
                 <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
@@ -8225,35 +8274,6 @@
                 </div>
               </div>
               <div class="settings-section">
-                <div class="settings-grid settings-grid-3">
-                  <div class="settings-card">
-                    <h4>Senha e autenticação</h4>
-                    <button class="btn outline small">
-                      <span class="material-symbols-rounded">key</span>
-                      Alterar senha
-                    </button>
-                    <div class="toggle-row">
-                      <label class="switch">
-                        <input type="checkbox" />
-                        <span class="switch-track"></span>
-                      </label>
-                      <span>Autenticação em dois fatores</span>
-                    </div>
-                    <label class="settings-label" for="settingsSessionSelect">Tempo de sessão (minutos)</label>
-                    <div class="hub-select-wrap hub-select-wrap--block settings-hub-select">
-                      <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">schedule</span>
-                      <select class="hub-select" id="settingsSessionSelect" aria-label="Tempo de sessão">
-                        <option>30 minutos</option>
-                        <option>60 minutos</option>
-                        <option>120 minutos</option>
-                      </select>
-                      <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="settings-section">
                 <div class="tabs tabs-underline settings-tabs">
                   <button class="tab settings-tab active" data-tab="active-sessions">Sessões ativas</button>
                   <button class="tab settings-tab" data-tab="security-log">Log de segurança</button>
@@ -8263,6 +8283,8 @@
                   <div class="data-table settings-table sessions-table">
                     <div class="data-row header">
                       <span>Dispositivo</span>
+                      <span>Usuário</span>
+                      <span>Endereço IP</span>
                       <span>Local</span>
                       <span>Último acesso</span>
                       <span>Status</span>
@@ -8270,9 +8292,11 @@
                     </div>
                     <div class="data-row">
                       <span>Sessão atual</span>
+                      <span>Alfeu Vinicius Souza</span>
+                      <span>192.0.2.18</span>
                       <span>São Paulo, SP</span>
                       <span>2 min atrás</span>
-                      <span class="chip">Atual</span>
+                      <span class="settings-status-cell"><span class="chip">Atual</span></span>
                       <span class="row-actions">
                         <button class="icon-btn action-icon danger" aria-label="Encerrar sessão">
                           <span class="material-symbols-rounded">delete</span>
@@ -8281,9 +8305,11 @@
                     </div>
                     <div class="data-row">
                       <span>Chrome no Windows</span>
+                      <span>Alfeu Vinicius Souza</span>
+                      <span>198.51.100.42</span>
                       <span>Rio de Janeiro, RJ</span>
                       <span>2 dias atrás</span>
-                      <span class="chip">Ativa</span>
+                      <span class="settings-status-cell"><span class="chip">Ativa</span></span>
                       <span class="row-actions">
                         <button class="icon-btn action-icon danger" aria-label="Encerrar sessão">
                           <span class="material-symbols-rounded">delete</span>
@@ -8297,21 +8323,27 @@
                   <div class="data-table settings-table security-table">
                     <div class="data-row header">
                       <span>Evento</span>
+                      <span>Usuário</span>
+                      <span>Endereço IP</span>
                       <span>Data</span>
                       <span>Local</span>
                       <span>Status</span>
                     </div>
                     <div class="data-row">
                       <span>Login</span>
+                      <span>Alfeu Vinicius Souza</span>
+                      <span>192.0.2.18</span>
                       <span>28/01/2025 10:30</span>
                       <span>São Paulo, SP</span>
-                      <span class="chip success">Sucesso</span>
+                      <span class="settings-status-cell"><span class="chip success">Sucesso</span></span>
                     </div>
                     <div class="data-row">
                       <span>Alteração de senha</span>
+                      <span>Alfeu Vinicius Souza</span>
+                      <span>192.0.2.18</span>
                       <span>27/01/2025 15:45</span>
                       <span>São Paulo, SP</span>
-                      <span class="chip success">Sucesso</span>
+                      <span class="settings-status-cell"><span class="chip success">Sucesso</span></span>
                     </div>
                   </div>
                 </div>

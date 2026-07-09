@@ -191,6 +191,7 @@ const agentHistorySingleDateInput = document.getElementById('agentHistorySingleD
 const agentHistoryApplyPeriodBtn = document.getElementById('agentHistoryApplyPeriodBtn');
 const agentHistoryTable = document.getElementById('agentHistoryTable');
 const agentHistoryConversationModal = document.getElementById('agentHistoryConversationModal');
+const agentHistoryConversationTitle = document.getElementById('agentHistoryConversationTitle');
 const agentHistoryConversationSubtitle = document.getElementById('agentHistoryConversationSubtitle');
 const agentHistoryConversationBody = document.getElementById('agentHistoryConversationBody');
 const agentHistoryDetailsModal = document.getElementById('agentHistoryDetailsModal');
@@ -458,6 +459,22 @@ const executionDetailsEnd = document.getElementById('executionDetailsEnd');
 const executionDetailsDuration = document.getElementById('executionDetailsDuration');
 const executionDetailsStatus = document.getElementById('executionDetailsStatus');
 const executionDetailsRecording = document.getElementById('executionDetailsRecording');
+const executionDetailsRecordingButton = document.getElementById('executionDetailsRecordingButton');
+const executionLogsTitle = document.getElementById('executionLogsTitle');
+const executionLogsLevelFilter = document.getElementById('executionLogsLevelFilter');
+const executionLogsSearch = document.getElementById('executionLogsSearch');
+const executionLogsClear = document.getElementById('executionLogsClear');
+const executionLogsRows = document.getElementById('executionLogsRows');
+const executionRecordingModal = document.getElementById('executionRecordingModal');
+const executionRecordingModalTitle = document.getElementById('executionRecordingModalTitle');
+const executionRecordingId = document.getElementById('executionRecordingId');
+const executionRecordingDuration = document.getElementById('executionRecordingDuration');
+const executionRecordingRecordedAt = document.getElementById('executionRecordingRecordedAt');
+const executionRecordingName = document.getElementById('executionRecordingName');
+const executionRecordingMode = document.getElementById('executionRecordingMode');
+const executionRecordingSize = document.getElementById('executionRecordingSize');
+const executionRecordingStorage = document.getElementById('executionRecordingStorage');
+const executionRecordingDownload = document.getElementById('executionRecordingDownload');
 const auditDetailsModal = document.getElementById('auditDetailsModal');
 const auditDetailsDate = document.getElementById('auditDetailsDate');
 const auditDetailsUser = document.getElementById('auditDetailsUser');
@@ -1499,6 +1516,10 @@ function getOrCreateNativeTableEmptyRow(table) {
 
 function syncTableEmptyState(table) {
   if (!table) return;
+  if (table.dataset.tableEmptyStateDisabled === 'true') {
+    table.querySelector(TABLE_EMPTY_STATE_SELECTOR)?.remove();
+    return;
+  }
   const isDataTable = table.classList.contains('data-table');
   const rows = isDataTable ? getDataTableRows(table) : getNativeTableRows(table);
   const emptyRow = isDataTable ? getOrCreateDataTableEmptyRow(table) : getOrCreateNativeTableEmptyRow(table);
@@ -1522,6 +1543,7 @@ function scheduleTableEmptyStateSync(table) {
 
 function bindTableEmptyState(table) {
   if (!table || tableEmptyStateObservers.has(table)) return;
+  if (table.dataset.tableEmptyStateDisabled === 'true') return;
   syncTableEmptyState(table);
 
   const observer = new MutationObserver(() => scheduleTableEmptyStateSync(table));
@@ -11437,14 +11459,176 @@ if (periodFilterBtn && periodFilterMenu) {
 }
 
 if (executionsTable && executionDetailsModal) {
+  let activeExecutionRecording = null;
+  let executionRecordingDownloadUrl = '';
+  let activeExecutionLogs = [];
+
+  const executionLogSeedRows = [
+    { date: '07/05/2026, 23:48:04', level: 'DEBUG', message: 'ExecutionContext initialized for src', runtime: '0,00' },
+    { date: '07/05/2026, 23:48:04', level: 'DEBUG', message: 'Signal handlers registered (Windows-compatible)', runtime: '0,00' },
+    { date: '07/05/2026, 23:48:04', level: 'INFO', message: 'Windows Skipper wrapper initialized for job 490404b5-8d20-43e4-b9df-c7ebf9b05343', runtime: '0,00' },
+    { date: '07/05/2026, 23:48:04', level: 'INFO', message: 'Starting execution of main_tok.py', runtime: '0,00' },
+    { date: '07/05/2026, 23:48:04', level: 'INFO', message: 'Status: running (10.0%) - Initializing execution', runtime: '0,00' },
+    { date: '07/05/2026, 23:48:05', level: 'INFO', message: 'Loading automation package and runtime dependencies', runtime: '0,12' },
+    { date: '07/05/2026, 23:48:05', level: 'DEBUG', message: 'Resolved working directory and environment variables', runtime: '0,18' },
+    { date: '07/05/2026, 23:48:05', level: 'INFO', message: 'Input validation completed successfully', runtime: '0,26' },
+    { date: '07/05/2026, 23:48:05', level: 'WARNING', message: 'Optional cache file not found; continuing with default configuration', runtime: '0,31' },
+    { date: '07/05/2026, 23:48:06', level: 'INFO', message: 'Execution finished with status completed', runtime: '1,32' },
+  ];
+
+  const buildExecutionLogs = () => Array.from({ length: 40 }, (_, index) => {
+    const item = executionLogSeedRows[index % executionLogSeedRows.length];
+    return {
+      ...item,
+      runtime: index < 5 ? '0,00' : item.runtime,
+    };
+  });
+
+  const getExecutionStatusMeta = (status) => {
+    const normalized = String(status || '').toLowerCase();
+    if (normalized.includes('conclu') || normalized.includes('complet')) {
+      return { icon: 'check', className: 'success', label: status || 'Concluída' };
+    }
+    if (normalized.includes('interromp') || normalized.includes('paus')) {
+      return { icon: 'pause', className: 'warning', label: status || 'Interrompida' };
+    }
+    if (normalized.includes('erro') || normalized.includes('falh')) {
+      return { icon: 'close', className: 'danger', label: status || 'Falha' };
+    }
+    return { icon: 'sync', className: 'running', label: status || '-' };
+  };
+
+  const renderExecutionLogs = () => {
+    if (!executionLogsRows || !executionLogsTitle) return;
+    const level = executionLogsLevelFilter?.value || 'all';
+    const query = String(executionLogsSearch?.value || '').trim().toLowerCase();
+    const filteredLogs = activeExecutionLogs.filter((item) => {
+      const matchesLevel = level === 'all' || item.level.toLowerCase() === level;
+      const matchesQuery = !query || item.message.toLowerCase().includes(query) || item.date.toLowerCase().includes(query);
+      return matchesLevel && matchesQuery;
+    });
+
+    executionLogsTitle.textContent = `Registros (${filteredLogs.length} de ${activeExecutionLogs.length})`;
+    executionLogsRows.innerHTML = filteredLogs.map((item) => `
+      <div class="data-row execution-logs-row">
+        <span>${escapeHtmlWes(item.date)}</span>
+        <span><span class="execution-log-level execution-log-level--${escapeHtmlWes(item.level.toLowerCase())}">${escapeHtmlWes(item.level)}</span></span>
+        <span class="execution-log-message">${escapeHtmlWes(item.message)}</span>
+        <span>${escapeHtmlWes(item.runtime)}</span>
+      </div>
+    `).join('');
+
+    if (executionLogsClear) {
+      executionLogsClear.disabled = level === 'all' && !query;
+    }
+  };
+
+  const resetExecutionLogFilters = () => {
+    if (executionLogsLevelFilter) {
+      executionLogsLevelFilter.value = 'all';
+      const wrap = executionLogsLevelFilter.closest('.hub-select-wrap');
+      if (wrap) hubCustomSelectRefresh(wrap);
+    }
+    if (executionLogsSearch) {
+      executionLogsSearch.value = '';
+    }
+  };
+
+  const revokeExecutionRecordingDownloadUrl = () => {
+    if (executionRecordingDownloadUrl) {
+      URL.revokeObjectURL(executionRecordingDownloadUrl);
+      executionRecordingDownloadUrl = '';
+    }
+  };
+
+  const getExecutionRecordingData = (row) => {
+    const hasRecording = row.dataset.executionRecordingAvailable === 'true' || row.dataset.executionRecording === 'Sim';
+    const name = row.dataset.executionRecordingTitle || row.dataset.executionAutomation || '-';
+    return {
+      available: hasRecording,
+      id: row.dataset.executionId || '-',
+      name,
+      title: `Gravação — ${name}`,
+      duration: row.dataset.executionDuration || '-',
+      recordedAt: row.dataset.executionRecordingRecordedAt || row.dataset.executionEnd || '-',
+      mode: row.dataset.executionRecordingMode || 'Automático (até conclusão)',
+      size: row.dataset.executionRecordingSize || '-',
+      storage: row.dataset.executionRecordingStorage || '-',
+      download: row.dataset.executionRecordingDownload || `${name.toLowerCase().replace(/\s+/g, '-')}.webm`,
+    };
+  };
+
+  const fillExecutionRecordingModal = (recording) => {
+    if (!recording || !executionRecordingModal) return;
+    executionRecordingModalTitle.textContent = recording.title;
+    executionRecordingId.textContent = recording.id;
+    executionRecordingDuration.textContent = recording.duration;
+    executionRecordingRecordedAt.textContent = recording.recordedAt;
+    executionRecordingName.textContent = recording.name;
+    executionRecordingMode.textContent = recording.mode;
+    executionRecordingSize.textContent = recording.size;
+    executionRecordingStorage.textContent = recording.storage;
+
+    if (executionRecordingDownload) {
+      revokeExecutionRecordingDownloadUrl();
+      const payload = [
+        `Gravação: ${recording.name}`,
+        `ID da execução: ${recording.id}`,
+        `Duração: ${recording.duration}`,
+        `Gravado: ${recording.recordedAt}`,
+        `Armazenamento: ${recording.storage}`,
+      ].join('\n');
+      executionRecordingDownloadUrl = URL.createObjectURL(new Blob([payload], { type: 'application/octet-stream' }));
+      executionRecordingDownload.href = executionRecordingDownloadUrl;
+      executionRecordingDownload.download = recording.download;
+      executionRecordingDownload.setAttribute('aria-disabled', 'false');
+    }
+  };
+
+  const openExecutionRecordingModal = () => {
+    if (!executionRecordingModal || !activeExecutionRecording?.available) return;
+    fillExecutionRecordingModal(activeExecutionRecording);
+    closeExecutionDetailsModal();
+    executionRecordingModal.classList.add('open');
+    executionRecordingModal.setAttribute('aria-hidden', 'false');
+  };
+
+  const closeExecutionRecordingModal = () => {
+    if (!executionRecordingModal) return;
+    executionRecordingModal.classList.remove('open');
+    executionRecordingModal.setAttribute('aria-hidden', 'true');
+  };
+
   const fillExecutionDetailsModal = (row) => {
     if (!row) return;
     executionDetailsId.textContent = row.dataset.executionId || '-';
     executionDetailsStart.textContent = row.dataset.executionStart || '-';
     executionDetailsEnd.textContent = row.dataset.executionEnd || '-';
     executionDetailsDuration.textContent = row.dataset.executionDuration || '-';
-    executionDetailsStatus.textContent = row.dataset.executionStatus || '-';
-    executionDetailsRecording.textContent = row.dataset.executionRecording || '-';
+    const statusMeta = getExecutionStatusMeta(row.dataset.executionStatus || '-');
+    executionDetailsStatus.innerHTML = `
+      <span class="execution-status-indicator execution-status-indicator--${escapeHtmlWes(statusMeta.className)}">
+        <span class="material-symbols-rounded" aria-hidden="true">${escapeHtmlWes(statusMeta.icon)}</span>
+      </span>
+      <span>${escapeHtmlWes(statusMeta.label)}</span>
+    `;
+    activeExecutionLogs = buildExecutionLogs();
+    resetExecutionLogFilters();
+    renderExecutionLogs();
+    activeExecutionRecording = getExecutionRecordingData(row);
+    if (executionDetailsRecording) {
+      executionDetailsRecording.textContent = row.dataset.executionRecording || '-';
+    }
+    if (executionDetailsRecordingButton) {
+      executionDetailsRecordingButton.disabled = !activeExecutionRecording.available;
+      executionDetailsRecordingButton.innerHTML = activeExecutionRecording.available
+        ? '<span class="material-symbols-rounded" aria-hidden="true">play_circle</span>Ver gravação'
+        : '<span class="material-symbols-rounded" aria-hidden="true">videocam_off</span>Sem gravação';
+      executionDetailsRecordingButton.setAttribute(
+        'aria-label',
+        activeExecutionRecording.available ? 'Ver gravação' : 'Sem gravação disponível',
+      );
+    }
   };
 
   const openExecutionDetailsModal = () => {
@@ -11469,6 +11653,27 @@ if (executionsTable && executionDetailsModal) {
   executionDetailsModal.addEventListener('click', (event) => {
     if (event.target.closest('[data-modal-close]')) {
       closeExecutionDetailsModal();
+    }
+  });
+
+  executionLogsLevelFilter?.addEventListener('change', renderExecutionLogs);
+  executionLogsSearch?.addEventListener('input', renderExecutionLogs);
+  executionLogsClear?.addEventListener('click', () => {
+    resetExecutionLogFilters();
+    renderExecutionLogs();
+  });
+
+  executionDetailsRecordingButton?.addEventListener('click', openExecutionRecordingModal);
+
+  executionRecordingModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-recording-modal-close]')) {
+      closeExecutionRecordingModal();
+    }
+  });
+
+  executionRecordingDownload?.addEventListener('click', (event) => {
+    if (!activeExecutionRecording?.available) {
+      event.preventDefault();
     }
   });
 }
@@ -13410,24 +13615,19 @@ function closeAgentHistoryModal(modal) {
 
 function renderAgentHistoryConversation(item) {
   if (!agentHistoryConversationBody || !agentHistoryConversationSubtitle || !item) return;
-  agentHistoryConversationSubtitle.textContent = `${item.userName} • ${item.agentName} • ${formatAgentHistoryDateTime(item.occurredAt)}`;
-  const sourceChipClass = getAgentHistorySourceChipClass(item);
+  if (agentHistoryConversationTitle) agentHistoryConversationTitle.textContent = `Chat com ${item.agentName}`;
+  agentHistoryConversationSubtitle.textContent = `${item.agentContext} • Última conversa ${formatAgentHistoryDateTime(item.occurredAt)}`;
   agentHistoryConversationBody.innerHTML = `
-    <section class="agent-history-conversation-meta">
-      <div class="agent-history-conversation-meta-copy">
-        <strong>${escapeHtmlWes(item.agentName)}</strong>
-        <small>${escapeHtmlWes(item.agentContext)} • ${escapeHtmlWes(item.userEmail)}</small>
-      </div>
-      <span class="${sourceChipClass}">${escapeHtmlWes(item.sourceLabel)}</span>
-    </section>
-    <section class="agent-history-message-list">
+    <section class="agent-history-readonly-chat" aria-label="Conversa completa somente para visualização">
       ${item.conversation.map((message) => `
-        <article class="agent-history-message${String(message.role).toLowerCase() === 'agente' ? ' agent-history-message--assistant' : ''}">
-          <div class="agent-history-message-head">
-            <span class="agent-history-message-role">${escapeHtmlWes(message.role)}</span>
-            <span class="agent-history-message-time">${escapeHtmlWes(message.at || '')}</span>
+        <article class="agent-history-chat-message${String(message.role).toLowerCase() === 'agente' ? ' agent-history-chat-message--agent' : ' agent-history-chat-message--user'}">
+          <div class="agent-history-chat-meta">
+            <span>${String(message.role).toLowerCase() === 'agente' ? 'Agente' : 'Você'}${message.at ? ` • ${escapeHtmlWes(message.at)}` : ''}</span>
+            <span class="agent-history-chat-audio" aria-hidden="true">
+              <span class="material-symbols-rounded">volume_up</span>
+            </span>
           </div>
-          <p class="agent-history-message-text">${escapeHtmlWes(message.text || '')}</p>
+          <div class="agent-history-chat-bubble">${escapeHtmlWes(message.text || '')}</div>
         </article>
       `).join('')}
     </section>
@@ -14641,6 +14841,83 @@ function applyAgentsProjectRoute() {
     hubRefreshCustomSelects();
   }
   syncAgentsFolderStripScroller();
+}
+
+function applyVmMonitoringRoute() {
+  const vmPage = document.getElementById('page-vm-monitoring');
+  if (!vmPage || !vmPage.classList.contains('is-active')) return;
+
+  const { routeKey } = getHashRouteInfo();
+  const machineMatch = routeKey.match(/^dashboard\/vm-monitoring\/machine\/([^/?#]+)$/);
+  const machineId = machineMatch ? decodeURIComponent(machineMatch[1]) : null;
+  const cards = Array.from(vmPage.querySelectorAll('.vm-machine-card[data-vm-machine]'));
+  const selectedCard = machineId ? cards.find((card) => card.dataset.vmMachine === machineId) : null;
+
+  if (machineId && !selectedCard) {
+    const fallback = '#/dashboard/vm-monitoring';
+    if (window.location.hash !== fallback) {
+      window.location.replace(fallback);
+    }
+    return;
+  }
+
+  const metricState = selectedCard
+    ? {
+        title: `Visão geral da máquina: ${selectedCard.dataset.vmMachineTitle || machineId}`,
+        cpu: selectedCard.dataset.vmCpu,
+        cpuBar: selectedCard.dataset.vmCpuBar,
+        memory: selectedCard.dataset.vmMemory,
+        memoryBar: selectedCard.dataset.vmMemoryBar,
+        disk: selectedCard.dataset.vmDisk,
+        diskBar: selectedCard.dataset.vmDiskBar,
+        network: selectedCard.dataset.vmNetwork,
+        networkBar: selectedCard.dataset.vmNetworkBar,
+      }
+    : {
+        title: 'Visão geral da frota (4 máquinas)',
+        cpu: '49%',
+        cpuBar: '49%',
+        memory: '62%',
+        memoryBar: '62%',
+        disk: '55%',
+        diskBar: '55%',
+        network: '6.5 MB/s',
+        networkBar: '48%',
+      };
+
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
+  const setBar = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.style.width = value;
+  };
+
+  setText('vmMetricsTitle', metricState.title);
+  setText('vmCpuLabel', 'Uso médio de CPU');
+  setText('vmMemoryLabel', 'Uso médio de memória');
+  setText('vmDiskLabel', 'Uso médio de disco');
+  setText('vmNetworkLabel', 'Carga média de rede');
+  setText('vmCpuValue', metricState.cpu);
+  setText('vmMemoryValue', metricState.memory);
+  setText('vmDiskValue', metricState.disk);
+  setText('vmNetworkValue', metricState.network);
+  setText('vmTrendText', `CPU média: ${metricState.cpu} · Memória média: ${metricState.memory} · Disco médio: ${metricState.disk} · Rede média: ${metricState.network}`);
+  setBar('vmCpuBar', metricState.cpuBar);
+  setBar('vmMemoryBar', metricState.memoryBar);
+  setBar('vmDiskBar', metricState.diskBar);
+  setBar('vmNetworkBar', metricState.networkBar);
+
+  cards.forEach((card) => {
+    const active = card === selectedCard;
+    card.classList.toggle('is-active', active);
+    if (active) {
+      card.setAttribute('aria-current', 'true');
+    } else {
+      card.removeAttribute('aria-current');
+    }
+  });
 }
 
 (function initAgentsFolderStripControls() {
@@ -15866,6 +16143,9 @@ const updateActivePage = () => {
   if (!pageId && routeKey.startsWith('dashboard/agents/project/')) {
     pageId = 'page-agents';
   }
+  if (!pageId && routeKey.startsWith('dashboard/vm-monitoring/machine/')) {
+    pageId = 'page-vm-monitoring';
+  }
   if (!pageId) pageId = 'page-dashboard';
   const page = document.getElementById(pageId);
 
@@ -15885,6 +16165,8 @@ const updateActivePage = () => {
 
   const navRouteKey = routeKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
+    : routeKey.startsWith('dashboard/vm-monitoring/machine/')
+      ? 'dashboard/vm-monitoring'
     : routeKey.startsWith('dashboard/automations/')
       ? 'dashboard/automations'
     : routeKey.startsWith('dashboard/voice-messaging/')
@@ -15958,6 +16240,7 @@ const updateActivePage = () => {
   }
 
   applyAgentsProjectRoute();
+  applyVmMonitoringRoute();
   openAgentChatFromRouteParam();
 
   if (window.WesDashboardAuth?.isAuthenticated?.()) {
@@ -15974,7 +16257,7 @@ const updateActivePage = () => {
   document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
   document.body.classList.toggle('route-automation-create', routeKey === 'dashboard/automations/new');
   document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
-  document.body.classList.toggle('route-vm-monitoring', routeKey === 'dashboard/vm-monitoring');
+  document.body.classList.toggle('route-vm-monitoring', routeKey === 'dashboard/vm-monitoring' || routeKey.startsWith('dashboard/vm-monitoring/machine/'));
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
   document.body.classList.toggle('route-profile', routeKey === 'dashboard/profile');
   syncVoiceMessagingInsightsChart(routeKey);

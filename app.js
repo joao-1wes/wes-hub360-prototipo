@@ -536,6 +536,8 @@ const automationTabs = document.querySelectorAll('#page-automations .tab');
 const automationPanels = document.querySelectorAll('#page-automations .tab-panel');
 const automationsTable = document.querySelector('#page-automations .automations-table');
 const executionsTable = document.querySelector('#page-automations .executions-table');
+const schedulesTable = document.querySelector('#page-automations .schedules-table');
+const exportSchedulesCsvButton = document.getElementById('exportSchedulesCsvButton');
 const executorTabs = document.querySelectorAll('#page-executors .tab');
 const executorPanels = document.querySelectorAll('#page-executors .tab-panel');
 const usersTabs = document.querySelectorAll('#page-users .tab');
@@ -12033,6 +12035,47 @@ if (telegramHelpCard) {
     });
   }
 }
+
+function escapeCsvCell(value) {
+  return `"${String(value ?? '').replace(/\s+/g, ' ').trim().replace(/"/g, '""')}"`;
+}
+
+function downloadTextFile(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function exportSchedulesCsv() {
+  if (!schedulesTable) return;
+
+  const headers = ['Agendamento', 'Automação', 'Frequência', 'Status', 'Próxima execução'];
+  const rows = Array.from(schedulesTable.querySelectorAll('.data-row:not(.header)'))
+    .map((row) => Array.from(row.children)
+      .slice(0, headers.length)
+      .map((cell) => cell.textContent));
+
+  if (!rows.length) {
+    showAppToast('Nenhum agendamento para exportar');
+    return;
+  }
+
+  const csv = [
+    headers.map(escapeCsvCell).join(';'),
+    ...rows.map((row) => row.map(escapeCsvCell).join(';')),
+  ].join('\n');
+
+  downloadTextFile('agendamentos.csv', `\uFEFF${csv}`, 'text/csv;charset=utf-8');
+  showAppToast('Agendamentos exportados em CSV');
+}
+
+exportSchedulesCsvButton?.addEventListener('click', exportSchedulesCsv);
 
 if (automationTabs.length && automationPanels.length) {
   automationTabs.forEach((tab) => {

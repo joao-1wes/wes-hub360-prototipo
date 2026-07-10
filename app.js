@@ -297,6 +297,9 @@ const agentsPageEnvironmentSelect = document.getElementById('agentsPageEnvironme
 const agentsFolderAccordion = document.getElementById('agentsFolderAccordion');
 const agentsFolderAccordionToggle = document.getElementById('agentsFolderAccordionToggle');
 const agentsFolderAccordionPanel = document.getElementById('agentsFolderAccordionPanel');
+const vmMachinesBlock = document.getElementById('vmMachinesBlock');
+const vmMachinesToggle = document.getElementById('vmMachinesToggle');
+const vmMachinesPanel = document.getElementById('vmMachinesPanel');
 const openAgentModal = document.getElementById('openAgentModal');
 const agentModal = document.getElementById('agentModal');
 const agentChatModal = document.getElementById('agentChatModal');
@@ -13309,6 +13312,13 @@ function setAgentsFolderAccordionExpanded(expanded) {
   agentsFolderAccordionPanel.hidden = !expanded;
 }
 
+function setVmMachinesAccordionExpanded(expanded) {
+  if (!vmMachinesBlock || !vmMachinesToggle || !vmMachinesPanel) return;
+  vmMachinesBlock.classList.toggle('is-open', expanded);
+  vmMachinesToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  vmMachinesPanel.hidden = !expanded;
+}
+
 function hubSyncFromState() {
   const org = getHubScopeCurrentOrg();
   if (!org) return;
@@ -14596,6 +14606,13 @@ if (agentsFolderAccordionToggle && agentsFolderAccordionPanel) {
   });
 }
 
+if (vmMachinesToggle && vmMachinesPanel) {
+  setVmMachinesAccordionExpanded(!vmMachinesPanel.hidden);
+  vmMachinesToggle.addEventListener('click', () => {
+    setVmMachinesAccordionExpanded(vmMachinesPanel.hidden);
+  });
+}
+
 function rebuildAgentsFolderStrip(environments) {
   const strip = document.getElementById('agentsFolderStrip');
   if (!strip) return;
@@ -14884,83 +14901,6 @@ function applyAgentsProjectRoute() {
     hubRefreshCustomSelects();
   }
   syncAgentsFolderStripScroller();
-}
-
-function applyVmMonitoringRoute() {
-  const vmPage = document.getElementById('page-vm-monitoring');
-  if (!vmPage || !vmPage.classList.contains('is-active')) return;
-
-  const { routeKey } = getHashRouteInfo();
-  const machineMatch = routeKey.match(/^dashboard\/vm-monitoring\/machine\/([^/?#]+)$/);
-  const machineId = machineMatch ? decodeURIComponent(machineMatch[1]) : null;
-  const cards = Array.from(vmPage.querySelectorAll('.vm-machine-card[data-vm-machine]'));
-  const selectedCard = machineId ? cards.find((card) => card.dataset.vmMachine === machineId) : null;
-
-  if (machineId && !selectedCard) {
-    const fallback = '#/dashboard/vm-monitoring';
-    if (window.location.hash !== fallback) {
-      window.location.replace(fallback);
-    }
-    return;
-  }
-
-  const metricState = selectedCard
-    ? {
-        title: `Visão geral da máquina: ${selectedCard.dataset.vmMachineTitle || machineId}`,
-        cpu: selectedCard.dataset.vmCpu,
-        cpuBar: selectedCard.dataset.vmCpuBar,
-        memory: selectedCard.dataset.vmMemory,
-        memoryBar: selectedCard.dataset.vmMemoryBar,
-        disk: selectedCard.dataset.vmDisk,
-        diskBar: selectedCard.dataset.vmDiskBar,
-        network: selectedCard.dataset.vmNetwork,
-        networkBar: selectedCard.dataset.vmNetworkBar,
-      }
-    : {
-        title: 'Visão geral da frota (4 máquinas)',
-        cpu: '49%',
-        cpuBar: '49%',
-        memory: '62%',
-        memoryBar: '62%',
-        disk: '55%',
-        diskBar: '55%',
-        network: '6.5 MB/s',
-        networkBar: '48%',
-      };
-
-  const setText = (id, value) => {
-    const element = document.getElementById(id);
-    if (element) element.textContent = value;
-  };
-  const setBar = (id, value) => {
-    const element = document.getElementById(id);
-    if (element) element.style.width = value;
-  };
-
-  setText('vmMetricsTitle', metricState.title);
-  setText('vmCpuLabel', 'Uso médio de CPU');
-  setText('vmMemoryLabel', 'Uso médio de memória');
-  setText('vmDiskLabel', 'Uso médio de disco');
-  setText('vmNetworkLabel', 'Carga média de rede');
-  setText('vmCpuValue', metricState.cpu);
-  setText('vmMemoryValue', metricState.memory);
-  setText('vmDiskValue', metricState.disk);
-  setText('vmNetworkValue', metricState.network);
-  setText('vmTrendText', `CPU média: ${metricState.cpu} · Memória média: ${metricState.memory} · Disco médio: ${metricState.disk} · Rede média: ${metricState.network}`);
-  setBar('vmCpuBar', metricState.cpuBar);
-  setBar('vmMemoryBar', metricState.memoryBar);
-  setBar('vmDiskBar', metricState.diskBar);
-  setBar('vmNetworkBar', metricState.networkBar);
-
-  cards.forEach((card) => {
-    const active = card === selectedCard;
-    card.classList.toggle('is-active', active);
-    if (active) {
-      card.setAttribute('aria-current', 'true');
-    } else {
-      card.removeAttribute('aria-current');
-    }
-  });
 }
 
 (function initAgentsFolderStripControls() {
@@ -16186,9 +16126,6 @@ const updateActivePage = () => {
   if (!pageId && routeKey.startsWith('dashboard/agents/project/')) {
     pageId = 'page-agents';
   }
-  if (!pageId && routeKey.startsWith('dashboard/vm-monitoring/machine/')) {
-    pageId = 'page-vm-monitoring';
-  }
   if (!pageId) pageId = 'page-dashboard';
   const page = document.getElementById(pageId);
 
@@ -16208,8 +16145,6 @@ const updateActivePage = () => {
 
   const navRouteKey = routeKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
-    : routeKey.startsWith('dashboard/vm-monitoring/machine/')
-      ? 'dashboard/vm-monitoring'
     : routeKey.startsWith('dashboard/automations/')
       ? 'dashboard/automations'
     : routeKey.startsWith('dashboard/voice-messaging/')
@@ -16283,7 +16218,6 @@ const updateActivePage = () => {
   }
 
   applyAgentsProjectRoute();
-  applyVmMonitoringRoute();
   openAgentChatFromRouteParam();
 
   if (window.WesDashboardAuth?.isAuthenticated?.()) {
@@ -16300,7 +16234,7 @@ const updateActivePage = () => {
   document.body.classList.toggle('route-agents', routeKey === 'dashboard/agents' || routeKey.startsWith('dashboard/agents/project/'));
   document.body.classList.toggle('route-automation-create', routeKey === 'dashboard/automations/new');
   document.body.classList.toggle('route-executors', routeKey === 'dashboard/executors');
-  document.body.classList.toggle('route-vm-monitoring', routeKey === 'dashboard/vm-monitoring' || routeKey.startsWith('dashboard/vm-monitoring/machine/'));
+  document.body.classList.toggle('route-vm-monitoring', routeKey === 'dashboard/vm-monitoring');
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
   document.body.classList.toggle('route-profile', routeKey === 'dashboard/profile');
   syncVoiceMessagingInsightsChart(routeKey);

@@ -13747,6 +13747,30 @@ body.agent-chat-standalone .chat-thread {
   gap: 16px;
 }
 
+#page-vm-monitoring #vmMetricsPanel {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  margin-bottom: 0;
+}
+
+.vm-metrics-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+#page-vm-monitoring .vm-metrics-header {
+  justify-content: flex-start;
+}
+
+.vm-metrics-header h4 {
+  margin: 0;
+}
+
 .vm-machines-folder {
   border: 0;
   border-radius: 0;
@@ -13756,13 +13780,45 @@ body.agent-chat-standalone .chat-thread {
 }
 
 .vm-machines-folder-head {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  width: fit-content;
+  padding: 0 14px;
   margin-bottom: 10px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(1, 111, 244, 0.08);
+  font-family: inherit;
   font-size: var(--md-label-large);
   font-weight: 700;
   color: #0d47a1;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.vm-machines-folder-head:hover {
+  background: rgba(1, 111, 244, 0.12);
+}
+
+.vm-machines-folder-head:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(1, 111, 244, 0.18);
+}
+
+.vm-machines-folder-caret {
+  font-size: 18px !important;
+  transition: transform 0.2s ease;
+}
+
+.vm-machines-folder.is-open .vm-machines-folder-caret {
+  transform: rotate(180deg);
+}
+
+.vm-machines-grid[hidden] {
+  display: none !important;
 }
 
 .vm-machines-grid {
@@ -13793,12 +13849,6 @@ body.agent-chat-standalone .chat-thread {
   border-color: #016ff4;
   transform: translateY(-1px);
   box-shadow: 0 4px 14px rgba(1, 111, 244, 0.1);
-}
-
-.vm-machine-card.is-active {
-  border-color: #016ff4;
-  background: #eef6ff;
-  box-shadow: 0 4px 14px rgba(1, 111, 244, 0.14);
 }
 
 .vm-machine-card:focus-visible {

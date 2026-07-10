@@ -6408,6 +6408,36 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   padding: 20px;
 }
 
+.channel-edit-dialog {
+  width: min(760px, 94vw);
+}
+
+.channel-edit-body {
+  gap: 14px;
+}
+
+.channel-edit-summary {
+  margin: 0;
+}
+
+.channel-edit-summary .chip {
+  min-width: 74px;
+  text-align: center;
+}
+
+.channel-edit-status-toggle {
+  margin: 2px 0 4px;
+}
+
+.channel-edit-token-field {
+  display: grid;
+  gap: 8px;
+}
+
+.channel-edit-token-field .modal-field-hint {
+  margin: 0 0 4px;
+}
+
 .channel-picker-header h3 {
   font-size: var(--md-headline-small);
   line-height: 1.2;

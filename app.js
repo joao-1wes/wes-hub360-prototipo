@@ -356,6 +356,24 @@ const rotatePublicLinkModal = document.getElementById('rotatePublicLinkModal');
 const rotatePublicLinkConfirm = document.getElementById('rotatePublicLinkConfirm');
 const openChannelModal = document.getElementById('openChannelModal');
 const channelModal = document.getElementById('channelModal');
+const channelEditModal = document.getElementById('channelEditModal');
+const channelEditForm = document.getElementById('channelEditForm');
+const channelEditError = document.getElementById('channelEditError');
+const channelEditAvatar = document.getElementById('channelEditAvatar');
+const channelEditSummaryName = document.getElementById('channelEditSummaryName');
+const channelEditSummaryIdentifier = document.getElementById('channelEditSummaryIdentifier');
+const channelEditSummaryType = document.getElementById('channelEditSummaryType');
+const channelEditSummaryStatus = document.getElementById('channelEditSummaryStatus');
+const channelEditName = document.getElementById('channelEditName');
+const channelEditType = document.getElementById('channelEditType');
+const channelEditIdentifier = document.getElementById('channelEditIdentifier');
+const channelEditPublicLink = document.getElementById('channelEditPublicLink');
+const channelEditBotToken = document.getElementById('channelEditBotToken');
+const toggleChannelEditBotToken = document.getElementById('toggleChannelEditBotToken');
+const channelEditStatus = document.getElementById('channelEditStatus');
+const channelEditStatusWrap = document.getElementById('channelEditStatusWrap');
+const channelEditStatusValue = document.getElementById('channelEditStatusValue');
+const channelEditDescription = document.getElementById('channelEditDescription');
 const openTelegramConfigModal = document.getElementById('openTelegramConfigModal');
 const telegramIntegrationName = document.getElementById('telegramIntegrationName');
 const telegramBotToken = document.getElementById('telegramBotToken');
@@ -1220,6 +1238,7 @@ const SUPPORTED_LANGUAGES = {
   es: { label: 'ES', flag: './assets/flag-es.svg', documentLang: 'es' },
 };
 let currentLanguage = DEFAULT_LANGUAGE;
+let activeChannelEditRow = null;
 const AUTOMATION_PACKAGE_OPTIONS = Object.freeze([
   {
     id: 'teste_wiki',
@@ -2622,6 +2641,145 @@ function completeTelegramConfiguration() {
   window.setTimeout(() => {
     window.location.hash = '#/dashboard/channels';
   }, 180);
+}
+
+function getChannelRowData(row) {
+  const cells = row ? Array.from(row.children) : [];
+  const channelName = cells[0]?.querySelector('strong')?.textContent?.trim() || '';
+  const channelSubtitle = cells[0]?.querySelector('.muted')?.textContent?.trim() || '';
+  const type = cells[1]?.textContent?.trim() || '';
+  const integrationName = cells[2]?.textContent?.trim() || '';
+  const identifier = cells[3]?.textContent?.trim() || '';
+  const status = cells[4]?.textContent?.trim() || '';
+  const description = cells[5]?.textContent?.trim() || '';
+  return { channelName, channelSubtitle, type, integrationName, identifier, status, description };
+}
+
+function setChannelEditError(message = '') {
+  if (!channelEditError) return;
+  channelEditError.textContent = message;
+}
+
+function syncChannelEditTokenVisibility() {
+  if (!channelEditBotToken || !toggleChannelEditBotToken) return;
+  const isVisible = channelEditBotToken.type === 'text';
+  const icon = toggleChannelEditBotToken.querySelector('.material-symbols-rounded');
+  toggleChannelEditBotToken.setAttribute('aria-label', isVisible ? 'Ocultar bot token' : 'Mostrar bot token');
+  toggleChannelEditBotToken.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+  if (icon) icon.textContent = isVisible ? 'visibility_off' : 'visibility';
+}
+
+function syncChannelEditStatus() {
+  if (!channelEditStatus || !channelEditStatusValue) return;
+  const isActive = channelEditStatus.checked;
+  channelEditStatusValue.textContent = isActive ? 'Ativa' : 'Pausada';
+  channelEditStatusWrap?.classList.toggle('is-active', isActive);
+  channelEditStatusWrap?.classList.toggle('is-paused', !isActive);
+  if (channelEditSummaryStatus) {
+    channelEditSummaryStatus.textContent = isActive ? 'Ativa' : 'Pausada';
+    channelEditSummaryStatus.classList.toggle('success', isActive);
+    channelEditSummaryStatus.classList.toggle('warning', !isActive);
+  }
+}
+
+function syncChannelEditPublicLink() {
+  if (!channelEditIdentifier || !channelEditPublicLink) return;
+  const type = String(channelEditType?.value || '').trim().toLowerCase();
+  const rawIdentifier = String(channelEditIdentifier.value || '').trim();
+  const username = normalizeTelegramUsername(rawIdentifier);
+  if (type === 'telegram') {
+    channelEditIdentifier.value = username;
+    channelEditPublicLink.value = username ? `https://t.me/${username}` : '';
+    if (channelEditSummaryIdentifier) channelEditSummaryIdentifier.textContent = username ? `@${username}` : '-';
+  } else {
+    channelEditPublicLink.value = '';
+    if (channelEditSummaryIdentifier) channelEditSummaryIdentifier.textContent = rawIdentifier || '-';
+  }
+}
+
+function openChannelEditModal(row) {
+  if (!channelEditModal || !channelEditForm || !row) return;
+  const data = getChannelRowData(row);
+  const isTelegram = data.type.toLowerCase() === 'telegram';
+  activeChannelEditRow = row;
+  setChannelEditError();
+
+  if (channelEditAvatar) {
+    channelEditAvatar.textContent = (data.type || data.channelName || 'CA').slice(0, 2).toUpperCase();
+  }
+  if (channelEditSummaryName) channelEditSummaryName.textContent = data.channelName || data.integrationName || 'Canal';
+  if (channelEditSummaryType) channelEditSummaryType.textContent = data.type || 'Canal';
+  if (channelEditName) channelEditName.value = data.integrationName;
+  if (channelEditType) channelEditType.value = data.type;
+  if (channelEditIdentifier) channelEditIdentifier.value = isTelegram ? normalizeTelegramUsername(data.identifier) : data.identifier;
+  if (channelEditBotToken) {
+    channelEditBotToken.value = '';
+    channelEditBotToken.disabled = !isTelegram;
+    channelEditBotToken.placeholder = isTelegram ? 'Mantém o token atual se ficar em branco' : 'Token editável no fluxo do provedor';
+    channelEditBotToken.type = 'password';
+  }
+  if (toggleChannelEditBotToken) toggleChannelEditBotToken.disabled = !isTelegram;
+  if (channelEditStatus) channelEditStatus.checked = data.status.toLowerCase() !== 'pausada';
+  if (channelEditDescription) channelEditDescription.value = data.description;
+
+  syncChannelEditTokenVisibility();
+  syncChannelEditPublicLink();
+  syncChannelEditStatus();
+
+  channelEditModal.classList.add('open');
+  channelEditModal.setAttribute('aria-hidden', 'false');
+  channelEditName?.focus();
+  channelEditName?.select();
+}
+
+function closeChannelEditModal() {
+  if (!channelEditModal) return;
+  channelEditModal.classList.remove('open');
+  channelEditModal.setAttribute('aria-hidden', 'true');
+  activeChannelEditRow = null;
+}
+
+function submitChannelEditForm(event) {
+  event.preventDefault();
+  if (!activeChannelEditRow) return;
+  const integrationName = String(channelEditName?.value || '').trim();
+  const type = String(channelEditType?.value || '').trim();
+  const identifierRaw = String(channelEditIdentifier?.value || '').trim();
+  const identifier = type.toLowerCase() === 'telegram' ? normalizeTelegramUsername(identifierRaw) : identifierRaw;
+  const description = String(channelEditDescription?.value || '').trim();
+  const token = String(channelEditBotToken?.value || '').trim();
+  const isActive = Boolean(channelEditStatus?.checked);
+
+  if (!integrationName) {
+    setChannelEditError('Informe o nome interno da integração.');
+    channelEditName?.focus();
+    return;
+  }
+  if (!identifier) {
+    setChannelEditError('Informe o identificador público do canal.');
+    channelEditIdentifier?.focus();
+    return;
+  }
+  if (type.toLowerCase() === 'telegram' && token && !isTelegramTokenFormatValid(token)) {
+    setChannelEditError('Informe um bot token válido ou deixe o campo em branco para manter o atual.');
+    channelEditBotToken?.focus();
+    channelEditBotToken?.select();
+    return;
+  }
+
+  const cells = Array.from(activeChannelEditRow.children);
+  if (cells[2]) cells[2].textContent = integrationName;
+  if (cells[3]) cells[3].textContent = type.toLowerCase() === 'telegram' ? `@${identifier}` : identifier;
+  if (cells[4]) {
+    const chip = cells[4].querySelector('.chip') || cells[4];
+    chip.textContent = isActive ? 'Ativa' : 'Pausada';
+    chip.classList.toggle('success', isActive);
+    chip.classList.toggle('warning', !isActive);
+  }
+  if (cells[5]) cells[5].textContent = description || 'Sem descrição';
+
+  closeChannelEditModal();
+  showAppToast('Canal atualizado com sucesso');
 }
 
 function showAppToast(message) {
@@ -9791,6 +9949,41 @@ if (openChannelModal && channelModal) {
     }
   });
 }
+
+if (channelEditModal) {
+  channelEditModal.addEventListener('click', (event) => {
+    const closeTarget = event.target.closest('[data-channel-edit-close]');
+    if (closeTarget) closeChannelEditModal();
+  });
+}
+
+if (channelEditForm) {
+  channelEditForm.addEventListener('submit', submitChannelEditForm);
+}
+
+if (channelEditIdentifier) {
+  channelEditIdentifier.addEventListener('input', syncChannelEditPublicLink);
+  channelEditIdentifier.addEventListener('blur', syncChannelEditPublicLink);
+}
+
+if (channelEditStatus) {
+  channelEditStatus.addEventListener('change', syncChannelEditStatus);
+}
+
+if (channelEditBotToken && toggleChannelEditBotToken) {
+  toggleChannelEditBotToken.addEventListener('click', () => {
+    channelEditBotToken.type = channelEditBotToken.type === 'password' ? 'text' : 'password';
+    syncChannelEditTokenVisibility();
+  });
+  syncChannelEditTokenVisibility();
+}
+
+document.querySelector('#page-channels .channels-table')?.addEventListener('click', (event) => {
+  const editButton = event.target.closest('[data-channel-edit]');
+  if (!editButton) return;
+  const row = editButton.closest('.data-row:not(.header)');
+  if (row) openChannelEditModal(row);
+});
 
 if (openTelegramConfigModal && channelModal) {
   openTelegramConfigModal.addEventListener('click', () => {

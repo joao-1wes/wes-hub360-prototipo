@@ -5172,7 +5172,7 @@
                   <span><span class="chip success">Ativa</span></span>
                   <span class="muted channel-tooltip-target">Lembretes, confirmações e retomada pós-voz</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar canal" type="button">
+                    <button class="icon-btn action-icon" aria-label="Editar canal" data-channel-edit type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir canal" type="button">
@@ -5193,7 +5193,7 @@
                   <span><span class="chip success">Ativa</span></span>
                   <span class="muted channel-tooltip-target">Triagem inicial antes da continuidade no chat</span>
                   <span class="row-actions">
-                    <button class="icon-btn action-icon" aria-label="Editar canal" type="button">
+                    <button class="icon-btn action-icon" aria-label="Editar canal" data-channel-edit type="button">
                       <span class="material-symbols-rounded">edit</span>
                     </button>
                     <button class="icon-btn action-icon danger" aria-label="Excluir canal" type="button">
@@ -5517,6 +5517,94 @@
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="modal" id="channelEditModal" aria-hidden="true">
+            <div class="modal-backdrop" data-channel-edit-close></div>
+            <div class="modal-dialog channel-edit-dialog" role="dialog" aria-modal="true" aria-labelledby="channelEditModalTitle">
+              <form id="channelEditForm">
+                <div class="modal-header">
+                  <div>
+                    <h3 id="channelEditModalTitle">Editar canal</h3>
+                    <p class="modal-subtitle">Atualize os dados editáveis desta integração sem alterar o tipo de canal.</p>
+                  </div>
+                  <button class="icon-btn" aria-label="Fechar" data-channel-edit-close type="button">
+                    <span class="material-symbols-rounded">close</span>
+                  </button>
+                </div>
+                <div class="modal-body channel-edit-body">
+                  <p class="modal-form-error" id="channelEditError" role="alert"></p>
+
+                  <div class="telegram-bot-summary channel-edit-summary">
+                    <div class="telegram-bot-summary-main">
+                      <span class="telegram-bot-avatar" id="channelEditAvatar">TE</span>
+                      <div>
+                        <strong id="channelEditSummaryName">Telegram</strong>
+                        <p><span id="channelEditSummaryIdentifier">@wes_hub_bot</span> · <span id="channelEditSummaryType">Telegram</span></p>
+                      </div>
+                    </div>
+                    <span class="chip success" id="channelEditSummaryStatus">Ativa</span>
+                  </div>
+
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label modal-label--required" for="channelEditName">Nome interno da integração</label>
+                      <input class="modal-input" id="channelEditName" type="text" required />
+                      <p class="modal-field-hint">Nome exibido para a equipe nos seletores de canal e fluxos.</p>
+                    </div>
+                    <div>
+                      <label class="modal-label" for="channelEditType">Tipo de canal</label>
+                      <input class="modal-input" id="channelEditType" type="text" readonly />
+                      <p class="modal-field-hint">O tipo é definido na criação da integração.</p>
+                    </div>
+                  </div>
+
+                  <div class="modal-row">
+                    <div>
+                      <label class="modal-label modal-label--required" for="channelEditIdentifier">Identificador público</label>
+                      <input class="modal-input" id="channelEditIdentifier" type="text" required />
+                      <p class="modal-field-hint">Para Telegram, use o usuário público do bot. Ex.: <code>wes_hub_bot</code>.</p>
+                    </div>
+                    <div>
+                      <label class="modal-label" for="channelEditPublicLink">Link público</label>
+                      <input class="modal-input" id="channelEditPublicLink" type="text" readonly />
+                      <p class="modal-field-hint">Gerado automaticamente quando o identificador for um usuário Telegram.</p>
+                    </div>
+                  </div>
+
+                  <div class="channel-edit-token-field">
+                    <label class="modal-label" for="channelEditBotToken">Bot token</label>
+                    <div class="modal-input-action-wrap">
+                      <input class="modal-input modal-input--with-action" id="channelEditBotToken" type="password" placeholder="Mantém o token atual se ficar em branco" />
+                      <button class="icon-btn modal-input-action" id="toggleChannelEditBotToken" type="button" aria-label="Mostrar bot token" aria-pressed="false">
+                        <span class="material-symbols-rounded" aria-hidden="true">visibility</span>
+                      </button>
+                    </div>
+                    <p class="modal-field-hint">Preencha apenas se precisar substituir o token gerado pelo <code>@BotFather</code>.</p>
+                  </div>
+
+                  <div class="modal-toggle telegram-status-toggle channel-edit-status-toggle" id="channelEditStatusWrap">
+                    <span class="modal-toggle-label" id="channelEditStatusLabel">Status</span>
+                    <label class="switch" for="channelEditStatus">
+                      <input type="checkbox" id="channelEditStatus" aria-labelledby="channelEditStatusLabel" />
+                      <span class="switch-track"></span>
+                    </label>
+                    <span class="switch-label" id="channelEditStatusValue">Ativa</span>
+                  </div>
+
+                  <div>
+                    <label class="modal-label" for="channelEditDescription">Descrição de uso</label>
+                    <textarea class="modal-textarea" id="channelEditDescription" rows="4" placeholder="Descreva como este canal será usado"></textarea>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-channel-edit-close type="button">Cancelar</button>
+                  <button class="btn primary" id="channelEditSubmit" type="submit">
+                    Salvar alterações
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 

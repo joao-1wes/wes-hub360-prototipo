@@ -2411,6 +2411,266 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   justify-content: flex-end;
 }
 
+.health-page {
+  display: grid;
+  gap: 18px;
+}
+
+.health-metrics-grid,
+.health-panel-grid,
+.health-schedule-grid,
+.health-integrations-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.health-metrics-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.health-panel-grid,
+.health-schedule-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.health-integrations-grid {
+  grid-template-columns: minmax(320px, 2fr) repeat(2, minmax(240px, 1fr));
+  align-items: stretch;
+}
+
+.health-metric-card,
+.health-panel,
+.health-integration-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.health-metric-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.health-metric-card > .material-symbols-rounded,
+.health-integration-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  color: #016ff4;
+  background: #eef6ff;
+}
+
+.health-integrations-page {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.health-integrations-header {
+  align-items: center;
+}
+
+.health-integrations-header .page-subtitle {
+  max-width: 760px;
+}
+
+.health-connection-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #fff4e8;
+  color: #9a4a0a;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.health-metric-card small,
+.health-list span,
+.health-timeline time,
+.health-integration-card p {
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-metric-card strong {
+  display: block;
+  margin-top: 2px;
+  color: #111827;
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.health-panel {
+  padding: 16px;
+}
+
+.health-panel h3,
+.health-integration-card h3 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-medium);
+  line-height: 24px;
+}
+
+.health-list,
+.health-timeline {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.health-list > div,
+.health-timeline > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.health-list strong,
+.health-timeline span {
+  color: #111827;
+  font-size: var(--md-body-medium);
+  text-align: right;
+}
+
+.health-service-table .data-row {
+  grid-template-columns: 1.2fr 0.8fr 0.8fr 1fr 1fr;
+}
+
+.health-integration-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 18px;
+  min-height: 380px;
+  padding: 22px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.health-integration-card p {
+  margin: 0;
+  font-size: var(--md-body-large);
+  line-height: 24px;
+}
+
+.health-integration-card > div {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  row-gap: 22px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.health-integration-card h3 {
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.health-integration-card--wide {
+  grid-column: span 1;
+}
+
+.health-integration-icon {
+  width: 54px;
+  height: 54px;
+  margin-bottom: 4px;
+  font-size: 32px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.health-integration-icon--green {
+  color: #059669;
+  background: #ecfdf5;
+}
+
+.health-integration-icon--whatsapp {
+  color: #22c55e;
+  background: #f0fdf4;
+}
+
+.health-integration-icon--blue {
+  color: #016ff4;
+  background: #eef6ff;
+}
+
+.health-provider-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-self: end;
+  margin-top: 0;
+  padding-top: 0;
+  min-height: 0;
+}
+
+.health-provider-chips span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 12px;
+  border: 1px solid #d8e4f2;
+  border-radius: 999px;
+  background: #f8fbff;
+  color: #334155;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.health-integration-action {
+  width: 100%;
+  justify-content: center;
+  align-self: end;
+  margin-top: 0;
+  min-height: 48px;
+}
+
+.health-provider-chips + .health-integration-action {
+  margin-top: 0;
+}
+
+@media (max-width: 1180px) {
+  .health-integrations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .health-integration-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .health-integrations-header {
+    align-items: stretch;
+  }
+
+  .health-integrations-header .page-actions {
+    width: 100%;
+  }
+
+  .health-integrations-header .page-actions .btn,
+  .health-connection-count {
+    width: 100%;
+  }
+}
+
 /* Histórico: organização + contexto */
 .history-scope-banner {
   display: flex;
@@ -2741,12 +3001,16 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border);
   background: #ffffff;
   color: #016ff4;
   padding: 8px 14px;
   border-radius: 999px;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
 }
 

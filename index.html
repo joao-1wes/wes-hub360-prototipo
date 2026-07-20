@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>WES HUB 360 - Painel (Estático)</title>
-    <link rel="stylesheet" href="./styles.css?v=20260702-credential-modal-selects" />
+    <link rel="stylesheet" href="./styles.css?v=20260717-health-integrations-layout" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
@@ -293,6 +293,37 @@
                 <div class="organization-section-group">
                   <div class="organization-section-head">
                     <label class="organization-section-check organization-section-check--parent">
+                      <input type="checkbox" name="organization_sections" value="health" checked />
+                      <span class="material-symbols-rounded" aria-hidden="true">health_and_safety</span>
+                      <strong>Saúde</strong>
+                    </label>
+                    <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Saúde">
+                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+                    </button>
+                  </div>
+                  <div class="organization-subsections">
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="health-whatsapp" checked />
+                      <span>WhatsApp</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="health-service" checked />
+                      <span>Atendimento</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="health-agenda" checked />
+                      <span>Agenda</span>
+                    </label>
+                    <label class="organization-section-check">
+                      <input type="checkbox" name="organization_subsections" value="health-integrations" checked />
+                      <span>Integrações</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="organization-section-group">
+                  <div class="organization-section-head">
+                    <label class="organization-section-check organization-section-check--parent">
                       <input type="checkbox" name="organization_sections" value="administration" checked />
                       <span class="material-symbols-rounded" aria-hidden="true">admin_panel_settings</span>
                       <strong>Administração</strong>
@@ -400,6 +431,20 @@
             </div>
           </div>
 
+          <div class="nav-group">
+            <button class="nav-item nav-trigger" data-menu="health" type="button">
+              <span class="material-symbols-rounded">health_and_safety</span>
+              <span class="nav-label">Saúde</span>
+              <span class="nav-caret">▾</span>
+            </button>
+            <div class="submenu" id="submenu-health">
+              <a class="submenu-item" href="#/dashboard/health/whatsapp"><span class="submenu-label">WhatsApp</span></a>
+              <a class="submenu-item" href="#/dashboard/health/service"><span class="submenu-label">Atendimento</span></a>
+              <a class="submenu-item" href="#/dashboard/health/agenda"><span class="submenu-label">Agenda</span></a>
+              <a class="submenu-item" href="#/dashboard/health/integrations"><span class="submenu-label">Integrações</span></a>
+            </div>
+          </div>
+
           <div class="nav-group" data-access-section="administration">
             <button class="nav-item nav-trigger" data-menu="administration" type="button">
               <span class="material-symbols-rounded">admin_panel_settings</span>
@@ -409,11 +454,8 @@
             <div class="submenu" id="submenu-administration">
               <a class="submenu-item" href="#/dashboard/audit"><span class="submenu-label">Auditoria</span></a>
               <a class="submenu-item" href="#/dashboard/mcps"><span class="submenu-label">Conexões</span></a>
-              <a class="submenu-item" href="#/dashboard/organizations" data-access-item="organizations"><span class="submenu-label">Organizações</span></a>
-              <a class="submenu-item" href="#/dashboard/companies" data-access-item="companies"><span class="submenu-label">Empresas</span></a>
+              <a class="submenu-item" href="#/dashboard/people-management" data-access-item="people-management"><span class="submenu-label">Estrutura e Pessoas</span></a>
               <a class="submenu-item" href="#/dashboard/skills"><span class="submenu-label">Habilidades</span></a>
-              <a class="submenu-item" href="#/dashboard/environments"><span class="submenu-label">Setores</span></a>
-              <a class="submenu-item" href="#/dashboard/users"><span class="submenu-label">Usuários</span></a>
             </div>
           </div>
 
@@ -5837,26 +5879,26 @@
             </div>
           </div>
 
-          <div class="page" id="page-users" data-title="Usuários">
+          <div class="page" id="page-users" data-title="Estrutura e Pessoas">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>Usuários</h2>
-                  <p class="page-subtitle">Controle de acesso, papéis e permissões.</p>
+                  <h2>Estrutura e Pessoas</h2>
+                  <p class="page-subtitle">Centralize organizações, empresas, setores, usuários e permissões.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn outline" id="openManageRolesModal" type="button">
-                    Criar nova função
-                  </button>
                   <button class="btn primary" id="openCreateUserModal" type="button">
                     <span class="material-symbols-rounded">person_add</span>
                     Adicionar usuário
                   </button>
                 </div>
               </div>
-              <div class="tabs tabs-underline">
-                <button class="tab active" data-tab="users-tab">Usuários (2)</button>
-                <button class="tab" data-tab="roles-tab">Funções (4)</button>
+              <div class="tabs tabs-underline people-management-tabs" aria-label="Estrutura e Pessoas">
+                <a class="tab" href="#/dashboard/organizations" data-access-item="organizations">Organizações</a>
+                <a class="tab" href="#/dashboard/companies" data-access-item="companies">Empresas</a>
+                <a class="tab" href="#/dashboard/environments">Setores</a>
+                <a class="tab active" href="#/dashboard/users">Usuários</a>
+                <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
               <div class="filters-grid users-filters">
                 <div class="form-field">
@@ -5890,99 +5932,119 @@
                   </div>
                 </div>
               </div>
-              <div class="tab-panel active" data-panel="users-tab">
-                <div class="data-table users-table">
-                  <div class="data-row header">
-                    <span>Usuário</span>
-                    <span>E-mail</span>
-                    <span>Funções</span>
-                    <span>Status</span>
-                    <span>Criado</span>
-                    <span>Ações</span>
-                  </div>
-                  <div class="data-row">
-                    <span class="user-cell">
-                      <span class="user-avatar small">W</span>
-                      <span>
-                        <strong>WES ADMIN</strong>
-                        <span class="muted">ID: c80f2d54...</span>
-                      </span>
-                    </span>
-                    <span>admin@wes.com</span>
-                    <span class="chip">Administrador</span>
-                    <span class="chip success">Ativo</span>
-                    <span>22/01/2026</span>
-                    <span class="row-actions has-details">
-                      <button class="icon-btn action-icon muted-icon" aria-label="Editar" disabled>
-                        <span class="material-symbols-rounded">edit</span>
-                      </button>
-                      <button class="icon-btn action-icon danger muted-icon" aria-label="Excluir" disabled>
-                        <span class="material-symbols-rounded">delete</span>
-                      </button>
-                      <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                      <div class="details-card">
-                        <div class="details-title">Permissões do WES ADMIN</div>
-                        <div class="details-item"><span>Gestão de usuários</span><strong>Permitido</strong></div>
-                        <div class="details-item"><span>Gestão de funções</span><strong>Permitido</strong></div>
-                        <div class="details-item"><span>Gestão da organização</span><strong>Permitido</strong></div>
-                        <div class="details-item"><span>Gestão de ambientes</span><strong>Permitido</strong></div>
-                        <div class="details-item"><span>Gestão de credenciais</span><strong>Permitido</strong></div>
-                        <div class="details-item"><span>Logs de auditoria</span><strong>Permitido</strong></div>
-                        <div class="details-item"><span>Excluir / editar WES ADMIN</span><strong>Bloqueado</strong></div>
-                      </div>
-                    </span>
-                  </div>
-                  <div class="data-row">
-                    <span class="user-cell">
-                      <span class="user-avatar small">A</span>
-                      <span>
-                        <strong>Alfeu Vinicius Souza</strong>
-                        <span class="muted">ID: 7c3e76f1...</span>
-                      </span>
-                    </span>
-                    <span>viniciusaires@hotmail.com</span>
-                    <span class="chip">Administrador</span>
-                    <span class="chip success">Ativo</span>
-                    <span>24/08/2025</span>
-                    <span class="row-actions has-details">
-                      <button class="icon-btn action-icon" aria-label="Editar">
-                        <span class="material-symbols-rounded">edit</span>
-                      </button>
-                      <button class="icon-btn action-icon danger" aria-label="Excluir">
-                        <span class="material-symbols-rounded">delete</span>
-                      </button>
-                      <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
-                        <span class="material-symbols-rounded">more_vert</span>
-                      </button>
-                      <div class="details-card">
-                        <div class="details-title">Detalhes do usuário</div>
-                        <div class="details-item"><span>Função</span><strong>Administrador</strong></div>
-                        <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
-                        <div class="details-item"><span>Acesso ao tenant</span><strong>AVAS</strong></div>
-                      </div>
-                    </span>
-                  </div>
+              <div class="data-table users-table">
+                <div class="data-row header">
+                  <span>Usuário</span>
+                  <span>E-mail</span>
+                  <span>Funções</span>
+                  <span>Status</span>
+                  <span>Criado</span>
+                  <span>Ações</span>
                 </div>
-                <div class="table-pagination">
-                  <button class="icon-btn" aria-label="Anterior">
-                    <span class="material-symbols-rounded">chevron_left</span>
-                  </button>
-                  <button class="page-number active" type="button">1</button>
-                  <button class="page-number" type="button">2</button>
-                  <button class="page-number" type="button">3</button>
-                  <span class="page-ellipsis">…</span>
-                  <button class="page-number" type="button">10</button>
-                  <button class="page-number" type="button">11</button>
-                  <button class="page-number" type="button">12</button>
-                  <button class="icon-btn" aria-label="Próximo">
-                    <span class="material-symbols-rounded">chevron_right</span>
+                <div class="data-row">
+                  <span class="user-cell">
+                    <span class="user-avatar small">W</span>
+                    <span>
+                      <strong>WES ADMIN</strong>
+                      <span class="muted">ID: c80f2d54...</span>
+                    </span>
+                  </span>
+                  <span>admin@wes.com</span>
+                  <span class="chip">Administrador</span>
+                  <span class="chip success">Ativo</span>
+                  <span>22/01/2026</span>
+                  <span class="row-actions has-details">
+                    <button class="icon-btn action-icon muted-icon" aria-label="Editar" disabled>
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger muted-icon" aria-label="Excluir" disabled>
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                    <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                    <div class="details-card">
+                      <div class="details-title">Permissões do WES ADMIN</div>
+                      <div class="details-item"><span>Gestão de usuários</span><strong>Permitido</strong></div>
+                      <div class="details-item"><span>Gestão de funções</span><strong>Permitido</strong></div>
+                      <div class="details-item"><span>Gestão da organização</span><strong>Permitido</strong></div>
+                      <div class="details-item"><span>Gestão de ambientes</span><strong>Permitido</strong></div>
+                      <div class="details-item"><span>Gestão de credenciais</span><strong>Permitido</strong></div>
+                      <div class="details-item"><span>Logs de auditoria</span><strong>Permitido</strong></div>
+                      <div class="details-item"><span>Excluir / editar WES ADMIN</span><strong>Bloqueado</strong></div>
+                    </div>
+                  </span>
+                </div>
+                <div class="data-row">
+                  <span class="user-cell">
+                    <span class="user-avatar small">A</span>
+                    <span>
+                      <strong>Alfeu Vinicius Souza</strong>
+                      <span class="muted">ID: 7c3e76f1...</span>
+                    </span>
+                  </span>
+                  <span>viniciusaires@hotmail.com</span>
+                  <span class="chip">Administrador</span>
+                  <span class="chip success">Ativo</span>
+                  <span>24/08/2025</span>
+                  <span class="row-actions has-details">
+                    <button class="icon-btn action-icon" aria-label="Editar">
+                      <span class="material-symbols-rounded">edit</span>
+                    </button>
+                    <button class="icon-btn action-icon danger" aria-label="Excluir">
+                      <span class="material-symbols-rounded">delete</span>
+                    </button>
+                    <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
+                    <div class="details-card">
+                      <div class="details-title">Detalhes do usuário</div>
+                      <div class="details-item"><span>Função</span><strong>Administrador</strong></div>
+                      <div class="details-item"><span>Status</span><strong>Ativo</strong></div>
+                      <div class="details-item"><span>Acesso ao tenant</span><strong>AVAS</strong></div>
+                    </div>
+                  </span>
+                </div>
+              </div>
+              <div class="table-pagination">
+                <button class="icon-btn" aria-label="Anterior">
+                  <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <button class="page-number active" type="button">1</button>
+                <button class="page-number" type="button">2</button>
+                <button class="page-number" type="button">3</button>
+                <span class="page-ellipsis">…</span>
+                <button class="page-number" type="button">10</button>
+                <button class="page-number" type="button">11</button>
+                <button class="page-number" type="button">12</button>
+                <button class="icon-btn" aria-label="Próximo">
+                  <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-roles" data-title="Estrutura e Pessoas">
+            <div class="section">
+              <div class="page-header">
+                <div>
+                  <h2>Estrutura e Pessoas</h2>
+                  <p class="page-subtitle">Centralize organizações, empresas, setores, usuários e permissões.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" id="openManageRolesModal" type="button">
+                    Criar nova função
                   </button>
                 </div>
               </div>
-              <div class="tab-panel" data-panel="roles-tab">
-                <div class="data-table roles-table">
+              <div class="tabs tabs-underline people-management-tabs" aria-label="Estrutura e Pessoas">
+                <a class="tab" href="#/dashboard/organizations" data-access-item="organizations">Organizações</a>
+                <a class="tab" href="#/dashboard/companies" data-access-item="companies">Empresas</a>
+                <a class="tab" href="#/dashboard/environments">Setores</a>
+                <a class="tab" href="#/dashboard/users">Usuários</a>
+                <a class="tab active" href="#/dashboard/roles">Funções</a>
+              </div>
+              <div class="data-table roles-table">
                   <div class="data-row header">
                     <span>Função</span>
                     <span>Descrição</span>
@@ -6061,7 +6123,6 @@
                 </div>
               </div>
             </div>
-          </div>
 
           <div class="page" id="page-skills" data-title="Habilidades">
             <div class="section">
@@ -6563,17 +6624,18 @@
             </div>
           </div>
 
-          <div class="page" id="page-environments" data-title="Setores">
+          <div class="page" id="page-environments" data-title="Estrutura e Pessoas">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>Setores</h2>
+                  <h2>Estrutura e Pessoas</h2>
+                  <p class="page-subtitle">Centralize organizações, empresas, setores, usuários e permissões.</p>
                 </div>
                 <div class="page-actions">
                   <div class="hub-select-wrap environments-company-select-wrap" id="environmentsCompanySelectWrap">
                     <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">business</span>
                     <select id="environmentsCompanySelect" class="hub-select" aria-label="Selecionar empresa dos setores">
-                      <option value="all">Todas as empresas</option>
+                      <option value="all">Todas as organizações</option>
                       <option value="avas" data-organization="avas-group">AVAS Energia</option>
                       <option value="techcorp" data-organization="avas-group">TechCorp Brasil</option>
                       <option value="aguas-rio" data-organization="cedae">Águas Rio</option>
@@ -6583,6 +6645,13 @@
                   </div>
                   <button class="btn primary" id="openCreateEnvironmentModal" type="button">Criar setor</button>
                 </div>
+              </div>
+              <div class="tabs tabs-underline people-management-tabs" aria-label="Estrutura e Pessoas">
+                <a class="tab" href="#/dashboard/organizations" data-access-item="organizations">Organizações</a>
+                <a class="tab" href="#/dashboard/companies" data-access-item="companies">Empresas</a>
+                <a class="tab active" href="#/dashboard/environments">Setores</a>
+                <a class="tab" href="#/dashboard/users">Usuários</a>
+                <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
               <div class="data-table environments-table">
                 <div class="data-row header">
@@ -7252,12 +7321,12 @@
             </div>
           </div>
 
-          <div class="page" id="page-organizations" data-title="Organizações">
+          <div class="page" id="page-organizations" data-title="Estrutura e Pessoas">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>Organizações</h2>
-                  <p class="page-subtitle">Gerencie organizações cliente. Cada organização pode ter várias empresas e cada empresa pode ter seus próprios setores.</p>
+                  <h2>Estrutura e Pessoas</h2>
+                  <p class="page-subtitle">Centralize organizações, empresas, setores, usuários e permissões.</p>
                 </div>
                 <div class="page-actions">
                   <a class="btn outline" href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization">
@@ -7268,6 +7337,13 @@
                     Criar organização
                   </button>
                 </div>
+              </div>
+              <div class="tabs tabs-underline people-management-tabs" aria-label="Estrutura e Pessoas">
+                <a class="tab active" href="#/dashboard/organizations" data-access-item="organizations">Organizações</a>
+                <a class="tab" href="#/dashboard/companies" data-access-item="companies">Empresas</a>
+                <a class="tab" href="#/dashboard/environments">Setores</a>
+                <a class="tab" href="#/dashboard/users">Usuários</a>
+                <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
               <div class="data-table organizations-table">
                 <div class="data-row header">
@@ -7312,18 +7388,25 @@
             </div>
           </div>
 
-          <div class="page" id="page-companies" data-title="Empresas">
+          <div class="page" id="page-companies" data-title="Estrutura e Pessoas">
             <div class="section">
               <div class="page-header">
                 <div>
-                  <h2>Empresas</h2>
-                  <p class="page-subtitle">Gerencie as empresas da organização ativa. O ADM cliente acessa todas as empresas daqui, sem alternar contexto global.</p>
+                  <h2>Estrutura e Pessoas</h2>
+                  <p class="page-subtitle">Centralize organizações, empresas, setores, usuários e permissões.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn primary" type="button" data-open-create-company-modal>
                     Criar empresa
                   </button>
                 </div>
+              </div>
+              <div class="tabs tabs-underline people-management-tabs" aria-label="Estrutura e Pessoas">
+                <a class="tab" href="#/dashboard/organizations" data-access-item="organizations">Organizações</a>
+                <a class="tab active" href="#/dashboard/companies" data-access-item="companies">Empresas</a>
+                <a class="tab" href="#/dashboard/environments">Setores</a>
+                <a class="tab" href="#/dashboard/users">Usuários</a>
+                <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
               <div class="data-table companies-table">
                 <div class="data-row header">
@@ -8132,6 +8215,222 @@
             </div>
           </div>
 
+          <div class="page" id="page-health-whatsapp" data-title="WhatsApp Saúde">
+            <div class="section health-page">
+              <div class="page-header">
+                <div>
+                  <h2>WhatsApp Saúde</h2>
+                  <p class="page-subtitle">Centralize conversas, confirmações e orientações enviadas aos pacientes pelo WhatsApp.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn outline" type="button">
+                    <span class="material-symbols-rounded">sync</span>
+                    Sincronizar
+                  </button>
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Novo fluxo
+                  </button>
+                </div>
+              </div>
+
+              <div class="health-metrics-grid">
+                <article class="health-metric-card">
+                  <span class="material-symbols-rounded" aria-hidden="true">forum</span>
+                  <div>
+                    <small>Conversas abertas</small>
+                    <strong>128</strong>
+                  </div>
+                </article>
+                <article class="health-metric-card">
+                  <span class="material-symbols-rounded" aria-hidden="true">task_alt</span>
+                  <div>
+                    <small>Confirmações hoje</small>
+                    <strong>74%</strong>
+                  </div>
+                </article>
+                <article class="health-metric-card">
+                  <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
+                  <div>
+                    <small>Tempo médio</small>
+                    <strong>2m 18s</strong>
+                  </div>
+                </article>
+              </div>
+
+              <div class="health-panel-grid">
+                <article class="health-panel">
+                  <h3>Filas de conversa</h3>
+                  <div class="health-list">
+                    <div><span>Pré-consulta</span><strong>42 aguardando</strong></div>
+                    <div><span>Resultados de exames</span><strong>18 aguardando</strong></div>
+                    <div><span>Retorno pós-atendimento</span><strong>9 aguardando</strong></div>
+                  </div>
+                </article>
+                <article class="health-panel">
+                  <h3>Automações ativas</h3>
+                  <div class="health-list">
+                    <div><span>Lembrete de consulta</span><strong>Ativo</strong></div>
+                    <div><span>Triagem inicial</span><strong>Ativo</strong></div>
+                    <div><span>Pesquisa NPS</span><strong>Pausado</strong></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-service" data-title="Atendimento Saúde">
+            <div class="section health-page">
+              <div class="page-header">
+                <div>
+                  <h2>Atendimento Saúde</h2>
+                  <p class="page-subtitle">Acompanhe filas, prioridade clínica e evolução dos atendimentos em andamento.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">support_agent</span>
+                    Abrir atendimento
+                  </button>
+                </div>
+              </div>
+
+              <div class="data-table health-service-table">
+                <div class="data-row header">
+                  <span>Paciente</span>
+                  <span>Canal</span>
+                  <span>Prioridade</span>
+                  <span>Status</span>
+                  <span>Responsável</span>
+                </div>
+                <div class="data-row">
+                  <span>Marina Costa</span>
+                  <span>WhatsApp</span>
+                  <span><span class="chip warning">Média</span></span>
+                  <span>Em triagem</span>
+                  <span>Dra. Camila</span>
+                </div>
+                <div class="data-row">
+                  <span>Roberto Lima</span>
+                  <span>Portal</span>
+                  <span><span class="chip danger">Alta</span></span>
+                  <span>Aguardando retorno</span>
+                  <span>Equipe clínica</span>
+                </div>
+                <div class="data-row">
+                  <span>Ana Beatriz</span>
+                  <span>Telefone</span>
+                  <span><span class="chip success">Baixa</span></span>
+                  <span>Resolvido</span>
+                  <span>Central</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-agenda" data-title="Agenda Saúde">
+            <div class="section health-page">
+              <div class="page-header">
+                <div>
+                  <h2>Agenda Saúde</h2>
+                  <p class="page-subtitle">Gerencie consultas, encaixes, confirmações e remarcações da operação de saúde.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn outline" type="button">
+                    <span class="material-symbols-rounded">calendar_month</span>
+                    Ver calendário
+                  </button>
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Novo agendamento
+                  </button>
+                </div>
+              </div>
+
+              <div class="health-schedule-grid">
+                <article class="health-panel">
+                  <h3>Hoje</h3>
+                  <div class="health-timeline">
+                    <div><time>09:00</time><span>Cardiologia - Marina Costa</span></div>
+                    <div><time>10:30</time><span>Teleconsulta - Roberto Lima</span></div>
+                    <div><time>14:00</time><span>Retorno clínico - Ana Beatriz</span></div>
+                  </div>
+                </article>
+                <article class="health-panel">
+                  <h3>Indicadores</h3>
+                  <div class="health-list">
+                    <div><span>Consultas confirmadas</span><strong>36</strong></div>
+                    <div><span>Remarcações</span><strong>7</strong></div>
+                    <div><span>Encaixes disponíveis</span><strong>5</strong></div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-integrations" data-title="Integrações Saúde">
+            <div class="section health-page health-integrations-page">
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Planos de saúde e canais integrados</h2>
+                  <p class="page-subtitle">Conectores previstos para validar cobertura, acionar o WhatsApp Business API e sincronizar confirmações com a agenda local.</p>
+                </div>
+                <div class="page-actions">
+                  <span class="health-connection-count">3 tipos de conexão</span>
+                  <button class="btn primary" type="button">
+                    <span class="material-symbols-rounded">code</span>
+                    Realizar integração
+                  </button>
+                </div>
+              </div>
+
+              <div class="health-integrations-grid">
+                <article class="health-integration-card health-integration-card--wide">
+                  <span class="material-symbols-rounded health-integration-icon health-integration-icon--green" aria-hidden="true">health_and_safety</span>
+                  <div>
+                    <h3>Conexão com plano de saúde</h3>
+                    <p>Conector para integrar carteirinha, elegibilidade, autorizações, histórico assistencial e dados operacionais das operadoras atendidas.</p>
+                    <div class="health-provider-chips" aria-label="Planos de saúde previstos">
+                      <span>Unimed</span>
+                      <span>Hapvida</span>
+                      <span>NotreDame</span>
+                      <span>Amil</span>
+                      <span>Bradesco Saúde</span>
+                      <span>SulAmérica</span>
+                      <span>Porto Saúde</span>
+                      <span>Planos regionais</span>
+                    </div>
+                    <button class="btn primary health-integration-action" type="button">
+                      <span class="material-symbols-rounded">link</span>
+                      Configurar plano
+                    </button>
+                  </div>
+                </article>
+                <article class="health-integration-card">
+                  <span class="material-symbols-rounded health-integration-icon health-integration-icon--whatsapp" aria-hidden="true">chat</span>
+                  <div>
+                    <h3>WhatsApp Business API</h3>
+                    <p>Aciona o chat do paciente, envia confirmações, mensagens transacionais e orientações antes ou depois da consulta.</p>
+                    <button class="btn primary health-integration-action" type="button">
+                      <span class="material-symbols-rounded">edit</span>
+                      Editar conexão
+                    </button>
+                  </div>
+                </article>
+                <article class="health-integration-card">
+                  <span class="material-symbols-rounded health-integration-icon health-integration-icon--blue" aria-hidden="true">event_available</span>
+                  <div>
+                    <h3>WhatsApp + agenda local</h3>
+                    <p>Sincroniza confirmação, remarcação e cancelamento recebidos pelo WhatsApp com a agenda local da clínica.</p>
+                    <button class="btn primary health-integration-action" type="button">
+                      <span class="material-symbols-rounded">link</span>
+                      Conectar agenda
+                    </button>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-bpmn" data-title="BPMN">
             <div class="section">
               <div class="page-header">
@@ -8527,6 +8826,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="./assets/chart.umd.min.js"></script>
     <script src="./auth.js?v=20260701-hybrid-flow-voice-page"></script>
-    <script src="./app.js?v=20260702-profile-page"></script>
+    <script src="./app.js?v=20260717-health-section"></script>
   </body>
 </html>

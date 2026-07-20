@@ -561,8 +561,6 @@ const schedulesTable = document.querySelector('#page-automations .schedules-tabl
 const exportSchedulesCsvButton = document.getElementById('exportSchedulesCsvButton');
 const executorTabs = document.querySelectorAll('#page-executors .tab');
 const executorPanels = document.querySelectorAll('#page-executors .tab-panel');
-const usersTabs = document.querySelectorAll('#page-users .tab');
-const usersPanels = document.querySelectorAll('#page-users .tab-panel');
 const orgTabs = document.querySelectorAll('#page-organization .tab');
 const orgPanels = document.querySelectorAll('#page-organization .tab-panel');
 const orgActionButtons = document.querySelectorAll('#page-organization .org-action');
@@ -6622,7 +6620,7 @@ bindStaticTableDeleteConfirmation(document.querySelector('#page-input-files .dat
   getSuccessMessage: () => 'Arquivo excluído',
 });
 
-bindStaticTableDeleteConfirmation(document.querySelector('#page-users .roles-table'), {
+bindStaticTableDeleteConfirmation(document.querySelector('#page-roles .roles-table'), {
   getTargetLabel: (row) => {
     const roleCell = row.querySelector('.role-cell');
     const iconText = roleCell?.querySelector('.material-symbols-rounded')?.textContent?.trim() || '';
@@ -12299,19 +12297,6 @@ if (executorTabs.length && executorPanels.length) {
   });
 }
 
-if (usersTabs.length && usersPanels.length) {
-  usersTabs.forEach((tab) => {
-    tab.addEventListener('click', () => {
-      const target = tab.dataset.tab;
-      usersTabs.forEach((item) => item.classList.remove('active'));
-      tab.classList.add('active');
-      usersPanels.forEach((panel) => {
-        panel.classList.toggle('active', panel.dataset.panel === target);
-      });
-    });
-  });
-}
-
 if (orgTabs.length && orgPanels.length) {
   const updateOrgActions = (activeTab) => {
     const isKeys = activeTab === 'org-keys';
@@ -16078,6 +16063,10 @@ const routeMap = {
   'dashboard/hybrid-flows/new': 'page-hybrid-flows-create',
   'dashboard/hybrid-flows/history': 'page-hybrid-flows-history',
   'dashboard/hybrid-flows/history/details': 'page-hybrid-flows-history-details',
+  'dashboard/health/whatsapp': 'page-health-whatsapp',
+  'dashboard/health/service': 'page-health-service',
+  'dashboard/health/agenda': 'page-health-agenda',
+  'dashboard/health/integrations': 'page-health-integrations',
   'dashboard/vm-monitoring': 'page-vm-monitoring',
   'dashboard/executors': 'page-executors',
   'dashboard/packages': 'page-packages',
@@ -16086,7 +16075,9 @@ const routeMap = {
   'dashboard/channels/telegram/botfather': 'page-telegram-botfather',
   'dashboard/credentials': 'page-credentials',
   'dashboard/input-files': 'page-input-files',
+  'dashboard/people-management': 'page-organizations',
   'dashboard/users': 'page-users',
+  'dashboard/roles': 'page-roles',
   'dashboard/mcps': 'page-mcps',
   'dashboard/skills': 'page-skills',
   'dashboard/audit': 'page-agent-history',
@@ -16120,13 +16111,19 @@ const sectionMap = {
   'dashboard/hybrid-flows/new': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history/details': 'Atendimento dinâmico',
+  'dashboard/health/whatsapp': 'Saúde',
+  'dashboard/health/service': 'Saúde',
+  'dashboard/health/agenda': 'Saúde',
+  'dashboard/health/integrations': 'Saúde',
   'dashboard/vm-monitoring': 'Máquinas virtuais',
   'dashboard/executors': 'Infraestrutura',
   'dashboard/packages': 'Infraestrutura',
   'dashboard/channels': 'Atendimento dinâmico',
   'dashboard/channels/telegram': 'Atendimento dinâmico',
   'dashboard/channels/telegram/botfather': 'Atendimento dinâmico',
+  'dashboard/people-management': 'Administração',
   'dashboard/users': 'Administração',
+  'dashboard/roles': 'Administração',
   'dashboard/mcps': 'Administração',
   'dashboard/skills': 'Administração',
   'dashboard/audit': 'Administração',
@@ -16140,6 +16137,20 @@ const sectionMap = {
   'dashboard/history': 'Painel de histórico',
   'dashboard/profile': 'Perfil',
   'dashboard/settings': 'Configurações'
+};
+
+const peopleManagementRouteKeys = new Set([
+  'dashboard/people-management',
+  'dashboard/organizations',
+  'dashboard/companies',
+  'dashboard/environments',
+  'dashboard/users',
+  'dashboard/roles',
+]);
+
+const getPeopleManagementDefaultRoute = () => {
+  const access = getSelectedOrganizationAccess();
+  return access.canManageOrganizations ? 'dashboard/organizations' : 'dashboard/companies';
 };
 
 const organizationAccessProfiles = {
@@ -16191,6 +16202,10 @@ const setAccessVisibility = (element, isVisible) => {
   element.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
 };
 
+const setAccessVisibilityForAll = (elements, isVisible) => {
+  elements.forEach((element) => setAccessVisibility(element, isVisible));
+};
+
 const isInOrganizationScope = (organizationId, access) => {
   const scope = String(access?.organizationScope || access?.id || '').trim();
   if (!scope || scope === 'all') return true;
@@ -16223,9 +16238,10 @@ const applyEnvironmentCompanyOptionsScope = (access) => {
 const applyOrganizationAccessControls = (routeKey) => {
   const access = getSelectedOrganizationAccess();
   const administrationGroup = document.querySelector('[data-access-section="administration"]');
-  const organizationsLink = document.querySelector('[data-access-item="organizations"]');
-  const companiesLink = document.querySelector('[data-access-item="companies"]');
-  const switchOrganizationLink = document.querySelector('[data-access-item="switch-organization"]');
+  const peopleManagementLinks = document.querySelectorAll('[data-access-item="people-management"]');
+  const organizationsLinks = document.querySelectorAll('[data-access-item="organizations"]');
+  const companiesLinks = document.querySelectorAll('[data-access-item="companies"]');
+  const switchOrganizationLinks = document.querySelectorAll('[data-access-item="switch-organization"]');
   const tenantEl = document.querySelector('#userMenu .user-tenant');
 
   document.body.dataset.organizationAccess = access.id;
@@ -16233,9 +16249,10 @@ const applyOrganizationAccessControls = (routeKey) => {
   if (tenantEl) tenantEl.textContent = access.name;
 
   setAccessVisibility(administrationGroup, access.showAdministration);
-  setAccessVisibility(organizationsLink, access.showAdministration && access.canManageOrganizations);
-  setAccessVisibility(companiesLink, access.showAdministration && access.canManageCompanies);
-  setAccessVisibility(switchOrganizationLink, access.canSwitchOrganization);
+  setAccessVisibilityForAll(peopleManagementLinks, access.showAdministration && (access.canManageOrganizations || access.canManageCompanies));
+  setAccessVisibilityForAll(organizationsLinks, access.showAdministration && access.canManageOrganizations);
+  setAccessVisibilityForAll(companiesLinks, access.showAdministration && access.canManageCompanies);
+  setAccessVisibilityForAll(switchOrganizationLinks, access.canSwitchOrganization);
   setAccessVisibility(environmentsCompanySelectWrap, access.showAdministration && access.canManageCompanies);
   applyCompaniesOrganizationScope(access);
   applyEnvironmentCompanyOptionsScope(access);
@@ -16278,11 +16295,13 @@ const normalizeVisiblePortugueseLabels = () => {
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Auditoria'],
     ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'Conex\u00f5es'],
-    ['#submenu-administration a[href="#/dashboard/organizations"] .submenu-label', 'Organiza\u00e7\u00f5es'],
-    ['#submenu-administration a[href="#/dashboard/companies"] .submenu-label', 'Empresas'],
+    ['#submenu-administration a[href="#/dashboard/people-management"] .submenu-label', 'Estrutura e Pessoas'],
     ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
-    ['#submenu-administration a[href="#/dashboard/environments"] .submenu-label', 'Setores'],
-    ['#submenu-administration a[href="#/dashboard/users"] .submenu-label', 'Usu\u00e1rios'],
+    ['.nav-trigger[data-menu="health"] .nav-label', 'Sa\u00fade'],
+    ['#submenu-health a[href="#/dashboard/health/whatsapp"] .submenu-label', 'WhatsApp'],
+    ['#submenu-health a[href="#/dashboard/health/service"] .submenu-label', 'Atendimento'],
+    ['#submenu-health a[href="#/dashboard/health/agenda"] .submenu-label', 'Agenda'],
+    ['#submenu-health a[href="#/dashboard/health/integrations"] .submenu-label', 'Integra\u00e7\u00f5es'],
     ['#wesProjectDescription', null],
   ];
 
@@ -16308,15 +16327,18 @@ const normalizeVisiblePortugueseLabels = () => {
 const updateActivePage = () => {
   normalizeVisiblePortugueseLabels();
   const { routeKey } = getHashRouteInfo();
+  const pageRouteKey = routeKey === 'dashboard/people-management'
+    ? getPeopleManagementDefaultRoute()
+    : routeKey;
   if (!isStandaloneChatRoute(routeKey) && agentChatModal?.classList.contains('agent-chat-modal--standalone')) {
     agentChatModal.classList.remove('open', 'agent-chat-modal--standalone', 'voice-mode', 'voice-history-open', 'has-voice-transcript');
     agentChatModal.setAttribute('aria-hidden', 'true');
     agentChatModal.dataset.routeAgentHydrated = 'false';
     agentChatModal.dataset.routeHybridFlowHydrated = 'false';
   }
-  if (!applyOrganizationAccessControls(routeKey)) return;
-  let pageId = routeMap[routeKey];
-  if (!pageId && routeKey.startsWith('dashboard/agents/project/')) {
+  if (!applyOrganizationAccessControls(pageRouteKey)) return;
+  let pageId = routeMap[pageRouteKey];
+  if (!pageId && pageRouteKey.startsWith('dashboard/agents/project/')) {
     pageId = 'page-agents';
   }
   if (!pageId) pageId = 'page-dashboard';
@@ -16328,25 +16350,27 @@ const updateActivePage = () => {
     page.tabIndex = -1;
   }
   if (pageId === 'page-agent-history') {
-    setActiveHistoryTab(routeKey === 'dashboard/agent-history' ? 'history-agents' : 'history-audit');
+    setActiveHistoryTab(pageRouteKey === 'dashboard/agent-history' ? 'history-agents' : 'history-audit');
   }
-  forceRouteScrollTop(routeKey);
-  window.requestAnimationFrame(() => forceRouteScrollTop(routeKey));
-  window.setTimeout(() => forceRouteScrollTop(routeKey), 0);
-  window.setTimeout(() => forceRouteScrollTop(routeKey), 50);
-  window.setTimeout(() => forceRouteScrollTop(routeKey), 250);
+  forceRouteScrollTop(pageRouteKey);
+  window.requestAnimationFrame(() => forceRouteScrollTop(pageRouteKey));
+  window.setTimeout(() => forceRouteScrollTop(pageRouteKey), 0);
+  window.setTimeout(() => forceRouteScrollTop(pageRouteKey), 50);
+  window.setTimeout(() => forceRouteScrollTop(pageRouteKey), 250);
 
-  const navRouteKey = routeKey.startsWith('dashboard/agents/project/')
+  const navRouteKey = peopleManagementRouteKeys.has(pageRouteKey)
+    ? 'dashboard/people-management'
+    : pageRouteKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
-    : routeKey.startsWith('dashboard/automations/')
+    : pageRouteKey.startsWith('dashboard/automations/')
       ? 'dashboard/automations'
-    : routeKey.startsWith('dashboard/voice-messaging/')
+    : pageRouteKey.startsWith('dashboard/voice-messaging/')
       ? 'dashboard/voice-messaging'
-    : routeKey.startsWith('dashboard/campaigns/')
+    : pageRouteKey.startsWith('dashboard/campaigns/')
       ? 'dashboard/campaigns'
-    : routeKey.startsWith('dashboard/channels/')
+    : pageRouteKey.startsWith('dashboard/channels/')
       ? 'dashboard/channels'
-      : routeKey;
+      : pageRouteKey;
 
   if (hubScopeBar) {
     const hideHubScopeRoutes = [
@@ -16357,6 +16381,10 @@ const updateActivePage = () => {
       'dashboard/voice-messaging/new',
       'dashboard/campaigns',
       'dashboard/hybrid-flows',
+      'dashboard/health/whatsapp',
+      'dashboard/health/service',
+      'dashboard/health/agenda',
+      'dashboard/health/integrations',
       'dashboard/agents',
       'dashboard/vm-monitoring',
       'dashboard/environments'

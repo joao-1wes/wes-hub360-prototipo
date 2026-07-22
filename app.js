@@ -219,6 +219,34 @@ const createUserPassword = document.getElementById('createUserPassword');
 const createUserStatus = document.getElementById('createUserStatus');
 const createUserRole = document.getElementById('createUserRole');
 const createUserSubmit = document.getElementById('createUserSubmit');
+const createUserModeSwitch = document.getElementById('createUserModeSwitch');
+const createUserModeInputs = Array.from(document.querySelectorAll('input[name="create_user_mode"]'));
+const createUserModeTabs = Array.from(document.querySelectorAll('[data-create-user-mode]'));
+const createUserFieldsPanel = document.getElementById('createUserFieldsPanel');
+const createUserSingleFields = document.getElementById('createUserSingleFields');
+const createUserSingleOnlyFields = Array.from(document.querySelectorAll('.create-user-single-only'));
+const createUserBulkFields = document.getElementById('createUserBulkFields');
+const createUserCsvInput = document.getElementById('createUserCsvInput');
+const createUserCsvDropzone = document.getElementById('createUserCsvDropzone');
+const createUserCsvFile = document.getElementById('createUserCsvFile');
+const createUserCsvFileName = document.getElementById('createUserCsvFileName');
+const createUserCsvRemove = document.getElementById('createUserCsvRemove');
+const createUserCsvStatus = document.getElementById('createUserCsvStatus');
+const createUserProgressPanel = document.getElementById('createUserProgressPanel');
+const createUserProgressBar = document.getElementById('createUserProgressBar');
+const createUserProgressLabel = document.getElementById('createUserProgressLabel');
+const createUserReviewPanel = document.getElementById('createUserReviewPanel');
+const createUserReviewTotal = document.getElementById('createUserReviewTotal');
+const createUserReviewSuccess = document.getElementById('createUserReviewSuccess');
+const createUserReviewError = document.getElementById('createUserReviewError');
+const createUserSuccessCount = document.getElementById('createUserSuccessCount');
+const createUserErrorCount = document.getElementById('createUserErrorCount');
+const createUserSuccessDetails = document.getElementById('createUserSuccessDetails');
+const createUserErrorDetails = document.getElementById('createUserErrorDetails');
+const createUserSuccessList = document.getElementById('createUserSuccessList');
+const createUserErrorList = document.getElementById('createUserErrorList');
+const createUserCancel = document.getElementById('createUserCancel');
+const createUserCloseButtons = Array.from(createUserModal?.querySelectorAll('button[data-modal-close]') || []);
 const openSkillModal = document.getElementById('openSkillModal');
 const skillModal = document.getElementById('skillModal');
 const skillModalForm = document.getElementById('skillModalForm');
@@ -5217,6 +5245,12 @@ if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
 
 if (openCreateUserModal && createUserModal && createUserModalForm) {
   let editingUserRow = null;
+  let createUserBulkRows = [];
+  let createUserBulkErrors = [];
+  let createUserBulkTotalRows = 0;
+  let createUserModalStep = 'form';
+  let createUserProgressTimeout = null;
+  let createUserProgressInterval = null;
 
   const roleTextToValue = (value) => {
     const normalized = String(value || '').trim().toLowerCase();
@@ -5232,42 +5266,509 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     return normalized.includes('inativo') ? 'inactive' : 'active';
   };
 
+  const clearCreateUserProgressTimers = () => {
+    if (createUserProgressTimeout) window.clearTimeout(createUserProgressTimeout);
+    if (createUserProgressInterval) window.clearInterval(createUserProgressInterval);
+    createUserProgressTimeout = null;
+    createUserProgressInterval = null;
+  };
+
+  const setCreateUserModalStep = (step) => {
+    createUserModalStep = step;
+    if (createUserFieldsPanel) createUserFieldsPanel.hidden = step !== 'form';
+    if (createUserProgressPanel) createUserProgressPanel.hidden = step !== 'progress';
+    if (createUserReviewPanel) createUserReviewPanel.hidden = step !== 'review';
+
+    createUserCloseButtons.forEach((button) => {
+      button.hidden = step === 'progress';
+      button.disabled = step === 'progress';
+    });
+
+    if (createUserCancel) {
+      createUserCancel.hidden = step === 'progress';
+      createUserCancel.disabled = step === 'progress';
+      createUserCancel.textContent = step === 'review' ? 'Fechar' : 'Cancelar';
+    }
+
+    if (step === 'progress') {
+      if (createUserTitle) createUserTitle.textContent = 'Adicionando usuários';
+      if (createUserSubmit) {
+        createUserSubmit.textContent = 'Processando...';
+        createUserSubmit.disabled = true;
+      }
+      return;
+    }
+
+    if (step === 'review') {
+      if (createUserTitle) createUserTitle.textContent = 'Revisão da importação';
+      if (createUserSubmit) {
+        createUserSubmit.textContent = 'Concluir';
+        createUserSubmit.disabled = false;
+      }
+      return;
+    }
+
+    syncCreateUserSubmit();
+  };
+
+  const getCreateUserMode = () => (
+    createUserModeInputs.find((input) => input.checked)?.value === 'bulk' ? 'bulk' : 'single'
+  );
+
+  const setCreateUserMode = (mode) => {
+    const nextMode = mode === 'bulk' ? 'bulk' : 'single';
+    createUserModeInputs.forEach((input) => {
+      input.checked = input.value === nextMode;
+    });
+    createUserModeTabs.forEach((tab) => {
+      const isActive = tab.dataset.createUserMode === nextMode;
+      tab.classList.toggle('active', isActive);
+      tab.setAttribute('aria-selected', String(isActive));
+    });
+    if (createUserSingleFields) createUserSingleFields.hidden = nextMode === 'bulk';
+    createUserSingleOnlyFields.forEach((field) => {
+      field.hidden = nextMode === 'bulk';
+    });
+    if (createUserBulkFields) createUserBulkFields.hidden = nextMode !== 'bulk';
+    if (createUserSubmit && !editingUserRow) {
+      createUserSubmit.textContent = nextMode === 'bulk' ? 'Adicionar usuários' : 'Criar usuário';
+    }
+    syncCreateUserSubmit();
+  };
+
+  const normalizeCsvHeader = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, '');
+
+  const parseCsvText = (text, delimiter = ',') => {
+    const rows = [];
+    let row = [];
+    let field = '';
+    let inQuotes = false;
+    const source = String(text || '').replace(/^\uFEFF/, '');
+
+    for (let index = 0; index < source.length; index += 1) {
+      const char = source[index];
+      const nextChar = source[index + 1];
+      if (char === '"') {
+        if (inQuotes && nextChar === '"') {
+          field += '"';
+          index += 1;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (char === delimiter && !inQuotes) {
+        row.push(field.trim());
+        field = '';
+      } else if ((char === '\n' || char === '\r') && !inQuotes) {
+        if (char === '\r' && nextChar === '\n') index += 1;
+        row.push(field.trim());
+        if (row.some((cell) => cell !== '')) rows.push(row);
+        row = [];
+        field = '';
+      } else {
+        field += char;
+      }
+    }
+
+    row.push(field.trim());
+    if (row.some((cell) => cell !== '')) rows.push(row);
+    return rows;
+  };
+
+  const getExistingUserEmails = () => new Set(Array.from(usersTable?.querySelectorAll('.data-row:not(.header)') || [])
+    .map((row) => row.children[1]?.textContent?.trim().toLowerCase())
+    .filter(Boolean));
+
+  const getBulkPasswordEmailNote = (email) => (
+    `Senha temporária aleatória enviada para ${email}. O e-mail sugere alteração da senha na aba Perfil.`
+  );
+
+  const readUsersFromCsv = (text) => {
+    const commaRows = parseCsvText(text, ',');
+    const semicolonRows = parseCsvText(text, ';');
+    const rows = (semicolonRows[0]?.length || 0) > (commaRows[0]?.length || 0) ? semicolonRows : commaRows;
+    if (rows.length < 2) {
+      return { users: [], error: 'O CSV precisa ter uma linha de cabeçalho e ao menos um colaborador.' };
+    }
+
+    const headers = rows[0].map(normalizeCsvHeader);
+    const nameIndex = headers.findIndex((header) => [
+      'nome',
+      'nomedocolaborador',
+      'nomecompleto',
+      'colaborador',
+      'funcionario',
+      'name',
+      'fullname',
+    ].includes(header));
+    const emailIndex = headers.findIndex((header) => ['email', 'mail', 'emailcorporativo'].includes(header));
+
+    if (nameIndex < 0 || emailIndex < 0) {
+      return { users: [], error: 'Não encontrei as colunas obrigatórias: nome do colaborador e e-mail.' };
+    }
+
+    const existingEmails = getExistingUserEmails();
+    const importedEmails = new Set();
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const errors = [];
+    const dataRows = rows.slice(1);
+
+    const users = dataRows.reduce((acc, csvRow, index) => {
+      const rowNumber = index + 2;
+      const name = String(csvRow[nameIndex] || '').trim();
+      const email = String(csvRow[emailIndex] || '').trim().toLowerCase();
+      const reasons = [];
+
+      if (!name) reasons.push('Nome do colaborador ausente');
+      if (!email) {
+        reasons.push('E-mail ausente');
+      } else if (!emailPattern.test(email)) {
+        reasons.push('E-mail inválido');
+      }
+      if (email && emailPattern.test(email) && existingEmails.has(email)) {
+        reasons.push('E-mail já existe na lista de usuários');
+      }
+      if (email && emailPattern.test(email) && importedEmails.has(email)) {
+        reasons.push('E-mail duplicado no CSV');
+      }
+
+      if (reasons.length) {
+        errors.push({
+          rowNumber,
+          name: name || 'Sem nome',
+          email: email || 'Sem e-mail',
+          reason: reasons.join('; '),
+        });
+        return acc;
+      }
+
+      importedEmails.add(email);
+      acc.push({
+        rowNumber,
+        name,
+        email,
+        passwordEmailSent: true,
+        passwordNote: getBulkPasswordEmailNote(email),
+      });
+      return acc;
+    }, []);
+
+    return { users, errors, totalRows: dataRows.length };
+  };
+
+  const setCreateUserCsvStatus = (message, variant = '', asHtml = false) => {
+    if (!createUserCsvStatus) return;
+    if (asHtml) {
+      createUserCsvStatus.innerHTML = message;
+    } else {
+      createUserCsvStatus.textContent = message;
+    }
+    createUserCsvStatus.dataset.variant = variant;
+  };
+
+  const setCreateUserCsvSummaryCard = ({ readyCount, errorCount }) => {
+    const hasErrors = errorCount > 0;
+    setCreateUserCsvStatus(`
+      <span class="material-symbols-rounded" aria-hidden="true">task_alt</span>
+      <span>
+        <strong>${escapeHtmlWes(String(readyCount))} usuário(s) pronto(s) para importar</strong>
+        <small>Cada usuário receberá uma senha temporária por e-mail.${hasErrors ? ` ${escapeHtmlWes(String(errorCount))} linha(s) serão revisadas como erro.` : ''}</small>
+      </span>
+    `, 'success', true);
+  };
+
+  const resetCreateUserBulkState = () => {
+    createUserBulkRows = [];
+    createUserBulkErrors = [];
+    createUserBulkTotalRows = 0;
+    if (createUserCsvInput) createUserCsvInput.value = '';
+    if (createUserCsvDropzone) createUserCsvDropzone.hidden = false;
+    if (createUserCsvFile) createUserCsvFile.hidden = true;
+    if (createUserCsvFileName) createUserCsvFileName.textContent = '';
+    setCreateUserCsvStatus('Nenhum arquivo selecionado.');
+  };
+
+  const formatUserCreatedDate = (date = new Date()) => (
+    new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
+  );
+
+  const getUserInitial = (name, email) => {
+    const source = String(name || email || '?').trim();
+    return (source[0] || '?').toUpperCase();
+  };
+
+  const createUserRowElement = ({
+    name,
+    email,
+    roleLabel,
+    statusLabel,
+    statusValue,
+    passwordEmailSent = false,
+  }) => {
+    const row = document.createElement('div');
+    row.className = 'data-row';
+    row.dataset.userCreated = 'true';
+    const userId = Math.random().toString(16).slice(2, 10);
+    const isActive = statusValue !== 'inactive';
+    row.innerHTML = `
+      <span class="user-cell">
+        <span class="user-avatar small">${escapeHtmlWes(getUserInitial(name, email))}</span>
+        <span>
+          <strong>${escapeHtmlWes(name)}</strong>
+          <span class="muted">ID: ${escapeHtmlWes(userId)}...</span>
+        </span>
+      </span>
+      <span>${escapeHtmlWes(email)}</span>
+      <span class="chip">${escapeHtmlWes(roleLabel)}</span>
+      <span class="chip ${isActive ? 'success' : ''}">${escapeHtmlWes(statusLabel)}</span>
+      <span>${escapeHtmlWes(formatUserCreatedDate())}</span>
+      <span class="row-actions has-details">
+        <button class="icon-btn action-icon" aria-label="Editar">
+          <span class="material-symbols-rounded">edit</span>
+        </button>
+        <button class="icon-btn action-icon danger" aria-label="Excluir">
+          <span class="material-symbols-rounded">delete</span>
+        </button>
+        <button class="icon-btn action-icon details-toggle" aria-label="Detalhes">
+          <span class="material-symbols-rounded">more_vert</span>
+        </button>
+        <div class="details-card">
+          <div class="details-title">Detalhes do usuário</div>
+          <div class="details-item"><span>Função</span><strong>${escapeHtmlWes(roleLabel)}</strong></div>
+          <div class="details-item"><span>Status</span><strong>${escapeHtmlWes(statusLabel)}</strong></div>
+          <div class="details-item"><span>E-mail</span><strong>${escapeHtmlWes(email)}</strong></div>
+          ${passwordEmailSent ? '<div class="details-item"><span>Senha temporária</span><strong>Enviada por e-mail</strong></div><div class="details-item"><span>Orientação</span><strong>Alterar em Perfil</strong></div>' : ''}
+        </div>
+      </span>
+    `;
+    return row;
+  };
+
+  const appendUserRows = (users, { roleLabel, statusLabel, statusValue }) => {
+    const headerRow = usersTable?.querySelector('.data-row.header');
+    if (!usersTable || !headerRow || !users.length) return;
+    const rows = users.map((user) => createUserRowElement({
+      name: user.name,
+      email: user.email,
+      roleLabel,
+      statusLabel,
+      statusValue,
+      passwordEmailSent: Boolean(user.passwordEmailSent),
+    }));
+    headerRow.after(...rows);
+  };
+
+  const createReviewItem = ({ name, email, rowNumber, reason, passwordNote }) => {
+    const item = document.createElement('div');
+    item.className = 'create-user-review-item';
+    const meta = reason
+      ? `Linha ${rowNumber || '-'} - ${reason}`
+      : `Linha ${rowNumber || '-'} - ${passwordNote || 'Senha temporária enviada por e-mail; orientar troca na aba Perfil.'}`;
+    item.innerHTML = `
+      <span class="user-avatar small">${escapeHtmlWes(getUserInitial(name, email))}</span>
+      <span>
+        <strong>${escapeHtmlWes(name || 'Sem nome')}</strong>
+        <small>${escapeHtmlWes(email || 'Sem e-mail')}</small>
+        <em>${escapeHtmlWes(meta)}</em>
+      </span>
+    `;
+    return item;
+  };
+
+  const renderCreateUserReview = () => {
+    const successCount = createUserBulkRows.length;
+    const errorCount = createUserBulkErrors.length;
+    const totalCount = createUserBulkTotalRows || successCount + errorCount;
+
+    if (createUserReviewTotal) createUserReviewTotal.textContent = String(totalCount);
+    if (createUserReviewSuccess) createUserReviewSuccess.textContent = String(successCount);
+    if (createUserReviewError) createUserReviewError.textContent = String(errorCount);
+    if (createUserSuccessCount) createUserSuccessCount.textContent = String(successCount);
+    if (createUserErrorCount) createUserErrorCount.textContent = String(errorCount);
+
+    if (createUserSuccessDetails) createUserSuccessDetails.open = successCount > 0;
+    if (createUserErrorDetails) createUserErrorDetails.open = errorCount > 0;
+
+    if (createUserSuccessList) {
+      createUserSuccessList.replaceChildren();
+      if (successCount) {
+        createUserBulkRows.forEach((user) => createUserSuccessList.append(createReviewItem(user)));
+      } else {
+        const empty = document.createElement('p');
+        empty.className = 'create-user-review-empty';
+        empty.textContent = 'Nenhum usuário foi adicionado.';
+        createUserSuccessList.append(empty);
+      }
+    }
+
+    if (createUserErrorList) {
+      createUserErrorList.replaceChildren();
+      if (errorCount) {
+        createUserBulkErrors.forEach((user) => createUserErrorList.append(createReviewItem(user)));
+      } else {
+        const empty = document.createElement('p');
+        empty.className = 'create-user-review-empty';
+        empty.textContent = 'Nenhum erro encontrado no CSV.';
+        createUserErrorList.append(empty);
+      }
+    }
+  };
+
+  const startCreateUserBulkProgress = ({ roleLabel, statusLabel, statusValue }) => {
+    clearCreateUserProgressTimers();
+    if (createUserProgressBar) createUserProgressBar.style.width = '0%';
+    if (createUserProgressLabel) createUserProgressLabel.textContent = 'Processando 0%';
+    setCreateUserModalStep('progress');
+
+    const duration = 10000;
+    const startedAt = Date.now();
+    createUserProgressInterval = window.setInterval(() => {
+      const elapsed = Date.now() - startedAt;
+      const progress = Math.min(99, Math.floor((elapsed / duration) * 100));
+      if (createUserProgressBar) createUserProgressBar.style.width = `${progress}%`;
+      if (createUserProgressLabel) createUserProgressLabel.textContent = `Processando ${progress}%`;
+    }, 120);
+
+    createUserProgressTimeout = window.setTimeout(() => {
+      clearCreateUserProgressTimers();
+      if (createUserProgressBar) createUserProgressBar.style.width = '100%';
+      if (createUserProgressLabel) createUserProgressLabel.textContent = 'Processando 100%';
+      appendUserRows(createUserBulkRows, { roleLabel, statusLabel, statusValue });
+      renderCreateUserReview();
+      setCreateUserModalStep('review');
+      showAppToast(`${createUserBulkRows.length} usuário(s) adicionados com senha enviada por e-mail; ${createUserBulkErrors.length} com erro`);
+    }, duration);
+  };
+
   const closeCreateUserModal = () => {
+    clearCreateUserProgressTimers();
     editingUserRow = null;
     createUserModal.classList.remove('open');
     createUserModal.setAttribute('aria-hidden', 'true');
+    setCreateUserModalStep('form');
   };
 
   const syncCreateUserSubmit = () => {
+    if (createUserModalStep === 'progress') {
+      if (createUserSubmit) createUserSubmit.disabled = true;
+      return;
+    }
+    if (createUserModalStep === 'review') {
+      if (createUserSubmit) createUserSubmit.disabled = false;
+      return;
+    }
+    const hasRole = Boolean(String(createUserRole?.value || '').trim());
+    if (getCreateUserMode() === 'bulk' && !editingUserRow) {
+      const hasCsvRows = createUserBulkRows.length + createUserBulkErrors.length > 0;
+      if (createUserSubmit) createUserSubmit.disabled = !(hasRole && hasCsvRows);
+      return;
+    }
     const hasName = Boolean(String(createUserName?.value || '').trim());
     const hasEmail = Boolean(String(createUserEmail?.value || '').trim());
     const hasPassword = editingUserRow ? true : String(createUserPassword?.value || '').length >= 8;
-    const hasRole = Boolean(String(createUserRole?.value || '').trim());
     if (createUserSubmit) createUserSubmit.disabled = !(hasName && hasEmail && hasPassword && hasRole);
   };
 
   openCreateUserModal.addEventListener('click', () => {
     editingUserRow = null;
     createUserModalForm.reset();
+    resetCreateUserBulkState();
+    if (createUserModeSwitch) createUserModeSwitch.hidden = false;
     if (createUserTitle) createUserTitle.textContent = 'Criar novo usuário';
     if (createUserSubmit) createUserSubmit.textContent = 'Criar usuário';
-    syncCreateUserSubmit();
+    setCreateUserModalStep('form');
+    setCreateUserMode('single');
     createUserModal.classList.add('open');
     createUserModal.setAttribute('aria-hidden', 'false');
     createUserName?.focus();
   });
 
-  [createUserName, createUserEmail, createUserPassword, createUserRole].forEach((field) => {
+  [createUserName, createUserEmail, createUserPassword, createUserRole, createUserStatus].forEach((field) => {
     field?.addEventListener('input', syncCreateUserSubmit);
     field?.addEventListener('change', syncCreateUserSubmit);
   });
 
+  createUserModeInputs.forEach((input) => {
+    input.addEventListener('change', () => setCreateUserMode(input.value));
+  });
+
+  createUserModeTabs.forEach((tab) => {
+    tab.addEventListener('click', () => setCreateUserMode(tab.dataset.createUserMode));
+  });
+
+  createUserCsvRemove?.addEventListener('click', () => {
+    resetCreateUserBulkState();
+    syncCreateUserSubmit();
+    createUserCsvInput?.focus();
+  });
+
+  createUserCsvInput?.addEventListener('change', () => {
+    const file = createUserCsvInput.files?.[0];
+    createUserBulkRows = [];
+    createUserBulkErrors = [];
+    createUserBulkTotalRows = 0;
+    if (!file) {
+      setCreateUserCsvStatus('Nenhum arquivo selecionado.');
+      syncCreateUserSubmit();
+      return;
+    }
+    if (createUserCsvDropzone) createUserCsvDropzone.hidden = true;
+    if (createUserCsvFile) createUserCsvFile.hidden = false;
+    if (createUserCsvFileName) createUserCsvFileName.textContent = file.name;
+    if (!file.name.toLowerCase().endsWith('.csv') && file.type !== 'text/csv') {
+      setCreateUserCsvStatus('Selecione um arquivo no formato CSV.', 'error');
+      syncCreateUserSubmit();
+      return;
+    }
+
+    setCreateUserCsvStatus(`Lendo ${file.name}...`);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = readUsersFromCsv(reader.result);
+      if (result.error) {
+        setCreateUserCsvStatus(result.error, 'error');
+        syncCreateUserSubmit();
+        return;
+      }
+      createUserBulkRows = result.users;
+      createUserBulkErrors = result.errors;
+      createUserBulkTotalRows = result.totalRows;
+      const ignoredText = createUserBulkErrors.length ? ` ${createUserBulkErrors.length} linha(s) serão revisadas como erro.` : '';
+      const statusVariant = createUserBulkRows.length ? 'success' : 'error';
+      if (createUserBulkRows.length) {
+        setCreateUserCsvSummaryCard({
+          readyCount: createUserBulkRows.length,
+          errorCount: createUserBulkErrors.length,
+        });
+      } else {
+        setCreateUserCsvStatus(`Nenhum usuário válido encontrado.${ignoredText || ' Verifique os dados do CSV.'}`, statusVariant);
+      }
+      syncCreateUserSubmit();
+    };
+    reader.onerror = () => {
+      setCreateUserCsvStatus('Não foi possível ler o arquivo CSV.', 'error');
+      syncCreateUserSubmit();
+    };
+    reader.readAsText(file);
+  });
+
   createUserModal.addEventListener('click', (event) => {
+    if (createUserModalStep === 'progress') return;
     if (event.target.closest('[data-modal-close]')) closeCreateUserModal();
   });
 
   createUserModalForm.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (createUserModalStep === 'progress') return;
+    if (createUserModalStep === 'review') {
+      closeCreateUserModal();
+      showAppToast('Revisão da importação concluída');
+      return;
+    }
+
     if (editingUserRow) {
       const name = String(createUserName?.value || '').trim();
       const email = String(createUserEmail?.value || '').trim();
@@ -5291,7 +5792,20 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
       return;
     }
 
+    const roleLabel = createUserRole?.selectedOptions?.[0]?.textContent?.trim() || '';
+    const statusLabel = createUserStatus?.selectedOptions?.[0]?.textContent?.trim() || '';
+    const statusValue = String(createUserStatus?.value || 'active');
+
+    if (getCreateUserMode() === 'bulk') {
+      startCreateUserBulkProgress({ roleLabel, statusLabel, statusValue });
+      return;
+    }
+
+    const name = String(createUserName?.value || '').trim();
+    const email = String(createUserEmail?.value || '').trim();
+    appendUserRows([{ name, email }], { roleLabel, statusLabel, statusValue });
     closeCreateUserModal();
+    showAppToast('Usuário criado com sucesso');
   });
 
   usersTable?.addEventListener('click', (event) => {
@@ -5308,6 +5822,10 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
 
     editingUserRow = row;
     createUserModalForm.reset();
+    resetCreateUserBulkState();
+    if (createUserModeSwitch) createUserModeSwitch.hidden = true;
+    setCreateUserModalStep('form');
+    setCreateUserMode('single');
     if (createUserTitle) createUserTitle.textContent = 'Editar usuário';
     if (createUserSubmit) createUserSubmit.textContent = 'Salvar alterações';
     if (createUserName) createUserName.value = name;

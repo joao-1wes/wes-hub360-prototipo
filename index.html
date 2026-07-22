@@ -3247,8 +3247,20 @@
                 </button>
               </div>
               <form id="createUserModalForm" class="modal-body create-user-body">
-                <section class="users-modal-section">
-                  <div class="modal-row">
+                <section class="users-modal-section" id="createUserFieldsPanel">
+                  <div class="tabs tabs-underline create-user-mode-tabs" id="createUserModeSwitch" role="tablist" aria-label="Modo de criação de usuário">
+                    <button class="tab create-user-mode-tab active" type="button" role="tab" aria-selected="true" data-create-user-mode="single">
+                      <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+                      Individual
+                    </button>
+                    <button class="tab create-user-mode-tab" type="button" role="tab" aria-selected="false" data-create-user-mode="bulk">
+                      <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                      Em massa
+                    </button>
+                    <input class="visually-hidden" type="radio" name="create_user_mode" value="single" checked />
+                    <input class="visually-hidden" type="radio" name="create_user_mode" value="bulk" />
+                  </div>
+                  <div class="modal-row create-user-single-fields" id="createUserSingleFields">
                     <div>
                       <label class="modal-label modal-label--required" for="createUserName">Nome completo</label>
                       <input class="modal-input" id="createUserName" name="name" type="text" maxlength="120" autocomplete="off" placeholder="Ex.: Ana Silva" />
@@ -3261,12 +3273,12 @@
                     </div>
                   </div>
                   <div class="modal-row">
-                    <div>
+                    <div class="create-user-single-only">
                       <label class="modal-label modal-label--required" for="createUserPassword">Senha</label>
                       <input class="modal-input" id="createUserPassword" name="password" type="password" minlength="8" maxlength="120" placeholder="Mínimo 8 caracteres" />
                       <p class="modal-field-hint">Mínimo 8 caracteres.</p>
                     </div>
-                    <div>
+                    <div class="create-user-single-only">
                       <label class="modal-label modal-label--required" for="createUserStatus">Status</label>
                       <div class="hub-select-wrap hub-select-wrap--block">
                         <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">verified_user</span>
@@ -3277,6 +3289,24 @@
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                       </div>
                     </div>
+                  </div>
+                  <div class="create-user-bulk-fields" id="createUserBulkFields" hidden>
+                    <label class="modal-label modal-label--required" for="createUserCsvInput">Arquivo CSV</label>
+                    <label class="create-user-upload-dropzone" id="createUserCsvDropzone" for="createUserCsvInput">
+                      <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                      <strong>Selecionar CSV de colaboradores</strong>
+                      <span>O arquivo precisa ter uma coluna com o nome do colaborador e outra com o respectivo e-mail.</span>
+                    </label>
+                    <input id="createUserCsvInput" class="visually-hidden" type="file" accept=".csv,text/csv" />
+                    <p class="modal-field-hint">Use cabeçalhos como <strong>nome</strong> ou <strong>nome do colaborador</strong> e <strong>email</strong> ou <strong>e-mail</strong>. Nome e e-mail serão puxados do CSV; a senha será aleatória e enviada por e-mail para cada novo usuário.</p>
+                    <div class="create-user-csv-file" id="createUserCsvFile" hidden>
+                      <span class="material-symbols-rounded" aria-hidden="true">description</span>
+                      <strong id="createUserCsvFileName"></strong>
+                      <button type="button" class="icon-btn" id="createUserCsvRemove" aria-label="Remover arquivo CSV">
+                        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                      </button>
+                    </div>
+                    <p class="create-user-csv-status" id="createUserCsvStatus" role="status">Nenhum arquivo selecionado.</p>
                   </div>
                   <label class="modal-label modal-label--required" for="createUserRole">Função</label>
                   <div class="hub-select-wrap hub-select-wrap--block">
@@ -3290,11 +3320,59 @@
                     </select>
                     <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
                   </div>
-                  <p class="modal-field-hint">Defina a função que controla permissões e acessos.</p>
+                  <p class="modal-field-hint">Defina a função que controla permissões e acessos. No upload CSV, todos os usuários serão criados com esta função e receberão uma senha temporária por e-mail.</p>
+                </section>
+                <section class="create-user-progress-panel" id="createUserProgressPanel" hidden>
+                  <span class="material-symbols-rounded" aria-hidden="true">sync</span>
+                  <div>
+                    <h4>Adicionando usuários</h4>
+                    <p>Estamos criando os usuários válidos do CSV e enviando uma senha temporária aleatória por e-mail. A revisão será exibida ao final.</p>
+                  </div>
+                  <div class="create-user-progress-track" aria-label="Progresso de importação">
+                    <span id="createUserProgressBar"></span>
+                  </div>
+                  <p class="create-user-progress-label" id="createUserProgressLabel">Processando 0%</p>
+                </section>
+                <section class="create-user-review-panel" id="createUserReviewPanel" hidden>
+                  <div class="create-user-review-head">
+                    <span class="material-symbols-rounded" aria-hidden="true">fact_check</span>
+                    <div>
+                      <h4>Revisão da importação</h4>
+                      <p>Confira quantos usuários foram adicionados, quais receberam e-mail com senha temporária e quais linhas não puderam ser importadas.</p>
+                    </div>
+                  </div>
+                  <div class="create-user-review-stats" aria-label="Resumo da importação">
+                    <div>
+                      <span>Total no CSV</span>
+                      <strong id="createUserReviewTotal">0</strong>
+                    </div>
+                    <div>
+                      <span>Adicionados</span>
+                      <strong id="createUserReviewSuccess">0</strong>
+                    </div>
+                    <div>
+                      <span>Com erro</span>
+                      <strong id="createUserReviewError">0</strong>
+                    </div>
+                  </div>
+                  <details class="create-user-review-list" id="createUserSuccessDetails" open>
+                    <summary>
+                      <span>Usuários adicionados</span>
+                      <strong id="createUserSuccessCount">0</strong>
+                    </summary>
+                    <div class="create-user-review-items" id="createUserSuccessList"></div>
+                  </details>
+                  <details class="create-user-review-list create-user-review-list--error" id="createUserErrorDetails">
+                    <summary>
+                      <span>Usuários com erro</span>
+                      <strong id="createUserErrorCount">0</strong>
+                    </summary>
+                    <div class="create-user-review-items" id="createUserErrorList"></div>
+                  </details>
                 </section>
               </form>
               <div class="modal-footer">
-                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
+                <button type="button" class="btn outline" id="createUserCancel" data-modal-close>Cancelar</button>
                 <button type="submit" form="createUserModalForm" class="btn primary" id="createUserSubmit" disabled>Criar usuário</button>
               </div>
             </div>

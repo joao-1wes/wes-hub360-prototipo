@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>WES HUB 360 - Painel (Estático)</title>
-    <link rel="stylesheet" href="./styles.css?v=20260717-health-integrations-layout" />
+    <link rel="stylesheet" href="./styles.css?v=20260722-dashboard-card-icons" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
@@ -759,6 +759,83 @@
               </div>
             </div>
           </div>
+
+            <div class="section is-hidden dashboard-common-home" id="dashboardCommonHome">
+            <div class="section-heading">
+              <h2>Ações rápidas</h2>
+              <button class="icon-btn action-icon dashboard-quick-actions-edit" type="button" aria-label="Editar ações rápidas">
+                <span class="material-symbols-rounded">edit</span>
+              </button>
+            </div>
+            <div class="quick-actions" data-dashboard-quick-actions></div>
+
+            <section class="dashboard-navigation-home" aria-labelledby="dashboardNavigationHomeTitle">
+              <div class="dashboard-navigation-heading">
+                <h2 id="dashboardNavigationHomeTitle">Home</h2>
+                <p>Acesse as áreas disponíveis para sua organização.</p>
+              </div>
+              <div class="dashboard-navigation-grid">
+                <article class="dashboard-navigation-card">
+                  <div class="dashboard-navigation-main">
+                    <span class="material-symbols-rounded dashboard-navigation-icon" aria-hidden="true">smart_toy</span>
+                    <span>
+                      <strong>Agentes</strong>
+                      <small>Gerencie agentes e projetos.</small>
+                    </span>
+                  </div>
+                  <nav class="dashboard-navigation-submenu" aria-label="Agentes">
+                    <a href="#/dashboard/agents">Agentes <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/agents">Projetos <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/agents">Conversas e histórico <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                  </nav>
+                </article>
+                <article class="dashboard-navigation-card">
+                  <div class="dashboard-navigation-main">
+                    <span class="material-symbols-rounded dashboard-navigation-icon" aria-hidden="true">automation</span>
+                    <span>
+                      <strong>Fluxos de Trabalho</strong>
+                      <small>Escolha uma área operacional.</small>
+                    </span>
+                  </div>
+                  <nav class="dashboard-navigation-submenu" aria-label="Fluxos de Trabalho">
+                    <a href="#/dashboard/automations">Automações <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/document-analysis">Análise de documentos <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/bpmn">Processos <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                  </nav>
+                </article>
+                <article class="dashboard-navigation-card">
+                  <div class="dashboard-navigation-main">
+                    <span class="material-symbols-rounded dashboard-navigation-icon" aria-hidden="true">account_tree</span>
+                    <span>
+                      <strong>Atendimento dinâmico</strong>
+                      <small>Gerencie módulos de atendimento.</small>
+                    </span>
+                  </div>
+                  <nav class="dashboard-navigation-submenu" aria-label="Atendimento dinâmico">
+                    <a href="#/dashboard/campaigns">Campanhas <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/channels">Canais <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/hybrid-flows">Fluxos híbridos <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/voice-messaging">Mensageria por voz <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                  </nav>
+                </article>
+                <article class="dashboard-navigation-card">
+                  <div class="dashboard-navigation-main">
+                    <span class="material-symbols-rounded dashboard-navigation-icon" aria-hidden="true">health_and_safety</span>
+                    <span>
+                      <strong>Saúde</strong>
+                      <small>Acesse rotinas de saúde.</small>
+                    </span>
+                  </div>
+                  <nav class="dashboard-navigation-submenu" aria-label="Saúde">
+                    <a href="#/dashboard/health/whatsapp">WhatsApp <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/health/service">Atendimento <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/health/agenda">Agenda <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/health/integrations">Integrações <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                  </nav>
+                </article>
+              </div>
+            </section>
+            </div>
 
             <div class="section is-hidden" id="dashboardViewDetail">
             <div class="section-heading">

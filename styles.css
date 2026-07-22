@@ -30,6 +30,12 @@
   box-sizing: border-box;
 }
 
+input,
+textarea,
+select {
+  line-height: 1.35;
+}
+
 body {
   margin: 0;
   font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
@@ -3101,9 +3107,10 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   border: none !important;
   outline: none;
   font-size: var(--md-body-medium);
+  line-height: 1.35;
   flex: 1;
   background: transparent;
-  padding: 0 !important;
+  padding: 2px 0 !important;
   box-shadow: none;
 }
 
@@ -4338,6 +4345,37 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .environment-relation-picker-list .ui-menu-item .material-symbols-rounded {
   color: #64748b;
   font-size: 18px;
+}
+
+.environment-relation-picker-list .environment-relation-user-option {
+  gap: 10px;
+}
+
+.environment-relation-picker-list .environment-relation-user-option > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.environment-relation-picker-list .environment-relation-user-option strong,
+.environment-relation-picker-list .environment-relation-user-option small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.environment-relation-picker-list .environment-relation-user-option strong {
+  font-size: var(--md-body-small);
+  font-weight: 700;
+}
+
+.environment-relation-picker-list .environment-relation-user-option small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.environment-relation-picker-list .environment-relation-create-user {
+  color: #1d4ed8;
+  font-weight: 700;
 }
 
 .environment-relation-picker-empty {
@@ -9845,6 +9883,10 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   display: flex;
 }
 
+.modal.modal--stacked {
+  z-index: 90;
+}
+
 .modal-backdrop {
   position: absolute;
   inset: 0;
@@ -10571,6 +10613,126 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .create-user-dialog .modal-field-hint {
   margin: 0;
+}
+
+.user-lookup {
+  position: relative;
+  min-width: 0;
+}
+
+.user-lookup-field {
+  min-height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.company-users-dialog .user-lookup-field:focus-within {
+  border-color: #016ff4;
+  box-shadow: 0 0 0 2px rgba(1, 111, 244, 0.14);
+}
+
+.user-lookup-field .material-symbols-rounded {
+  color: #2563eb;
+}
+
+.user-lookup-input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #111827;
+  font: inherit;
+  font-weight: 500;
+}
+
+.user-lookup-input::placeholder {
+  color: #9ca3af;
+}
+
+.user-lookup-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+  z-index: 1200;
+}
+
+.user-lookup-menu.open {
+  display: flex;
+}
+
+.user-lookup-option,
+.user-lookup-create {
+  width: 100%;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  text-align: left;
+  cursor: pointer;
+}
+
+.user-lookup-option:hover,
+.user-lookup-create:hover {
+  border-color: #cfe3ff;
+  background: #eef6ff;
+  color: #016ff4;
+}
+
+.user-lookup-option > span:last-child {
+  display: grid;
+  min-width: 0;
+}
+
+.user-lookup-option strong,
+.user-lookup-option small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-lookup-option strong {
+  font-size: var(--md-body-small);
+  font-weight: 700;
+}
+
+.user-lookup-option small {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.user-lookup-create {
+  color: #1d4ed8;
+  font-weight: 700;
+}
+
+.user-lookup-create .material-symbols-rounded {
+  color: #2563eb;
+  font-size: 20px;
+}
+
+.user-lookup-empty {
+  padding: 10px;
+  color: #64748b;
+  font-size: var(--md-body-small);
 }
 
 .create-user-mode-tabs {
@@ -17691,7 +17853,7 @@ body.route-automation-create #directChatFab {
   color: #101010;
   font: inherit;
   font-size: 18px;
-  line-height: 1;
+  line-height: 1.35;
   letter-spacing: 0;
 }
 

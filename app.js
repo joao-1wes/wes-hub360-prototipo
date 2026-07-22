@@ -206,6 +206,7 @@ const agentHistoryOpenConversationBtn = document.getElementById('agentHistoryOpe
 const companyUsersModal = document.getElementById('companyUsersModal');
 const companyUsersModalTitle = document.getElementById('companyUsersModalTitle');
 const companyUserSelect = document.getElementById('companyUserSelect');
+const companyUserLookupMenu = document.getElementById('companyUserLookupMenu');
 const companyAddUserButton = document.getElementById('companyAddUserButton');
 const companyUsersList = document.getElementById('companyUsersList');
 const companyUsersCount = document.getElementById('companyUsersCount');
@@ -247,6 +248,84 @@ const createUserSuccessList = document.getElementById('createUserSuccessList');
 const createUserErrorList = document.getElementById('createUserErrorList');
 const createUserCancel = document.getElementById('createUserCancel');
 const createUserCloseButtons = Array.from(createUserModal?.querySelectorAll('button[data-modal-close]') || []);
+
+const fallbackUserDirectory = [
+  { id: 'admin@wes.com', name: 'WES ADMIN', email: 'admin@wes.com', role: 'Administrador' },
+  { id: 'viniciusaires@hotmail.com', name: 'Alfeu Vinicius Souza', email: 'viniciusaires@hotmail.com', role: 'Administrador' },
+  { id: 'ana.silva@cedae.com', name: 'Ana Silva', email: 'ana.silva@cedae.com', role: 'Usuário' },
+  { id: 'carlos.santos@cedae.com', name: 'Carlos Santos', email: 'carlos.santos@cedae.com', role: 'Usuário' },
+  { id: 'mariana.costa@1wes.com', name: 'Mariana Costa', email: 'mariana.costa@1wes.com', role: 'Usuário' },
+  { id: 'lucas.almeida@1wes.com', name: 'Lucas Almeida', email: 'lucas.almeida@1wes.com', role: 'Usuário' },
+  { id: 'paula.ribeiro@1wes.com', name: 'Paula Ribeiro', email: 'paula.ribeiro@1wes.com', role: 'Usuário' },
+  { id: 'rafael.moura@1wes.com', name: 'Rafael Moura', email: 'rafael.moura@1wes.com', role: 'Usuário' },
+  { id: 'camila.rocha@1wes.com', name: 'Camila Rocha', email: 'camila.rocha@1wes.com', role: 'Usuário' },
+  { id: 'bruno.martins@1wes.com', name: 'Bruno Martins', email: 'bruno.martins@1wes.com', role: 'Usuário' },
+  { id: 'fernanda.lima@1wes.com', name: 'Fernanda Lima', email: 'fernanda.lima@1wes.com', role: 'Usuário' },
+  { id: 'renato.pires@1wes.com', name: 'Renato Pires', email: 'renato.pires@1wes.com', role: 'Usuário' },
+];
+
+const normalizeUserLookupValue = (value) => String(value || '')
+  .trim()
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase();
+
+const normalizeUserDirectoryId = (value) => String(value || '').trim().toLowerCase();
+
+const getUserInitialFromDirectory = (user) => {
+  const source = String(user?.name || user?.email || '?').trim();
+  return (source[0] || '?').toUpperCase();
+};
+
+const getUserDirectoryRecords = () => {
+  const byId = new Map();
+  fallbackUserDirectory.forEach((user) => {
+    const id = normalizeUserDirectoryId(user.id || user.email);
+    if (!id) return;
+    byId.set(id, { ...user, id });
+  });
+
+  usersTable?.querySelectorAll('.data-row:not(.header)').forEach((row) => {
+    const name = row.querySelector('.user-cell strong')?.textContent?.trim() || '';
+    const email = row.children[1]?.textContent?.trim() || '';
+    const role = row.children[2]?.textContent?.trim() || 'Usuário';
+    const id = normalizeUserDirectoryId(email);
+    if (!id) return;
+    byId.set(id, { id, name: name || email, email, role });
+  });
+
+  return Array.from(byId.values());
+};
+
+const searchUserDirectory = (query = '', { excludeIds = new Set(), limit = 6 } = {}) => {
+  const normalizedQuery = normalizeUserLookupValue(query);
+  const normalizedExclusions = new Set(Array.from(excludeIds || []).map(normalizeUserDirectoryId));
+  const results = getUserDirectoryRecords().filter((user) => {
+    const id = normalizeUserDirectoryId(user.id || user.email);
+    if (!id || normalizedExclusions.has(id)) return false;
+    if (!normalizedQuery) return true;
+    return normalizeUserLookupValue(`${user.name} ${user.email}`).includes(normalizedQuery);
+  });
+  return Number.isInteger(limit) ? results.slice(0, limit) : results;
+};
+
+const findUserDirectoryRecord = (value) => {
+  const normalized = normalizeUserLookupValue(value);
+  if (!normalized) return null;
+  return getUserDirectoryRecords().find((user) => (
+    normalizeUserLookupValue(user.email) === normalized
+    || normalizeUserLookupValue(user.name) === normalized
+    || normalizeUserLookupValue(`${user.name} ${user.email}`) === normalized
+  )) || null;
+};
+
+const getMissingUserPrefill = (query) => {
+  const value = String(query || '').trim();
+  if (!value) return {};
+  return value.includes('@') ? { email: value.toLowerCase() } : { name: value };
+};
+
+let openCreateUserModalFromLookup = null;
 const openSkillModal = document.getElementById('openSkillModal');
 const skillModal = document.getElementById('skillModal');
 const skillModalForm = document.getElementById('skillModalForm');
@@ -5647,6 +5726,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     clearCreateUserProgressTimers();
     editingUserRow = null;
     createUserModal.classList.remove('open');
+    createUserModal.classList.remove('modal--stacked');
     createUserModal.setAttribute('aria-hidden', 'true');
     setCreateUserModalStep('form');
   };
@@ -5672,7 +5752,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     if (createUserSubmit) createUserSubmit.disabled = !(hasName && hasEmail && hasPassword && hasRole);
   };
 
-  openCreateUserModal.addEventListener('click', () => {
+  const openCreateUserDialog = ({ prefillName = '', prefillEmail = '', stacked = false } = {}) => {
     editingUserRow = null;
     createUserModalForm.reset();
     resetCreateUserBulkState();
@@ -5681,9 +5761,26 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     if (createUserSubmit) createUserSubmit.textContent = 'Criar usuário';
     setCreateUserModalStep('form');
     setCreateUserMode('single');
+    createUserModal.classList.toggle('modal--stacked', Boolean(stacked));
+    if (createUserName) createUserName.value = prefillName;
+    if (createUserEmail) createUserEmail.value = prefillEmail;
+    syncCreateUserSubmit();
     createUserModal.classList.add('open');
     createUserModal.setAttribute('aria-hidden', 'false');
-    createUserName?.focus();
+    (prefillName && !prefillEmail ? createUserEmail : createUserName)?.focus();
+  };
+
+  openCreateUserModalFromLookup = ({ query = '', name = '', email = '' } = {}) => {
+    const prefill = getMissingUserPrefill(query);
+    openCreateUserDialog({
+      prefillName: name || prefill.name || '',
+      prefillEmail: email || prefill.email || '',
+      stacked: true,
+    });
+  };
+
+  openCreateUserModal.addEventListener('click', () => {
+    openCreateUserDialog();
   });
 
   [createUserName, createUserEmail, createUserPassword, createUserRole, createUserStatus].forEach((field) => {
@@ -5804,6 +5901,15 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     const name = String(createUserName?.value || '').trim();
     const email = String(createUserEmail?.value || '').trim();
     appendUserRows([{ name, email }], { roleLabel, statusLabel, statusValue });
+    document.dispatchEvent(new CustomEvent('wes:user-created', {
+      detail: {
+        id: normalizeUserDirectoryId(email),
+        name,
+        email,
+        role: roleLabel,
+        status: statusLabel,
+      },
+    }));
     closeCreateUserModal();
     showAppToast('Usuário criado com sucesso');
   });
@@ -6252,13 +6358,8 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
   let activeCompanyRow = null;
   let activeCompanyId = '';
   let draftCompanyUsers = [];
-
-  const fallbackCompanyUsers = [
-    { id: 'admin@wes.com', name: 'WES ADMIN', email: 'admin@wes.com', role: 'Administrador' },
-    { id: 'viniciusaires@hotmail.com', name: 'Alfeu Vinicius Souza', email: 'viniciusaires@hotmail.com', role: 'Administrador' },
-    { id: 'ana.silva@cedae.com', name: 'Ana Silva', email: 'ana.silva@cedae.com', role: 'Usuário' },
-    { id: 'carlos.santos@cedae.com', name: 'Carlos Santos', email: 'carlos.santos@cedae.com', role: 'Usuário' },
-  ];
+  let selectedCompanyUserId = '';
+  let shouldAttachNextCreatedUserToCompany = false;
 
   const companyUsersByCompany = {
     avas: [
@@ -6278,30 +6379,13 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     ],
   };
 
-  const normalizeCompanyUserId = (value) => String(value || '').trim().toLowerCase();
+  const normalizeCompanyUserId = normalizeUserDirectoryId;
 
   const getCompanyUserInitial = (user) => {
-    const source = String(user?.name || user?.email || '?').trim();
-    return (source[0] || '?').toUpperCase();
+    return getUserInitialFromDirectory(user);
   };
 
-  const getAllCompanyUsers = () => {
-    const byId = new Map();
-    fallbackCompanyUsers.forEach((user) => {
-      byId.set(normalizeCompanyUserId(user.id), { ...user, id: normalizeCompanyUserId(user.id) });
-    });
-
-    usersTable?.querySelectorAll('.data-row:not(.header)').forEach((row) => {
-      const name = row.querySelector('.user-cell strong')?.textContent?.trim() || '';
-      const email = row.children[1]?.textContent?.trim() || '';
-      const role = row.children[2]?.textContent?.trim() || 'Usuário';
-      const id = normalizeCompanyUserId(email);
-      if (!id) return;
-      byId.set(id, { id, name: name || email, email, role });
-    });
-
-    return Array.from(byId.values());
-  };
+  const getAllCompanyUsers = getUserDirectoryRecords;
 
   const findCompanyUser = (userId) => {
     const normalizedId = normalizeCompanyUserId(userId);
@@ -6319,33 +6403,82 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     if (countCell) countCell.textContent = String(count);
   };
 
-  const updateCompanyUserSelect = () => {
-    const linkedUserIds = new Set(draftCompanyUsers.map((item) => normalizeCompanyUserId(item.userId)));
-    const availableUsers = getAllCompanyUsers().filter((user) => !linkedUserIds.has(user.id));
+  const closeCompanyUserLookup = () => {
+    companyUserLookupMenu?.classList.remove('open');
+  };
 
-    companyUserSelect.innerHTML = '';
-    if (availableUsers.length === 0) {
-      const option = document.createElement('option');
-      option.value = '';
-      option.textContent = 'Todos os usuários já estão vinculados';
-      companyUserSelect.appendChild(option);
-      companyUserSelect.disabled = true;
+  const setCompanyUserSelection = (user) => {
+    selectedCompanyUserId = normalizeCompanyUserId(user?.id || user?.email);
+    companyUserSelect.value = user ? `${user.name} · ${user.email}` : '';
+    if (companyAddUserButton) companyAddUserButton.disabled = !selectedCompanyUserId;
+    closeCompanyUserLookup();
+  };
+
+  const renderCompanyUserLookup = () => {
+    if (!companyUserLookupMenu) return;
+    const query = String(companyUserSelect.value || '').trim();
+    const linkedUserIds = new Set(draftCompanyUsers.map((item) => normalizeCompanyUserId(item.userId)));
+    const directoryMatches = searchUserDirectory(query, { limit: null });
+    const matches = directoryMatches
+      .filter((user) => !linkedUserIds.has(normalizeCompanyUserId(user.id || user.email)))
+      .slice(0, 6);
+
+    companyUserLookupMenu.replaceChildren();
+
+    if (!matches.length && !query) {
+      const empty = document.createElement('div');
+      empty.className = 'user-lookup-empty';
+      empty.textContent = 'Todos os usuários já estão vinculados';
+      companyUserLookupMenu.appendChild(empty);
+      companyUserLookupMenu.classList.add('open');
       if (companyAddUserButton) companyAddUserButton.disabled = true;
       return;
     }
 
-    const emptyOption = document.createElement('option');
-    emptyOption.value = '';
-    emptyOption.textContent = 'Selecione um usuário';
-    companyUserSelect.appendChild(emptyOption);
-    availableUsers.forEach((user) => {
-      const option = document.createElement('option');
-      option.value = user.id;
-      option.textContent = `${user.name} · ${user.email}`;
-      companyUserSelect.appendChild(option);
+    matches.forEach((user) => {
+      const option = document.createElement('button');
+      option.type = 'button';
+      option.className = 'user-lookup-option';
+      option.dataset.companyUserId = user.id;
+      option.innerHTML = `
+        <span class="user-avatar small">${escapeHtmlWes(getCompanyUserInitial(user))}</span>
+        <span>
+          <strong>${escapeHtmlWes(user.name)}</strong>
+          <small>${escapeHtmlWes(user.email)}</small>
+        </span>
+      `;
+      companyUserLookupMenu.appendChild(option);
     });
+
+    if (query && !directoryMatches.length) {
+      const createOption = document.createElement('button');
+      createOption.type = 'button';
+      createOption.className = 'user-lookup-create';
+      createOption.dataset.companyCreateMissingUser = query;
+      createOption.innerHTML = `
+        <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+        <span>Não encontramos esse usuário. Deseja adicioná-lo?</span>
+      `;
+      companyUserLookupMenu.appendChild(createOption);
+    }
+
+    if (query && directoryMatches.length && !matches.length) {
+      const empty = document.createElement('div');
+      empty.className = 'user-lookup-empty';
+      empty.textContent = 'Usuário já vinculado';
+      companyUserLookupMenu.appendChild(empty);
+    }
+
+    companyUserLookupMenu.classList.add('open');
+    if (companyAddUserButton) companyAddUserButton.disabled = !selectedCompanyUserId;
+  };
+
+  const resetCompanyUserLookup = () => {
+    selectedCompanyUserId = '';
+    companyUserSelect.value = '';
     companyUserSelect.disabled = false;
     if (companyAddUserButton) companyAddUserButton.disabled = true;
+    closeCompanyUserLookup();
   };
 
   const renderCompanyUsers = () => {
@@ -6385,7 +6518,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
       const count = draftCompanyUsers.length;
       companyUsersCount.textContent = `${count} ${count === 1 ? 'usuário' : 'usuários'}`;
     }
-    updateCompanyUserSelect();
+    resetCompanyUserLookup();
   };
 
   const closeCompanyUsersModal = () => {
@@ -6394,6 +6527,9 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     activeCompanyRow = null;
     activeCompanyId = '';
     draftCompanyUsers = [];
+    selectedCompanyUserId = '';
+    shouldAttachNextCreatedUserToCompany = false;
+    closeCompanyUserLookup();
   };
 
   const openCompanyUsersModal = (companyRow) => {
@@ -6430,15 +6566,68 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     showAppToast('Empresa excluída');
   });
 
-  companyUserSelect.addEventListener('change', () => {
-    if (companyAddUserButton) companyAddUserButton.disabled = !companyUserSelect.value;
+  companyUserSelect.addEventListener('focus', renderCompanyUserLookup);
+
+  companyUserSelect.closest('[data-user-lookup="company"]')?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    renderCompanyUserLookup();
+  });
+
+  companyUserSelect.addEventListener('input', () => {
+    selectedCompanyUserId = '';
+    if (companyAddUserButton) companyAddUserButton.disabled = true;
+    renderCompanyUserLookup();
+  });
+
+  companyUserSelect.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeCompanyUserLookup();
+      return;
+    }
+    if (event.key !== 'Enter') return;
+    const exactUser = findUserDirectoryRecord(companyUserSelect.value);
+    if (!exactUser) return;
+    event.preventDefault();
+    setCompanyUserSelection(exactUser);
+  });
+
+  companyUserLookupMenu?.addEventListener('click', (event) => {
+    const createButton = event.target.closest('[data-company-create-missing-user]');
+    if (createButton) {
+      shouldAttachNextCreatedUserToCompany = true;
+      openCreateUserModalFromLookup?.({ query: createButton.dataset.companyCreateMissingUser || companyUserSelect.value });
+      closeCompanyUserLookup();
+      return;
+    }
+
+    const option = event.target.closest('[data-company-user-id]');
+    if (!option) return;
+    const user = getAllCompanyUsers().find((item) => normalizeCompanyUserId(item.id) === normalizeCompanyUserId(option.dataset.companyUserId));
+    if (user) setCompanyUserSelection(user);
   });
 
   companyAddUserButton?.addEventListener('click', () => {
-    const userId = normalizeCompanyUserId(companyUserSelect.value);
+    const typedUser = selectedCompanyUserId ? null : findUserDirectoryRecord(companyUserSelect.value);
+    const userId = normalizeCompanyUserId(selectedCompanyUserId || typedUser?.id || typedUser?.email);
     if (!userId || draftCompanyUsers.some((item) => normalizeCompanyUserId(item.userId) === userId)) return;
     draftCompanyUsers.push({ userId, active: true });
     renderCompanyUsers();
+  });
+
+  document.addEventListener('wes:user-created', (event) => {
+    if (!shouldAttachNextCreatedUserToCompany || !companyUsersModal.classList.contains('open')) return;
+    shouldAttachNextCreatedUserToCompany = false;
+    const userId = normalizeCompanyUserId(event.detail?.id || event.detail?.email);
+    if (!userId || draftCompanyUsers.some((item) => normalizeCompanyUserId(item.userId) === userId)) return;
+    draftCompanyUsers.push({ userId, active: true });
+    renderCompanyUsers();
+    showAppToast('Novo usuário vinculado à empresa');
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!companyUserLookupMenu?.classList.contains('open')) return;
+    if (event.target.closest('[data-user-lookup="company"]')) return;
+    closeCompanyUserLookup();
   });
 
   companyUsersList.addEventListener('change', (event) => {
@@ -7224,6 +7413,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   let draftEnvironmentCode = '';
   let activeRelationPickerType = '';
   let activeRelationPickerButton = null;
+  let shouldAttachNextCreatedUserToEnvironment = false;
 
   const environmentRelations = {
     'env-operacoes': {
@@ -7455,7 +7645,27 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
   const normalizeRelationPickerValue = (value) => String(value || '').trim().toLowerCase();
 
+  const getEnvironmentUserOptionValue = (user) => `${user.name} · ${user.email}`;
+
+  const isEnvironmentUserAlreadyLinked = (user) => {
+    const relation = ensureEnvironmentRelationRecord(activeEnvironmentCode);
+    const existingValues = Array.isArray(relation.users) ? relation.users : [];
+    const possibleValues = [
+      user?.name,
+      user?.email,
+      getEnvironmentUserOptionValue(user),
+    ].map(normalizeRelationPickerValue);
+    return existingValues.some((item) => possibleValues.includes(normalizeRelationPickerValue(item)));
+  };
+
   const getEnvironmentRelationPickerOptions = (relationType, limit = null) => {
+    if (relationType === 'users') {
+      const users = searchUserDirectory('', { limit: null })
+        .filter((user) => !isEnvironmentUserAlreadyLinked(user))
+        .map(getEnvironmentUserOptionValue);
+      return Number.isInteger(limit) ? users.slice(0, limit) : users;
+    }
+
     const defaults = Array.isArray(defaultExamplesByType[relationType]) ? defaultExamplesByType[relationType] : [];
     const recents = getEnvironmentRelationRecentItems(relationType, 8);
     const pool = Array.isArray(environmentRelationSuggestionPool[relationType]) ? environmentRelationSuggestionPool[relationType] : [];
@@ -7492,6 +7702,62 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (!environmentRelationPickerList || !activeRelationPickerType) return;
     const query = String(environmentRelationPickerSearch?.value || '').trim().toLowerCase();
     const rawQuery = String(environmentRelationPickerSearch?.value || '').trim();
+    const isUserPicker = activeRelationPickerType === 'users';
+
+    if (isUserPicker) {
+      const directoryUsers = searchUserDirectory(rawQuery, { limit: null });
+      const visibleUsers = directoryUsers
+        .filter((user) => !isEnvironmentUserAlreadyLinked(user))
+        .slice(0, rawQuery ? 6 : 4);
+      environmentRelationPickerList.replaceChildren();
+
+      const createPickerOption = (user) => {
+        const option = document.createElement('button');
+        option.type = 'button';
+        option.className = 'ui-menu-item environment-relation-user-option';
+        option.dataset.relationAddValue = getEnvironmentUserOptionValue(user);
+        option.innerHTML = `
+          <span class="user-avatar small">${escapeHtmlWes(getUserInitialFromDirectory(user))}</span>
+          <span>
+            <strong>${escapeHtmlWes(user.name)}</strong>
+            <small>${escapeHtmlWes(user.email)}</small>
+          </span>
+        `;
+        return option;
+      };
+
+      visibleUsers.forEach((user) => {
+        environmentRelationPickerList.appendChild(createPickerOption(user));
+      });
+
+      if (rawQuery && !directoryUsers.length) {
+        const createOption = document.createElement('button');
+        createOption.type = 'button';
+        createOption.className = 'ui-menu-item environment-relation-create-user';
+        createOption.dataset.relationCreateUser = rawQuery;
+        createOption.innerHTML = `
+          <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+          <span>Não encontramos esse usuário. Deseja adicioná-lo?</span>
+        `;
+        environmentRelationPickerList.appendChild(createOption);
+      }
+
+      if (rawQuery && directoryUsers.length && !visibleUsers.length) {
+        const empty = document.createElement('div');
+        empty.className = 'environment-relation-picker-empty';
+        empty.textContent = 'Usuário já vinculado';
+        environmentRelationPickerList.appendChild(empty);
+      }
+
+      if (!environmentRelationPickerList.childElementCount) {
+        const empty = document.createElement('div');
+        empty.className = 'environment-relation-picker-empty';
+        empty.textContent = 'Nenhum usuário disponível';
+        environmentRelationPickerList.appendChild(empty);
+      }
+      return;
+    }
+
     const allOptions = getEnvironmentRelationPickerOptions(activeRelationPickerType);
     const baseItems = getEnvironmentRelationPickerOptions(activeRelationPickerType, 4);
     const visibleItems = query
@@ -7696,6 +7962,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     activeEnvironmentRow = null;
     isCreatingEnvironment = false;
     activeEnvironmentCode = '';
+    shouldAttachNextCreatedUserToEnvironment = false;
     if (draftEnvironmentCode) {
       delete environmentRelations[draftEnvironmentCode];
       draftEnvironmentCode = '';
@@ -7880,6 +8147,19 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     event.preventDefault();
     const value = String(environmentRelationPickerSearch.value || '').trim();
     if (!value || !activeRelationPickerType) return;
+    if (activeRelationPickerType === 'users') {
+      const user = findUserDirectoryRecord(value);
+      if (!user || isEnvironmentUserAlreadyLinked(user)) {
+        renderEnvironmentRelationPickerItems();
+        return;
+      }
+      const addedUser = addItemToActiveEnvironmentRelation(activeRelationPickerType, getEnvironmentUserOptionValue(user));
+      if (addedUser) {
+        showAppToast('Usuário adicionado ao setor');
+        closeEnvironmentRelationPicker();
+      }
+      return;
+    }
     const added = addItemToActiveEnvironmentRelation(activeRelationPickerType, value);
     if (added) {
       showAppToast('Item adicionado com sucesso');
@@ -7890,6 +8170,14 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   });
 
   environmentRelationPickerList?.addEventListener('click', (event) => {
+    const createUserButton = event.target.closest('[data-relation-create-user]');
+    if (createUserButton && activeRelationPickerType === 'users') {
+      shouldAttachNextCreatedUserToEnvironment = true;
+      openCreateUserModalFromLookup?.({ query: createUserButton.dataset.relationCreateUser || environmentRelationPickerSearch?.value || '' });
+      closeEnvironmentRelationPicker();
+      return;
+    }
+
     const option = event.target.closest('[data-relation-add-value]');
     if (!option || !activeRelationPickerType) return;
     const value = String(option.dataset.relationAddValue || '').trim();
@@ -7901,6 +8189,15 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       return;
     }
     showAppToast('Item já está vinculado');
+  });
+
+  document.addEventListener('wes:user-created', (event) => {
+    if (!shouldAttachNextCreatedUserToEnvironment || !environmentModal.classList.contains('open')) return;
+    shouldAttachNextCreatedUserToEnvironment = false;
+    const user = findUserDirectoryRecord(event.detail?.email || event.detail?.id);
+    if (!user) return;
+    const added = addItemToActiveEnvironmentRelation('users', getEnvironmentUserOptionValue(user));
+    if (added) showAppToast('Novo usuário vinculado ao setor');
   });
 
   document.addEventListener('click', (event) => {

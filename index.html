@@ -7637,10 +7637,12 @@
                   <div class="company-users-add-row">
                     <div>
                       <label class="modal-label" for="companyUserSelect">Adicionar usuário</label>
-                      <div class="hub-select-wrap hub-select-wrap--block">
-                        <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">person_add</span>
-                        <select id="companyUserSelect" class="hub-select" name="company_user" aria-label="Usuário para adicionar à empresa"></select>
-                        <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      <div class="user-lookup" data-user-lookup="company">
+                        <div class="search-field user-lookup-field">
+                          <span class="material-symbols-rounded" aria-hidden="true">person_search</span>
+                          <input id="companyUserSelect" class="user-lookup-input" name="company_user" type="search" autocomplete="off" placeholder="Buscar por nome ou e-mail" aria-label="Usuário para adicionar à empresa" />
+                        </div>
+                        <div class="user-lookup-menu" id="companyUserLookupMenu"></div>
                       </div>
                     </div>
                     <button class="btn primary" id="companyAddUserButton" type="button">Adicionar</button>

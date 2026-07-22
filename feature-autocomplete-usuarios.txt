@@ -1,0 +1,31 @@
+Feature: autocomplete de usuarios em empresas e setores
+
+Foi implementado autocomplete de usuarios por nome ou e-mail nos fluxos de vinculo de usuarios em empresas e setores.
+
+O que foi feito:
+
+- Ao adicionar usuarios em empresas, o campo agora sugere usuarios antes mesmo de digitar.
+- Ao digitar, a busca filtra usuarios por nome ou por e-mail.
+- A busca usa uma base central simulada, combinando os usuarios ja exibidos na tabela atual com uma lista fallback do prototipo.
+- O picker de usuarios em setores passou a usar a mesma busca central por nome/e-mail.
+- Quando nenhum usuario e encontrado, aparece a opcao:
+  "Nao encontramos esse usuario. Deseja adiciona-lo?"
+- Ao clicar nessa opcao, o modal de criar usuario abre por cima do modal atual.
+- Quando possivel, o modal de criar usuario ja abre com nome ou e-mail preenchido a partir da busca digitada.
+- Depois de criar o usuario, ele volta vinculado automaticamente a empresa ou ao setor em edicao.
+- O modal original de empresa ou setor permanece aberto, preservando o andamento da atividade do usuario.
+
+Tambem foi ajustado:
+
+- Estilos do autocomplete, lista de sugestoes, estado vazio e opcao de criar usuario.
+- Camada visual do modal de criar usuario para abrir sobre outros modais.
+- Correcao global em inputs para evitar corte de letras descendentes, como j, g e p, em campos de busca e demais inputs.
+
+Validacoes realizadas:
+
+- Checagem de sintaxe com node --check app.js.
+- Teste do fluxo de empresa:
+  sugestoes antes de digitar, filtro por nome/e-mail, opcao de criar usuario inexistente, abertura do modal sobreposto e vinculo automatico do novo usuario.
+- Teste do fluxo de setor:
+  sugestoes antes de digitar, filtro por nome/e-mail, opcao de criar usuario inexistente, abertura do modal sobreposto e vinculo automatico do novo usuario.
+- Teste visual/computado da barra de busca de Estrutura e Pessoas para confirmar que o texto nao fica cortado.

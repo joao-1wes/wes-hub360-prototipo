@@ -15,6 +15,7 @@ const insightsCountAlt = document.getElementById('insightsCountAlt');
 const dashboardToggle = document.getElementById('dashboardToggle');
 const dashboardViewDefault = document.getElementById('dashboardViewDefault');
 const dashboardViewDetail = document.getElementById('dashboardViewDetail');
+const dashboardCommonHome = document.getElementById('dashboardCommonHome');
 const filterBtnAlt = document.getElementById('alertFilterBtnAlt');
 const filterMenuAlt = document.getElementById('alertFilterMenuAlt');
 const agentsFilterBtn = document.getElementById('agentsFilterBtn');
@@ -161,7 +162,9 @@ const hybridHistoryFilterMenu = document.getElementById('hybridHistoryFilterMenu
 const openManageRolesModal = document.getElementById('openManageRolesModal');
 const manageRolesModal = document.getElementById('manageRolesModal');
 const manageRolesModalForm = document.getElementById('manageRolesModalForm');
+const manageRolesTitle = document.getElementById('manageRolesTitle');
 const manageRolesName = document.getElementById('manageRolesName');
+const manageRolesDescription = document.getElementById('manageRolesDescription');
 const manageRolesSubmit = document.getElementById('manageRolesSubmit');
 const openCreateUserModal = document.getElementById('openCreateUserModal');
 const usersTable = document.querySelector('#page-users .users-table');
@@ -5133,9 +5136,12 @@ if (hybridHistoryFilterBtn && hybridHistoryFilterMenu) {
 }
 
 if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
+  let editingRoleRow = null;
+
   const closeManageRolesModal = () => {
     manageRolesModal.classList.remove('open');
     manageRolesModal.setAttribute('aria-hidden', 'true');
+    editingRoleRow = null;
   };
 
   const syncManageRolesSubmit = () => {
@@ -5143,12 +5149,46 @@ if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
     if (manageRolesSubmit) manageRolesSubmit.disabled = !hasName;
   };
 
-  openManageRolesModal.addEventListener('click', () => {
+  const getRoleNameFromRow = (row) => {
+    const roleCell = row?.querySelector('.role-cell');
+    const iconText = roleCell?.querySelector('.material-symbols-rounded')?.textContent?.trim() || '';
+    return (roleCell?.textContent || '').replace(iconText, '').trim();
+  };
+
+  const setCheckedPermissionsCount = (count) => {
+    const permissionInputs = Array.from(manageRolesModalForm.querySelectorAll('input[name="permissions"]'));
+    permissionInputs.forEach((input, index) => {
+      input.checked = index < count;
+    });
+  };
+
+  const openRolesModal = ({ mode = 'create', row = null } = {}) => {
+    editingRoleRow = mode === 'edit' ? row : null;
     manageRolesModalForm.reset();
+    if (manageRolesTitle) manageRolesTitle.textContent = mode === 'edit' ? 'Editar função' : 'Criar nova função';
+    if (manageRolesSubmit) manageRolesSubmit.textContent = mode === 'edit' ? 'Salvar alterações' : 'Criar função';
+    if (mode === 'edit' && row) {
+      const permissionCount = Number.parseInt(row.children[2]?.textContent?.trim() || '0', 10);
+      if (manageRolesName) manageRolesName.value = getRoleNameFromRow(row);
+      if (manageRolesDescription) manageRolesDescription.value = row.children[1]?.textContent?.trim() || '';
+      setCheckedPermissionsCount(Number.isFinite(permissionCount) ? permissionCount : 0);
+    }
     syncManageRolesSubmit();
     manageRolesModal.classList.add('open');
     manageRolesModal.setAttribute('aria-hidden', 'false');
     manageRolesName?.focus();
+  };
+
+  openManageRolesModal.addEventListener('click', () => {
+    openRolesModal();
+  });
+
+  document.querySelector('#page-roles .roles-table')?.addEventListener('click', (event) => {
+    const editButton = event.target.closest('.row-actions .action-icon:not(.danger)');
+    if (!editButton) return;
+    const row = editButton.closest('.data-row:not(.header)');
+    if (!row) return;
+    openRolesModal({ mode: 'edit', row });
   });
 
   manageRolesName?.addEventListener('input', syncManageRolesSubmit);
@@ -5159,6 +5199,18 @@ if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
 
   manageRolesModalForm.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (editingRoleRow) {
+      const nextName = String(manageRolesName?.value || '').trim();
+      const nextDescription = String(manageRolesDescription?.value || '').trim();
+      const permissionCount = manageRolesModalForm.querySelectorAll('input[name="permissions"]:checked').length;
+      const roleCell = editingRoleRow.querySelector('.role-cell');
+      const iconText = roleCell?.querySelector('.material-symbols-rounded')?.textContent?.trim() || 'person';
+      if (roleCell && nextName) {
+        roleCell.innerHTML = `<span class="material-symbols-rounded">${escapeHtmlWes(iconText)}</span>${escapeHtmlWes(nextName)}`;
+      }
+      if (editingRoleRow.children[1]) editingRoleRow.children[1].textContent = nextDescription;
+      if (editingRoleRow.children[2]) editingRoleRow.children[2].textContent = String(permissionCount);
+    }
     closeManageRolesModal();
   });
 }
@@ -15927,18 +15979,28 @@ if (profilePage) {
   updateProfilePasswordState();
 }
 
+const activateSettingsTab = (target) => {
+  if (!target || !settingsTabs.length || !settingsPanels.length) return;
+  settingsTabs.forEach((item) => item.classList.toggle('active', item.dataset.tab === target));
+  settingsPanels.forEach((panel) => {
+    panel.classList.toggle('active', panel.dataset.panel === target);
+  });
+};
+
 if (settingsTabs.length && settingsPanels.length) {
   settingsTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      const target = tab.dataset.tab;
-      settingsTabs.forEach((item) => item.classList.remove('active'));
-      tab.classList.add('active');
-      settingsPanels.forEach((panel) => {
-        panel.classList.toggle('active', panel.dataset.panel === target);
-      });
+      activateSettingsTab(tab.dataset.tab);
     });
   });
 }
+
+document.querySelectorAll('[data-settings-tab-target]').forEach((link) => {
+  link.addEventListener('click', () => {
+    const target = link.dataset.settingsTabTarget;
+    window.setTimeout(() => activateSettingsTab(target), 0);
+  });
+});
 
 if (navTriggers.length) {
   navTriggers.forEach((trigger) => {
@@ -16039,6 +16101,11 @@ if (dashboardToggle && dashboardViewDefault && dashboardViewDetail) {
     const currentPage = document.querySelector('.page.is-active');
     if (!currentPage || currentPage.id !== 'page-dashboard') {
       window.location.hash = '#/dashboard';
+      return;
+    }
+    const access = getSelectedOrganizationAccess();
+    if (!access.showAdministration) {
+      syncDashboardHomeForAccess(access);
       return;
     }
 
@@ -16195,6 +16262,20 @@ const getSelectedOrganizationAccess = () => {
   return organizationAccessProfiles['adm-wes'];
 };
 
+const syncDashboardHomeForAccess = (access) => {
+  const isCommonUser = !access?.showAdministration;
+  dashboardCommonHome?.classList.toggle('is-hidden', !isCommonUser);
+  if (isCommonUser) {
+    dashboardViewDefault?.classList.add('is-hidden');
+    dashboardViewDetail?.classList.add('is-hidden');
+    return;
+  }
+  dashboardCommonHome?.classList.add('is-hidden');
+  if (!isCommonUser && dashboardViewDefault?.classList.contains('is-hidden') && dashboardViewDetail?.classList.contains('is-hidden')) {
+    dashboardViewDefault.classList.remove('is-hidden');
+  }
+};
+
 const setAccessVisibility = (element, isVisible) => {
   if (!element) return;
   element.classList.toggle('is-hidden', !isVisible);
@@ -16238,6 +16319,7 @@ const applyEnvironmentCompanyOptionsScope = (access) => {
 const applyOrganizationAccessControls = (routeKey) => {
   const access = getSelectedOrganizationAccess();
   const administrationGroup = document.querySelector('[data-access-section="administration"]');
+  const organizationsPage = document.getElementById('page-organizations');
   const peopleManagementLinks = document.querySelectorAll('[data-access-item="people-management"]');
   const organizationsLinks = document.querySelectorAll('[data-access-item="organizations"]');
   const companiesLinks = document.querySelectorAll('[data-access-item="companies"]');
@@ -16247,8 +16329,10 @@ const applyOrganizationAccessControls = (routeKey) => {
   document.body.dataset.organizationAccess = access.id;
   document.body.dataset.organizationScope = access.organizationScope || access.id || 'all';
   if (tenantEl) tenantEl.textContent = access.name;
+  syncDashboardHomeForAccess(access);
 
   setAccessVisibility(administrationGroup, access.showAdministration);
+  setAccessVisibility(organizationsPage, access.showAdministration && access.canManageOrganizations);
   setAccessVisibilityForAll(peopleManagementLinks, access.showAdministration && (access.canManageOrganizations || access.canManageCompanies));
   setAccessVisibilityForAll(organizationsLinks, access.showAdministration && access.canManageOrganizations);
   setAccessVisibilityForAll(companiesLinks, access.showAdministration && access.canManageCompanies);
@@ -16396,7 +16480,10 @@ const updateActivePage = () => {
   }
 
   if (dashboardToggle) {
-    const sectionTitle = sectionMap[navRouteKey] || sectionMap[routeKey] || 'Painel';
+    const access = getSelectedOrganizationAccess();
+    const sectionTitle = navRouteKey === 'dashboard' && !access.showAdministration
+      ? 'Home'
+      : (sectionMap[navRouteKey] || sectionMap[routeKey] || 'Painel');
     dashboardToggle.textContent = sectionTitle;
     if (
       navRouteKey === 'dashboard/automations' ||

@@ -279,13 +279,13 @@
           : (isOrganization ? 'Informe os dados iniciais da organização.' : 'Informe os dados iniciais da empresa.');
       }
       if (companyNameLabel) companyNameLabel.textContent = isOrganization ? 'Nome da organização' : 'Nome da empresa';
-      if (companyAdminEmailLabel) companyAdminEmailLabel.textContent = isOrganization ? 'E-mail do ADM da organização' : 'E-mail do ADM da empresa';
+      if (companyAdminEmailLabel) companyAdminEmailLabel.textContent = isOrganization ? 'E-mail do ADM da organização' : 'Responsável';
       if (createCompanySubmitButton) createCompanySubmitButton.textContent = isEditingOrganization ? 'Salvar alterações' : 'Salvar';
       if (createCompanyAdminUserLink) {
-        createCompanyAdminUserLink.hidden = isEditingOrganization;
+        createCompanyAdminUserLink.hidden = !isOrganization || isEditingOrganization;
         createCompanyAdminUserLink.textContent = isOrganization
           ? 'Não criou o ADM da organização ainda?'
-          : 'Não criou o ADM da empresa ainda?';
+          : 'Não criou o responsável ainda?';
       }
     };
 

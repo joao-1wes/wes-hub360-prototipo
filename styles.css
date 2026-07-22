@@ -2992,6 +2992,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   border-color: #016ff4;
 }
 
+.people-management-tab-description {
+  margin: -6px 0 16px;
+  max-width: 860px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
 .tab-panel {
   display: none;
 }
@@ -17742,12 +17750,14 @@ body.route-automation-create #directChatFab {
 
 .organization-sections-picker {
   display: grid;
-  gap: 10px;
-  margin: 2px 0 0;
-  padding: 14px;
-  border: 1px solid #d9dee8;
-  border-radius: 12px;
-  background: #ffffff;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
 }
 
 .organization-sections-picker[hidden] {
@@ -17755,11 +17765,9 @@ body.route-automation-create #directChatFab {
 }
 
 .organization-sections-picker legend {
-  padding: 0 6px;
-  color: #0f172a;
-  font-size: 14px;
-  font-weight: 800;
-  line-height: 1.25;
+  padding: 0;
+  color: inherit;
+  font: inherit;
 }
 
 .organization-sections-picker p {

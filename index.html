@@ -172,7 +172,7 @@
               <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
             </label>
             <label class="public-modal-field" for="companyAdminEmail">
-              <span>E-mail do ADM da empresa</span>
+              <span>Responsável</span>
               <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
             </label>
             <fieldset class="organization-sections-picker" id="organizationSectionsPicker" hidden>
@@ -195,9 +195,9 @@
                 </div>
                 <div class="organization-section-row organization-section-row--single">
                   <label class="organization-section-check organization-section-check--parent">
-                    <input type="checkbox" name="organization_sections" value="automation" checked />
-                    <span class="material-symbols-rounded" aria-hidden="true">bolt</span>
-                    <strong>Automação</strong>
+                    <input type="checkbox" name="organization_sections" value="vm-monitoring" checked />
+                    <span class="material-symbols-rounded" aria-hidden="true">desktop_windows</span>
+                    <strong>Máquinas virtuais</strong>
                   </label>
                 </div>
 
@@ -214,47 +214,16 @@
                   </div>
                   <div class="organization-subsections">
                     <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="schedules" checked />
-                      <span>Agendamentos</span>
+                      <input type="checkbox" name="organization_subsections" value="automations" checked />
+                      <span>Automações</span>
                     </label>
                     <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="document-analysis" checked />
                       <span>Análise de documentos</span>
                     </label>
                     <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="input-files" checked />
-                      <span>Arquivos de entrada</span>
-                    </label>
-                    <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="credentials" checked />
-                      <span>Credenciais</span>
-                    </label>
-                    <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="processes" checked />
                       <span>Processos</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="organization-section-group">
-                  <div class="organization-section-head">
-                    <label class="organization-section-check organization-section-check--parent">
-                      <input type="checkbox" name="organization_sections" value="infrastructure" checked />
-                      <span class="material-symbols-rounded" aria-hidden="true">computer</span>
-                      <strong>Infraestrutura</strong>
-                    </label>
-                    <button class="organization-section-toggle" type="button" aria-expanded="false" aria-label="Alternar subseções de Infraestrutura">
-                      <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-                    </button>
-                  </div>
-                  <div class="organization-subsections">
-                    <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="executors" checked />
-                      <span>Executores</span>
-                    </label>
-                    <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="packages" checked />
-                      <span>Pacotes</span>
                     </label>
                   </div>
                 </div>
@@ -342,27 +311,19 @@
                       <span>Conexões</span>
                     </label>
                     <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="companies" checked />
-                      <span>Empresas</span>
+                      <input type="checkbox" name="organization_subsections" value="people-management" checked />
+                      <span>Estrutura e Pessoas</span>
                     </label>
                     <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="skills" checked />
                       <span>Habilidades</span>
-                    </label>
-                    <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="environments" checked />
-                      <span>Setores</span>
-                    </label>
-                    <label class="organization-section-check">
-                      <input type="checkbox" name="organization_subsections" value="users" checked />
-                      <span>Usuários</span>
                     </label>
                   </div>
                 </div>
               </div>
             </fieldset>
             <button class="auth-link public-modal-admin-link" id="createCompanyAdminUserLink" type="button">
-              Não criou o ADM da empresa ainda?
+              Não criou o responsável ainda?
             </button>
             <div class="public-modal-footer">
               <button class="btn outline" type="button" data-create-company-close>Cancelar</button>
@@ -3245,7 +3206,7 @@
                   <p class="modal-field-hint">Descreva brevemente o que esta função pode acessar.</p>
                 </section>
                 <section class="users-modal-section users-modal-section--last">
-                  <h4 class="users-modal-section-title">Permissões</h4>
+                  <div class="modal-label">Permissões</div>
                   <div class="manage-roles-permissions-list" role="group" aria-label="Permissões da função">
                     <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="dashboard:view" /><span>Visualizar painel geral</span></label>
                     <label class="manage-roles-permission-item"><input type="checkbox" name="permissions" value="automation:create" /><span>Criar automações</span></label>
@@ -5977,6 +5938,7 @@
                 <a class="tab active" href="#/dashboard/users">Usuários</a>
                 <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
+              <p class="people-management-tab-description">Usuários são os acessos individuais ao sistema. Cadastre pessoas, acompanhe status e vincule permissões conforme a operação de cada organização.</p>
               <div class="filters-grid users-filters">
                 <div class="form-field">
                   <div class="search-field">
@@ -6121,6 +6083,7 @@
                 <a class="tab" href="#/dashboard/users">Usuários</a>
                 <a class="tab active" href="#/dashboard/roles">Funções</a>
               </div>
+              <p class="people-management-tab-description">Funções definem conjuntos de permissões para os usuários. Use esta aba para controlar o que cada perfil pode visualizar, criar, editar ou administrar.</p>
               <div class="data-table roles-table">
                   <div class="data-row header">
                     <span>Função</span>
@@ -6730,6 +6693,7 @@
                 <a class="tab" href="#/dashboard/users">Usuários</a>
                 <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
+              <p class="people-management-tab-description">Setores são opcionais e servem para organizar projetos, agentes e usuários por áreas internas. O sistema pode funcionar sem setores cadastrados.</p>
               <div class="data-table environments-table">
                 <div class="data-row header">
                   <span>Setor</span>
@@ -7422,6 +7386,7 @@
                 <a class="tab" href="#/dashboard/users">Usuários</a>
                 <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
+              <p class="people-management-tab-description">Organizações representam clientes ou unidades administradas no HUB 360. Esta visão é exclusiva do ADM WES; ADMs de cliente e usuários comuns não acessam esta aba.</p>
               <div class="data-table organizations-table">
                 <div class="data-row header">
                   <span>Organização</span>
@@ -7485,6 +7450,7 @@
                 <a class="tab" href="#/dashboard/users">Usuários</a>
                 <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
+              <p class="people-management-tab-description">Empresas são opcionais e ajudam a segmentar usuários e setores dentro de uma organização. O funcionamento principal do sistema não depende desse cadastro.</p>
               <div class="data-table companies-table">
                 <div class="data-row header">
                   <span>Empresa</span>

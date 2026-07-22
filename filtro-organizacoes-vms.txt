@@ -1,0 +1,20 @@
+Regra solicitada para a pagina de Maquinas Virtuais
+
+Contexto:
+O ADM WES precisa visualizar as maquinas virtuais de todas as organizacoes.
+O ADM Cliente deve visualizar somente as maquinas virtuais da propria organizacao.
+
+Comportamento esperado:
+1. Ao entrar na pagina de Maquinas Virtuais como ADM WES, a visao inicial deve ser a visao geral de todas as organizacoes.
+2. O ADM WES pode usar o filtro de Organizacao para listar somente as maquinas de uma organizacao especifica.
+3. Ao entrar como ADM Cliente, a pagina deve ficar restrita a organizacao dele.
+4. O ADM Cliente nao deve conseguir selecionar "Todas as organizacoes" nem visualizar maquinas de outras organizacoes.
+5. Os indicadores da frota devem acompanhar o filtro aplicado, recalculando CPU, memoria, disco, rede e quantidade de maquinas exibidas.
+
+Implementacao inicial:
+Foi adicionado um filtro de organizacoes na pagina de Maquinas Virtuais usando os mesmos escopos ja existentes no sistema:
+- ADM WES: escopo all
+- ADM Cliente: escopo cedae
+- Grupo AVAS: escopo avas-group
+
+Assim, a regra de permissao da pagina fica alinhada com a gestao de organizacoes, empresas e setores ja presente no HUB 360.

@@ -410,6 +410,19 @@ const agentsFolderAccordionPanel = document.getElementById('agentsFolderAccordio
 const vmMachinesBlock = document.getElementById('vmMachinesBlock');
 const vmMachinesToggle = document.getElementById('vmMachinesToggle');
 const vmMachinesPanel = document.getElementById('vmMachinesPanel');
+const vmOrganizationFilter = document.getElementById('vmOrganizationFilter');
+const vmMachinesEmpty = document.getElementById('vmMachinesEmpty');
+const vmMetricsTitle = document.getElementById('vmMetricsTitle');
+const vmMetricsCount = document.querySelector('#vmMetricsPanel .vm-metrics-count');
+const vmCpuValue = document.getElementById('vmCpuValue');
+const vmMemoryValue = document.getElementById('vmMemoryValue');
+const vmDiskValue = document.getElementById('vmDiskValue');
+const vmNetworkValue = document.getElementById('vmNetworkValue');
+const vmCpuBar = document.getElementById('vmCpuBar');
+const vmMemoryBar = document.getElementById('vmMemoryBar');
+const vmDiskBar = document.getElementById('vmDiskBar');
+const vmNetworkBar = document.getElementById('vmNetworkBar');
+const vmTrendText = document.getElementById('vmTrendText');
 const openAgentModal = document.getElementById('openAgentModal');
 const agentModal = document.getElementById('agentModal');
 const agentChatModal = document.getElementById('agentChatModal');
@@ -14364,6 +14377,109 @@ function setVmMachinesAccordionExpanded(expanded) {
   vmMachinesPanel.hidden = !expanded;
 }
 
+function getVmOrganizationLabel(organizationId) {
+  if (!organizationId || organizationId === 'all') return 'Todas as organizações';
+  const option = Array.from(vmOrganizationFilter?.options || [])
+    .find((item) => item.value === organizationId);
+  return option ? option.textContent.trim() : organizationId;
+}
+
+function formatVmMachineCount(count) {
+  return `${count} ${count === 1 ? 'máquina' : 'máquinas'}`;
+}
+
+function formatVmMetricsScopeBadge(count, organizationId) {
+  const access = getSelectedOrganizationAccess();
+  const organizationScope = String(access?.organizationScope || 'all').trim() || 'all';
+  if (organizationScope !== 'all') return formatVmMachineCount(count);
+  if (!organizationId || organizationId === 'all') return 'Todas as organizações';
+  return `Organização ${getVmOrganizationLabel(organizationId)}`;
+}
+
+function updateVmFleetMetrics(cards, organizationId) {
+  const total = cards.length;
+  const average = (field) => {
+    if (!total) return 0;
+    const sum = cards.reduce((acc, card) => acc + Number(card.dataset[field] || 0), 0);
+    return sum / total;
+  };
+  const cpu = Math.round(average('vmCpu'));
+  const memory = Math.round(average('vmMemory'));
+  const disk = Math.round(average('vmDisk'));
+  const network = average('vmNetwork');
+  const networkLabel = total ? `${Number.isInteger(network) ? network : network.toFixed(1)} MB/s` : '0 MB/s';
+  const networkBarWidth = Math.max(0, Math.min(100, Math.round(network * 7.4)));
+  const organizationLabel = getVmOrganizationLabel(organizationId);
+
+  if (vmMetricsTitle) {
+    vmMetricsTitle.textContent = organizationId && organizationId !== 'all'
+      ? `Frota - ${organizationLabel}`
+      : 'Visão geral da frota';
+  }
+  if (vmMetricsCount) vmMetricsCount.textContent = formatVmMetricsScopeBadge(total, organizationId);
+  if (vmCpuValue) vmCpuValue.textContent = `${cpu}%`;
+  if (vmMemoryValue) vmMemoryValue.textContent = `${memory}%`;
+  if (vmDiskValue) vmDiskValue.textContent = `${disk}%`;
+  if (vmNetworkValue) vmNetworkValue.textContent = networkLabel;
+  if (vmCpuBar) vmCpuBar.style.width = `${cpu}%`;
+  if (vmMemoryBar) vmMemoryBar.style.width = `${memory}%`;
+  if (vmDiskBar) vmDiskBar.style.width = `${disk}%`;
+  if (vmNetworkBar) vmNetworkBar.style.width = `${networkBarWidth}%`;
+  if (vmTrendText) {
+    vmTrendText.textContent = `CPU média: ${cpu}% · Memória média: ${memory}% · Disco médio: ${disk}% · Rede média: ${networkLabel}`;
+  }
+}
+
+function syncVmOrganizationFilter() {
+  if (!vmMachinesPanel) return;
+  const access = getSelectedOrganizationAccess();
+  const organizationScope = String(access?.organizationScope || 'all').trim() || 'all';
+  const selectedOrganization = vmOrganizationFilter?.value || 'all';
+  const effectiveOrganization = organizationScope === 'all' ? selectedOrganization : organizationScope;
+  const cards = Array.from(vmMachinesPanel.querySelectorAll('.vm-machine-card[data-vm-machine]'));
+  const visibleCards = [];
+
+  cards.forEach((card) => {
+    const cardOrganization = String(card.dataset.vmOrganization || '').trim();
+    const showCard = isInOrganizationScope(cardOrganization, access)
+      && (effectiveOrganization === 'all' || cardOrganization === effectiveOrganization);
+    card.hidden = !showCard;
+    card.classList.toggle('is-hidden', !showCard);
+    if (showCard) visibleCards.push(card);
+  });
+
+  if (vmMachinesEmpty) vmMachinesEmpty.hidden = visibleCards.length > 0;
+  updateVmFleetMetrics(visibleCards, effectiveOrganization);
+
+}
+
+function applyVmOrganizationAccessScope(access) {
+  if (!vmOrganizationFilter) return;
+  const organizationScope = String(access?.organizationScope || 'all').trim() || 'all';
+  const wasRestricted = vmOrganizationFilter.disabled;
+  Array.from(vmOrganizationFilter.options).forEach((option) => {
+    const optionValue = option.value;
+    const showOption = optionValue === 'all'
+      ? organizationScope === 'all'
+      : isInOrganizationScope(optionValue, access);
+    option.hidden = !showOption;
+    option.disabled = !showOption;
+  });
+
+  if (organizationScope === 'all') {
+    const selectedOption = vmOrganizationFilter.selectedOptions[0];
+    if (wasRestricted || !selectedOption || selectedOption.disabled || selectedOption.hidden) {
+      vmOrganizationFilter.value = 'all';
+    }
+    vmOrganizationFilter.disabled = false;
+  } else {
+    vmOrganizationFilter.value = organizationScope;
+    vmOrganizationFilter.disabled = true;
+  }
+
+  syncVmOrganizationFilter();
+}
+
 function hubSyncFromState() {
   const org = getHubScopeCurrentOrg();
   if (!org) return;
@@ -15656,6 +15772,10 @@ if (vmMachinesToggle && vmMachinesPanel) {
   vmMachinesToggle.addEventListener('click', () => {
     setVmMachinesAccordionExpanded(vmMachinesPanel.hidden);
   });
+}
+
+if (vmOrganizationFilter) {
+  vmOrganizationFilter.addEventListener('change', syncVmOrganizationFilter);
 }
 
 function rebuildAgentsFolderStrip(environments) {
@@ -17155,6 +17275,7 @@ const applyOrganizationAccessControls = (routeKey) => {
   setAccessVisibility(environmentsCompanySelectWrap, access.showAdministration && access.canManageCompanies);
   applyCompaniesOrganizationScope(access);
   applyEnvironmentCompanyOptionsScope(access);
+  applyVmOrganizationAccessScope(access);
   if (environmentsCompanySelect) {
     environmentsCompanySelect.value = 'all';
     environmentsCompanySelect.dispatchEvent(new Event('change'));

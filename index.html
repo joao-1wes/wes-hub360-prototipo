@@ -971,6 +971,15 @@
                   <p class="page-subtitle">Acompanhe a saúde, consumo e disponibilidade das máquinas virtuais. Selecione uma máquina para acompanhar as médias de consumo dela.</p>
                 </div>
                 <div class="page-actions">
+                  <div class="hub-select-wrap environments-company-select-wrap vm-organization-select-wrap">
+                    <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">business</span>
+                    <select class="hub-select" id="vmOrganizationFilter" aria-label="Filtrar máquinas virtuais por organização">
+                      <option value="all">Todas as organizações</option>
+                      <option value="cedae">ADM Cliente</option>
+                      <option value="avas-group">Grupo AVAS</option>
+                    </select>
+                    <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                  </div>
                   <a class="btn outline" href="#/dashboard">
                     <span class="material-symbols-rounded">arrow_back</span>
                     Voltar ao painel
@@ -981,7 +990,7 @@
                 <div class="monitoring-panel" id="vmMetricsPanel">
                   <div class="panel-header vm-metrics-header">
                     <h4 id="vmMetricsTitle">Visão geral da frota</h4>
-                    <span class="badge vm-metrics-count">4 máquinas</span>
+                    <span class="badge vm-metrics-count">Todas as organizações</span>
                   </div>
                   <div class="fleet-grid">
                     <div class="fleet-card">
@@ -1028,31 +1037,36 @@
                     <span class="material-symbols-rounded vm-machines-folder-caret" aria-hidden="true">expand_more</span>
                   </button>
                   <div class="vm-machines-grid" id="vmMachinesPanel">
-                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="04d1f883">
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="04d1f883" data-vm-organization="cedae" data-vm-organization-name="ADM Cliente" data-vm-cpu="18" data-vm-memory="46" data-vm-disk="32" data-vm-network="2">
                       <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">desktop_windows</span></span>
                       <span class="vm-machine-card-kicker">Produção</span>
+                      <span class="vm-machine-card-org">ADM Cliente</span>
                       <strong class="vm-machine-card-name">04d1f883...</strong>
                       <span class="vm-machine-card-desc">CPU 18% · Memória 46% · Disco 32% · Rede 2 MB/s</span>
                     </a>
-                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="vm-api-02">
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="vm-api-02" data-vm-organization="cedae" data-vm-organization-name="ADM Cliente" data-vm-cpu="74" data-vm-memory="68" data-vm-disk="57" data-vm-network="8">
                       <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">desktop_windows</span></span>
                       <span class="vm-machine-card-kicker">Produção</span>
+                      <span class="vm-machine-card-org">ADM Cliente</span>
                       <strong class="vm-machine-card-name">vm-api-02</strong>
                       <span class="vm-machine-card-desc">CPU 74% · Memória 68% · Disco 57% · Rede 8 MB/s</span>
                     </a>
-                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="vm-worker-07">
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="vm-worker-07" data-vm-organization="avas-group" data-vm-organization-name="Grupo AVAS" data-vm-cpu="41" data-vm-memory="52" data-vm-disk="39" data-vm-network="5">
                       <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">desktop_windows</span></span>
                       <span class="vm-machine-card-kicker">Operações</span>
+                      <span class="vm-machine-card-org">Grupo AVAS</span>
                       <strong class="vm-machine-card-name">vm-worker-07</strong>
                       <span class="vm-machine-card-desc">CPU 41% · Memória 52% · Disco 39% · Rede 5 MB/s</span>
                     </a>
-                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="vm-db-01">
+                    <a class="vm-machine-card" href="#/dashboard/vm-monitoring" data-vm-machine="vm-db-01" data-vm-organization="avas-group" data-vm-organization-name="Grupo AVAS" data-vm-cpu="63" data-vm-memory="81" data-vm-disk="91" data-vm-network="11">
                       <span class="vm-machine-card-icon" aria-hidden="true"><span class="material-symbols-rounded">desktop_windows</span></span>
                       <span class="vm-machine-card-kicker">Banco de dados</span>
+                      <span class="vm-machine-card-org">Grupo AVAS</span>
                       <strong class="vm-machine-card-name">vm-db-01</strong>
                       <span class="vm-machine-card-desc">CPU 63% · Memória 81% · Disco 91% · Rede 11 MB/s</span>
                     </a>
                   </div>
+                  <div class="vm-machines-empty" id="vmMachinesEmpty" hidden>Nenhuma máquina virtual encontrada para esta organização.</div>
                 </div>
               </div>
             </div>

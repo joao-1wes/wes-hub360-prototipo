@@ -273,7 +273,7 @@
                   <div class="organization-subsections">
                     <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="health-whatsapp" checked />
-                      <span>WhatsApp</span>
+                      <span>Agente do paciente</span>
                     </label>
                     <label class="organization-section-check">
                       <input type="checkbox" name="organization_subsections" value="health-service" checked />
@@ -399,7 +399,7 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-health">
-              <a class="submenu-item" href="#/dashboard/health/whatsapp"><span class="submenu-label">WhatsApp</span></a>
+              <a class="submenu-item" href="#/dashboard/health/whatsapp"><span class="submenu-label">Agente do paciente</span></a>
               <a class="submenu-item" href="#/dashboard/health/service"><span class="submenu-label">Atendimento</span></a>
               <a class="submenu-item" href="#/dashboard/health/agenda"><span class="submenu-label">Agenda</span></a>
               <a class="submenu-item" href="#/dashboard/health/integrations"><span class="submenu-label">Integrações</span></a>
@@ -788,7 +788,7 @@
                     </span>
                   </div>
                   <nav class="dashboard-navigation-submenu" aria-label="Saúde">
-                    <a href="#/dashboard/health/whatsapp">WhatsApp <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
+                    <a href="#/dashboard/health/whatsapp">Agente do paciente <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
                     <a href="#/dashboard/health/service">Atendimento <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
                     <a href="#/dashboard/health/agenda">Agenda <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
                     <a href="#/dashboard/health/integrations">Integrações <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
@@ -8352,66 +8352,268 @@
             </div>
           </div>
 
-          <div class="page" id="page-health-whatsapp" data-title="WhatsApp Saúde">
-            <div class="section health-page">
-              <div class="page-header">
+          <div class="page" id="page-health-whatsapp" data-title="Agente do paciente">
+            <div class="section health-page health-patient-agent-page">
+              <div class="page-header health-patient-agent-header">
                 <div>
-                  <h2>WhatsApp Saúde</h2>
-                  <p class="page-subtitle">Centralize conversas, confirmações e orientações enviadas aos pacientes pelo WhatsApp.</p>
+                  <h2>Agente do paciente</h2>
+                  <p class="page-subtitle">Acompanhe atendimentos automatizados, solicitações clínicas e encaminhamentos do canal de pacientes.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn outline" type="button">
-                    <span class="material-symbols-rounded">sync</span>
-                    Sincronizar
+                  <button class="btn outline health-patient-preview-icon-btn" type="button" aria-label="Ver prévia da conversa" data-health-patient-preview-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">chat</span>
                   </button>
-                  <button class="btn primary" type="button">
-                    <span class="material-symbols-rounded">add</span>
-                    Novo fluxo
-                  </button>
+                  <a class="btn primary" href="#/dashboard/health/integrations">
+                    <span class="material-symbols-rounded" aria-hidden="true">code</span>
+                    Realizar integração
+                  </a>
                 </div>
+	              </div>
+
+	              <div class="health-patient-metrics-grid" aria-label="Indicadores do agente do paciente">
+	                <article class="health-patient-metric-card">
+	                  <div class="stat-body">
+	                    <div class="stat-value">142</div>
+	                    <div class="stat-label">Atendimentos via WhatsApp</div>
+	                    <div class="stat-sub">+18% nos últimos 7 dias</div>
+	                  </div>
+	                </article>
+	                <article class="health-patient-metric-card">
+	                  <div class="stat-body">
+	                    <div class="stat-value">37</div>
+	                    <div class="stat-label">Consultas solicitadas</div>
+	                    <div class="stat-sub">12 aguardando confirmação</div>
+	                  </div>
+	                </article>
+	                <article class="health-patient-metric-card">
+	                  <div class="stat-body">
+	                    <div class="stat-value">19</div>
+	                    <div class="stat-label">Exames enviados</div>
+	                    <div class="stat-sub">PDFs e imagens anexados</div>
+	                  </div>
+	                </article>
+	              </div>
+
+              <div class="health-patient-agent-grid">
+                <article class="health-patient-panel health-patient-panel--wide">
+	                  <div class="health-patient-panel-head">
+		                    <div>
+		                      <h3 class="health-patient-panel-title">Insights das conversas</h3>
+		                    </div>
+                    <div class="health-patient-panel-actions">
+                      <span class="health-patient-period-chip health-patient-period-chip--orange">Últimos 7 dias</span>
+                      <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/insights">Ver mais</a>
+                    </div>
+                  </div>
+	                  <div class="health-patient-insight-list">
+	                    <div class="health-patient-insight-item">
+	                      <div>
+	                        <strong>Dúvidas sobre exames</strong>
+	                        <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
+	                      </div>
+	                      <span class="health-patient-tag">Mais frequente</span>
+	                    </div>
+		                    <div class="health-patient-insight-item">
+		                      <div>
+		                        <strong>Solicitação de consulta</strong>
+		                        <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
+		                      </div>
+		                      <span class="health-patient-tag">+18%</span>
+		                    </div>
+	                  </div>
+                </article>
+
+                <article class="health-patient-panel health-patient-panel--events">
+	                  <div class="health-patient-panel-head">
+		                    <div>
+		                      <h3 class="health-patient-panel-title">Histórico de interações</h3>
+		                    </div>
+                    <div class="health-patient-panel-actions">
+                      <span class="health-patient-period-chip">Tempo real</span>
+                      <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/history">Ver mais</a>
+                    </div>
+                  </div>
+                  <div class="health-patient-events-list">
+                    <div class="health-patient-event-item">
+                      <time>10:48</time>
+                      <div>
+                        <strong>Solicitou consulta</strong>
+                        <span>Ana Beatriz Lima</span>
+                        <p>Escolheu amanhã 09:40 para avaliação de renovação.</p>
+                      </div>
+                    </div>
+                    <div class="health-patient-event-item">
+                      <time>10:32</time>
+                      <div>
+                        <strong>Pediu renovação</strong>
+                        <span>Carlos Eduardo Nunes</span>
+                        <p>Agente sinalizou necessidade de revisão médica.</p>
+                      </div>
+                    </div>
+                    <div class="health-patient-event-item">
+                      <time>09:58</time>
+                      <div>
+                        <strong>Enviou exames</strong>
+                        <span>Marina Costa Rocha</span>
+                        <p>Arquivo exame-laboratorial.pdf recebido no histórico.</p>
+                      </div>
+                    </div>
+                    <div class="health-patient-event-item">
+                      <time>09:41</time>
+                      <div>
+                        <strong>Atendimento humano</strong>
+                        <span>Luciana Martins</span>
+                        <p>Fluxo automatizado interrompido e solicitação encaminhada.</p>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-patient-panel--share">
+                  <div class="health-patient-panel-head">
+	                    <div>
+	                      <h3 class="health-patient-panel-title">Compartilhar agente</h3>
+	                    </div>
+	                  </div>
+	                  <div class="health-patient-contact-card">
+	                    <span>Número do agente</span>
+	                    <strong>+55 85 98888-1048</strong>
+	                    <div class="health-patient-contact-actions">
+	                      <button class="btn outline health-patient-copy-link-btn" type="button" data-health-patient-copy-link>
+	                        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+	                        Copiar link
+	                      </button>
+	                      <button class="btn primary health-patient-share-btn" type="button" data-health-patient-share-open>
+	                        <span class="material-symbols-rounded" aria-hidden="true">ios_share</span>
+	                        Compartilhar
+	                      </button>
+	                    </div>
+	                  </div>
+                  <p class="health-patient-panel-note">Use este cartão em campanhas, lembretes de consulta e comunicações para direcionar pacientes ao atendimento automatizado.</p>
+                </article>
+	              </div>
+	            </div>
+	          </div>
+
+          <div class="page" id="page-health-whatsapp-insights" data-title="Insights do agente do paciente">
+            <div class="section health-page health-patient-detail-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/whatsapp">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Agente do paciente</span>
+                </a>
+              </div>
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Insights das conversas</h2>
+                  <p class="page-subtitle">Acompanhe sinais recorrentes, variações de demanda e motivos de atendimento do canal de pacientes.</p>
+                </div>
+                <span class="health-patient-period-chip health-patient-period-chip--orange">Últimos 7 dias</span>
               </div>
 
-              <div class="health-metrics-grid">
-                <article class="health-metric-card">
-                  <span class="material-symbols-rounded" aria-hidden="true">forum</span>
-                  <div>
-                    <small>Conversas abertas</small>
-                    <strong>128</strong>
-                  </div>
+              <div class="health-patient-detail-grid">
+                <article class="health-patient-detail-card">
+                  <span class="health-patient-kicker">Mais frequente</span>
+                  <strong>Dúvidas sobre exames</strong>
+                  <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
+                  <span class="health-patient-tag">412 menções</span>
                 </article>
-                <article class="health-metric-card">
-                  <span class="material-symbols-rounded" aria-hidden="true">task_alt</span>
-                  <div>
-                    <small>Confirmações hoje</small>
-                    <strong>74%</strong>
-                  </div>
-                </article>
-                <article class="health-metric-card">
-                  <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
-                  <div>
-                    <small>Tempo médio</small>
-                    <strong>2m 18s</strong>
-                  </div>
+                <article class="health-patient-detail-card">
+                  <span class="health-patient-kicker">Crescimento</span>
+                  <strong>Solicitação de consulta</strong>
+                  <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
+                  <span class="health-patient-tag">+18%</span>
                 </article>
               </div>
 
-              <div class="health-panel-grid">
-                <article class="health-panel">
-                  <h3>Filas de conversa</h3>
-                  <div class="health-list">
-                    <div><span>Pré-consulta</span><strong>42 aguardando</strong></div>
-                    <div><span>Resultados de exames</span><strong>18 aguardando</strong></div>
-                    <div><span>Retorno pós-atendimento</span><strong>9 aguardando</strong></div>
+              <article class="health-patient-detail-panel">
+                <div class="health-patient-panel-head">
+                  <span class="health-patient-kicker">Auditoria dos sinais</span>
+                  <span class="health-patient-period-chip">Base consolidada</span>
+                </div>
+                <div class="data-table health-patient-audit-table">
+                  <div class="data-row header">
+                    <span>Sinal</span>
+                    <span>Ocorrências</span>
+                    <span>Impacto</span>
+                    <span>Ação sugerida</span>
                   </div>
-                </article>
-                <article class="health-panel">
-                  <h3>Automações ativas</h3>
-                  <div class="health-list">
-                    <div><span>Lembrete de consulta</span><strong>Ativo</strong></div>
-                    <div><span>Triagem inicial</span><strong>Ativo</strong></div>
-                    <div><span>Pesquisa NPS</span><strong>Pausado</strong></div>
+                  <div class="data-row">
+                    <span>Dúvidas sobre exames</span>
+                    <span>412</span>
+                    <span>Alta recorrência</span>
+                    <span>Revisar mensagens de preparo e retorno.</span>
                   </div>
-                </article>
+                  <div class="data-row">
+                    <span>Solicitação de consulta</span>
+                    <span>193</span>
+                    <span>+18%</span>
+                    <span>Reservar encaixes após envio de exames.</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-whatsapp-history" data-title="Histórico do agente do paciente">
+            <div class="section health-page health-patient-detail-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/whatsapp">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Agente do paciente</span>
+                </a>
+              </div>
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Histórico de interações</h2>
+                  <p class="page-subtitle">Consulte eventos do agente do paciente para acompanhamento operacional e auditoria de atendimento.</p>
+                </div>
+                <span class="health-patient-period-chip">Tempo real</span>
+              </div>
+
+              <div class="data-table health-patient-history-table">
+                <div class="data-row header">
+                  <span>Horário</span>
+                  <span>Paciente</span>
+                  <span>Evento</span>
+                  <span>Detalhe</span>
+                  <span>Status</span>
+                </div>
+                <div class="data-row">
+                  <span>10:48</span>
+                  <span>Ana Beatriz Lima</span>
+                  <span>Solicitou consulta</span>
+                  <span>Escolheu amanhã 09:40 para avaliação de renovação.</span>
+                  <span><span class="chip success">Agendável</span></span>
+                </div>
+                <div class="data-row">
+                  <span>10:32</span>
+                  <span>Carlos Eduardo Nunes</span>
+                  <span>Pediu renovação</span>
+                  <span>Agente sinalizou necessidade de revisão médica.</span>
+                  <span><span class="chip warning">Revisão</span></span>
+                </div>
+                <div class="data-row">
+                  <span>09:58</span>
+                  <span>Marina Costa Rocha</span>
+                  <span>Enviou exames</span>
+                  <span>Arquivo exame-laboratorial.pdf recebido no histórico.</span>
+                  <span><span class="chip">Recebido</span></span>
+                </div>
+                <div class="data-row">
+                  <span>09:41</span>
+                  <span>Luciana Martins</span>
+                  <span>Atendimento humano</span>
+                  <span>Fluxo automatizado interrompido e solicitação encaminhada.</span>
+                  <span><span class="chip warning">Transbordo</span></span>
+                </div>
+                <div class="data-row">
+                  <span>09:22</span>
+                  <span>Raquel Sampaio</span>
+                  <span>Copiou link do agente</span>
+                  <span>Compartilhamento gerado para continuação do atendimento.</span>
+                  <span><span class="chip success">Compartilhado</span></span>
+                </div>
               </div>
             </div>
           </div>
@@ -8864,10 +9066,86 @@
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+	          </div>
+	        </section>
 
-        <div id="directChatDrawer" class="direct-chat-drawer" aria-hidden="true">
+	        <div class="modal" id="healthPatientShareModal" aria-hidden="true">
+	          <div class="modal-backdrop" data-health-patient-share-close></div>
+	          <div class="modal-dialog health-patient-share-dialog" role="dialog" aria-modal="true" aria-labelledby="healthPatientShareTitle">
+	            <div class="modal-header">
+	              <div>
+	                <h3 id="healthPatientShareTitle">Compartilhar agente do paciente</h3>
+	                <p class="modal-subtitle">Busque o paciente para enviar o link pelo telefone cadastrado.</p>
+	              </div>
+	              <button type="button" class="icon-btn" aria-label="Fechar" data-health-patient-share-close>
+	                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+	              </button>
+	            </div>
+	            <div class="modal-body health-patient-share-body">
+	              <label class="modal-label" for="healthPatientShareSearch">Paciente</label>
+	              <div class="health-patient-share-search">
+	                <span class="material-symbols-rounded" aria-hidden="true">search</span>
+	                <input class="modal-input" id="healthPatientShareSearch" type="search" autocomplete="off" placeholder="Digite o nome do paciente" />
+	              </div>
+	              <div class="health-patient-share-results" id="healthPatientShareResults" aria-live="polite"></div>
+	              <div class="health-patient-share-detail" id="healthPatientShareDetail" hidden></div>
+	            </div>
+	            <div class="modal-footer health-patient-share-footer">
+	              <button type="button" class="btn outline" data-health-patient-share-close>Fechar</button>
+	              <button type="button" class="btn primary" id="healthPatientShareSendBtn" disabled>
+	                <span class="material-symbols-rounded" aria-hidden="true">send</span>
+	                Enviar link
+	              </button>
+	            </div>
+	          </div>
+	        </div>
+
+	        <div class="modal" id="healthPatientPreviewModal" aria-hidden="true">
+	          <div class="modal-backdrop" data-health-patient-preview-close></div>
+	          <div class="modal-dialog health-patient-preview-dialog" role="dialog" aria-modal="true" aria-label="Prévia da conversa do agente do paciente">
+	            <button type="button" class="icon-btn health-patient-preview-close" aria-label="Fechar prévia" data-health-patient-preview-close>
+	              <span class="material-symbols-rounded" aria-hidden="true">close</span>
+	            </button>
+	            <div class="modal-body health-patient-preview-body">
+	              <section class="health-patient-wa-phone" aria-label="Simulação do WhatsApp do paciente">
+	                <header class="health-patient-wa-header">
+	                  <div>
+	                    <strong>Agente WES Saúde</strong>
+	                    <span>Online agora</span>
+	                  </div>
+	                  <div class="health-patient-wa-actions" aria-hidden="true">
+	                    <span class="material-symbols-rounded">more_vert</span>
+	                  </div>
+	                </header>
+	                <div class="health-patient-wa-chat" id="healthPatientPreviewLog" aria-live="polite"></div>
+	                <form class="health-patient-wa-form" id="healthPatientPreviewCpfForm">
+	                  <span class="material-symbols-rounded" aria-hidden="true">mood</span>
+	                  <label class="direct-chat-sr-only" for="healthPatientPreviewCpfInput">CPF do paciente no WhatsApp</label>
+	                  <input id="healthPatientPreviewCpfInput" inputmode="numeric" autocomplete="off" placeholder="Digite o CPF do paciente" />
+	                  <button type="submit" aria-label="Enviar CPF">
+	                    <span class="material-symbols-rounded" aria-hidden="true">send</span>
+	                  </button>
+	                </form>
+	                <div class="health-patient-wa-options" id="healthPatientPreviewOptions">
+	                  <button type="button" data-health-patient-flow="renewal" disabled>
+	                    <span class="material-symbols-rounded" aria-hidden="true">calendar_add_on</span>
+	                    Renovação de receita
+	                  </button>
+	                  <button type="button" data-health-patient-flow="questions" disabled>
+	                    <span class="material-symbols-rounded" aria-hidden="true">help</span>
+	                    Dúvidas gerais
+	                  </button>
+	                  <button type="button" data-health-patient-flow="exams" disabled>
+	                    <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+	                    Enviar exames
+	                  </button>
+	                </div>
+	              </section>
+	            </div>
+	          </div>
+	        </div>
+
+	        <div id="directChatDrawer" class="direct-chat-drawer" aria-hidden="true">
           <div class="direct-chat-backdrop" data-direct-chat-close tabindex="-1" aria-hidden="true"></div>
           <aside
             class="direct-chat-panel"

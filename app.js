@@ -15455,6 +15455,263 @@ async function copyTextToClipboard(text) {
   }
 }
 
+const HEALTH_PATIENT_AGENT_PHONE = '+55 85 98888-1048';
+const HEALTH_PATIENT_AGENT_LINK = 'https://wa.me/5585988881048';
+const HEALTH_PATIENT_SHARE_MESSAGE = 'Olá! Use este link para falar com o agente do paciente: https://wa.me/5585988881048';
+const healthPatientPreviewPatients = [
+  { cpf: '12345678900', name: 'Ana Beatriz Lima' },
+  { cpf: '98765432100', name: 'Carlos Eduardo Nunes' },
+  { cpf: '45678912300', name: 'Marina Costa Rocha' },
+];
+const healthPatientSharePatients = [
+  { id: 'ana-beatriz-lima', name: 'Ana Beatriz Lima', phone: '+55 85 98765-2031' },
+  { id: 'carlos-eduardo-nunes', name: 'Carlos Eduardo Nunes', phone: '' },
+  { id: 'marina-costa-rocha', name: 'Marina Costa Rocha', phone: '+55 85 99122-4477' },
+  { id: 'luciana-martins', name: 'Luciana Martins', phone: '' },
+  { id: 'raquel-sampaio', name: 'Raquel Sampaio', phone: '+55 85 98210-4500' },
+];
+
+function normalizeHealthPatientSearch(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function getHealthPatientById(patientId) {
+  return healthPatientSharePatients.find((patient) => patient.id === patientId) || null;
+}
+
+function formatHealthPatientPhoneLabel(phone) {
+  const value = String(phone || '').trim();
+  return value || 'Sem telefone cadastrado';
+}
+
+function formatHealthPatientPreviewCpf(cpf) {
+  const digits = String(cpf || '').replace(/\D/g, '').slice(0, 11);
+  if (digits.length !== 11) return cpf;
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
+}
+
+function addHealthPatientPreviewMessage(content, type = 'agent') {
+  const log = document.getElementById('healthPatientPreviewLog');
+  if (!log) return;
+  const message = document.createElement('p');
+  message.className = `health-patient-wa-message is-${type}`;
+  message.textContent = content;
+  const time = document.createElement('time');
+  time.textContent = '10:48';
+  message.appendChild(time);
+  log.appendChild(message);
+  log.scrollTop = log.scrollHeight;
+}
+
+function setHealthPatientPreviewOptionsEnabled(isEnabled) {
+  document.querySelectorAll('[data-health-patient-flow]').forEach((button) => {
+    button.disabled = !isEnabled;
+  });
+}
+
+function resetHealthPatientPreview() {
+  const log = document.getElementById('healthPatientPreviewLog');
+  const form = document.getElementById('healthPatientPreviewCpfForm');
+  const input = document.getElementById('healthPatientPreviewCpfInput');
+  if (log) log.innerHTML = '';
+  if (form) form.hidden = false;
+  if (input) input.value = '';
+  setHealthPatientPreviewOptionsEnabled(false);
+  addHealthPatientPreviewMessage('Olá! Sou o agente da clínica. Envie seu CPF para começarmos.');
+}
+
+function unlockHealthPatientPreview(cpf) {
+  const digits = String(cpf || '').replace(/\D/g, '');
+  const patient = healthPatientPreviewPatients.find((item) => item.cpf === digits);
+  if (!patient) {
+    addHealthPatientPreviewMessage(cpf || 'CPF não informado', 'user');
+    addHealthPatientPreviewMessage('Não encontrei esse CPF. Para testar, envie 12345678900.');
+    return;
+  }
+  addHealthPatientPreviewMessage(formatHealthPatientPreviewCpf(digits), 'user');
+  addHealthPatientPreviewMessage(`CPF localizado, ${patient.name}. Como posso ajudar hoje? Escolha uma das opções abaixo.`);
+  document.getElementById('healthPatientPreviewCpfForm')?.setAttribute('hidden', '');
+  setHealthPatientPreviewOptionsEnabled(true);
+}
+
+function runHealthPatientPreviewFlow(flow) {
+  if (flow === 'renewal') {
+    addHealthPatientPreviewMessage('Quero renovar uma receita.', 'user');
+    addHealthPatientPreviewMessage('Perfeito. Vou mostrar horários disponíveis para uma consulta de avaliação. A receita não é renovada automaticamente.');
+    addHealthPatientPreviewMessage('Horários disponíveis: hoje 11:00, amanhã 09:40 ou sexta 14:40.');
+    addHealthPatientPreviewMessage('Amanhã 09:40', 'user');
+    addHealthPatientPreviewMessage('Solicitação enviada ao médico. Você receberá uma confirmação após o aceite do encaixe.');
+  }
+  if (flow === 'questions') {
+    addHealthPatientPreviewMessage('Tenho dúvidas gerais sobre meus exames.', 'user');
+    addHealthPatientPreviewMessage('Pode perguntar. Vou responder com base no seu histórico e orientar quando for necessário falar com o médico.');
+    addHealthPatientPreviewMessage('Exemplo: seus exames recentes estão no histórico, mas sinais de alarme ou piora dos sintomas exigem avaliação médica.');
+  }
+  if (flow === 'exams') {
+    addHealthPatientPreviewMessage('Quero enviar exames para meu histórico.', 'user');
+    addHealthPatientPreviewMessage('Envie as imagens ou PDFs dos exames por aqui.');
+    addHealthPatientPreviewMessage('exame-laboratorial.pdf', 'user');
+    addHealthPatientPreviewMessage('Recebi o arquivo. Você já enviou todos os exames?');
+    addHealthPatientPreviewMessage('Sim, enviei todos.', 'user');
+    addHealthPatientPreviewMessage('Obrigado. Vou adicionar os exames ao histórico e avisar se houver algo que demande nova orientação.');
+  }
+}
+
+function renderHealthPatientShareDetail(patient) {
+  const detail = document.getElementById('healthPatientShareDetail');
+  const sendBtn = document.getElementById('healthPatientShareSendBtn');
+  if (!detail || !sendBtn) return;
+  if (!patient) {
+    detail.hidden = true;
+    detail.innerHTML = '';
+    sendBtn.disabled = true;
+    return;
+  }
+  const hasPhone = Boolean(String(patient.phone || '').trim());
+  sendBtn.disabled = !hasPhone;
+  sendBtn.dataset.patientId = patient.id;
+  detail.hidden = false;
+  detail.innerHTML = `
+    <div>
+      <strong>${escapeHtmlWes(patient.name)}</strong>
+      <span>${escapeHtmlWes(formatHealthPatientPhoneLabel(patient.phone))}</span>
+    </div>
+    <div class="health-patient-share-link-row">
+      <span class="health-patient-share-link">${escapeHtmlWes(HEALTH_PATIENT_AGENT_LINK)}</span>
+      <button class="icon-btn health-patient-copy-link-btn" type="button" aria-label="Copiar link do WhatsApp" data-health-patient-modal-copy-link>
+        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+      </button>
+    </div>
+    <span>${hasPhone
+      ? 'O link será enviado pelo telefone cadastrado do paciente.'
+      : `Paciente sem telefone cadastrado. Mostre o número ${escapeHtmlWes(HEALTH_PATIENT_AGENT_PHONE)} ou copie o link para orientar manualmente.`}</span>
+  `;
+}
+
+function renderHealthPatientShareResults() {
+  const input = document.getElementById('healthPatientShareSearch');
+  const results = document.getElementById('healthPatientShareResults');
+  if (!input || !results) return;
+  const query = normalizeHealthPatientSearch(input.value);
+  const matches = healthPatientSharePatients.filter((patient) =>
+    normalizeHealthPatientSearch(patient.name).includes(query)
+  );
+  if (!matches.length) {
+    results.innerHTML = '<p class="health-patient-share-empty">Nenhum paciente encontrado. Copie o link do agente ou informe o número do atendimento ao paciente.</p>';
+    renderHealthPatientShareDetail(null);
+    return;
+  }
+  results.innerHTML = matches.map((patient) => {
+    const hasPhone = Boolean(String(patient.phone || '').trim());
+    return `
+      <button class="health-patient-share-result" type="button" data-health-patient-id="${escapeHtmlWes(patient.id)}">
+        <span>
+          <strong>${escapeHtmlWes(patient.name)}</strong>
+          <span>${escapeHtmlWes(formatHealthPatientPhoneLabel(patient.phone))}</span>
+        </span>
+        <span class="health-patient-phone-chip${hasPhone ? '' : ' is-missing'}">${hasPhone ? 'Telefone' : 'Sem telefone'}</span>
+      </button>
+    `;
+  }).join('');
+}
+
+function openHealthPatientShareModal() {
+  const modal = document.getElementById('healthPatientShareModal');
+  const input = document.getElementById('healthPatientShareSearch');
+  if (!modal || !input) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  input.value = '';
+  renderHealthPatientShareResults();
+  renderHealthPatientShareDetail(null);
+  window.setTimeout(() => input.focus(), 0);
+}
+
+function closeHealthPatientShareModal() {
+  const modal = document.getElementById('healthPatientShareModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function openHealthPatientPreviewModal() {
+  const modal = document.getElementById('healthPatientPreviewModal');
+  if (!modal) return;
+  resetHealthPatientPreview();
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  window.setTimeout(() => document.getElementById('healthPatientPreviewCpfInput')?.focus(), 0);
+}
+
+function closeHealthPatientPreviewModal() {
+  const modal = document.getElementById('healthPatientPreviewModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function initHealthPatientShareControls() {
+  const modal = document.getElementById('healthPatientShareModal');
+  const previewModal = document.getElementById('healthPatientPreviewModal');
+  const previewCpfForm = document.getElementById('healthPatientPreviewCpfForm');
+  const previewCpfInput = document.getElementById('healthPatientPreviewCpfInput');
+  const previewOptions = document.getElementById('healthPatientPreviewOptions');
+  const input = document.getElementById('healthPatientShareSearch');
+  const results = document.getElementById('healthPatientShareResults');
+  const sendBtn = document.getElementById('healthPatientShareSendBtn');
+  document.querySelector('[data-health-patient-copy-link]')?.addEventListener('click', async () => {
+    const copied = await copyTextToClipboard(HEALTH_PATIENT_AGENT_LINK);
+    showAppToast(copied ? 'Link do WhatsApp copiado' : 'Não foi possível copiar o link');
+  });
+  document.querySelector('[data-health-patient-share-open]')?.addEventListener('click', openHealthPatientShareModal);
+  document.querySelector('[data-health-patient-preview-open]')?.addEventListener('click', openHealthPatientPreviewModal);
+  previewModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-patient-preview-close]')) closeHealthPatientPreviewModal();
+  });
+  previewCpfForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    unlockHealthPatientPreview(previewCpfInput?.value || '');
+    if (previewCpfInput) previewCpfInput.value = '';
+  });
+  previewOptions?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-health-patient-flow]');
+    if (!button || button.disabled) return;
+    runHealthPatientPreviewFlow(button.dataset.healthPatientFlow);
+  });
+  if (!modal || !input || !results || !sendBtn) return;
+  modal.addEventListener('click', async (event) => {
+    if (event.target.closest('[data-health-patient-share-close]')) closeHealthPatientShareModal();
+    if (event.target.closest('[data-health-patient-modal-copy-link]')) {
+      const copied = await copyTextToClipboard(HEALTH_PATIENT_AGENT_LINK);
+      showAppToast(copied ? 'Link do WhatsApp copiado' : 'Não foi possível copiar o link');
+    }
+  });
+  input.addEventListener('input', renderHealthPatientShareResults);
+  results.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-health-patient-id]');
+    if (!button) return;
+    results.querySelectorAll('.health-patient-share-result').forEach((item) => item.classList.remove('is-selected'));
+    button.classList.add('is-selected');
+    renderHealthPatientShareDetail(getHealthPatientById(button.dataset.healthPatientId));
+  });
+  sendBtn.addEventListener('click', () => {
+    const patient = getHealthPatientById(sendBtn.dataset.patientId);
+    if (!patient?.phone) return;
+    showAppToast(`Link enviado para ${patient.name} em ${patient.phone}`);
+    closeHealthPatientShareModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal.classList.contains('open')) closeHealthPatientShareModal();
+    if (event.key === 'Escape' && previewModal?.classList.contains('open')) closeHealthPatientPreviewModal();
+  });
+}
+
+initHealthPatientShareControls();
+
 function getAgentSharePermission(agent = {}) {
   return String(agent.share_permission || agent.public_permission || 'viewer').trim() || 'viewer';
 }
@@ -17066,6 +17323,8 @@ const routeMap = {
   'dashboard/hybrid-flows/history': 'page-hybrid-flows-history',
   'dashboard/hybrid-flows/history/details': 'page-hybrid-flows-history-details',
   'dashboard/health/whatsapp': 'page-health-whatsapp',
+  'dashboard/health/whatsapp/insights': 'page-health-whatsapp-insights',
+  'dashboard/health/whatsapp/history': 'page-health-whatsapp-history',
   'dashboard/health/service': 'page-health-service',
   'dashboard/health/agenda': 'page-health-agenda',
   'dashboard/health/integrations': 'page-health-integrations',
@@ -17114,6 +17373,8 @@ const sectionMap = {
   'dashboard/hybrid-flows/history': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history/details': 'Atendimento dinâmico',
   'dashboard/health/whatsapp': 'Saúde',
+  'dashboard/health/whatsapp/insights': 'Saúde',
+  'dashboard/health/whatsapp/history': 'Saúde',
   'dashboard/health/service': 'Saúde',
   'dashboard/health/agenda': 'Saúde',
   'dashboard/health/integrations': 'Saúde',
@@ -17318,7 +17579,7 @@ const normalizeVisiblePortugueseLabels = () => {
     ['#submenu-administration a[href="#/dashboard/people-management"] .submenu-label', 'Estrutura e Pessoas'],
     ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['.nav-trigger[data-menu="health"] .nav-label', 'Sa\u00fade'],
-    ['#submenu-health a[href="#/dashboard/health/whatsapp"] .submenu-label', 'WhatsApp'],
+    ['#submenu-health a[href="#/dashboard/health/whatsapp"] .submenu-label', 'Agente do paciente'],
     ['#submenu-health a[href="#/dashboard/health/service"] .submenu-label', 'Atendimento'],
     ['#submenu-health a[href="#/dashboard/health/agenda"] .submenu-label', 'Agenda'],
     ['#submenu-health a[href="#/dashboard/health/integrations"] .submenu-label', 'Integra\u00e7\u00f5es'],
@@ -17390,6 +17651,8 @@ const updateActivePage = () => {
       ? 'dashboard/campaigns'
     : pageRouteKey.startsWith('dashboard/channels/')
       ? 'dashboard/channels'
+    : pageRouteKey.startsWith('dashboard/health/whatsapp/')
+      ? 'dashboard/health/whatsapp'
       : pageRouteKey;
 
   if (hubScopeBar) {

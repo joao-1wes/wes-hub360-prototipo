@@ -2557,6 +2557,752 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   grid-template-columns: 1.2fr 0.8fr 0.8fr 1fr 1fr;
 }
 
+.health-patient-agent-page {
+  display: grid;
+  grid-template-rows: auto auto auto;
+  gap: 8px;
+  min-height: calc(100vh - 128px);
+  max-height: calc(100vh - 128px);
+  padding: 12px 16px;
+  overflow: hidden;
+}
+
+.health-patient-agent-header {
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.health-patient-agent-header h2 {
+  font-size: var(--md-headline-small);
+  line-height: 32px;
+}
+
+.health-patient-agent-header .page-subtitle {
+  max-width: 760px;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.health-patient-agent-header .page-actions {
+  gap: 8px;
+}
+
+.health-patient-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
+  gap: 8px;
+  min-height: 0;
+}
+
+.health-patient-metric-card {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  min-height: 68px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.health-patient-metric-card:hover {
+  border-color: #cfe3ff;
+  box-shadow: 0 10px 24px rgba(1, 111, 244, 0.12);
+}
+
+.health-patient-metric-card .stat-body {
+  min-width: 0;
+}
+
+.health-patient-metric-card .stat-value {
+  font-size: 24px;
+  line-height: 26px;
+}
+
+.health-patient-metric-card .stat-label {
+  overflow: hidden;
+  color: #111827;
+  font-size: var(--md-label-large);
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-patient-metric-card .stat-sub {
+  overflow: hidden;
+  font-size: var(--md-body-small);
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-patient-metric-card--warning .stat-value {
+  color: #8b3f0a;
+}
+
+.health-patient-agent-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 1.18fr) minmax(300px, 1fr) minmax(220px, 0.72fr);
+  gap: 8px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.health-patient-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.health-patient-panel--wide {
+  grid-column: auto;
+}
+
+.health-patient-panel--share {
+  padding: 16px 18px;
+}
+
+.health-patient-panel--share .health-patient-panel-head {
+  margin-bottom: 18px;
+}
+
+.health-patient-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.health-patient-panel-head > div:first-child {
+  min-width: 0;
+}
+
+.health-patient-panel-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.health-patient-more-link {
+  color: #016ff4;
+  font-size: var(--md-label-large);
+  font-weight: 600;
+  line-height: 20px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.health-patient-more-link:hover {
+  text-decoration: underline;
+}
+
+.health-patient-preview-icon-btn.btn {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.health-patient-agent-header .page-actions .health-patient-preview-icon-btn.btn {
+  width: 44px;
+  min-width: 44px;
+}
+
+.health-patient-preview-icon-btn.btn:hover {
+  background: #eef6ff;
+}
+
+.health-patient-panel-title {
+  margin: 0;
+  color: #111827;
+  overflow: hidden;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 24px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-patient-kicker {
+  display: block;
+  color: #1859c9;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 12px;
+  text-transform: uppercase;
+}
+
+.health-patient-period-chip,
+.health-patient-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eaf7f0;
+  color: #166534;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.health-patient-period-chip--orange {
+  background: #fff1e8;
+  color: #8b3f0a;
+}
+
+.health-patient-insight-list,
+.health-patient-events-list {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+  max-height: 318px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.health-patient-insight-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+}
+
+.health-patient-insight-item:first-child {
+  padding-top: 0;
+}
+
+.health-patient-insight-item strong,
+.health-patient-event-item strong {
+  display: block;
+  color: #0b0f19;
+  font-size: var(--md-title-medium);
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.health-patient-insight-item p,
+.health-patient-event-item p,
+.health-patient-panel-note {
+  margin: 1px 0 0;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-patient-tag {
+  background: #f7fbff;
+  color: #0f54b6;
+}
+
+.health-patient-contact-card {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.health-patient-contact-card > span {
+  color: #1859c9;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 20px;
+  text-transform: uppercase;
+}
+
+.health-patient-contact-card > strong {
+  color: #00163d;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 27px;
+  overflow-wrap: anywhere;
+}
+
+.health-patient-panel-note {
+  margin-top: 18px;
+  line-height: 22px;
+}
+
+.health-patient-contact-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  margin-top: 2px;
+  gap: 8px;
+}
+
+.health-patient-copy-link-btn.btn.outline,
+.health-patient-share-btn.btn.primary {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  justify-content: center;
+}
+
+.health-patient-share-dialog {
+  width: min(680px, 92vw);
+}
+
+.modal-dialog.health-patient-preview-dialog {
+  width: min(520px, 94vw);
+  padding: 0;
+  gap: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
+}
+
+.health-patient-share-body {
+  gap: 10px;
+}
+
+.health-patient-preview-body {
+  display: block;
+  flex: 0 0 auto;
+  min-height: auto;
+  padding: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  overflow: visible;
+}
+
+.health-patient-preview-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #016ff4;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+}
+
+.health-patient-preview-close.icon-btn[aria-label]::after {
+  top: calc(100% + 8px);
+  right: 0;
+  bottom: auto;
+}
+
+.health-patient-wa-phone {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid #d8e4f2;
+  border-radius: 18px;
+  background: #ffffff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+}
+
+.health-patient-wa-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 74px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #d8e4f2;
+  background: #f8fafc;
+}
+
+.health-patient-wa-header strong {
+  display: block;
+  overflow: hidden;
+  color: #111827;
+  font-size: var(--md-title-large);
+  font-weight: 700;
+  line-height: 26px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-patient-wa-header span:not(.material-symbols-rounded) {
+  display: block;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-patient-wa-actions {
+  display: inline-flex;
+  gap: 14px;
+  color: #54656f;
+}
+
+.health-patient-wa-actions .material-symbols-rounded {
+  font-size: 26px;
+}
+
+.health-patient-wa-chat {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 360px;
+  max-height: min(520px, 58vh);
+  overflow-y: auto;
+  padding: 24px 38px;
+  background-color: #efeae2;
+  background-image:
+    radial-gradient(circle at 24px 24px, rgba(17, 27, 33, 0.045) 1px, transparent 1.5px),
+    radial-gradient(circle at 72px 72px, rgba(17, 27, 33, 0.035) 1px, transparent 1.5px);
+  background-size: 96px 96px;
+}
+
+.health-patient-wa-message {
+  position: relative;
+  max-width: min(82%, 360px);
+  margin: 0;
+  padding: 9px 58px 9px 12px;
+  border-radius: 10px;
+  color: #111b21;
+  font-size: var(--md-body-medium);
+  line-height: 1.42;
+  box-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+}
+
+.health-patient-wa-message time {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  color: #667781;
+  font-size: var(--md-label-small);
+  line-height: 14px;
+}
+
+.health-patient-wa-message.is-agent {
+  justify-self: start;
+  background: #ffffff;
+}
+
+.health-patient-wa-message.is-user {
+  justify-self: end;
+  background: #d9fdd3;
+}
+
+.health-patient-wa-form {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  border-top: 1px solid #d9dee3;
+  background: #f0f2f5;
+}
+
+.health-patient-wa-form > .material-symbols-rounded {
+  color: #54656f;
+  font-size: 22px;
+}
+
+.health-patient-wa-form[hidden] {
+  display: none;
+}
+
+.health-patient-wa-form input {
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  border: 0;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: #ffffff;
+  color: #111827;
+  font-size: var(--md-body-medium);
+  outline: none;
+}
+
+.health-patient-wa-form button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 42px;
+  min-width: 42px;
+  height: 40px;
+  border: 0;
+  border-radius: 999px;
+  background: #008069;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.health-patient-wa-form button:hover {
+  background: #006d5b;
+}
+
+.health-patient-wa-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px 14px;
+  border-top: 1px solid #d9dee3;
+  background: #f0f2f5;
+}
+
+.health-patient-wa-options button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 38px;
+  border: 1px solid #d9dee3;
+  border-radius: 999px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: #075e54;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.health-patient-wa-options button:disabled {
+  cursor: not-allowed;
+  background: #e9edef;
+  color: #667781;
+}
+
+.health-patient-wa-options .material-symbols-rounded {
+  font-size: 18px;
+}
+
+.health-patient-share-search {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+  border: 1px solid #d8e4f2;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.health-patient-share-search:focus-within {
+  border-color: #016ff4;
+  box-shadow: 0 0 0 3px rgba(1, 111, 244, 0.12);
+}
+
+.health-patient-share-search .material-symbols-rounded {
+  justify-self: center;
+  color: #016ff4;
+}
+
+.health-patient-share-search .modal-input {
+  border: 0;
+  border-radius: 0;
+}
+
+.health-patient-share-results {
+  display: grid;
+  gap: 8px;
+}
+
+.health-patient-share-result {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  color: #111827;
+  text-align: left;
+  cursor: pointer;
+}
+
+.health-patient-share-result:hover,
+.health-patient-share-result.is-selected {
+  border-color: #cfe3ff;
+  background: #f8fbff;
+}
+
+.health-patient-share-result strong,
+.health-patient-share-detail strong {
+  display: block;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-patient-share-result span,
+.health-patient-share-detail span,
+.health-patient-share-empty {
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-patient-phone-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #eaf7f0;
+  color: #166534;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.health-patient-phone-chip.is-missing {
+  background: #fff4e8;
+  color: #8b3f0a;
+}
+
+.health-patient-share-detail {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d8e4f2;
+  border-radius: 12px;
+  background: #f8fbff;
+}
+
+.health-patient-share-link-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.health-patient-share-link {
+  overflow: hidden;
+  padding: 9px 10px;
+  border: 1px solid #d8e4f2;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #334155;
+  font-size: 12px;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-patient-share-footer .btn.primary {
+  gap: 8px;
+}
+
+.health-patient-detail-page {
+  gap: 16px;
+}
+
+.health-patient-detail-top {
+  margin-bottom: 2px;
+}
+
+.health-patient-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.health-patient-detail-card,
+.health-patient-detail-panel {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.health-patient-detail-card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.health-patient-detail-card strong {
+  color: #111827;
+  font-size: var(--md-title-medium);
+  line-height: 24px;
+}
+
+.health-patient-detail-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-patient-detail-card .health-patient-tag {
+  justify-self: start;
+}
+
+.health-patient-detail-panel {
+  padding: 16px;
+}
+
+.health-patient-audit-table .data-row {
+  grid-template-columns: minmax(180px, 1.2fr) minmax(100px, 0.55fr) minmax(140px, 0.8fr) minmax(260px, 1.5fr);
+  min-width: 780px;
+}
+
+.health-patient-history-table .data-row {
+  grid-template-columns: minmax(82px, 0.45fr) minmax(180px, 1.05fr) minmax(180px, 1fr) minmax(320px, 1.65fr) minmax(130px, 0.75fr);
+  min-width: 960px;
+}
+
+.health-patient-event-item {
+  display: grid;
+  grid-template-columns: 50px minmax(0, 1fr);
+  gap: 7px;
+  align-items: start;
+  min-width: 0;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+}
+
+.health-patient-event-item:first-child {
+  padding-top: 0;
+}
+
+.health-patient-event-item time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 4px 6px;
+  border-radius: 999px;
+  background: #e2f0ff;
+  color: #0f54b6;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 13px;
+}
+
+.health-patient-event-item span {
+  display: block;
+  margin-top: 0;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  font-weight: 600;
+  line-height: 20px;
+}
+
 .health-integration-card {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
@@ -2653,6 +3399,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 @media (max-width: 1180px) {
+  .health-patient-metrics-grid {
+    grid-template-columns: repeat(3, minmax(180px, 1fr));
+  }
+
+  .health-patient-agent-grid {
+    grid-template-columns: 1fr;
+  }
+
   .health-integrations-grid {
     grid-template-columns: 1fr;
   }
@@ -2663,6 +3417,49 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 @media (max-width: 720px) {
+  .health-patient-agent-header {
+    align-items: stretch;
+  }
+
+  .health-patient-metrics-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .health-patient-metric-card {
+    min-height: 0;
+  }
+
+  .health-patient-panel {
+    padding: 18px;
+  }
+
+  .health-patient-panel-head {
+    display: grid;
+    gap: 12px;
+  }
+
+  .health-patient-panel-head .health-patient-panel-title {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .health-patient-period-chip {
+    justify-self: start;
+  }
+
+  .health-patient-contact-card > strong {
+    font-size: 30px;
+    line-height: 34px;
+  }
+
+  .health-patient-event-item {
+    grid-template-columns: 1fr;
+  }
+
+  .health-patient-event-item time {
+    justify-self: start;
+  }
+
   .health-integrations-header {
     align-items: stretch;
   }

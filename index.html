@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>WES HUB 360 - Painel (Estático)</title>
-    <link rel="stylesheet" href="./styles.css?v=20260722-dashboard-card-icons" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/skeleton.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/themes/classic/theme.css" />
+    <link rel="stylesheet" href="./styles.css?v=20260724-health-agenda-consult-blue" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
@@ -8623,86 +8625,582 @@
               <div class="page-header">
                 <div>
                   <h2>Atendimento Saúde</h2>
-                  <p class="page-subtitle">Acompanhe filas, prioridade clínica e evolução dos atendimentos em andamento.</p>
+                  <p class="page-subtitle">Consulte o histórico de atendimentos, conversas e registros dos pacientes.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn primary" type="button">
-                    <span class="material-symbols-rounded">support_agent</span>
-                    Abrir atendimento
+                  <button class="btn primary" type="button" data-health-service-start>
+                    Iniciar atendimento
                   </button>
                 </div>
               </div>
 
               <div class="data-table health-service-table">
                 <div class="data-row header">
-                  <span>Paciente</span>
-                  <span>Canal</span>
-                  <span>Prioridade</span>
-                  <span>Status</span>
-                  <span>Responsável</span>
+                  <span>Nome do paciente</span>
+                  <span>Plano</span>
+                  <span>Data e hora</span>
+                  <span>Ações</span>
                 </div>
                 <div class="data-row">
                   <span>Marina Costa</span>
-                  <span>WhatsApp</span>
-                  <span><span class="chip warning">Média</span></span>
-                  <span>Em triagem</span>
-                  <span>Dra. Camila</span>
+                  <span>Unimed Fortaleza</span>
+                  <span>22/07/2026, 10:48</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do chat de Marina Costa" data-health-service-open-chat-history>
+                      <span class="material-symbols-rounded" aria-hidden="true">chat</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do paciente Marina Costa" data-health-service-open-patient-history>
+                      <span class="material-symbols-rounded" aria-hidden="true">assignment_ind</span>
+                    </button>
+                  </span>
                 </div>
                 <div class="data-row">
                   <span>Roberto Lima</span>
-                  <span>Portal</span>
-                  <span><span class="chip danger">Alta</span></span>
-                  <span>Aguardando retorno</span>
-                  <span>Equipe clínica</span>
+                  <span>Bradesco Saúde</span>
+                  <span>21/07/2026, 16:12</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do chat de Roberto Lima" data-health-service-open-chat-history>
+                      <span class="material-symbols-rounded" aria-hidden="true">chat</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do paciente Roberto Lima" data-health-service-open-patient-history>
+                      <span class="material-symbols-rounded" aria-hidden="true">assignment_ind</span>
+                    </button>
+                  </span>
                 </div>
                 <div class="data-row">
                   <span>Ana Beatriz</span>
-                  <span>Telefone</span>
-                  <span><span class="chip success">Baixa</span></span>
-                  <span>Resolvido</span>
-                  <span>Central</span>
+                  <span>SulAmérica Saúde</span>
+                  <span>20/07/2026, 09:35</span>
+                  <span class="row-actions">
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do chat de Ana Beatriz" data-health-service-open-chat-history>
+                      <span class="material-symbols-rounded" aria-hidden="true">chat</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do paciente Ana Beatriz" data-health-service-open-patient-history>
+                      <span class="material-symbols-rounded" aria-hidden="true">assignment_ind</span>
+                    </button>
+                  </span>
                 </div>
               </div>
             </div>
           </div>
 
+          <div class="page" id="page-health-service-patient" data-title="Histórico médico">
+            <div class="section health-page health-patient-detail-page health-service-patient-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/service">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Atendimento Saúde</span>
+                </a>
+              </div>
+
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Histórico médico</h2>
+                  <p class="page-subtitle">Paciente carregado pelo CPF para iniciar o atendimento com contexto clínico.</p>
+                </div>
+                <span class="health-patient-period-chip">CPF carregado</span>
+              </div>
+
+              <div class="health-service-patient-layout">
+                <article class="health-patient-detail-panel health-service-clinical-summary">
+                  <div class="health-service-patient-profile">
+                    <div>
+                      <span class="health-patient-kicker">Paciente selecionado</span>
+                      <h3 data-health-service-patient-name>Ana Beatriz Lima</h3>
+                      <p><span data-health-service-patient-age>42 anos</span> | CPF <span data-health-service-patient-cpf>123.456.789-00</span> | <span data-health-service-patient-plan>Unimed Premium</span></p>
+                    </div>
+                  </div>
+
+                  <div class="health-service-summary-grid" aria-label="Resumo clínico">
+                    <div>
+                      <span>Última consulta</span>
+                      <strong>08/07/2026</strong>
+                    </div>
+                    <div>
+                      <span>Medicamentos</span>
+                      <strong>2 em uso</strong>
+                    </div>
+                    <div>
+                      <span>Exames recentes</span>
+                      <strong>3 registros</strong>
+                    </div>
+                  </div>
+
+                  <div class="health-service-record-section">
+                    <div class="health-patient-panel-head">
+                      <h3 class="health-patient-panel-title">Exames recentes</h3>
+                      <span class="health-patient-period-chip">Atualizado</span>
+                    </div>
+                    <div class="health-service-exam-groups">
+                      <article class="health-service-exam-group">
+                        <div class="health-service-exam-group-head">
+                          <div>
+                            <strong>Laboratoriais</strong>
+                            <small>2 registros recentes</small>
+                          </div>
+                        </div>
+                        <div class="health-service-record-list">
+                          <button class="health-service-record-item" type="button" data-health-service-exam-id="metabolic-panel" aria-label="Ver detalhes do exame Painel metabólico">
+                            <span>
+                              <strong>Painel metabólico</strong>
+                              <small>13/07/2026 | Laboratorial</small>
+                              <span>HbA1c 6,1%, LDL 142 mg/dL, triglicerídeos 178 mg/dL e creatinina preservada.</span>
+                            </span>
+                          </button>
+                          <button class="health-service-record-item" type="button" data-health-service-exam-id="blood-count" aria-label="Ver detalhes do exame Hemograma completo">
+                            <span>
+                              <strong>Hemograma completo</strong>
+                              <small>22/05/2026 | Laboratorial</small>
+                              <span>Sem sinais laboratoriais relevantes no hemograma.</span>
+                            </span>
+                          </button>
+                        </div>
+                      </article>
+                      <article class="health-service-exam-group">
+                        <div class="health-service-exam-group-head">
+                          <div>
+                            <strong>Imagem</strong>
+                            <small>1 registro recente</small>
+                          </div>
+                        </div>
+                        <div class="health-service-record-list">
+                          <button class="health-service-record-item" type="button" data-health-service-exam-id="abdominal-ultrasound" aria-label="Ver detalhes do exame Ultrassom abdominal">
+                            <span>
+                              <strong>Ultrassom abdominal</strong>
+                              <small>02/06/2026 | Imagem</small>
+                              <span>Sem alterações agudas; acompanhamento mantido conforme rotina clínica.</span>
+                            </span>
+                          </button>
+                        </div>
+                      </article>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="health-patient-detail-panel health-service-consult-panel">
+                  <div class="health-service-consult-head">
+                    <span class="health-patient-kicker">Dúvidas</span>
+                    <h3>Auxiliar médico</h3>
+                    <p>Use o auxiliar apenas para dúvidas relacionadas ao histórico deste paciente.</p>
+                  </div>
+                  <div class="health-service-consult-body">
+                    <div class="health-service-helper-chat">
+                      <div class="health-service-consult-empty-card">
+                        <strong>Comece pelo histórico</strong>
+                        <p>Quer revisar exames, consultas, medicamentos ou sinais recorrentes deste paciente?</p>
+                        <span>Digite sua pergunta sobre os dados carregados acima.</span>
+                      </div>
+                    </div>
+                    <div class="health-service-helper-composer">
+                      <button class="health-service-helper-tool" type="button" aria-label="Adicionar contexto">
+                        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                      </button>
+                      <label class="direct-chat-sr-only" for="healthServiceConsultReason">Pergunta sobre o histórico</label>
+                      <input id="healthServiceConsultReason" type="text" autocomplete="off" placeholder="Pergunte sobre o histórico do paciente" />
+                      <button class="health-service-helper-send" type="button" aria-label="Enviar pergunta" data-health-service-consult-chat>
+                        <span class="material-symbols-rounded" aria-hidden="true">send</span>
+                      </button>
+                    </div>
+                  </div>
+                </article>
+              </div>
+
+              <article class="health-patient-detail-panel health-service-timeline-panel">
+                <div class="health-patient-panel-head">
+                  <div>
+                    <h3 class="health-patient-panel-title">Linha do tempo</h3>
+                    <p class="page-subtitle">Entrada no plano, consultas, exames, internações, cirurgias e medicamentos em ordem cronológica.</p>
+                  </div>
+                </div>
+                <div class="health-service-medical-timeline" data-health-service-timeline-graph>
+                  <div class="health-service-timeline-head">
+                    <div class="health-service-timeline-legend" aria-label="Legenda da linha do tempo">
+                      <span><i class="is-plan"></i>Entrada no plano</span>
+                      <span><i class="is-consult"></i>Consultas</span>
+                      <span><i class="is-exam"></i>Exames</span>
+                      <span><i class="is-diagnosis"></i>Diagnósticos</span>
+                      <span><i class="is-hospital"></i>Internações</span>
+                      <span><i class="is-surgery"></i>Cirurgias</span>
+                      <span><i class="is-medication"></i>Medicamentos</span>
+                      <span><i class="is-current"></i>Atendimento atual</span>
+                    </div>
+                    <div class="health-service-timeline-controls">
+                      <div class="form-field health-service-timeline-filter-field">
+                        <button class="btn filter-btn" type="button" data-health-service-timeline-filter-btn>
+                          <span class="material-symbols-rounded" aria-hidden="true">filter_list</span>
+                          <span data-health-service-timeline-filter-label>Filtros</span>
+                        </button>
+                        <div class="menu filter-menu filter-menu--standard filter-menu--groups-2 health-service-timeline-filter-menu" data-health-service-timeline-filter-menu>
+                          <div class="filter-footer">
+                            <button class="filter-clear" type="button" data-health-service-timeline-filter-clear>Visualizar todos</button>
+                          </div>
+                          <div class="filter-group" data-health-service-timeline-year-options>
+                            <span>Ano</span>
+                          </div>
+                          <div class="filter-group">
+                            <span>Evento</span>
+                            <button class="filter-option active" type="button" data-health-service-timeline-kind="" data-value="">Todos os eventos</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="plan" data-value="plan">Entrada no plano</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="consult" data-value="consult">Consultas</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="exam" data-value="exam">Exames</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="diagnosis" data-value="diagnosis">Diagnósticos</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="hospital" data-value="hospital">Internações</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="surgery" data-value="surgery">Cirurgias</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="medication" data-value="medication">Medicamentos</button>
+                            <button class="filter-option" type="button" data-health-service-timeline-kind="current" data-value="current">Atendimento atual</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="health-service-timeline-map" aria-label="Gráfico interativo da linha do tempo">
+                    <div class="health-service-timeline-zoom-controls" aria-label="Zoom da linha do tempo">
+                      <button class="icon-btn" type="button" aria-label="Compactar linha do tempo" data-health-service-timeline-zoom="out">
+                        <span class="material-symbols-rounded" aria-hidden="true">remove</span>
+                      </button>
+                      <button class="icon-btn" type="button" aria-label="Aproximar linha do tempo" data-health-service-timeline-zoom="in">
+                        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                      </button>
+                      <button class="icon-btn" type="button" aria-label="Ajustar linha do tempo" data-health-service-timeline-zoom="fit">
+                        <span class="material-symbols-rounded" aria-hidden="true">fit_screen</span>
+                      </button>
+                    </div>
+                    <div class="health-service-timeline-ruler" data-health-service-timeline-ruler aria-hidden="true"></div>
+                    <div class="health-service-timeline-axis" aria-hidden="true"></div>
+                    <div class="health-service-timeline-nodes" data-health-service-timeline-nodes></div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
           <div class="page" id="page-health-agenda" data-title="Agenda Saúde">
-            <div class="section health-page">
-              <div class="page-header">
+            <div class="section health-page health-agenda-page">
+              <div class="page-header health-agenda-header">
                 <div>
                   <h2>Agenda Saúde</h2>
-                  <p class="page-subtitle">Gerencie consultas, encaixes, confirmações e remarcações da operação de saúde.</p>
+                  <p class="page-subtitle">Acompanhe consultas, retornos e janelas de encaixe sincronizadas com o atendimento do paciente.</p>
                 </div>
                 <div class="page-actions">
-                  <button class="btn outline" type="button">
-                    <span class="material-symbols-rounded">calendar_month</span>
-                    Ver calendário
-                  </button>
-                  <button class="btn primary" type="button">
-                    <span class="material-symbols-rounded">add</span>
-                    Novo agendamento
+                  <button class="icon-btn health-agenda-settings-btn" id="openHealthAgendaSettings" type="button" aria-label="Ajustes da agenda" aria-haspopup="dialog" aria-controls="healthAgendaSettingsModal">
+                    <span class="material-symbols-rounded" aria-hidden="true">tune</span>
                   </button>
                 </div>
               </div>
 
-              <div class="health-schedule-grid">
-                <article class="health-panel">
-                  <h3>Hoje</h3>
-                  <div class="health-timeline">
-                    <div><time>09:00</time><span>Cardiologia - Marina Costa</span></div>
-                    <div><time>10:30</time><span>Teleconsulta - Roberto Lima</span></div>
-                    <div><time>14:00</time><span>Retorno clínico - Ana Beatriz</span></div>
+              <article class="health-agenda-renewal-card" aria-label="Encaixes para renovação">
+                <div class="health-agenda-renewal-head">
+                  <div>
+                    <span class="health-agenda-renewal-kicker">Notificações</span>
+                    <h3>Encaixes para renovação</h3>
                   </div>
-                </article>
-                <article class="health-panel">
-                  <h3>Indicadores</h3>
-                  <div class="health-list">
-                    <div><span>Consultas confirmadas</span><strong>36</strong></div>
-                    <div><span>Remarcações</span><strong>7</strong></div>
-                    <div><span>Encaixes disponíveis</span><strong>5</strong></div>
+                  <span class="health-agenda-renewal-count">3 pendentes</span>
+                </div>
+
+                <div class="health-agenda-renewal-list" data-health-agenda-renewal-list></div>
+              </article>
+
+              <article class="health-agenda-board" aria-label="Agenda semanal">
+                <div class="health-agenda-board-head">
+                  <div>
+                    <h3>Agenda semanal</h3>
+                    <p>Visualização operacional por horário, status e modalidade da consulta.</p>
                   </div>
-                </article>
+                  <div class="health-agenda-legend" aria-label="Legenda da agenda">
+                    <span><i class="is-consult"></i>Consulta</span>
+                    <span><i class="is-return"></i>Retorno</span>
+                  </div>
+                </div>
+                <div class="health-agenda-calendar" id="healthAgendaCalendar" aria-label="Calendário da agenda médica"></div>
+                <div class="health-agenda-toolbar">
+                  <div class="health-agenda-nav" aria-label="Navegar semanas">
+                    <button class="icon-btn" type="button" aria-label="Semana anterior">
+                      <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+                    </button>
+                    <button class="icon-btn" type="button" aria-label="Próxima semana">
+                      <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+                    </button>
+                    <button class="btn outline health-agenda-today" type="button">Hoje</button>
+                  </div>
+                  <h3>13 - 19 de jul. de 2026</h3>
+                  <div class="health-agenda-view-switch" aria-label="Alternar visualização">
+                    <button class="active" type="button">Dia</button>
+                    <button type="button">Semana</button>
+                    <button type="button">Mês</button>
+                    <button type="button">Lista</button>
+                  </div>
+                </div>
+
+                <div class="health-agenda-scroll">
+                  <div class="health-agenda-week">
+                    <div class="health-agenda-row health-agenda-days" role="row">
+                      <div class="health-agenda-time-spacer" aria-hidden="true"></div>
+                      <div>seg. 13/07</div>
+                      <div>ter. 14/07</div>
+                      <div>qua. 15/07</div>
+                      <div>qui. 16/07</div>
+                      <div>sex. 17/07</div>
+                      <div>sáb. 18/07</div>
+                      <div>dom. 19/07</div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>08</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult">
+                          <strong>Consulta | João Pereira</strong>
+                          <span>8:30 - 9:00</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult is-wide">
+                          <strong>Consulta | Rafael Duarte</strong>
+                          <span>8:00 - 8:30</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-return is-wide">
+                          <strong>Retorno | Luciana Martins</strong>
+                          <span>8:20 - 8:50</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult is-wide">
+                          <strong>Consulta | Marcos Vinícius</strong>
+                          <span>8:40 - 9:10</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>09</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>10</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-return">
+                          <strong>Retorno | Paulo Reis</strong>
+                          <span>10:10 - 10:40</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult is-wide">
+                          <strong>Consulta | Pedro Henrique</strong>
+                          <span>10:30 - 11:00</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>11</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>12</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>13</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult">
+                          <strong>Consulta | Beatriz Alves</strong>
+                          <span>13:30 - 14:00</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>14</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult is-wide">
+                          <strong>Consulta | Marina Costa</strong>
+                          <span>14:30 - 15:00</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>15</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>16</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-consult is-wide">
+                          <strong>Consulta | Helena Souza</strong>
+                          <span>16:30 - 17:00</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot">
+                        <div class="health-agenda-event is-return is-wide">
+                          <strong>Retorno | Fernanda Reis</strong>
+                          <span>16:10 - 16:40</span>
+                        </div>
+                      </div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+
+                    <div class="health-agenda-row">
+                      <time>17</time>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                      <div class="health-agenda-slot"></div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="modal" id="healthAgendaSettingsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog health-agenda-settings-dialog" role="dialog" aria-modal="true" aria-labelledby="healthAgendaSettingsTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="healthAgendaSettingsTitle">Ajustes da agenda</h3>
+                  <p class="modal-subtitle">Configure os dias, horários de atendimento e planos aceitos pelo médico.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
               </div>
+
+              <form id="healthAgendaSettingsForm">
+                <div class="modal-body health-agenda-settings-body">
+                  <section class="health-agenda-settings-section">
+                    <div class="health-agenda-settings-section-head">
+                      <span class="material-symbols-rounded" aria-hidden="true">event_available</span>
+                      <div>
+                        <h4>Dias de atendimento</h4>
+                        <p>Selecione os dias em que o médico atende.</p>
+                      </div>
+                    </div>
+                    <div class="health-agenda-days-picker" aria-label="Dias de atendimento">
+                      <label><input type="checkbox" name="doctor_weekdays" value="monday" checked /><span>Seg</span></label>
+                      <label><input type="checkbox" name="doctor_weekdays" value="tuesday" checked /><span>Ter</span></label>
+                      <label><input type="checkbox" name="doctor_weekdays" value="wednesday" checked /><span>Qua</span></label>
+                      <label><input type="checkbox" name="doctor_weekdays" value="thursday" checked /><span>Qui</span></label>
+                      <label><input type="checkbox" name="doctor_weekdays" value="friday" checked /><span>Sex</span></label>
+                      <label><input type="checkbox" name="doctor_weekdays" value="saturday" /><span>Sáb</span></label>
+                      <label><input type="checkbox" name="doctor_weekdays" value="sunday" /><span>Dom</span></label>
+                    </div>
+                  </section>
+
+                  <section class="health-agenda-settings-section">
+                    <div class="health-agenda-settings-section-head">
+                      <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
+                      <div>
+                        <h4>Horários de atendimento</h4>
+                        <p>Defina o intervalo padrão exibido para este médico.</p>
+                      </div>
+                    </div>
+                    <div class="modal-row">
+                      <div>
+                        <label class="modal-label" for="healthAgendaStartTime">Início</label>
+                        <input class="modal-input" id="healthAgendaStartTime" name="start_time" type="time" value="08:00" />
+                      </div>
+                      <div>
+                        <label class="modal-label" for="healthAgendaEndTime">Fim</label>
+                        <input class="modal-input" id="healthAgendaEndTime" name="end_time" type="time" value="17:00" />
+                      </div>
+                      <div>
+                        <label class="modal-label" for="healthAgendaSlotDuration">Duração da consulta</label>
+                        <select class="modal-input" id="healthAgendaSlotDuration" name="slot_duration">
+                          <option value="15">15 minutos</option>
+                          <option value="20">20 minutos</option>
+                          <option value="25">25 minutos</option>
+                          <option value="30" selected>30 minutos</option>
+                        </select>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section class="health-agenda-settings-section">
+                    <div class="health-agenda-settings-section-head">
+                      <span class="material-symbols-rounded" aria-hidden="true">health_and_safety</span>
+                      <div>
+                        <h4>Planos aceitos</h4>
+                        <p>Marque os planos que podem entrar na agenda deste médico.</p>
+                      </div>
+                    </div>
+                    <div class="health-agenda-plans-grid" aria-label="Planos aceitos">
+                      <label><input type="checkbox" name="accepted_plans" value="unimed" checked /><span>Unimed</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="hapvida" checked /><span>Hapvida</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="bradesco" checked /><span>Bradesco Saúde</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="sulamerica" checked /><span>SulAmérica</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="amil" /><span>Amil</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="notredame" /><span>NotreDame</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="porto" /><span>Porto Saúde</span></label>
+                      <label><input type="checkbox" name="accepted_plans" value="particular" checked /><span>Particular</span></label>
+                    </div>
+                  </section>
+                </div>
+
+                <div class="modal-footer">
+                  <button class="btn outline" data-modal-close type="button">Cancelar</button>
+                  <button class="btn primary" type="submit">
+                    <span class="material-symbols-rounded" aria-hidden="true">save</span>
+                    Salvar ajustes
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 
@@ -9069,6 +9567,114 @@
 	          </div>
 	        </section>
 
+	        <div class="modal" id="healthServiceCpfModal" aria-hidden="true">
+	          <div class="modal-backdrop" data-health-service-cpf-close></div>
+	          <div class="modal-dialog health-service-cpf-dialog" role="dialog" aria-modal="true" aria-labelledby="healthServiceCpfTitle">
+	            <form id="healthServiceCpfForm">
+	              <div class="modal-header">
+	                <div>
+	                  <h3 id="healthServiceCpfTitle">Iniciar atendimento</h3>
+	                  <p class="modal-subtitle">Informe o CPF do paciente para carregar o histórico médico.</p>
+	                </div>
+	                <button type="button" class="icon-btn" aria-label="Fechar" data-health-service-cpf-close>
+	                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+	                </button>
+	              </div>
+	              <div class="modal-body health-service-cpf-body">
+	                <div class="health-service-cpf-step" data-health-service-cpf-step="input">
+	                  <label class="modal-label modal-label--required" for="healthServiceCpfInput">CPF do paciente</label>
+	                  <div class="health-patient-share-search">
+	                    <span class="material-symbols-rounded" aria-hidden="true">badge</span>
+	                    <input class="modal-input" id="healthServiceCpfInput" inputmode="numeric" autocomplete="off" placeholder="Digite o CPF" required />
+	                  </div>
+	                  <p class="modal-field-hint">Use somente números ou o formato 000.000.000-00.</p>
+	                </div>
+	                <div class="health-service-cpf-loading" data-health-service-cpf-step="loading" hidden aria-live="polite">
+	                  <span class="material-symbols-rounded" aria-hidden="true">progress_activity</span>
+	                  <strong>Buscando no banco...</strong>
+	                  <p>Consultando cadastro, plano de saúde e histórico médico do paciente.</p>
+	                </div>
+	              </div>
+	              <div class="modal-footer health-service-cpf-footer">
+	                <button type="button" class="btn outline" data-health-service-cpf-close>Cancelar</button>
+	                <button type="submit" class="btn primary" id="healthServiceCpfSubmitBtn">
+	                  <span class="material-symbols-rounded" aria-hidden="true">search</span>
+	                  Buscar paciente
+	                </button>
+	              </div>
+	            </form>
+	          </div>
+	        </div>
+
+	        <div class="modal" id="healthServiceExamModal" aria-hidden="true">
+	          <div class="modal-backdrop" data-health-service-exam-close></div>
+	          <div class="modal-dialog health-service-exam-dialog" role="dialog" aria-modal="true" aria-labelledby="healthServiceExamTitle">
+	            <div class="modal-header">
+	              <div>
+	                <span class="health-patient-kicker">Exame</span>
+	                <h3 id="healthServiceExamTitle">Detalhes do exame</h3>
+	              </div>
+	              <button type="button" class="icon-btn" aria-label="Fechar" data-health-service-exam-close>
+	                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+	              </button>
+	            </div>
+	            <div class="modal-body health-service-exam-body">
+	              <div class="health-service-exam-chips" aria-label="Informações do exame">
+	                <span id="healthServiceExamDate">13/07/2026</span>
+	                <span id="healthServiceExamType">Laboratorial</span>
+	                <span id="healthServiceExamRequester">Dra. Camila Rocha</span>
+	              </div>
+	              <p class="health-service-exam-summary" id="healthServiceExamResult">Resultado do exame.</p>
+	              <div class="health-service-exam-results-table" id="healthServiceExamResultsTable" aria-label="Resultados do exame"></div>
+	              <section class="health-service-exam-notes-block" id="healthServiceExamReportSection" hidden>
+	                <h4>Laudo</h4>
+	                <ul id="healthServiceExamReportList"></ul>
+	              </section>
+	              <section class="health-service-exam-file-block" id="healthServiceExamFileBlock" hidden>
+	                <h4>Arquivos do exame</h4>
+	                <div class="health-service-exam-file-actions">
+	                  <a class="btn primary" id="healthServiceExamFullLink" href="#" target="_blank" rel="noopener">
+	                    <span class="material-symbols-rounded" aria-hidden="true">description</span>
+	                    Visualizar exame completo
+	                  </a>
+	                  <a class="btn outline" id="healthServiceExamImageLink" href="#" target="_blank" rel="noopener">
+	                    <span class="material-symbols-rounded" aria-hidden="true">image</span>
+	                    Ver imagem
+	                  </a>
+	                  <a class="btn primary" id="healthServiceExamPdfLink" href="#" target="_blank" rel="noopener">
+	                    <span class="material-symbols-rounded" aria-hidden="true">description</span>
+	                    Ver laudo
+	                  </a>
+	                </div>
+	              </section>
+	            </div>
+	          </div>
+	        </div>
+
+	        <div class="modal" id="healthServiceTimelineModal" aria-hidden="true">
+	          <div class="modal-backdrop" data-health-service-timeline-close></div>
+	          <div class="modal-dialog health-service-timeline-dialog" role="dialog" aria-modal="true" aria-labelledby="healthServiceTimelineTitle">
+	            <div class="modal-header">
+	              <div>
+	                <span class="health-patient-kicker" id="healthServiceTimelineType">Evento</span>
+	                <h3 id="healthServiceTimelineTitle">Detalhes do evento</h3>
+	              </div>
+	              <button type="button" class="icon-btn" aria-label="Fechar" data-health-service-timeline-close>
+	                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+	              </button>
+	            </div>
+	            <div class="modal-body health-service-timeline-modal-body">
+	              <div class="health-service-exam-chips" id="healthServiceTimelineChips" aria-label="Informações do evento"></div>
+	              <p class="health-service-exam-summary" id="healthServiceTimelineSummary">Resumo do evento.</p>
+	              <div class="health-service-timeline-detail-grid" id="healthServiceTimelineDetails"></div>
+	              <section class="health-service-exam-notes-block" id="healthServiceTimelineNotesSection">
+	                <h4>Observações</h4>
+	                <ul id="healthServiceTimelineNotes"></ul>
+	              </section>
+	            </div>
+	          </div>
+	        </div>
+
 	        <div class="modal" id="healthPatientShareModal" aria-hidden="true">
 	          <div class="modal-backdrop" data-health-patient-share-close></div>
 	          <div class="modal-dialog health-patient-share-dialog" role="dialog" aria-modal="true" aria-labelledby="healthPatientShareTitle">
@@ -9239,8 +9845,11 @@
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/all/global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/themes/classic/global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/locales/pt-br/global.js"></script>
     <script src="./assets/chart.umd.min.js"></script>
     <script src="./auth.js?v=20260701-hybrid-flow-voice-page"></script>
-    <script src="./app.js?v=20260717-health-section"></script>
+    <script src="./app.js?v=20260724-health-agenda-consult-blue"></script>
   </body>
 </html>

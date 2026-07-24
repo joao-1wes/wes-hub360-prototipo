@@ -2553,8 +2553,1127 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   text-align: right;
 }
 
+.health-agenda-page {
+  gap: 18px;
+}
+
+.health-agenda-header {
+  align-items: flex-start;
+  margin-bottom: 0;
+}
+
+.health-agenda-header .page-subtitle {
+  max-width: 760px;
+}
+
+.health-agenda-header h2 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-headline-small);
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.health-page-kicker {
+  display: block;
+  color: #1859c9;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.health-agenda-header .page-actions {
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.health-agenda-settings-btn.icon-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #016ff4;
+}
+
+.health-agenda-settings-btn.icon-btn:hover,
+.health-agenda-settings-btn.icon-btn:focus-visible {
+  background: #eef6ff;
+  color: #016ff4;
+}
+
+.health-agenda-header .btn {
+  min-height: 44px;
+  border-radius: 10px;
+  font-weight: 800;
+}
+
+.health-agenda-header .btn.outline {
+  border-color: var(--border);
+  color: #016ff4;
+  background: #ffffff;
+}
+
+.health-agenda-renewal-card {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.health-agenda-renewal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.health-agenda-renewal-kicker {
+  display: block;
+  margin-bottom: 4px;
+  color: #1859c9;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.health-agenda-renewal-head h3 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-large);
+  font-weight: 800;
+  line-height: 28px;
+}
+
+.health-agenda-renewal-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: #e2f0ff;
+  color: #1859c9;
+  font-size: var(--md-label-large);
+  font-weight: 800;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.health-agenda-renewal-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.health-agenda-renewal-item {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.health-agenda-renewal-copy {
+  display: grid;
+  gap: 8px;
+  align-items: start;
+}
+
+.health-agenda-renewal-copy h4 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-medium);
+  font-weight: 800;
+  line-height: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-agenda-renewal-copy p {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-agenda-renewal-slot {
+  overflow: hidden;
+  color: #475569;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-agenda-renewal-empty {
+  display: grid;
+  gap: 4px;
+  padding: 18px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #64748b;
+  text-align: center;
+}
+
+.health-agenda-renewal-empty strong {
+  color: #111827;
+  font-size: var(--md-title-medium);
+  line-height: 24px;
+}
+
+.health-agenda-renewal-empty span {
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-agenda-renewal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.health-agenda-renewal-actions .btn {
+  flex: 1 1 0;
+  gap: 6px;
+  min-height: 38px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.health-agenda-renewal-actions .material-symbols-rounded {
+  font-size: 20px;
+}
+
+.health-agenda-renewal-reject.btn.outline {
+  border-color: #dc5f5f;
+  background: #ffffff;
+  color: #dc5f5f;
+}
+
+.health-agenda-renewal-reject.btn.outline:hover {
+  background: #fdecec;
+  color: #dc5f5f;
+}
+
+.health-agenda-renewal-accept.btn.primary {
+  min-width: 0;
+  background: #1859c9;
+}
+
+.health-agenda-renewal-accept.btn.primary:hover {
+  background: #0f4eb7;
+}
+
+.health-agenda-board {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+.health-agenda-board-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+}
+
+.health-agenda-board-head h3 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-large);
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.health-agenda-board-head p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-agenda-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  max-width: 520px;
+}
+
+.health-agenda-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.health-agenda-legend i {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #016ff4;
+}
+
+.health-agenda-legend .is-return {
+  background: #0f766e;
+}
+
+.health-agenda-calendar {
+  display: none;
+  padding: 16px;
+}
+
+.health-agenda-board.is-fullcalendar-ready .health-agenda-calendar {
+  display: block;
+}
+
+.health-agenda-board.is-fullcalendar-ready > .health-agenda-toolbar,
+.health-agenda-board.is-fullcalendar-ready > .health-agenda-scroll {
+  display: none;
+}
+
+.health-agenda-calendar .fc {
+  --fc-border-color: var(--border);
+  --fc-button-group-border-color: #016ff4;
+  --fc-button-bg-color: #016ff4;
+  --fc-button-border-color: #016ff4;
+  --fc-button-hover-bg-color: #0b5fe3;
+  --fc-button-hover-border-color: #0b5fe3;
+  --fc-button-active-bg-color: #0b5fe3;
+  --fc-button-active-border-color: #0b5fe3;
+  --fc-button-text-color: #ffffff;
+  --fc-event-bg-color: #eef6ff;
+  --fc-event-border-color: #eef6ff;
+  --fc-event-text-color: #111827;
+  --fc-today-bg-color: rgba(1, 111, 244, 0.06);
+  --fc-neutral-bg-color: #f8fafc;
+  --fc-page-bg-color: #ffffff;
+  --fc-small-font-size: var(--md-label-small);
+  --fc-list-event-hover-bg-color: #eef6ff;
+  color: #111827;
+  font-family: inherit;
+  font-size: var(--md-body-medium);
+}
+
+.health-agenda-calendar .fc .fc-toolbar {
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.health-agenda-calendar .fc .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.health-agenda-calendar .fc .fc-toolbar-title {
+  color: #111827;
+  font-size: var(--md-title-medium);
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.health-agenda-calendar .fc .fc-button,
+.health-agenda-calendar .fc .fc-button-primary,
+.health-agenda-calendar .fc.fc-theme-classic .fc-button,
+.health-agenda-calendar .fc.fc-theme-classic .fc-button-primary {
+  min-height: 40px;
+  border: 1px solid #016ff4 !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  background: #016ff4 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  font-family: inherit;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 20px;
+  box-shadow: none !important;
+  text-transform: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.health-agenda-calendar .fc .fc-button:hover,
+.health-agenda-calendar .fc .fc-button:focus,
+.health-agenda-calendar .fc .fc-button-primary:hover,
+.health-agenda-calendar .fc .fc-button-primary:focus {
+  border-color: #0b5fe3 !important;
+  background: #0b5fe3 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.health-agenda-calendar .fc .fc-button-primary:not(:disabled).fc-button-active,
+.health-agenda-calendar .fc .fc-button-primary:not(:disabled):active,
+.health-agenda-calendar .fc .fc-button.fc-button-active {
+  border-color: #0b5fe3 !important;
+  background: #0b5fe3 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.health-agenda-calendar .fc .fc-button .fc-icon,
+.health-agenda-calendar .fc .fc-button-primary .fc-icon {
+  color: currentColor !important;
+}
+
+.health-agenda-calendar .fc .fc-prev-button,
+.health-agenda-calendar .fc .fc-next-button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  padding: 0 !important;
+  font-size: 0 !important;
+}
+
+.health-agenda-calendar .fc .fc-prev-button .fc-icon,
+.health-agenda-calendar .fc .fc-next-button .fc-icon {
+  display: none !important;
+}
+
+.health-agenda-calendar .fc .fc-prev-button::before,
+.health-agenda-calendar .fc .fc-next-button::before {
+  font-family: "Material Symbols Rounded";
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.health-agenda-calendar .fc .fc-prev-button::before {
+  content: "chevron_left";
+}
+
+.health-agenda-calendar .fc .fc-next-button::before {
+  content: "chevron_right";
+}
+
+.health-agenda-calendar .fc .fc-button-group {
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #016ff4;
+  border-radius: 8px;
+  background: #016ff4;
+}
+
+.health-agenda-calendar [role="tablist"] {
+  gap: 10px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.health-agenda-calendar [role="tablist"] button[role="tab"] {
+  min-height: 40px !important;
+  border: 0 !important;
+  border-bottom: 4px solid transparent !important;
+  border-radius: 0 !important;
+  padding: 8px 4px !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: #016ff4 !important;
+  box-shadow: none !important;
+}
+
+.health-agenda-calendar [role="tablist"] button[role="tab"][aria-selected="true"] {
+  border-bottom-color: #016ff4 !important;
+}
+
+.health-agenda-calendar .fc .fc-button-group .fc-button:not(:first-child) {
+  margin-left: 0;
+  border-left-color: rgba(255, 255, 255, 0.34) !important;
+}
+
+.health-agenda-calendar .fc .fc-button-group .fc-button:first-child {
+  border-top-right-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
+}
+
+.health-agenda-calendar .fc .fc-button-group .fc-button:last-child {
+  border-top-left-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
+}
+
+.health-agenda-calendar .fc .fc-button-group .fc-button:not(:first-child):not(:last-child) {
+  border-radius: 0 !important;
+}
+
+.health-agenda-calendar .fc .fc-scrollgrid,
+.health-agenda-calendar .fc .fc-theme-standard td,
+.health-agenda-calendar .fc .fc-theme-standard th,
+.health-agenda-calendar .fc.fc-theme-standard td,
+.health-agenda-calendar .fc.fc-theme-standard th,
+.health-agenda-calendar .fc.fc-theme-classic td,
+.health-agenda-calendar .fc.fc-theme-classic th {
+  border-color: var(--border) !important;
+}
+
+.health-agenda-calendar .fc table,
+.health-agenda-calendar .fc th,
+.health-agenda-calendar .fc td {
+  border-color: var(--border) !important;
+}
+
+.health-agenda-calendar .fc th,
+.health-agenda-calendar .fc td {
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+
+.health-agenda-calendar .fc .fc-scrollgrid {
+  border: 1px solid var(--border) !important;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.health-agenda-calendar .fc .fc-col-header-cell {
+  background: #f9fafb;
+}
+
+.health-agenda-calendar .fc .fc-col-header-cell-cushion,
+.health-agenda-calendar .fc .fc-timegrid-axis-cushion,
+.health-agenda-calendar .fc .fc-timegrid-slot-label-cushion {
+  color: #475569;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.health-agenda-calendar .fc .fc-timegrid-slot {
+  height: 36px;
+}
+
+.health-agenda-calendar .fc .fc-timegrid-slot-minor {
+  border-top: 1px dashed #eef2f7 !important;
+}
+
+.health-agenda-calendar .fc .fc-timegrid-slot,
+.health-agenda-calendar .fc .fc-timegrid-col,
+.health-agenda-calendar .fc .fc-daygrid-day,
+.health-agenda-calendar .fc .fc-list,
+.health-agenda-calendar .fc .fc-list-table td,
+.health-agenda-calendar .fc .fc-list-table th {
+  border-color: var(--border) !important;
+}
+
+.health-agenda-calendar .fc .fc-timegrid-now-indicator-line {
+  border-color: #016ff4;
+}
+
+.health-agenda-calendar .fc .fc-timegrid-now-indicator-arrow {
+  border-color: #016ff4;
+  border-top-color: transparent;
+  border-bottom-color: transparent;
+}
+
+.health-agenda-calendar .fc .fc-event,
+.health-agenda-calendar .fc .fc-timegrid-event,
+.health-agenda-calendar .fc .fc-daygrid-event {
+  overflow: hidden;
+  border: 1px solid var(--event-bg, #eef6ff) !important;
+  border-left: 4px solid var(--event-color, #016ff4) !important;
+  border-radius: 8px !important;
+  background: var(--event-bg, #eef6ff) !important;
+  color: #111827 !important;
+  box-shadow: none !important;
+}
+
+.health-agenda-calendar .fc .fc-event:hover {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.health-agenda-calendar .fc .fc-event-main,
+.health-agenda-calendar .fc .fc-event-main-frame {
+  color: #111827 !important;
+}
+
+.health-agenda-calendar .fc .fc-event-time {
+  color: #111827;
+  font-size: var(--md-label-small);
+  font-weight: 800;
+}
+
+.health-agenda-calendar .fc .fc-event-title,
+.health-agenda-fc-event-title {
+  color: #111827;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  line-height: 15px;
+}
+
+.health-agenda-fc-event {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  padding: 4px 6px;
+}
+
+.health-agenda-fc-event-meta {
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-agenda-calendar .fc .health-fc-event--consult {
+  --event-color: #016ff4;
+  --event-bg: #eef6ff;
+}
+
+.health-agenda-calendar .fc .health-fc-event--return {
+  --event-color: #0f766e;
+  --event-bg: #ecfdf5;
+}
+
+.health-agenda-toolbar {
+  display: grid;
+  grid-template-columns: minmax(190px, 1fr) auto minmax(230px, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  background: #ffffff;
+}
+
+.health-agenda-toolbar h3 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-large);
+  font-weight: 700;
+  line-height: 28px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.health-agenda-nav,
+.health-agenda-view-switch {
+  display: inline-flex;
+  align-items: center;
+}
+
+.health-agenda-nav {
+  justify-self: start;
+  gap: 8px;
+}
+
+.health-agenda-nav .icon-btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #016ff4;
+}
+
+.health-agenda-nav .icon-btn:hover {
+  border-color: #cfe3ff;
+  background: #eef6ff;
+}
+
+.health-agenda-today.btn {
+  min-height: 44px;
+  border-color: var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #016ff4;
+  font-weight: 700;
+}
+
+.health-agenda-view-switch {
+  justify-self: end;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.health-agenda-view-switch button {
+  min-height: 44px;
+  border: 0;
+  padding: 0 14px;
+  background: transparent;
+  color: #475569;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+.health-agenda-view-switch button:hover,
+.health-agenda-view-switch button.active {
+  background: #016ff4;
+  color: #ffffff;
+}
+
+.health-agenda-scroll {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.health-agenda-week {
+  min-width: 1120px;
+  background: #ffffff;
+}
+
+.health-agenda-row {
+  display: grid;
+  grid-template-columns: 48px repeat(7, minmax(132px, 1fr));
+}
+
+.health-agenda-days {
+  min-height: 40px;
+  border-bottom: 1px solid var(--border);
+  background: #f9fafb;
+}
+
+.health-agenda-days > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 8px 8px;
+  border-left: 1px solid var(--border);
+  color: #111827;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+.health-agenda-days .health-agenda-time-spacer {
+  border-left: 0;
+}
+
+.health-agenda-row > time {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-height: 66px;
+  padding-top: 8px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  color: #64748b;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 20px;
+  background: #f9fafb;
+}
+
+.health-agenda-slot {
+  position: relative;
+  min-height: 66px;
+  padding: 4px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  background-image: linear-gradient(to bottom, transparent 51%, rgba(226, 232, 240, 0.86) 51%, rgba(226, 232, 240, 0.86) calc(51% + 1px), transparent calc(51% + 1px));
+}
+
+.health-agenda-row .health-agenda-slot:last-child {
+  border-right: 0;
+}
+
+.health-agenda-event {
+  --event-color: #016ff4;
+  --event-bg: #eef6ff;
+  display: grid;
+  align-content: start;
+  gap: 1px;
+  width: 100%;
+  min-height: 58px;
+  padding: 7px 9px 7px;
+  overflow: hidden;
+  border: 1px solid var(--event-bg);
+  border-left: 4px solid var(--event-color);
+  border-radius: 8px;
+  background: var(--event-bg, #1859c9);
+  color: #111827;
+  box-shadow: none;
+}
+
+.health-agenda-event:hover {
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.health-agenda-event.is-wide {
+  min-height: 58px;
+}
+
+.health-agenda-event strong,
+.health-agenda-event span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-agenda-event strong {
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.health-agenda-event span {
+  color: #111827;
+  font-size: var(--md-label-large);
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.health-agenda-event.is-consult {
+  --event-color: #016ff4;
+  --event-bg: #eef6ff;
+}
+
+.health-agenda-event.is-return {
+  --event-color: #0f766e;
+  --event-bg: #ecfdf5;
+}
+
+.modal-dialog.health-agenda-settings-dialog {
+  width: min(760px, 94vw);
+  max-width: min(760px, 94vw);
+}
+
+.health-agenda-settings-body {
+  gap: 14px;
+}
+
+.health-agenda-settings-section {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.health-agenda-settings-section-head {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.health-agenda-settings-section-head > .material-symbols-rounded {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #eef6ff;
+  color: #016ff4;
+  font-size: 22px;
+}
+
+.health-agenda-settings-section h4 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-medium);
+  font-weight: 800;
+  line-height: 22px;
+}
+
+.health-agenda-settings-section p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-agenda-days-picker,
+.health-agenda-plans-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.health-agenda-days-picker label,
+.health-agenda-plans-grid label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+  cursor: pointer;
+}
+
+.health-agenda-days-picker input,
+.health-agenda-plans-grid input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.health-agenda-days-picker span,
+.health-agenda-plans-grid span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #475569;
+  font-size: var(--md-label-medium);
+  font-weight: 700;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.health-agenda-days-picker span {
+  min-width: 52px;
+  padding: 6px 12px;
+}
+
+.health-agenda-plans-grid span {
+  min-width: 112px;
+  padding: 7px 12px;
+}
+
+.health-agenda-days-picker input:checked + span,
+.health-agenda-plans-grid input:checked + span {
+  border-color: #016ff4;
+  background: #eef6ff;
+  color: #016ff4;
+  box-shadow: 0 0 0 3px rgba(1, 111, 244, 0.08);
+}
+
+.health-agenda-days-picker input:focus-visible + span,
+.health-agenda-plans-grid input:focus-visible + span {
+  outline: 2px solid #016ff4;
+  outline-offset: 2px;
+}
+
+@media (max-width: 980px) {
+  .health-agenda-header {
+    align-items: stretch;
+  }
+
+  .health-agenda-header .page-actions {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .health-agenda-board-head {
+    flex-direction: column;
+  }
+
+  .health-agenda-renewal-head,
+  .health-agenda-renewal-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .health-agenda-renewal-count {
+    justify-self: start;
+  }
+
+  .health-agenda-renewal-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .health-agenda-legend {
+    justify-content: flex-start;
+    max-width: none;
+  }
+
+  .health-agenda-toolbar {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .health-agenda-toolbar h3 {
+    order: -1;
+    text-align: left;
+    white-space: normal;
+  }
+
+  .health-agenda-view-switch,
+  .health-agenda-nav {
+    justify-self: start;
+  }
+
+  .health-agenda-calendar .fc .fc-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .health-agenda-calendar .fc .fc-toolbar-chunk {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .health-agenda-calendar .fc .fc-toolbar-chunk:nth-child(2) {
+    order: -1;
+  }
+}
+
+@media (max-width: 560px) {
+  .health-agenda-page,
+  .health-agenda-header,
+  .health-agenda-header > div,
+  .health-agenda-renewal-card,
+  .health-agenda-renewal-item,
+  .health-agenda-board,
+  .health-agenda-board-head {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .health-agenda-board {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .health-agenda-header h2 {
+    font-size: var(--md-title-large);
+    line-height: 28px;
+  }
+
+  .health-agenda-header .page-subtitle,
+  .health-agenda-board-head p {
+    overflow-wrap: anywhere;
+  }
+
+  .health-agenda-header .page-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .health-agenda-renewal-card {
+    padding: 14px;
+  }
+
+  .health-agenda-renewal-list {
+    grid-template-columns: 1fr;
+  }
+
+  .health-agenda-renewal-head h3 {
+    font-size: var(--md-title-large);
+    line-height: 28px;
+  }
+
+  .health-agenda-renewal-copy h4 {
+    font-size: var(--md-title-medium);
+    line-height: 24px;
+  }
+
+  .health-agenda-renewal-copy p {
+    font-size: var(--md-body-medium);
+    line-height: 20px;
+  }
+
+  .health-agenda-renewal-actions .btn,
+  .health-agenda-renewal-accept.btn.primary {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+  }
+
+  .health-agenda-board-head {
+    padding: 14px;
+  }
+
+  .health-agenda-legend {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+  }
+
+  .health-agenda-legend span {
+    width: 100%;
+    flex: none;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .health-agenda-calendar {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    contain: inline-size;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .health-agenda-calendar > div {
+    min-width: 900px;
+  }
+
+  .health-agenda-toolbar {
+    padding: 12px;
+  }
+
+  .health-agenda-toolbar h3 {
+    font-size: var(--md-title-large);
+    line-height: 28px;
+  }
+
+  .health-agenda-view-switch {
+    width: 100%;
+  }
+
+  .health-agenda-view-switch button {
+    flex: 1 1 0;
+    padding: 0 8px;
+  }
+
+  .health-agenda-nav {
+    width: 100%;
+  }
+
+  .health-agenda-today.btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .health-agenda-plans-grid span {
+    min-width: 100%;
+  }
+}
+
 .health-service-table .data-row {
-  grid-template-columns: 1.2fr 0.8fr 0.8fr 1fr 1fr;
+  grid-template-columns: 1.2fr 1.1fr 0.9fr 0.7fr;
 }
 
 .health-patient-agent-page {
@@ -2962,7 +4081,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   display: grid;
   align-content: start;
   gap: 12px;
-  min-height: 360px;
+  min-height: 380px;
   max-height: min(520px, 58vh);
   overflow-y: auto;
   padding: 24px 38px;
@@ -3265,6 +4384,987 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   min-width: 960px;
 }
 
+.health-service-patient-page {
+  gap: 14px;
+}
+
+.health-service-patient-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, 1.25fr) minmax(320px, 0.9fr);
+  gap: 14px;
+  align-items: stretch;
+}
+
+.health-service-clinical-summary,
+.health-service-consult-panel,
+.health-service-timeline-panel {
+  min-width: 0;
+}
+
+.health-service-patient-profile {
+  display: block;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.health-service-patient-profile h3 {
+  margin: 4px 0 4px;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 30px;
+}
+
+.health-service-patient-profile p,
+.health-service-consult-panel p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 22px;
+}
+
+.health-service-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.health-service-summary-grid > div {
+  display: grid;
+  gap: 4px;
+  min-height: 82px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.health-service-summary-grid span {
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-service-summary-grid strong {
+  color: #111827;
+  font-size: var(--md-title-medium);
+  line-height: 22px;
+}
+
+.health-service-record-section {
+  margin-top: 18px;
+  padding-top: 2px;
+}
+
+.health-service-exam-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.health-service-exam-group {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f8fbff;
+}
+
+.health-service-exam-group-head {
+  display: block;
+}
+
+.health-service-exam-group-head strong {
+  display: block;
+  color: #111827;
+  font-size: var(--md-title-small);
+  line-height: 20px;
+}
+
+.health-service-exam-group-head small {
+  display: block;
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-service-record-list {
+  display: grid;
+  gap: 8px;
+}
+
+.health-service-record-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  text-align: left;
+  cursor: pointer;
+}
+
+.health-service-record-item:hover {
+  border-color: #cfe3ff;
+  background: #f8fbff;
+}
+
+.health-service-record-item strong,
+.health-service-record-item small,
+.health-service-record-item span span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-service-record-item strong {
+  color: #00163d;
+  font-size: var(--md-title-small);
+  line-height: 20px;
+}
+
+.health-service-record-item small {
+  color: #0f54b6;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  line-height: 18px;
+}
+
+.health-service-record-item span span {
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-service-consult-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.health-service-consult-head {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px 16px;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.health-service-consult-body {
+  display: flex;
+  flex-direction: column;
+  min-height: 420px;
+  padding: 0;
+  background: #f8fafc;
+}
+
+.health-service-consult-panel h3 {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-title-large);
+  font-weight: 700;
+  line-height: 26px;
+}
+
+.health-service-consult-panel p {
+  max-width: 520px;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-service-consult-empty-card {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 520px);
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: var(--shadow);
+}
+
+.health-service-consult-empty-card strong {
+  color: #111827;
+  font-size: var(--md-title-medium);
+  font-weight: 700;
+  line-height: 24px;
+}
+
+.health-service-consult-empty-card p {
+  margin: 0;
+  color: #111827;
+  font-size: var(--md-body-large);
+  line-height: 24px;
+}
+
+.health-service-consult-empty-card span {
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-service-helper-chat {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 28px 20px;
+}
+
+.health-service-helper-composer {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 38px;
+  align-items: center;
+  gap: 8px;
+  margin: 0 16px 16px;
+  min-height: 60px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(1, 111, 244, 0.08);
+}
+
+.health-service-helper-composer:focus-within {
+  border-color: #9fbbe7;
+  box-shadow: 0 0 0 4px rgba(1, 111, 244, 0.12);
+}
+
+.health-service-helper-composer input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #334155;
+  font: inherit;
+  font-size: var(--md-body-large);
+  line-height: 24px;
+  outline: none;
+}
+
+.health-service-helper-composer input::placeholder {
+  color: #64748b;
+  opacity: 1;
+}
+
+.health-service-helper-tool,
+.health-service-helper-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #016ff4;
+  cursor: pointer;
+}
+
+.health-service-helper-tool:hover,
+.health-service-helper-send:hover {
+  background: #eef6ff;
+}
+
+.health-service-helper-tool .material-symbols-rounded,
+.health-service-helper-send .material-symbols-rounded {
+  font-size: 24px;
+}
+
+.health-service-timeline-panel {
+  overflow: visible;
+}
+
+.health-service-medical-timeline {
+  display: grid;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.health-service-timeline-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.health-service-timeline-legend {
+  display: flex;
+  flex-wrap: wrap;
+  flex: 1 1 auto;
+  gap: 8px 14px;
+  align-items: center;
+  min-width: 0;
+  padding-top: 6px;
+}
+
+.health-service-timeline-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #475569;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  line-height: 18px;
+  white-space: nowrap;
+}
+
+.health-service-timeline-legend i {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  background: var(--event-color);
+  box-shadow: 0 0 0 4px var(--event-bg), 0 0 0 5px rgba(15, 23, 42, 0.04);
+}
+
+.health-service-timeline-controls {
+  display: inline-flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.health-service-timeline-filter-field {
+  justify-content: center;
+  gap: 0;
+}
+
+.health-service-timeline-filter-field .btn {
+  min-height: 34px;
+  white-space: nowrap;
+}
+
+.health-service-timeline-filter-field .filter-btn {
+  gap: 6px;
+  margin: 0;
+  padding: 6px 10px;
+}
+
+.form-field.health-service-timeline-filter-field > .menu.health-service-timeline-filter-menu {
+  z-index: 20;
+  left: auto;
+  right: 0;
+  transform-origin: top right;
+}
+
+.health-service-timeline-zoom-controls {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  z-index: 5;
+  display: inline-flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid #d8e4f2;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.health-service-timeline-zoom-controls .icon-btn {
+  width: 32px;
+  height: 32px;
+  color: #0f54b6;
+}
+
+.health-service-timeline-empty {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  gap: 4px;
+  width: min(360px, calc(100% - 48px));
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+  color: #64748b;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+}
+
+.health-service-timeline-empty strong {
+  color: #111827;
+  font-size: var(--md-title-small);
+  line-height: 20px;
+}
+
+.health-service-timeline-empty span {
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-service-timeline-map {
+  position: relative;
+  min-height: 380px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background:
+    linear-gradient(180deg, rgba(248, 251, 255, 0.88), rgba(255, 255, 255, 0.94)),
+    repeating-linear-gradient(90deg, rgba(15, 84, 182, 0.08) 0 1px, transparent 1px 11.11%);
+}
+
+.health-service-timeline-axis {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  top: 50%;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #016ff4 45%, #0b2a66 72%, #7c3aed);
+  transform: translateY(-50%);
+}
+
+.health-service-timeline-ruler {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.health-service-timeline-ruler-tick {
+  position: absolute;
+  left: var(--ruler-left);
+  top: 50%;
+  width: 1px;
+  height: 14px;
+  background: rgba(15, 84, 182, 0.24);
+  transform: translate(-50%, 3px);
+}
+
+.health-service-timeline-ruler-tick.is-month {
+  height: 16px;
+  background: rgba(15, 84, 182, 0.3);
+  transform: translate(-50%, 2px);
+}
+
+.health-service-timeline-ruler-tick.is-year {
+  width: 2px;
+  height: 34px;
+  background: rgba(15, 84, 182, 0.58);
+  transform: translate(-50%, -12px);
+}
+
+.health-service-timeline-ruler-month,
+.health-service-timeline-ruler-year {
+  position: absolute;
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  white-space: nowrap;
+  transform: translateX(-50%);
+}
+
+.health-service-timeline-ruler-month {
+  top: 16px;
+  min-width: 24px;
+  color: #64748b;
+  font-size: 9px;
+  line-height: 12px;
+}
+
+.health-service-timeline-ruler-year {
+  top: -26px;
+  min-width: 42px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #e2f0ff;
+  color: #0b2a66;
+  font-size: 11px;
+  line-height: 14px;
+}
+
+.health-service-timeline-ruler-tick.is-year .health-service-timeline-ruler-month {
+  top: 30px;
+  color: #0b2a66;
+  font-size: 10px;
+}
+
+.health-service-timeline-ruler.is-years-only .health-service-timeline-ruler-tick.is-year {
+  height: 42px;
+  transform: translate(-50%, -16px);
+}
+
+.health-service-timeline-nodes {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.health-service-timeline-node {
+  --event-color: #016ff4;
+  --event-bg: #eef6ff;
+  position: absolute;
+  left: var(--timeline-left);
+  top: 50%;
+  display: block;
+  width: min(126px, 15%);
+  min-width: 86px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111827;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  z-index: 1;
+}
+
+.health-service-timeline-node::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 2px;
+  height: var(--timeline-stem, 52px);
+  background: color-mix(in srgb, var(--event-color) 45%, transparent);
+  transform: translateX(-50%);
+  bottom: 30px;
+}
+
+.health-service-timeline-node.is-lower::before {
+  top: 30px;
+  bottom: auto;
+}
+
+.health-service-timeline-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 4px solid #ffffff;
+  border-radius: 999px;
+  background: var(--event-color);
+  color: #ffffff;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+  transform: translate(-50%, -50%);
+}
+
+.health-service-timeline-dot .material-symbols-rounded {
+  font-size: 20px;
+}
+
+.health-service-timeline-node:hover .health-service-timeline-dot,
+.health-service-timeline-node:focus-visible .health-service-timeline-dot {
+  box-shadow: 0 0 0 5px var(--event-bg), 0 14px 28px rgba(15, 23, 42, 0.18);
+}
+
+.health-service-timeline-node:hover,
+.health-service-timeline-node:focus-visible {
+  z-index: 4;
+}
+
+.health-service-timeline-label {
+  position: absolute;
+  left: 50%;
+  bottom: calc(50% + var(--timeline-stem, 52px));
+  z-index: 1;
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-width: 0;
+  padding: 8px 9px;
+  border: 1px solid color-mix(in srgb, var(--event-color) 26%, #d8e4f2);
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  transform: translateX(-50%);
+}
+
+.health-service-timeline-node.is-lower .health-service-timeline-label {
+  top: calc(50% + var(--timeline-stem, 52px));
+  bottom: auto;
+}
+
+.health-service-timeline-label time,
+.health-service-timeline-label strong,
+.health-service-timeline-label span {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.health-service-timeline-label time {
+  color: var(--event-color);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 14px;
+}
+
+.health-service-timeline-label strong {
+  color: #111827;
+  font-size: var(--md-label-medium);
+  font-weight: 900;
+  line-height: 18px;
+}
+
+.health-service-timeline-label span {
+  color: #64748b;
+  font-size: var(--md-body-small);
+  font-weight: 700;
+  line-height: 16px;
+}
+
+.health-service-timeline-modal-body {
+  display: grid;
+  gap: 18px;
+}
+
+.modal-dialog.health-service-timeline-dialog {
+  width: min(760px, 94vw);
+  max-width: min(760px, 94vw);
+}
+
+.health-service-timeline-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.health-service-timeline-detail-grid > div {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #f8fbff;
+}
+
+.health-service-timeline-detail-grid span {
+  color: #64748b;
+  font-size: var(--md-label-small);
+  font-weight: 900;
+  line-height: 14px;
+  text-transform: uppercase;
+}
+
+.health-service-timeline-detail-grid strong {
+  min-width: 0;
+  color: #111827;
+  font-size: var(--md-body-medium);
+  line-height: 21px;
+  overflow-wrap: anywhere;
+}
+
+.health-service-timeline-legend .is-plan,
+.health-service-timeline-node.is-plan {
+  --event-color: #22c55e;
+  --event-bg: #ecfdf5;
+}
+
+.health-service-timeline-legend .is-consult,
+.health-service-timeline-node.is-consult {
+  --event-color: #016ff4;
+  --event-bg: #eef6ff;
+}
+
+.health-service-timeline-legend .is-exam,
+.health-service-timeline-node.is-exam {
+  --event-color: #0b2a66;
+  --event-bg: #e2f0ff;
+}
+
+.health-service-timeline-legend .is-diagnosis,
+.health-service-timeline-node.is-diagnosis {
+  --event-color: #be185d;
+  --event-bg: #fdf2f8;
+}
+
+.health-service-timeline-legend .is-hospital,
+.health-service-timeline-node.is-hospital {
+  --event-color: #f59e0b;
+  --event-bg: #fff7ed;
+}
+
+.health-service-timeline-legend .is-surgery,
+.health-service-timeline-node.is-surgery {
+  --event-color: #dc2626;
+  --event-bg: #fef2f2;
+}
+
+.health-service-timeline-legend .is-medication,
+.health-service-timeline-node.is-medication {
+  --event-color: #7c3aed;
+  --event-bg: #f5f3ff;
+}
+
+.health-service-timeline-legend .is-current,
+.health-service-timeline-node.is-current {
+  --event-color: #0f766e;
+  --event-bg: #ecfdf5;
+}
+
+.modal-dialog.health-service-exam-dialog {
+  width: min(920px, 94vw);
+  max-width: min(920px, 94vw);
+}
+
+.health-service-exam-body {
+  display: grid;
+  gap: 18px;
+}
+
+.health-service-exam-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.health-service-exam-chips span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #e2f0ff;
+  color: #0b2a66;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.health-service-exam-summary {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--md-body-large);
+  line-height: 26px;
+}
+
+.health-service-exam-results-table {
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.health-service-exam-results-row {
+  display: grid;
+  grid-template-columns: 1.25fr 0.85fr 1fr 0.75fr;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 12px 16px;
+  border-top: 1px solid var(--border);
+}
+
+.health-service-exam-results-row:first-child {
+  border-top: 0;
+}
+
+.health-service-exam-results-row.is-header {
+  min-height: 44px;
+  background: #f8fbff;
+}
+
+.health-service-exam-results-row.is-header span {
+  color: #0b2a66;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  line-height: 16px;
+  text-transform: uppercase;
+}
+
+.health-service-exam-results-row > span,
+.health-service-exam-results-row > strong {
+  min-width: 0;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 21px;
+}
+
+.health-service-exam-results-row > strong {
+  color: #00163d;
+  font-weight: 800;
+}
+
+.health-service-exam-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 26px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: var(--md-label-medium);
+  font-weight: 800;
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.health-service-exam-status.is-success {
+  background: #eaf7f0;
+  color: #166534;
+}
+
+.health-service-exam-status.is-warning {
+  background: #fff1e8;
+  color: #8b3f0a;
+}
+
+.health-service-exam-status.is-danger {
+  background: #f8e8ea;
+  color: #9f3434;
+}
+
+.health-service-exam-notes-block,
+.health-service-exam-file-block {
+  display: grid;
+  gap: 10px;
+}
+
+.health-service-exam-notes-block[hidden],
+.health-service-exam-file-block[hidden] {
+  display: none;
+}
+
+.health-service-exam-notes-block h4,
+.health-service-exam-file-block h4 {
+  margin: 0;
+  color: #00163d;
+  font-size: var(--md-title-medium);
+  font-weight: 800;
+  line-height: 22px;
+}
+
+.health-service-exam-notes-block ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: #111827;
+  font-size: var(--md-body-medium);
+  line-height: 22px;
+}
+
+.health-service-exam-file-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.health-service-exam-file-actions .btn {
+  gap: 8px;
+}
+
+.health-service-exam-file-actions .btn[hidden] {
+  display: none;
+}
+
+.modal-dialog.health-service-cpf-dialog {
+  width: min(560px, 92vw);
+  max-width: min(560px, 92vw);
+}
+
+.health-service-cpf-body {
+  display: grid;
+  gap: 14px;
+}
+
+.health-service-cpf-step {
+  display: grid;
+  gap: 8px;
+}
+
+.health-service-cpf-step .health-patient-share-search {
+  grid-template-columns: 48px minmax(0, 1fr);
+  min-height: 56px;
+  border-radius: 12px;
+}
+
+.health-service-cpf-step .health-patient-share-search .modal-input {
+  min-height: 54px;
+  border: 0;
+  border-left: 1px solid #d8e4f2;
+  border-radius: 0;
+  padding: 0 16px;
+  box-shadow: none;
+  font-size: var(--md-body-large);
+  line-height: 24px;
+  outline: none;
+}
+
+.health-service-cpf-step .health-patient-share-search .modal-input:focus {
+  border-color: #d8e4f2;
+  box-shadow: none;
+  outline: none;
+}
+
+.health-service-cpf-step .modal-field-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-service-cpf-loading {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+.health-service-cpf-loading[hidden] {
+  display: none;
+}
+
+.health-service-cpf-loading .material-symbols-rounded {
+  width: 48px;
+  height: 48px;
+  color: #016ff4;
+  font-size: 42px;
+  animation: health-service-spin 1s linear infinite;
+}
+
+.health-service-cpf-loading strong {
+  color: #111827;
+  font-size: var(--md-title-medium);
+  line-height: 22px;
+}
+
+.health-service-cpf-loading p {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-service-cpf-footer .btn.primary {
+  gap: 8px;
+}
+
+@keyframes health-service-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .health-patient-event-item {
   display: grid;
   grid-template-columns: 50px minmax(0, 1fr);
@@ -3399,6 +5499,10 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 @media (max-width: 1180px) {
+  .health-service-patient-layout {
+    grid-template-columns: 1fr;
+  }
+
   .health-patient-metrics-grid {
     grid-template-columns: repeat(3, minmax(180px, 1fr));
   }
@@ -3417,6 +5521,83 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 @media (max-width: 720px) {
+  .health-service-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .health-service-exam-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .health-service-exam-results-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    align-items: start;
+  }
+
+  .health-service-exam-results-row.is-header {
+    display: none;
+  }
+
+  .health-service-consult-body {
+    min-height: 360px;
+  }
+
+  .health-service-helper-composer {
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+  }
+
+  .health-service-timeline-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .health-service-timeline-controls {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .health-service-timeline-filter-field {
+    flex: 1 1 150px;
+  }
+
+  .health-service-timeline-filter-field .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .form-field.health-service-timeline-filter-field > .menu.health-service-timeline-filter-menu {
+    left: auto;
+    right: 0;
+    width: min(360px, calc(100vw - 48px));
+  }
+
+  .health-service-timeline-zoom-controls {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .health-service-timeline-map {
+    min-height: 420px;
+  }
+
+  .health-service-timeline-node {
+    width: min(120px, 28%);
+    min-width: 76px;
+  }
+
+  .health-service-timeline-label {
+    padding: 7px 8px;
+  }
+
+  .health-service-timeline-label span {
+    display: none;
+  }
+
+  .health-service-timeline-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
   .health-patient-agent-header {
     align-items: stretch;
   }

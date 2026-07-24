@@ -15470,6 +15470,313 @@ const healthPatientSharePatients = [
   { id: 'luciana-martins', name: 'Luciana Martins', phone: '' },
   { id: 'raquel-sampaio', name: 'Raquel Sampaio', phone: '+55 85 98210-4500' },
 ];
+const healthServicePatientRecords = [
+  {
+    cpf: '12345678900',
+    name: 'Ana Beatriz Lima',
+    initials: 'AB',
+    age: '42 anos',
+    plan: 'Unimed Premium',
+  },
+  {
+    cpf: '45678912300',
+    name: 'Marina Costa',
+    initials: 'MC',
+    age: '38 anos',
+    plan: 'Unimed Fortaleza',
+  },
+  {
+    cpf: '98765432100',
+    name: 'Roberto Lima',
+    initials: 'RL',
+    age: '56 anos',
+    plan: 'Bradesco Saúde',
+  },
+];
+const healthServiceExamRecords = {
+  'metabolic-panel': {
+    title: 'Painel metabólico',
+    category: 'lab',
+    type: 'Exame laboratorial',
+    date: '13/07/2026',
+    requester: 'Dra. Camila Rocha',
+    result: 'HbA1c 6,1%, LDL 142 mg/dL, triglicerídeos 178 mg/dL e creatinina preservada.',
+    report: 'Controle glicêmico limítrofe e dislipidemia leve. Função renal preservada. Recomenda-se correlacionar com sintomas atuais, hábitos alimentares e medicações em uso.',
+    rows: [
+      { marker: 'Hemoglobina glicada', result: '6,1%', reference: 'Meta usual: < 5,7%', status: 'Atenção', tone: 'warning' },
+      { marker: 'Glicemia de jejum', result: '112 mg/dL', reference: '70 a 99 mg/dL', status: 'Atenção', tone: 'warning' },
+      { marker: 'Colesterol total', result: '224 mg/dL', reference: '< 190 mg/dL', status: 'Elevado', tone: 'danger' },
+      { marker: 'LDL', result: '142 mg/dL', reference: 'Meta depende do risco', status: 'Elevado', tone: 'danger' },
+      { marker: 'HDL', result: '48 mg/dL', reference: '> 40 mg/dL', status: 'Adequado', tone: 'success' },
+      { marker: 'Triglicerídeos', result: '178 mg/dL', reference: '< 150 mg/dL', status: 'Atenção', tone: 'warning' },
+      { marker: 'Creatinina', result: '0,9 mg/dL', reference: '0,6 a 1,2 mg/dL', status: 'Adequado', tone: 'success' },
+      { marker: 'TFG estimada', result: '92 mL/min/1,73m²', reference: '> 60 mL/min/1,73m²', status: 'Adequado', tone: 'success' },
+    ],
+    reportItems: [
+      'Hemoglobina glicada: 6,1%.',
+      'Glicemia de jejum: 112 mg/dL.',
+      'Colesterol total: 224 mg/dL.',
+      'LDL: 142 mg/dL, acima da meta sugerida para risco moderado.',
+      'HDL: 48 mg/dL.',
+      'Triglicerídeos: 178 mg/dL.',
+      'Creatinina: 0,9 mg/dL, sem alteração relevante.',
+      'TFG estimada: 92 mL/min/1,73m².',
+      'Sugestão: correlacionar com adesão medicamentosa e sintomas de fadiga.',
+    ],
+  },
+  'blood-count': {
+    title: 'Hemograma completo',
+    category: 'lab',
+    type: 'Exame laboratorial',
+    date: '22/05/2026',
+    requester: 'Dr. Renato Alves',
+    result: 'Hemoglobina, leucócitos e plaquetas dentro dos intervalos de referência.',
+    report: 'Sem sinais laboratoriais relevantes no hemograma. Não há evidência de anemia, leucocitose ou plaquetopenia no registro analisado.',
+    rows: [
+      { marker: 'Hemoglobina', result: '13,4 g/dL', reference: '12,0 a 16,0 g/dL', status: 'Adequado', tone: 'success' },
+      { marker: 'Leucócitos', result: '6.800/mm³', reference: '4.000 a 10.000/mm³', status: 'Adequado', tone: 'success' },
+      { marker: 'Plaquetas', result: '248.000/mm³', reference: '150.000 a 450.000/mm³', status: 'Adequado', tone: 'success' },
+      { marker: 'Hematócrito', result: '40%', reference: '36 a 46%', status: 'Adequado', tone: 'success' },
+    ],
+    reportItems: [
+      'Hemoglobina dentro da faixa de referência.',
+      'Leucócitos sem alteração sugestiva de processo infeccioso no registro.',
+      'Plaquetas preservadas.',
+      'Sem sinais laboratoriais relevantes no hemograma.',
+    ],
+  },
+  'abdominal-ultrasound': {
+    title: 'Ultrassom abdominal',
+    category: 'image',
+    type: 'Imagem',
+    date: '02/06/2026',
+    requester: 'Dra. Camila Rocha',
+    result: 'Sem alterações agudas. Fígado, vias biliares, rins e baço sem achados obstrutivos relevantes.',
+    report: 'Exame de imagem sem achados agudos. Manter acompanhamento clínico conforme rotina e revisar se houver dor persistente, febre ou alteração laboratorial associada.',
+    rows: [
+      { marker: 'Fígado', result: 'Contornos preservados', reference: 'Sem lesão focal descrita', status: 'Adequado', tone: 'success' },
+      { marker: 'Vias biliares', result: 'Sem dilatação', reference: 'Calibre habitual', status: 'Adequado', tone: 'success' },
+      { marker: 'Rins', result: 'Sem hidronefrose', reference: 'Sem obstrução aparente', status: 'Adequado', tone: 'success' },
+      { marker: 'Achados agudos', result: 'Ausentes', reference: 'Sem sinais de urgência', status: 'Adequado', tone: 'success' },
+    ],
+    reportItems: [
+      'Exame de imagem sem achados agudos.',
+      'Sem dilatação de vias biliares.',
+      'Rins sem sinais de hidronefrose.',
+      'Manter acompanhamento clínico conforme rotina.',
+    ],
+  },
+};
+const healthServiceTimelineEvents = [
+  {
+    id: 'plan-entry',
+    kind: 'plan',
+    label: 'Entrada no plano',
+    title: 'Entrada no plano',
+    date: '15/01/2024',
+    isoDate: '2024-01-15',
+    icon: 'verified',
+    summary: 'Paciente vinculada ao plano Unimed Premium, com cobertura ambulatorial, hospitalar e cirúrgica ativa.',
+    details: [
+      { label: 'Plano', value: 'Unimed Premium' },
+      { label: 'Status', value: 'Ativo' },
+      { label: 'Cobertura', value: 'Ambulatorial, hospitalar e cirúrgica' },
+      { label: 'Carência', value: 'Cumprida para eventos eletivos' },
+    ],
+    notes: ['Registro base usado para ordenar o histórico clínico carregado pelo CPF.'],
+  },
+  {
+    id: 'consult-cardio-2024',
+    kind: 'consult',
+    label: 'Consulta',
+    title: 'Consulta cardiológica',
+    date: '18/04/2024',
+    isoDate: '2024-04-18',
+    icon: 'event_available',
+    summary: 'Avaliação inicial de hipertensão e risco cardiovascular, com orientação de acompanhamento periódico.',
+    details: [
+      { label: 'Médico', value: 'Dr. Henrique Paiva' },
+      { label: 'Especialidade', value: 'Cardiologia' },
+      { label: 'Exames pedidos', value: 'Eletrocardiograma, lipidograma e função renal' },
+      { label: 'Medicações passadas', value: 'Losartana 50 mg, 1 comprimido pela manhã' },
+      { label: 'Sintomas antigos', value: 'Não há campo estruturado para sintomas. Para tirar dúvidas, pergunte ao paciente durante o atendimento.' },
+    ],
+    notes: ['Pressão arterial monitorada em acompanhamento ambulatorial.'],
+  },
+	  {
+	    id: 'med-losartan-2024',
+	    kind: 'medication',
+    label: 'Medicamento',
+    title: 'Prescrição de Losartana',
+    date: '18/04/2024',
+    isoDate: '2024-04-18',
+    icon: 'medication',
+    summary: 'Prescrição iniciada para controle pressórico, vinculada à consulta cardiológica.',
+    details: [
+      { label: 'Medicamento', value: 'Losartana 50 mg' },
+      { label: 'Posologia', value: '1 comprimido pela manhã' },
+      { label: 'Prescritor', value: 'Dr. Henrique Paiva' },
+      { label: 'Status', value: 'Em uso contínuo' },
+	    ],
+	    notes: ['Revisar adesão, pressão domiciliar e efeitos adversos na próxima consulta.'],
+	  },
+	  {
+	    id: 'diagnosis-hypertension-2024',
+	    kind: 'diagnosis',
+	    label: 'Diagnóstico',
+	    title: 'Hipertensão arterial',
+	    date: '18/04/2024',
+	    isoDate: '2024-04-18',
+	    icon: 'diagnosis',
+	    summary: 'Diagnóstico de hipertensão arterial registrado após avaliação cardiológica e início de tratamento contínuo.',
+	    details: [
+	      { label: 'Condição', value: 'Hipertensão arterial sistêmica' },
+	      { label: 'Médico responsável', value: 'Dr. Henrique Paiva' },
+	      { label: 'Especialidade', value: 'Cardiologia' },
+	      { label: 'Conduta inicial', value: 'Losartana 50 mg pela manhã e monitoramento de pressão arterial' },
+	      { label: 'Acompanhamento', value: 'Reavaliar pressão domiciliar, adesão e risco cardiovascular nas próximas consultas' },
+	    ],
+	    notes: ['Registro de condição crônica importante para triagem, prescrição e análise de exames futuros.'],
+	  },
+	  {
+	    id: 'hospital-2025',
+	    kind: 'hospital',
+    label: 'Internação',
+    title: 'Internação curta',
+    date: '20/11/2025',
+    isoDate: '2025-11-20',
+    icon: 'local_hospital',
+    summary: 'Internação de curta permanência para investigação de dor abdominal persistente.',
+    details: [
+      { label: 'Hospital', value: 'Hospital São Lucas' },
+      { label: 'Duração', value: '20/11/2025 a 22/11/2025' },
+      { label: 'Motivo', value: 'Dor abdominal persistente e avaliação cirúrgica' },
+      { label: 'Alta', value: 'Estável, com retorno ambulatorial programado' },
+    ],
+    notes: ['Sem registro de intercorrência grave no resumo de alta.'],
+  },
+  {
+    id: 'surgery-2025',
+    kind: 'surgery',
+    label: 'Cirurgia',
+    title: 'Colecistectomia videolaparoscópica',
+    date: '21/11/2025',
+    isoDate: '2025-11-21',
+    icon: 'medical_services',
+    summary: 'Procedimento cirúrgico realizado durante a internação, com boa evolução pós-operatória.',
+    details: [
+      { label: 'Cirurgião', value: 'Dra. Livia Martins' },
+      { label: 'Procedimento', value: 'Colecistectomia videolaparoscópica' },
+      { label: 'Anestesia', value: 'Geral' },
+      { label: 'Evolução', value: 'Alta em 24 horas, sem complicações registradas' },
+    ],
+    notes: ['Registro cirúrgico disponível para conferência em prontuário hospitalar.'],
+  },
+  {
+    id: 'med-metformin-2026',
+    kind: 'medication',
+    label: 'Medicamento',
+    title: 'Prescrição de Metformina',
+    date: '15/01/2026',
+    isoDate: '2026-01-15',
+    icon: 'medication',
+    summary: 'Medicação prescrita para controle metabólico após exames limítrofes em acompanhamento.',
+    details: [
+      { label: 'Medicamento', value: 'Metformina XR 500 mg' },
+      { label: 'Posologia', value: '1 comprimido após o jantar' },
+      { label: 'Prescritor', value: 'Dra. Camila Rocha' },
+      { label: 'Status', value: 'Em uso, revisar tolerância gastrointestinal' },
+    ],
+    notes: ['Correlacionar uso com HbA1c e glicemia de jejum nos exames recentes.'],
+  },
+  {
+    id: 'blood-count-event',
+    kind: 'exam',
+    label: 'Exame',
+    title: 'Hemograma completo',
+    date: '22/05/2026',
+    isoDate: '2026-05-22',
+    icon: 'lab_profile',
+    examId: 'blood-count',
+  },
+  {
+    id: 'abdominal-ultrasound-event',
+    kind: 'exam',
+    label: 'Exame',
+    title: 'Ultrassom abdominal',
+    date: '02/06/2026',
+    isoDate: '2026-06-02',
+    icon: 'image',
+    examId: 'abdominal-ultrasound',
+  },
+  {
+    id: 'consult-clinic-2026',
+    kind: 'consult',
+    label: 'Consulta',
+    title: 'Consulta clínica',
+    date: '08/07/2026',
+    isoDate: '2026-07-08',
+    icon: 'stethoscope',
+    summary: 'Revisão clínica de hipertensão, fadiga e controle metabólico, com solicitação de exames laboratoriais.',
+    details: [
+      { label: 'Médico', value: 'Dra. Camila Rocha' },
+      { label: 'Especialidade', value: 'Clínica médica' },
+      { label: 'Exames pedidos', value: 'Painel metabólico, HbA1c, perfil lipídico, creatinina e TFG estimada' },
+      { label: 'Medicações passadas', value: 'Losartana mantida; Metformina XR 500 mg mantida até reavaliação' },
+      { label: 'Sintomas antigos', value: 'Não há campo estruturado para sintomas. Para tirar dúvida de sintomas antigos, pergunte ao paciente.' },
+    ],
+    notes: ['Paciente orientada a retornar com exames e monitoramento de pressão domiciliar.'],
+  },
+	  {
+	    id: 'metabolic-panel-event',
+	    kind: 'exam',
+    label: 'Exame',
+    title: 'Painel metabólico',
+    date: '13/07/2026',
+    isoDate: '2026-07-13',
+	    icon: 'lab_profile',
+	    examId: 'metabolic-panel',
+	  },
+	  {
+	    id: 'diagnosis-diabetes-2026',
+	    kind: 'diagnosis',
+	    label: 'Diagnóstico',
+	    title: 'Diabetes tipo 2',
+	    date: '15/07/2026',
+	    isoDate: '2026-07-15',
+	    icon: 'diagnosis',
+	    summary: 'Registro de diabetes tipo 2 em acompanhamento, associado a HbA1c limítrofe e uso de Metformina.',
+	    details: [
+	      { label: 'Condição', value: 'Diabetes mellitus tipo 2' },
+	      { label: 'Base do registro', value: 'Painel metabólico, histórico medicamentoso e revisão clínica' },
+	      { label: 'Exames relacionados', value: 'HbA1c 6,1%, glicemia de jejum 112 mg/dL e perfil lipídico alterado' },
+	      { label: 'Medicação vinculada', value: 'Metformina XR 500 mg após o jantar' },
+	      { label: 'Acompanhamento', value: 'Monitorar HbA1c, glicemia, função renal, hábitos alimentares e tolerância gastrointestinal' },
+	    ],
+	    notes: ['Condição crônica deve aparecer como alerta de contexto em consultas, exames e prescrições futuras.'],
+	  },
+	  {
+	    id: 'current-care',
+    kind: 'current',
+    label: 'Atual',
+    title: 'Atendimento atual',
+    date: '24/07/2026',
+    isoDate: '2026-07-24',
+    icon: 'support_agent',
+    summary: 'Contexto do histórico disponível para iniciar a consulta com apoio do agente.',
+    details: [
+      { label: 'Contexto carregado', value: 'Cadastro, plano de saúde, exames recentes, consultas, medicações e eventos hospitalares' },
+      { label: 'Uso sugerido', value: 'Perguntar ao agente sobre o histórico antes ou durante o atendimento' },
+    ],
+    notes: ['Não substitui a avaliação clínica. Use o histórico para orientar perguntas e conferir registros.'],
+  },
+];
+let healthServiceTimelineZoomIndex = 1;
+let healthServiceTimelineYearFilter = '';
+let healthServiceTimelineKindFilter = '';
+let healthServiceCpfLookupTimer = null;
+let healthServiceExamPdfUrl = '';
+let healthServiceExamImageUrl = '';
 
 function normalizeHealthPatientSearch(value) {
   return String(value || '')
@@ -15654,6 +15961,673 @@ function closeHealthPatientPreviewModal() {
   modal.setAttribute('aria-hidden', 'true');
 }
 
+function getHealthServicePatientByCpf(cpf) {
+  const digits = String(cpf || '').replace(/\D/g, '').slice(0, 11);
+  return healthServicePatientRecords.find((patient) => patient.cpf === digits) || {
+    cpf: digits,
+    name: 'Ana Beatriz Lima',
+    initials: 'AB',
+    age: '42 anos',
+    plan: 'Unimed Premium',
+  };
+}
+
+function renderHealthServicePatientRecord(patient = {}) {
+  const cpf = String(patient.cpf || '12345678900').replace(/\D/g, '').slice(0, 11);
+  const fields = {
+    '[data-health-service-patient-name]': patient.name || 'Ana Beatriz Lima',
+    '[data-health-service-patient-age]': patient.age || '42 anos',
+    '[data-health-service-patient-cpf]': formatHealthPatientPreviewCpf(cpf || '12345678900'),
+    '[data-health-service-patient-plan]': patient.plan || 'Unimed Premium',
+  };
+  Object.entries(fields).forEach(([selector, value]) => {
+    const element = document.querySelector(selector);
+    if (element) element.textContent = value;
+  });
+}
+
+function setHealthServiceCpfStep(step) {
+  const modal = document.getElementById('healthServiceCpfModal');
+  const inputStep = modal?.querySelector('[data-health-service-cpf-step="input"]');
+  const loadingStep = modal?.querySelector('[data-health-service-cpf-step="loading"]');
+  const submitBtn = document.getElementById('healthServiceCpfSubmitBtn');
+  const isLoading = step === 'loading';
+  if (inputStep) inputStep.hidden = isLoading;
+  if (loadingStep) loadingStep.hidden = !isLoading;
+  if (submitBtn) {
+    submitBtn.disabled = isLoading;
+    submitBtn.classList.toggle('is-loading', isLoading);
+    submitBtn.innerHTML = isLoading
+      ? '<span class="material-symbols-rounded" aria-hidden="true">progress_activity</span>Buscando...'
+      : '<span class="material-symbols-rounded" aria-hidden="true">search</span>Buscar paciente';
+  }
+}
+
+function openHealthServiceCpfModal() {
+  const modal = document.getElementById('healthServiceCpfModal');
+  const input = document.getElementById('healthServiceCpfInput');
+  if (!modal || !input) return;
+  window.clearTimeout(healthServiceCpfLookupTimer);
+  input.value = '';
+  setHealthServiceCpfStep('input');
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  window.setTimeout(() => input.focus(), 0);
+}
+
+function closeHealthServiceCpfModal() {
+  const modal = document.getElementById('healthServiceCpfModal');
+  if (!modal) return;
+  window.clearTimeout(healthServiceCpfLookupTimer);
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  setHealthServiceCpfStep('input');
+}
+
+function openHealthServicePatientPage(patient) {
+  renderHealthServicePatientRecord(patient);
+  const targetHash = '#/dashboard/health/service/patient';
+  if (window.location.hash === targetHash) {
+    updateActivePage();
+    forceRouteScrollTop('dashboard/health/service/patient');
+  } else {
+    window.location.hash = targetHash;
+  }
+}
+
+function sanitizeHealthServicePdfText(value) {
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7E]/g, ' ')
+    .replace(/[()\\]/g, '\\$&');
+}
+
+function createHealthServiceExamPdfUrl(exam) {
+  if (healthServiceExamPdfUrl) URL.revokeObjectURL(healthServiceExamPdfUrl);
+  const lines = [
+    `Exame: ${exam.title}`,
+    `Tipo: ${exam.type}`,
+    `Data: ${exam.date}`,
+    `Solicitante: ${exam.requester}`,
+    '',
+    'Resultado',
+    exam.result,
+    '',
+    'Marcadores',
+    ...(exam.rows || []).map((row) => `${row.marker}: ${row.result} (${row.status})`),
+  ];
+  if (exam.category === 'image') {
+    lines.push('', 'Laudo', ...(exam.reportItems || [exam.report]));
+  }
+  const content = lines.map((line, index) => {
+    const fontSize = index === 0 ? 16 : 11;
+    const y = 760 - (index * 28);
+    return `BT /F1 ${fontSize} Tf 72 ${y} Td (${sanitizeHealthServicePdfText(line)}) Tj ET`;
+  }).join('\n');
+  let pdf = '%PDF-1.4\n';
+  const offsets = [0];
+  const addObject = (number, body) => {
+    offsets[number] = pdf.length;
+    pdf += `${number} 0 obj\n${body}\nendobj\n`;
+  };
+  addObject(1, '<< /Type /Catalog /Pages 2 0 R >>');
+  addObject(2, '<< /Type /Pages /Kids [3 0 R] /Count 1 >>');
+  addObject(3, '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>');
+  addObject(4, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>');
+  addObject(5, `<< /Length ${content.length} >>\nstream\n${content}\nendstream`);
+  const xrefOffset = pdf.length;
+  pdf += `xref\n0 6\n0000000000 65535 f \n${offsets.slice(1).map((offset) => `${String(offset).padStart(10, '0')} 00000 n `).join('\n')}\n`;
+  pdf += `trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
+  healthServiceExamPdfUrl = URL.createObjectURL(new Blob([pdf], { type: 'application/pdf' }));
+  return healthServiceExamPdfUrl;
+}
+
+function createHealthServiceExamImageUrl(exam) {
+  if (healthServiceExamImageUrl) URL.revokeObjectURL(healthServiceExamImageUrl);
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720">
+      <rect width="960" height="720" fill="#07111f"/>
+      <rect x="46" y="42" width="868" height="636" rx="18" fill="#0f172a" stroke="#d8e4f2" stroke-width="2"/>
+      <text x="76" y="92" fill="#e5eefc" font-family="Arial, sans-serif" font-size="26" font-weight="700">${sanitizeHealthServicePdfText(exam.title)}</text>
+      <text x="76" y="126" fill="#94a3b8" font-family="Arial, sans-serif" font-size="18">${sanitizeHealthServicePdfText(exam.date)} - ${sanitizeHealthServicePdfText(exam.requester)}</text>
+      <path d="M170 620 Q480 130 790 620 Z" fill="#111827" stroke="#d8e4f2" stroke-width="2"/>
+      <path d="M245 585 Q480 225 715 585 Z" fill="#1f2937" opacity="0.92"/>
+      <path d="M305 560 Q480 305 655 560 Z" fill="#334155" opacity="0.86"/>
+      <path d="M355 535 Q480 370 605 535 Z" fill="#475569" opacity="0.78"/>
+      <path d="M410 500 Q480 430 550 500" fill="none" stroke="#cbd5e1" stroke-width="10" opacity="0.88"/>
+      <circle cx="512" cy="452" r="20" fill="#e5eefc" opacity="0.8"/>
+      <circle cx="438" cy="476" r="14" fill="#cbd5e1" opacity="0.72"/>
+      <g stroke="#64748b" stroke-width="2" opacity="0.42">
+        <path d="M180 620 L480 130 L780 620"/>
+        <path d="M230 620 L480 130 L730 620"/>
+        <path d="M280 620 L480 130 L680 620"/>
+        <path d="M330 620 L480 130 L630 620"/>
+      </g>
+      <text x="76" y="650" fill="#e5eefc" font-family="Arial, sans-serif" font-size="18">${sanitizeHealthServicePdfText(exam.result)}</text>
+    </svg>
+  `;
+  healthServiceExamImageUrl = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
+  return healthServiceExamImageUrl;
+}
+
+function setHealthServiceExamText(id, value) {
+  const element = document.getElementById(id);
+  if (element) element.textContent = value;
+}
+
+function renderHealthServiceExamRows(exam) {
+  const table = document.getElementById('healthServiceExamResultsTable');
+  if (!table) return;
+  const rows = Array.isArray(exam.rows) ? exam.rows : [];
+  if (!rows.length) {
+    table.innerHTML = '';
+    table.hidden = true;
+    return;
+  }
+  table.hidden = false;
+  table.innerHTML = `
+    <div class="health-service-exam-results-row is-header">
+      <span>Marcador</span>
+      <span>Resultado</span>
+      <span>Referência</span>
+      <span>Status</span>
+    </div>
+    ${rows.map((row) => `
+      <div class="health-service-exam-results-row">
+        <span>${escapeHtmlWes(row.marker)}</span>
+        <strong>${escapeHtmlWes(row.result)}</strong>
+        <span>${escapeHtmlWes(row.reference)}</span>
+        <span><span class="health-service-exam-status is-${escapeHtmlWes(row.tone)}">${escapeHtmlWes(row.status)}</span></span>
+      </div>
+    `).join('')}
+  `;
+}
+
+function renderHealthServiceExamReport(exam) {
+  const section = document.getElementById('healthServiceExamReportSection');
+  const list = document.getElementById('healthServiceExamReportList');
+  if (!list) return;
+  const items = Array.isArray(exam.reportItems) && exam.reportItems.length ? exam.reportItems : [exam.report];
+  list.innerHTML = items.map((item) => `<li>${escapeHtmlWes(item)}</li>`).join('');
+  if (section) section.hidden = true;
+}
+
+function openHealthServiceExamModal(examId) {
+  const exam = healthServiceExamRecords[examId];
+  const modal = document.getElementById('healthServiceExamModal');
+  const fileBlock = document.getElementById('healthServiceExamFileBlock');
+  const fullLink = document.getElementById('healthServiceExamFullLink');
+  const imageLink = document.getElementById('healthServiceExamImageLink');
+  const pdfLink = document.getElementById('healthServiceExamPdfLink');
+  if (!exam || !modal) return;
+  const isImageExam = exam.category === 'image';
+  const imageUrl = isImageExam ? createHealthServiceExamImageUrl(exam) : '';
+  const pdfUrl = createHealthServiceExamPdfUrl(exam);
+  setHealthServiceExamText('healthServiceExamTitle', exam.title);
+  setHealthServiceExamText('healthServiceExamType', exam.type);
+  setHealthServiceExamText('healthServiceExamDate', exam.date);
+  setHealthServiceExamText('healthServiceExamRequester', `Solicitante: ${exam.requester}`);
+  setHealthServiceExamText('healthServiceExamResult', exam.result);
+  renderHealthServiceExamRows(exam);
+  renderHealthServiceExamReport(exam);
+  if (fileBlock) fileBlock.hidden = false;
+  if (fullLink) {
+    fullLink.hidden = isImageExam;
+    fullLink.href = pdfUrl;
+    fullLink.setAttribute('aria-label', `Visualizar exame completo de ${exam.title}`);
+  }
+  if (imageLink) {
+    imageLink.hidden = !isImageExam;
+    imageLink.href = imageUrl || '#';
+    imageLink.setAttribute('aria-label', `Ver imagem do exame ${exam.title}`);
+  }
+  if (pdfLink) {
+    pdfLink.hidden = !isImageExam;
+    pdfLink.href = pdfUrl;
+    pdfLink.setAttribute('aria-label', `Ver laudo do exame ${exam.title}`);
+  }
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeHealthServiceExamModal() {
+  const modal = document.getElementById('healthServiceExamModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+  if (healthServiceExamPdfUrl) {
+    URL.revokeObjectURL(healthServiceExamPdfUrl);
+    healthServiceExamPdfUrl = '';
+  }
+  if (healthServiceExamImageUrl) {
+    URL.revokeObjectURL(healthServiceExamImageUrl);
+    healthServiceExamImageUrl = '';
+  }
+}
+
+function getHealthServiceTimelineEvent(eventId) {
+  return healthServiceTimelineEvents.find((event) => event.id === eventId) || null;
+}
+
+function getHealthServiceTimelineKindLabel(kind) {
+  const labels = {
+    plan: 'Entrada no plano',
+	    consult: 'Consultas',
+	    exam: 'Exames',
+	    diagnosis: 'Diagnósticos',
+	    hospital: 'Internações',
+    surgery: 'Cirurgias',
+    medication: 'Medicamentos',
+    current: 'Atual',
+  };
+  return labels[kind] || 'Eventos';
+}
+
+function getHealthServiceTimelineYearOptions() {
+  const eventYears = healthServiceTimelineEvents
+    .map((event) => Number(String(event.isoDate || '').slice(0, 4)))
+    .filter(Boolean);
+  const startYear = eventYears.length ? Math.min(...eventYears) : new Date().getFullYear();
+  const currentYear = Math.max(new Date().getFullYear(), eventYears.length ? Math.max(...eventYears) : startYear);
+  const years = [];
+  for (let year = startYear; year <= currentYear; year += 1) years.push(String(year));
+  return years;
+}
+
+function renderHealthServiceTimelineYearOptions() {
+  const group = document.querySelector('[data-health-service-timeline-year-options]');
+  if (!group) return;
+  group.innerHTML = `
+    <span>Ano</span>
+    <button class="filter-option active" type="button" data-health-service-timeline-year="" data-value="">Todos os anos</button>
+    ${getHealthServiceTimelineYearOptions().map((year) => `
+      <button class="filter-option" type="button" data-health-service-timeline-year="${escapeHtmlWes(year)}" data-value="${escapeHtmlWes(year)}">${escapeHtmlWes(year)}</button>
+    `).join('')}
+  `;
+}
+
+function getHealthServiceTimelineDateTime(isoDate) {
+  return new Date(`${isoDate}T12:00:00`).getTime();
+}
+
+function isHealthServiceTimelineEventInYear(event) {
+  return !healthServiceTimelineYearFilter || String(event.isoDate || '').startsWith(`${healthServiceTimelineYearFilter}-`);
+}
+
+function getFilteredHealthServiceTimelineEvents() {
+  return [...healthServiceTimelineEvents]
+    .sort((a, b) => a.isoDate.localeCompare(b.isoDate))
+    .filter(isHealthServiceTimelineEventInYear)
+    .filter((event) => !healthServiceTimelineKindFilter || event.kind === healthServiceTimelineKindFilter)
+}
+
+function updateHealthServiceTimelineFilterLabels(filteredCount, totalCount) {
+  const filterLabel = document.querySelector('[data-health-service-timeline-filter-label]');
+  const count = document.querySelector('[data-health-service-timeline-count]');
+  if (filterLabel) {
+    const yearLabel = healthServiceTimelineYearFilter || '';
+    const kindLabel = healthServiceTimelineKindFilter ? getHealthServiceTimelineKindLabel(healthServiceTimelineKindFilter) : '';
+    filterLabel.textContent = [yearLabel, kindLabel].filter(Boolean).join(' · ') || 'Filtros';
+  }
+  if (count) count.textContent = filteredCount === totalCount ? `${totalCount} eventos` : `${filteredCount} de ${totalCount} eventos`;
+}
+
+function getHealthServiceTimelinePositions(events, zoomFactor) {
+  const times = events.map((item) => new Date(`${item.isoDate}T12:00:00`).getTime());
+  const minTime = Math.min(...times);
+  const maxTime = Math.max(...times);
+  const uniformGap = events.length > 1 ? 90 / (events.length - 1) : 0;
+  const timeWeight = zoomFactor < 1 ? 0.14 : zoomFactor > 1.2 ? 0.34 : 0.24;
+  const minGap = Math.min(7.2, uniformGap * 0.82);
+  const positions = events.map((event, index) => {
+    const currentTime = new Date(`${event.isoDate}T12:00:00`).getTime();
+    const rawPercent = maxTime === minTime ? 50 : 7 + (((currentTime - minTime) / (maxTime - minTime)) * 86);
+    const sameDateBefore = events.slice(0, index).filter((item) => item.isoDate === event.isoDate).length;
+    const desiredPercent = 50 + ((rawPercent - 50) * zoomFactor) + (sameDateBefore * 2.4);
+    const uniformPercent = 5 + (index * uniformGap);
+    return uniformPercent + ((desiredPercent - uniformPercent) * timeWeight);
+  });
+  for (let index = 1; index < positions.length; index += 1) {
+    positions[index] = Math.max(positions[index], positions[index - 1] + minGap);
+  }
+  const overflow = positions[positions.length - 1] - 95;
+  if (overflow > 0) {
+    for (let index = 0; index < positions.length; index += 1) positions[index] -= overflow;
+  }
+  for (let index = positions.length - 2; index >= 0; index -= 1) {
+    positions[index] = Math.min(positions[index], positions[index + 1] - minGap);
+  }
+  const underflow = 5 - positions[0];
+  if (underflow > 0) {
+    for (let index = 0; index < positions.length; index += 1) positions[index] += underflow;
+  }
+  const hasSpacingIssue = positions.some((position, index) =>
+    position < 5 || position > 95 || (index > 0 && position - positions[index - 1] < minGap - 0.01)
+  );
+  if (hasSpacingIssue) {
+    return events.map((_, index) => 5 + (index * uniformGap));
+  }
+  return positions.map((position) => Math.max(5, Math.min(95, position)));
+}
+
+function getHealthServiceTimelineMonthLabel(isoDate) {
+  const [, month] = String(isoDate || '').split('-');
+  const labels = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return labels[Math.max(0, Math.min(11, Number(month) - 1))] || '';
+}
+
+function getHealthServiceTimelineMonthStart(isoDate) {
+  const [year, month] = String(isoDate || '').split('-').map(Number);
+  if (!year || !month) return null;
+  return new Date(year, month - 1, 1, 12, 0, 0, 0);
+}
+
+function getHealthServiceTimelineMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-01`;
+}
+
+function getHealthServiceTimelineRulerBounds(events) {
+  const fallbackEvents = [...healthServiceTimelineEvents].sort((a, b) => a.isoDate.localeCompare(b.isoDate));
+  const sourceEvents = events.length ? events : fallbackEvents;
+  let startDate = sourceEvents[0]?.isoDate ? new Date(`${sourceEvents[0].isoDate}T12:00:00`) : null;
+  let endDate = sourceEvents[sourceEvents.length - 1]?.isoDate ? new Date(`${sourceEvents[sourceEvents.length - 1].isoDate}T12:00:00`) : null;
+  if (healthServiceTimelineYearFilter) {
+    const year = Number(healthServiceTimelineYearFilter);
+    startDate = new Date(year, 0, 1, 12, 0, 0, 0);
+    endDate = new Date(year, 11, 31, 12, 0, 0, 0);
+  }
+  if (!startDate || !endDate) return null;
+  if (startDate > endDate) [startDate, endDate] = [endDate, startDate];
+  return { startDate, endDate };
+}
+
+function getHealthServiceTimelineRulerMonths(bounds) {
+  if (!bounds) return [];
+  const months = [];
+  const endMonth = new Date(bounds.endDate.getFullYear(), bounds.endDate.getMonth(), 1, 12, 0, 0, 0);
+  const cursor = new Date(bounds.startDate.getFullYear(), bounds.startDate.getMonth(), 1, 12, 0, 0, 0);
+  while (cursor <= endMonth) {
+    months.push(getHealthServiceTimelineMonthKey(cursor));
+    cursor.setMonth(cursor.getMonth() + 1);
+  }
+  return months;
+}
+
+function getHealthServiceTimelineRulerLeft(isoDate, bounds) {
+  if (!bounds) return 50;
+  const startTime = bounds.startDate.getTime();
+  const endTime = bounds.endDate.getTime();
+  const currentTime = getHealthServiceTimelineDateTime(isoDate);
+  if (startTime === endTime) return 50;
+  return Math.max(5, Math.min(95, 5 + (((currentTime - startTime) / (endTime - startTime)) * 90)));
+}
+
+function renderHealthServiceTimelineRuler(events) {
+  const ruler = document.querySelector('[data-health-service-timeline-ruler]');
+  if (!ruler) return;
+  const bounds = getHealthServiceTimelineRulerBounds(events);
+  if (!bounds) {
+    ruler.innerHTML = '';
+    return;
+  }
+  const months = getHealthServiceTimelineRulerMonths(bounds);
+  const showMonths = healthServiceTimelineZoomIndex >= 1;
+  const monthTicks = showMonths ? months.map((isoDate, index) => {
+    const [year, month] = isoDate.split('-');
+    const left = getHealthServiceTimelineRulerLeft(isoDate, bounds);
+    const isYear = month === '01' || index === 0;
+    const monthLabel = getHealthServiceTimelineMonthLabel(isoDate);
+    return `
+      <span class="health-service-timeline-ruler-tick is-month${isYear ? ' is-year' : ''}" style="--ruler-left: ${left.toFixed(2)}%;">
+        ${isYear ? `<span class="health-service-timeline-ruler-year">${escapeHtmlWes(year)}</span>` : ''}
+        <span class="health-service-timeline-ruler-month">${escapeHtmlWes(monthLabel)}</span>
+      </span>
+    `;
+  }).join('') : months
+    .filter((isoDate, index) => isoDate.slice(5, 7) === '01' || index === 0)
+    .map((isoDate) => `
+      <span class="health-service-timeline-ruler-tick is-year" style="--ruler-left: ${getHealthServiceTimelineRulerLeft(isoDate, bounds).toFixed(2)}%;">
+        <span class="health-service-timeline-ruler-year">${escapeHtmlWes(isoDate.slice(0, 4))}</span>
+      </span>
+	    `).join('');
+  ruler.classList.toggle('is-years-only', !showMonths);
+  ruler.innerHTML = monthTicks;
+}
+
+function renderHealthServiceTimeline() {
+  const nodes = document.querySelector('[data-health-service-timeline-nodes]');
+  if (!nodes) return;
+  const totalEvents = healthServiceTimelineEvents.length;
+  const events = getFilteredHealthServiceTimelineEvents();
+  const zoomFactors = [0.76, 1, 1.24, 1.48];
+  const zoomFactor = zoomFactors[healthServiceTimelineZoomIndex] || 1;
+  const upperLanes = [20, 27, 14];
+  const lowerLanes = [80, 72, 88];
+  updateHealthServiceTimelineFilterLabels(events.length, totalEvents);
+  if (!events.length) {
+    renderHealthServiceTimelineRuler([]);
+    nodes.innerHTML = `
+      <div class="health-service-timeline-empty">
+        <strong>Nenhum evento encontrado</strong>
+        <span>Ajuste o período ou visualize todos os eventos.</span>
+      </div>
+    `;
+    return;
+  }
+  const positions = getHealthServiceTimelinePositions(events, zoomFactor);
+  renderHealthServiceTimelineRuler(events);
+  nodes.innerHTML = events.map((event, index) => {
+    const isLower = index % 2 === 1;
+    const lanes = isLower ? lowerLanes : upperLanes;
+    const top = lanes[Math.floor(index / 2) % lanes.length];
+    const left = positions[index] || 50;
+    const stem = Math.max(34, Math.abs(50 - top) * 3);
+    return `
+      <button
+        class="health-service-timeline-node is-${escapeHtmlWes(event.kind)}${isLower ? ' is-lower' : ''}"
+        type="button"
+        data-health-service-timeline-event-id="${escapeHtmlWes(event.id)}"
+        style="--timeline-left: ${left.toFixed(2)}%; --timeline-label-top: ${top}%; --timeline-stem: ${stem.toFixed(0)}px;"
+        aria-label="Ver detalhes de ${escapeHtmlWes(event.title)} em ${escapeHtmlWes(event.date)}"
+      >
+        <span class="health-service-timeline-dot">
+          <span class="material-symbols-rounded" aria-hidden="true">${escapeHtmlWes(event.icon)}</span>
+        </span>
+        <span class="health-service-timeline-label">
+          <time>${escapeHtmlWes(event.date)}</time>
+          <strong>${escapeHtmlWes(event.title)}</strong>
+          <span>${escapeHtmlWes(event.label)}</span>
+        </span>
+      </button>
+    `;
+  }).join('');
+}
+
+function openHealthServiceTimelineModal(eventId) {
+  const event = getHealthServiceTimelineEvent(eventId);
+  const modal = document.getElementById('healthServiceTimelineModal');
+  const chips = document.getElementById('healthServiceTimelineChips');
+  const details = document.getElementById('healthServiceTimelineDetails');
+  const notes = document.getElementById('healthServiceTimelineNotes');
+  const notesSection = document.getElementById('healthServiceTimelineNotesSection');
+  if (!event || !modal) return;
+  setHealthServiceExamText('healthServiceTimelineType', event.label);
+  setHealthServiceExamText('healthServiceTimelineTitle', event.title);
+  setHealthServiceExamText('healthServiceTimelineSummary', event.summary || 'Evento registrado no histórico médico.');
+  if (chips) {
+    chips.innerHTML = `
+      <span>${escapeHtmlWes(event.date)}</span>
+      <span>${escapeHtmlWes(event.label)}</span>
+      <span>Histórico médico</span>
+    `;
+  }
+  if (details) {
+    details.innerHTML = (event.details || []).map((detail) => `
+      <div>
+        <span>${escapeHtmlWes(detail.label)}</span>
+        <strong>${escapeHtmlWes(detail.value)}</strong>
+      </div>
+    `).join('');
+    details.hidden = !(event.details || []).length;
+  }
+  if (notes) {
+    const items = Array.isArray(event.notes) && event.notes.length ? event.notes : [];
+    notes.innerHTML = items.map((item) => `<li>${escapeHtmlWes(item)}</li>`).join('');
+    if (notesSection) notesSection.hidden = !items.length;
+  }
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+}
+
+function closeHealthServiceTimelineModal() {
+  const modal = document.getElementById('healthServiceTimelineModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function setHealthServiceTimelineZoom(action) {
+  if (action === 'fit') {
+    healthServiceTimelineZoomIndex = 1;
+  } else if (action === 'in') {
+    healthServiceTimelineZoomIndex = Math.min(3, healthServiceTimelineZoomIndex + 1);
+  } else if (action === 'out') {
+    healthServiceTimelineZoomIndex = Math.max(0, healthServiceTimelineZoomIndex - 1);
+  }
+  renderHealthServiceTimeline();
+}
+
+function syncHealthServiceTimelineFilterOptions() {
+  document.querySelectorAll('[data-health-service-timeline-year]').forEach((button) => {
+    button.classList.toggle('active', String(button.dataset.healthServiceTimelineYear || '') === healthServiceTimelineYearFilter);
+  });
+  document.querySelectorAll('[data-health-service-timeline-kind]').forEach((button) => {
+    button.classList.toggle('active', String(button.dataset.healthServiceTimelineKind || '') === healthServiceTimelineKindFilter);
+  });
+}
+
+function closeHealthServiceTimelineFilterMenus() {
+  document.querySelector('[data-health-service-timeline-filter-menu]')?.classList.remove('open');
+}
+
+function initHealthServiceControls() {
+  const modal = document.getElementById('healthServiceCpfModal');
+  const examModal = document.getElementById('healthServiceExamModal');
+  const timelineModal = document.getElementById('healthServiceTimelineModal');
+  const timelineGraph = document.querySelector('[data-health-service-timeline-graph]');
+  const timelineFilterBtn = document.querySelector('[data-health-service-timeline-filter-btn]');
+  const timelineFilterMenu = document.querySelector('[data-health-service-timeline-filter-menu]');
+  const timelineFilterClear = document.querySelector('[data-health-service-timeline-filter-clear]');
+  const form = document.getElementById('healthServiceCpfForm');
+  const input = document.getElementById('healthServiceCpfInput');
+  renderHealthServiceTimelineYearOptions();
+  syncFilterMenuLayout(timelineFilterMenu);
+  syncHealthServiceTimelineFilterOptions();
+  renderHealthServiceTimeline();
+  document.querySelector('[data-health-service-start]')?.addEventListener('click', openHealthServiceCpfModal);
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const digits = String(input?.value || '').replace(/\D/g, '').slice(0, 11);
+    if (digits.length !== 11) {
+      showAppToast('Informe um CPF válido');
+      input?.focus();
+      return;
+    }
+    const patient = getHealthServicePatientByCpf(digits);
+    setHealthServiceCpfStep('loading');
+    healthServiceCpfLookupTimer = window.setTimeout(() => {
+      closeHealthServiceCpfModal();
+      openHealthServicePatientPage(patient);
+      showAppToast('Histórico médico carregado');
+    }, 1100);
+  });
+  modal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-service-cpf-close]')) closeHealthServiceCpfModal();
+  });
+  examModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-service-exam-close]')) closeHealthServiceExamModal();
+  });
+  timelineModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-service-timeline-close]')) closeHealthServiceTimelineModal();
+  });
+  timelineFilterBtn?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    timelineFilterMenu?.classList.toggle('open');
+  });
+  timelineFilterMenu?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const yearOption = event.target.closest('[data-health-service-timeline-year]');
+    if (yearOption) {
+      healthServiceTimelineYearFilter = String(yearOption.dataset.healthServiceTimelineYear || '');
+      syncHealthServiceTimelineFilterOptions();
+      renderHealthServiceTimeline();
+      return;
+    }
+    const option = event.target.closest('[data-health-service-timeline-kind]');
+    if (!option) return;
+    healthServiceTimelineKindFilter = String(option.dataset.healthServiceTimelineKind || '');
+    syncHealthServiceTimelineFilterOptions();
+    timelineFilterMenu.classList.remove('open');
+    renderHealthServiceTimeline();
+  });
+  timelineFilterClear?.addEventListener('click', () => {
+    healthServiceTimelineYearFilter = '';
+    healthServiceTimelineKindFilter = '';
+    syncHealthServiceTimelineFilterOptions();
+    timelineFilterMenu?.classList.remove('open');
+    renderHealthServiceTimeline();
+  });
+  document.addEventListener('click', closeHealthServiceTimelineFilterMenus);
+  timelineGraph?.addEventListener('click', (event) => {
+    const zoomButton = event.target.closest('[data-health-service-timeline-zoom]');
+    if (zoomButton) {
+      setHealthServiceTimelineZoom(zoomButton.dataset.healthServiceTimelineZoom);
+      return;
+    }
+    const node = event.target.closest('[data-health-service-timeline-event-id]');
+    if (!node) return;
+    const timelineEvent = getHealthServiceTimelineEvent(node.dataset.healthServiceTimelineEventId);
+    if (timelineEvent?.examId) {
+      openHealthServiceExamModal(timelineEvent.examId);
+      return;
+    }
+    openHealthServiceTimelineModal(node.dataset.healthServiceTimelineEventId);
+  });
+  document.querySelectorAll('[data-health-service-exam-id]').forEach((button) => {
+    button.addEventListener('click', () => openHealthServiceExamModal(button.dataset.healthServiceExamId));
+  });
+  document.querySelectorAll('[data-health-service-open-patient-history]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const row = button.closest('.data-row');
+      const cells = row ? Array.from(row.children) : [];
+      const name = cells[0]?.textContent?.trim() || 'Ana Beatriz Lima';
+      const plan = cells[1]?.textContent?.trim() || 'Unimed Premium';
+      const initials = name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0])
+        .join('')
+        .toUpperCase() || 'AB';
+      openHealthServicePatientPage({ cpf: '12345678900', name, initials, age: '42 anos', plan });
+    });
+  });
+  document.querySelectorAll('[data-health-service-open-chat-history]').forEach((button) => {
+    button.addEventListener('click', () => {
+      window.location.hash = '#/dashboard/health/whatsapp/history';
+    });
+  });
+  document.querySelector('[data-health-service-consult-chat]')?.addEventListener('click', () => {
+    showAppToast('Consulta iniciada no chat com o histórico do paciente');
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal?.classList.contains('open')) closeHealthServiceCpfModal();
+    if (event.key === 'Escape' && examModal?.classList.contains('open')) closeHealthServiceExamModal();
+    if (event.key === 'Escape' && timelineModal?.classList.contains('open')) closeHealthServiceTimelineModal();
+  });
+}
+
 function initHealthPatientShareControls() {
   const modal = document.getElementById('healthPatientShareModal');
   const previewModal = document.getElementById('healthPatientPreviewModal');
@@ -15711,6 +16685,7 @@ function initHealthPatientShareControls() {
 }
 
 initHealthPatientShareControls();
+initHealthServiceControls();
 
 function getAgentSharePermission(agent = {}) {
   return String(agent.share_permission || agent.public_permission || 'viewer').trim() || 'viewer';
@@ -17326,6 +18301,7 @@ const routeMap = {
   'dashboard/health/whatsapp/insights': 'page-health-whatsapp-insights',
   'dashboard/health/whatsapp/history': 'page-health-whatsapp-history',
   'dashboard/health/service': 'page-health-service',
+  'dashboard/health/service/patient': 'page-health-service-patient',
   'dashboard/health/agenda': 'page-health-agenda',
   'dashboard/health/integrations': 'page-health-integrations',
   'dashboard/vm-monitoring': 'page-vm-monitoring',
@@ -17653,6 +18629,8 @@ const updateActivePage = () => {
       ? 'dashboard/channels'
     : pageRouteKey.startsWith('dashboard/health/whatsapp/')
       ? 'dashboard/health/whatsapp'
+    : pageRouteKey.startsWith('dashboard/health/service/')
+      ? 'dashboard/health/service'
       : pageRouteKey;
 
   if (hubScopeBar) {
@@ -18002,3 +18980,499 @@ document.addEventListener('click', (event) => {
     environmentsTable.appendChild(row);
     return row;
   };
+
+(() => {
+  const openButton = document.getElementById('openHealthAgendaSettings');
+  const modal = document.getElementById('healthAgendaSettingsModal');
+  const form = document.getElementById('healthAgendaSettingsForm');
+  const calendarEl = document.getElementById('healthAgendaCalendar');
+  const calendarBoard = calendarEl?.closest('.health-agenda-board');
+  const renewalListEl = document.querySelector('[data-health-agenda-renewal-list]');
+  const renewalCountEl = document.querySelector('.health-agenda-renewal-count');
+  let healthAgendaCalendar = null;
+  if (!openButton || !modal || !form) return;
+
+  const escapeAgendaText = (value) => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  const healthAgendaEvents = [
+    {
+      title: 'Consulta | João Pereira',
+      start: '2026-07-14T08:30:00',
+      end: '2026-07-14T09:00:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Confirmada | Avaliação inicial' },
+    },
+    {
+      title: 'Consulta | Rafael Duarte',
+      start: '2026-07-15T08:00:00',
+      end: '2026-07-15T08:30:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Confirmada | Primeira avaliação' },
+    },
+    {
+      title: 'Retorno | Luciana Martins',
+      start: '2026-07-16T08:20:00',
+      end: '2026-07-16T08:50:00',
+      classNames: ['health-fc-event--return'],
+      extendedProps: { meta: 'Revisão | Pressão arterial' },
+    },
+    {
+      title: 'Consulta | Marcos Vinícius',
+      start: '2026-07-17T08:40:00',
+      end: '2026-07-17T09:10:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Confirmada | Dor lombar recorrente' },
+    },
+    {
+      title: 'Retorno | Paulo Reis',
+      start: '2026-07-14T10:10:00',
+      end: '2026-07-14T10:40:00',
+      classNames: ['health-fc-event--return'],
+      extendedProps: { meta: 'Revisão | Exames' },
+    },
+    {
+      title: 'Consulta | Pedro Henrique',
+      start: '2026-07-16T10:30:00',
+      end: '2026-07-16T11:00:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Confirmada | Sintomas respiratórios' },
+    },
+    {
+      title: 'Consulta | Beatriz Alves',
+      start: '2026-07-15T13:30:00',
+      end: '2026-07-15T14:00:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Online | Acompanhamento' },
+    },
+    {
+      title: 'Consulta | Marina Costa',
+      start: '2026-07-14T14:30:00',
+      end: '2026-07-14T15:00:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Confirmada | Atendimento clínico' },
+    },
+    {
+      title: 'Consulta | Helena Souza',
+      start: '2026-07-16T16:30:00',
+      end: '2026-07-16T17:00:00',
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Online | Pós-exame' },
+    },
+    {
+      title: 'Retorno | Fernanda Reis',
+      start: '2026-07-17T16:10:00',
+      end: '2026-07-17T16:40:00',
+      classNames: ['health-fc-event--return'],
+      extendedProps: { meta: 'Revisão | Exames laboratoriais' },
+    },
+  ];
+
+  const healthAgendaEventPalette = {
+    'health-fc-event--consult': { color: '#016ff4', bg: '#eef6ff' },
+    'health-fc-event--return': { color: '#0f766e', bg: '#ecfdf5' },
+  };
+
+  const healthAgendaRenewalQueue = [
+    {
+      id: 'ana-beatriz-lima',
+      patient: 'Ana Beatriz Lima',
+      start: '2026-07-17T11:20:00',
+      end: '2026-07-17T11:50:00',
+    },
+    {
+      id: 'carlos-eduardo-nunes',
+      patient: 'Carlos Eduardo Nunes',
+      start: '2026-07-16T15:20:00',
+      end: '2026-07-16T15:50:00',
+    },
+    {
+      id: 'marina-costa-rocha',
+      patient: 'Marina Costa Rocha',
+      start: '2026-07-15T16:10:00',
+      end: '2026-07-15T16:40:00',
+    },
+    {
+      id: 'paulo-henrique-alves',
+      patient: 'Paulo Henrique Alves',
+      start: '2026-07-18T09:00:00',
+      end: '2026-07-18T09:30:00',
+    },
+    {
+      id: 'luciana-martins',
+      patient: 'Luciana Martins',
+      start: '2026-07-18T10:00:00',
+      end: '2026-07-18T10:30:00',
+    },
+  ];
+
+  const getAgendaWeekdays = () => {
+    const dayMap = {
+      sunday: 0,
+      monday: 1,
+      tuesday: 2,
+      wednesday: 3,
+      thursday: 4,
+      friday: 5,
+      saturday: 6,
+    };
+    return Array.from(form.querySelectorAll('input[name="doctor_weekdays"]:checked'))
+      .map((input) => dayMap[input.value])
+      .filter((day) => Number.isInteger(day));
+  };
+
+  const formatAgendaSlotDuration = (minutes) => {
+    const safeMinutes = Number.isFinite(minutes) && minutes > 0 ? minutes : 30;
+    const hours = Math.floor(safeMinutes / 60);
+    const remainingMinutes = safeMinutes % 60;
+    return `${String(hours).padStart(2, '0')}:${String(remainingMinutes).padStart(2, '0')}:00`;
+  };
+
+  const clampAgendaAppointmentMinutes = (minutes) => {
+    if (!Number.isFinite(minutes)) return 30;
+    return Math.min(30, Math.max(15, minutes));
+  };
+
+  const addAgendaMinutesToIso = (isoDate, minutes) => {
+    const date = new Date(isoDate);
+    if (Number.isNaN(date.getTime())) return isoDate;
+    date.setMinutes(date.getMinutes() + minutes);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const mins = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${mins}:${seconds}`;
+  };
+
+  const formatHealthAgendaRenewalSlot = (isoDate) => {
+    const date = new Date(isoDate);
+    if (Number.isNaN(date.getTime())) return 'Horário a confirmar';
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${day}/${month}/${year} às ${hours}:${minutes}`;
+  };
+
+  const getAgendaSettings = () => {
+    const startTime = form.querySelector('#healthAgendaStartTime')?.value || '08:00';
+    const endTime = form.querySelector('#healthAgendaEndTime')?.value || '17:00';
+    const duration = form.querySelector('#healthAgendaSlotDuration')?.value || '30';
+    const durationNumber = clampAgendaAppointmentMinutes(Number.parseInt(duration, 10));
+    const formattedDuration = formatAgendaSlotDuration(durationNumber);
+    return {
+      daysOfWeek: getAgendaWeekdays(),
+      startTime,
+      endTime,
+      durationMinutes: durationNumber,
+      appointmentDuration: formattedDuration,
+      slotDuration: formattedDuration,
+    };
+  };
+
+  const applyAgendaSettingsToCalendar = () => {
+    if (!healthAgendaCalendar) return;
+    const settings = getAgendaSettings();
+    healthAgendaCalendar.setOption('slotMinTime', `${settings.startTime}:00`);
+    healthAgendaCalendar.setOption('slotMaxTime', `${settings.endTime}:00`);
+    healthAgendaCalendar.setOption('slotDuration', settings.slotDuration);
+    healthAgendaCalendar.setOption('snapDuration', settings.appointmentDuration);
+    healthAgendaCalendar.setOption('businessHours', {
+      daysOfWeek: settings.daysOfWeek,
+      startTime: settings.startTime,
+      endTime: settings.endTime,
+    });
+  };
+
+  const renderHealthAgendaRenewalQueue = () => {
+    if (!renewalListEl) return;
+    const visibleItems = healthAgendaRenewalQueue.slice(0, 3);
+    if (renewalCountEl) {
+      const count = healthAgendaRenewalQueue.length;
+      renewalCountEl.textContent = count === 1 ? '1 na fila' : `${count} na fila`;
+    }
+    if (!visibleItems.length) {
+      renewalListEl.innerHTML = `
+        <div class="health-agenda-renewal-empty">
+          <strong>Nenhum encaixe pendente</strong>
+          <span>Novas solicitações aparecerão aqui por ordem de chegada.</span>
+        </div>
+      `;
+      return;
+    }
+    renewalListEl.innerHTML = visibleItems.map((item) => `
+      <article class="health-agenda-renewal-item" data-renewal-id="${escapeAgendaText(item.id)}">
+        <div class="health-agenda-renewal-copy">
+          <h4>${escapeAgendaText(item.patient)}</h4>
+          <p class="health-agenda-renewal-slot">Solicitado para ${escapeAgendaText(formatHealthAgendaRenewalSlot(item.start))}</p>
+        </div>
+        <div class="health-agenda-renewal-actions">
+          <button class="btn outline health-agenda-renewal-reject" type="button" data-renewal-action="reject" data-renewal-id="${escapeAgendaText(item.id)}">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            Recusar
+          </button>
+          <button class="btn primary health-agenda-renewal-accept" type="button" data-renewal-action="accept" data-renewal-id="${escapeAgendaText(item.id)}">
+            <span class="material-symbols-rounded" aria-hidden="true">event_upcoming</span>
+            Aceitar
+          </button>
+        </div>
+      </article>
+    `).join('');
+  };
+
+  const removeHealthAgendaRenewalItem = (renewalId) => {
+    const index = healthAgendaRenewalQueue.findIndex((item) => item.id === renewalId);
+    if (index === -1) return null;
+    const [item] = healthAgendaRenewalQueue.splice(index, 1);
+    renderHealthAgendaRenewalQueue();
+    return item;
+  };
+
+  const acceptHealthAgendaRenewalItem = (renewalId) => {
+    const item = removeHealthAgendaRenewalItem(renewalId);
+    if (!item) return;
+    ensureHealthAgendaCalendar();
+    const settings = getAgendaSettings();
+    healthAgendaCalendar?.addEvent({
+      id: `renewal-${item.id}`,
+      title: `Encaixe | ${item.patient}`,
+      start: item.start,
+      end: addAgendaMinutesToIso(item.start, settings.durationMinutes),
+      classNames: ['health-fc-event--consult'],
+      extendedProps: { meta: 'Aceito | Encaixe' },
+    });
+    window.setTimeout(() => {
+      applyAgendaToolbarPalette();
+      healthAgendaCalendar?.updateSize();
+    }, 0);
+    if (typeof showAppToast === 'function') {
+      showAppToast('Encaixe adicionado à agenda');
+    }
+  };
+
+  const renderAgendaEventContent = (arg) => {
+    const title = escapeAgendaText(arg.event.title);
+    const time = escapeAgendaText(arg.timeText);
+    return {
+      html: `
+        <div class="health-agenda-fc-event">
+          <strong class="health-agenda-fc-event-title">${title}</strong>
+          <span class="health-agenda-fc-event-meta">${time}</span>
+        </div>
+      `,
+    };
+  };
+
+  const applyAgendaEventPalette = (arg) => {
+    const eventText = `${arg.event.title || ''} ${arg.event.extendedProps?.meta || ''}`.toLowerCase();
+    const inferredClassName = eventText.includes('retorno')
+      ? 'health-fc-event--return'
+      : 'health-fc-event--consult';
+    const className = (arg.event.classNames || []).find((name) => healthAgendaEventPalette[name]) || inferredClassName;
+    const palette = healthAgendaEventPalette[className] || healthAgendaEventPalette['health-fc-event--consult'];
+    arg.el.style.setProperty('--event-color', palette.color);
+    arg.el.style.setProperty('--event-bg', palette.bg);
+    arg.el.style.backgroundColor = palette.bg;
+    arg.el.style.border = `1px solid ${palette.bg}`;
+    arg.el.style.borderLeft = `4px solid ${palette.color}`;
+    arg.el.style.color = '#111827';
+    arg.el.style.boxShadow = 'none';
+    arg.el.querySelectorAll('*').forEach((element) => {
+      element.style.borderColor = palette.bg;
+      element.style.boxShadow = 'none';
+    });
+  };
+
+  const applyAgendaToolbarPalette = () => {
+    if (!calendarEl) return;
+    calendarEl.querySelectorAll('[role="heading"], .fc-toolbar-title').forEach((titleElement) => {
+      const titleText = String(titleElement.textContent || '').trim();
+      if (!titleText) return;
+      titleElement.textContent = titleText.charAt(0).toLocaleUpperCase('pt-BR') + titleText.slice(1);
+    });
+    calendarEl.querySelectorAll('button').forEach((button) => {
+      const isActive = button.getAttribute('aria-selected') === 'true' || button.getAttribute('aria-pressed') === 'true';
+      if (button.getAttribute('role') === 'tab') {
+        button.style.backgroundColor = 'transparent';
+        button.style.backgroundImage = 'none';
+        button.style.border = '0';
+        button.style.borderBottom = `4px solid ${isActive ? '#016ff4' : 'transparent'}`;
+        button.style.borderRadius = '0';
+        button.style.color = '#016ff4';
+        button.style.boxShadow = 'none';
+        button.style.minHeight = '40px';
+        button.style.padding = '8px 4px';
+        return;
+      }
+      button.style.backgroundColor = isActive ? '#0b5fe3' : '#016ff4';
+      button.style.backgroundImage = 'none';
+      button.style.borderColor = isActive ? '#0b5fe3' : '#016ff4';
+      button.style.color = '#ffffff';
+      button.style.boxShadow = 'none';
+      button.style.borderRadius = '8px';
+      button.style.minHeight = '40px';
+    });
+    calendarEl.querySelectorAll('[role="tablist"]').forEach((tablist) => {
+      tablist.style.gap = '10px';
+      tablist.style.border = '0';
+      tablist.style.borderRadius = '0';
+      tablist.style.backgroundColor = 'transparent';
+      tablist.style.overflow = 'visible';
+    });
+    calendarEl.querySelectorAll('button[aria-label*="Semana Anterior"]')?.forEach((group) => {
+      group.style.borderColor = '#016ff4';
+      group.style.borderRadius = '8px';
+      group.style.overflow = 'hidden';
+    });
+    calendarEl.querySelectorAll('button[aria-label*="Semana Anterior"]').forEach((button) => {
+      button.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>';
+    });
+    calendarEl.querySelectorAll('button[aria-label*="Próximo"]').forEach((button) => {
+      button.innerHTML = '<span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>';
+    });
+    calendarEl.querySelectorAll('[role="grid"], [role="rowgroup"], [role="row"], [role="gridcell"], [role="columnheader"], [role="rowheader"], [class*="fc-classic"]').forEach((element) => {
+      const styles = window.getComputedStyle(element);
+      const hasBorder = ['Top', 'Right', 'Bottom', 'Left'].some((side) => styles[`border${side}Style`] !== 'none');
+      if (hasBorder) {
+        element.style.borderColor = '#e5e7eb';
+      }
+      if (styles.borderTopStyle === 'dotted' || styles.borderTopStyle === 'dashed') {
+        element.style.borderTopColor = '#eef2f7';
+      }
+    });
+    calendarEl.querySelectorAll('[style*="--event-color"]').forEach((eventElement) => {
+      const styles = window.getComputedStyle(eventElement);
+      const eventBg = styles.getPropertyValue('--event-bg').trim() || '#eef6ff';
+      const eventColor = styles.getPropertyValue('--event-color').trim() || '#016ff4';
+      eventElement.style.border = `1px solid ${eventBg}`;
+      eventElement.style.borderLeft = `4px solid ${eventColor}`;
+      eventElement.style.boxShadow = 'none';
+    });
+  };
+
+  const ensureHealthAgendaCalendar = () => {
+    if (!calendarEl || !window.FullCalendar?.Calendar) return;
+    if (!healthAgendaCalendar) {
+      healthAgendaCalendar = new FullCalendar.Calendar(calendarEl, {
+        themeSystem: 'standard',
+        locale: 'pt-br',
+        initialDate: '2026-07-13',
+        initialView: 'timeGridWeek',
+        firstDay: 1,
+        allDaySlot: false,
+        nowIndicator: true,
+        selectable: true,
+        expandRows: true,
+        height: 'auto',
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'timeGridDay,timeGridWeek,dayGridMonth,listWeek',
+        },
+        buttonText: {
+          today: 'Hoje',
+          day: 'Dia',
+          week: 'Semana',
+          month: 'Mês',
+          list: 'Lista',
+        },
+        slotLabelFormat: {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        },
+        eventTimeFormat: {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        },
+        eventMinHeight: 54,
+        events: healthAgendaEvents,
+        eventContent: renderAgendaEventContent,
+        eventDidMount: applyAgendaEventPalette,
+        datesSet: applyAgendaToolbarPalette,
+      });
+      applyAgendaSettingsToCalendar();
+      healthAgendaCalendar.render();
+      applyAgendaToolbarPalette();
+      calendarBoard?.classList.add('is-fullcalendar-ready');
+    } else {
+      healthAgendaCalendar.updateSize();
+      applyAgendaToolbarPalette();
+    }
+  };
+
+  const syncHealthAgendaCalendar = () => {
+    const page = document.getElementById('page-health-agenda');
+    if (!page?.classList.contains('is-active')) return;
+    window.requestAnimationFrame(() => {
+      ensureHealthAgendaCalendar();
+      window.setTimeout(() => healthAgendaCalendar?.updateSize(), 50);
+    });
+  };
+
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    const firstInput = modal.querySelector('#healthAgendaStartTime') || modal.querySelector('input, select, button');
+    firstInput?.focus();
+  };
+
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    openButton.focus();
+  };
+
+  openButton.addEventListener('click', openModal);
+
+  modal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) {
+      closeModal();
+    }
+  });
+
+  modal.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      closeModal();
+    }
+  });
+
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    applyAgendaSettingsToCalendar();
+    closeModal();
+    if (typeof showAppToast === 'function') {
+      showAppToast('Ajustes da agenda salvos');
+    }
+  });
+
+  renewalListEl?.addEventListener('click', (event) => {
+    const actionButton = event.target.closest('[data-renewal-action]');
+    if (!actionButton || !renewalListEl.contains(actionButton)) return;
+    const renewalId = actionButton.dataset.renewalId || '';
+    if (actionButton.dataset.renewalAction === 'accept') {
+      acceptHealthAgendaRenewalItem(renewalId);
+      return;
+    }
+    removeHealthAgendaRenewalItem(renewalId);
+    if (typeof showAppToast === 'function') {
+      showAppToast('Encaixe removido da fila');
+    }
+  });
+
+  renderHealthAgendaRenewalQueue();
+  syncHealthAgendaCalendar();
+  window.addEventListener('hashchange', syncHealthAgendaCalendar);
+  window.addEventListener('resize', () => healthAgendaCalendar?.updateSize());
+  calendarEl?.addEventListener('click', () => {
+    window.setTimeout(applyAgendaToolbarPalette, 0);
+  });
+})();

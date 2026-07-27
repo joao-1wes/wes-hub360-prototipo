@@ -122,7 +122,7 @@
               </span>
               <span class="org-access">Acessar organização <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
             </a>
-            <a class="org-choice-card" href="#/dashboard" data-org-choice="cedae" data-org-name="ADM Cliente">
+            <a class="org-choice-card" href="#/select-company" data-org-choice="cedae" data-org-name="ADM Cliente">
               <span class="org-avatar org-avatar-red">C</span>
               <strong>ADM Cliente</strong>
               <span class="org-tags">
@@ -156,6 +156,23 @@
         </main>
       </section>
 
+      <section class="public-screen org-select-screen" id="companySelectScreen" data-public-route="select-company" aria-label="Seleção de empresa">
+        <main class="org-select-main">
+          <div class="org-select-brand" aria-label="WES HUB 360">
+            <img src="./assets/WES_LOGO_8.svg" alt="WES HUB 360" />
+          </div>
+          <div class="org-select-heading">
+            <h1>Selecione uma empresa</h1>
+            <p>Escolha qual empresa deseja acessar</p>
+          </div>
+          <div class="org-select-grid" id="companySelectGrid"></div>
+          <a class="org-logout" href="#/dashboard">
+            <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+            Voltar ao painel
+          </a>
+        </main>
+      </section>
+
       <div class="public-modal" id="createCompanyModal" aria-hidden="true">
         <div class="public-modal-backdrop" data-create-company-close></div>
         <div class="public-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="createCompanyModalTitle">
@@ -169,14 +186,34 @@
             </button>
           </div>
           <form class="public-modal-form" id="createCompanyForm">
-            <label class="public-modal-field" for="companyName">
-              <span>Nome da empresa</span>
-              <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
-            </label>
-            <label class="public-modal-field" for="companyAdminEmail">
-              <span>Responsável</span>
-              <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
-            </label>
+            <section class="create-company-details-section" aria-label="Dados da empresa">
+              <div class="create-company-details-grid">
+                <label class="public-modal-field" for="companyName">
+                  <span>Nome da empresa</span>
+                  <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
+                </label>
+                <label class="public-modal-field" for="companyAdminEmail">
+                  <span>Responsável</span>
+                  <input id="companyAdminEmail" name="company_admin_email" type="text" autocomplete="name" required />
+                </label>
+              </div>
+            </section>
+            <section class="create-company-sectors-panel" id="createCompanySectorsPanel">
+              <div class="company-users-section-head">
+                <h3 class="users-modal-section-title">Setores da empresa</h3>
+                <span class="chip">Opcional</span>
+              </div>
+              <label class="public-modal-field" for="companyInitialSectors">
+                <span>Setores</span>
+                <textarea id="companyInitialSectors" name="company_initial_sectors" rows="3" placeholder="Operações, Financeiro, Atendimento"></textarea>
+              </label>
+              <div class="company-sectors-actions">
+                <button type="button" class="btn outline" id="createCompanyViewSectorsButton">
+                  <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
+                  Visualizar setores
+                </button>
+              </div>
+            </section>
             <fieldset class="organization-sections-picker" id="organizationSectionsPicker" hidden>
               <legend>Seções disponíveis</legend>
               <p>Marque as áreas e subseções que ficarão disponíveis para esta organização.</p>
@@ -507,7 +544,10 @@
               <div class="user-avatar">A</div>
               <div class="user-meta">
                 <div class="user-name">Alfeu Vinicius Souza</div>
-                <div class="user-tenant">AVAS</div>
+                <div class="user-context-line">
+                  <span class="user-tenant">AVAS</span>
+                  <span class="user-company-chip" id="userCompanyChip" hidden></span>
+                </div>
               </div>
               <span class="material-symbols-rounded user-caret">expand_more</span>
               <div class="user-dropdown" id="userDropdown">
@@ -518,6 +558,10 @@
                 <a href="http://127.0.0.1:5502/?lang=pt-BR#/select-organization" data-access-item="switch-organization">
                   <span class="material-symbols-rounded">business</span>
                   Trocar de organização
+                </a>
+                <a href="#/select-company" id="openCompanySwitchModal" data-access-item="switch-company">
+                  <span class="material-symbols-rounded">store</span>
+                  Alternar empresa
                 </a>
                 <a href="#/dashboard/settings">
                   <span class="material-symbols-rounded">settings</span>
@@ -6769,7 +6813,7 @@
                   <div class="hub-select-wrap environments-company-select-wrap" id="environmentsCompanySelectWrap">
                     <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">business</span>
                     <select id="environmentsCompanySelect" class="hub-select" aria-label="Selecionar empresa dos setores">
-                      <option value="all">Todas as organizações</option>
+                      <option value="all">Todas as empresas</option>
                       <option value="avas" data-organization="avas-group">AVAS Energia</option>
                       <option value="techcorp" data-organization="avas-group">TechCorp Brasil</option>
                       <option value="aguas-rio" data-organization="cedae">Águas Rio</option>
@@ -7532,6 +7576,10 @@
                   <p class="page-subtitle">Centralize organizações, empresas, setores, usuários e permissões.</p>
                 </div>
                 <div class="page-actions">
+                  <a class="btn outline" href="#/select-company" data-access-item="switch-company">
+                    <span class="material-symbols-rounded">store</span>
+                    Alternar empresa
+                  </a>
                   <button class="btn primary" type="button" data-open-create-company-modal>
                     Criar empresa
                   </button>
@@ -7544,7 +7592,13 @@
                 <a class="tab" href="#/dashboard/users">Usuários</a>
                 <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
-              <p class="people-management-tab-description">Empresas são opcionais e ajudam a segmentar usuários e setores dentro de uma organização. O funcionamento principal do sistema não depende desse cadastro.</p>
+              <div class="company-description-row">
+                <p class="people-management-tab-description">Empresas são opcionais e ajudam a segmentar usuários e setores dentro de uma organização. Se nenhuma empresa for criada, você terá somente a empresa padrão com o mesmo nome da organização.</p>
+                <div class="company-current-context" id="companyCurrentContext" role="status" aria-live="polite">
+                  <span class="material-symbols-rounded" aria-hidden="true">store</span>
+                  <span>Empresa atual: <strong data-company-current-name>Nenhuma selecionada</strong></span>
+                </div>
+              </div>
               <div class="data-table companies-table">
                 <div class="data-row header">
                   <span>Empresa</span>
@@ -7649,6 +7703,22 @@
                 </button>
               </div>
               <div class="modal-body company-users-body">
+                <section class="users-modal-section company-details-section">
+                  <div class="company-details-grid" aria-label="Dados da empresa">
+                    <div class="company-detail-item">
+                      <span>Nome</span>
+                      <strong id="companyDetailsName">Empresa</strong>
+                    </div>
+                    <div class="company-detail-item">
+                      <span>Organização</span>
+                      <strong id="companyDetailsOrganization">Organização</strong>
+                    </div>
+                    <div class="company-detail-item">
+                      <span>Responsável</span>
+                      <strong id="companyDetailsResponsible">Responsável</strong>
+                    </div>
+                  </div>
+                </section>
                 <section class="users-modal-section">
                   <div class="company-users-add-row">
                     <div>

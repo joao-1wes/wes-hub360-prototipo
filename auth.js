@@ -7,10 +7,12 @@
   const STORAGE_KEY = 'wes_dashboard_auth';
   const LAST_BASE_KEY = 'wes_dashboard_api_base_last';
   const SELECTED_ORG_KEY = 'wes_selected_organization_access';
+  const SELECTED_COMPANY_KEY = 'wes_selected_company_access';
   const PUBLIC_ROUTE_SCREENS = {
     '': 'landingScreen',
     login: 'loginScreen',
     'select-organization': 'organizationSelectScreen',
+    'select-company': 'companySelectScreen',
   };
 
   function getDefaultApiBase() {
@@ -227,8 +229,11 @@
     const companyNameLabel = document.querySelector('label[for="companyName"] > span');
     const companyAdminEmailLabel = document.querySelector('label[for="companyAdminEmail"] > span');
     const companyName = document.getElementById('companyName');
+    const companyAdminEmail = document.getElementById('companyAdminEmail');
     const createCompanyAdminUserLink = document.getElementById('createCompanyAdminUserLink');
     const organizationSectionsPicker = document.getElementById('organizationSectionsPicker');
+    const createCompanySectorsPanel = document.getElementById('createCompanySectorsPanel');
+    const createCompanyViewSectorsButton = document.getElementById('createCompanyViewSectorsButton');
     const createCompanySubmitButton = createCompanyForm?.querySelector('button[type="submit"]');
     const orgChoices = document.querySelectorAll('[data-org-choice]');
     let createCompanyContext = 'company';
@@ -245,6 +250,7 @@
         const orgName = choice.getAttribute('data-org-name') || choice.querySelector('strong')?.textContent?.trim() || 'ADM WES';
         try {
           sessionStorage.setItem(SELECTED_ORG_KEY, JSON.stringify({ id: orgId, name: orgName }));
+          sessionStorage.removeItem(SELECTED_COMPANY_KEY);
         } catch {
           /* ignore */
         }
@@ -272,6 +278,7 @@
       }
       createCompanyModal?.classList.toggle('public-modal--organization', isOrganization);
       if (organizationSectionsPicker) organizationSectionsPicker.hidden = !isOrganization;
+      if (createCompanySectorsPanel) createCompanySectorsPanel.hidden = isOrganization;
       const subtitle = createCompanyModal?.querySelector('.public-modal-header p');
       if (subtitle) {
         subtitle.textContent = isEditingOrganization
@@ -280,6 +287,10 @@
       }
       if (companyNameLabel) companyNameLabel.textContent = isOrganization ? 'Nome da organização' : 'Nome da empresa';
       if (companyAdminEmailLabel) companyAdminEmailLabel.textContent = isOrganization ? 'E-mail do ADM da organização' : 'Responsável';
+      if (companyAdminEmail) {
+        companyAdminEmail.type = isOrganization ? 'email' : 'text';
+        companyAdminEmail.autocomplete = isOrganization ? 'email' : 'name';
+      }
       if (createCompanySubmitButton) createCompanySubmitButton.textContent = isEditingOrganization ? 'Salvar alterações' : 'Salvar';
       if (createCompanyAdminUserLink) {
         createCompanyAdminUserLink.hidden = !isOrganization || isEditingOrganization;
@@ -384,7 +395,6 @@
       event.preventDefault();
       if (createCompanyContext === 'organization' && createCompanyMode === 'edit' && activeOrganizationEditRow) {
         const nextName = String(companyName?.value || '').trim();
-        const companyAdminEmail = document.getElementById('companyAdminEmail');
         const nextAdmin = String(companyAdminEmail?.value || '').trim();
         if (nextName) {
           activeOrganizationEditRow.dataset.organizationName = nextName;
@@ -401,6 +411,19 @@
       createCompanyForm.reset();
       closeCreateCompanyModal();
       window.location.hash = createCompanyContext === 'organization' ? '#/select-organization' : '#/dashboard/companies';
+    });
+    createCompanyViewSectorsButton?.addEventListener('click', () => {
+      if (createCompanyContext === 'organization') return;
+      closeCreateCompanyModal();
+      ensureDemoSession();
+      ensureAppVisible();
+      WesDashboardAuth.applyUserToUI();
+      window.location.hash = '#/dashboard/environments';
+      window.setTimeout(() => {
+        if (typeof window.updateActivePage === 'function') {
+          window.updateActivePage();
+        }
+      }, 120);
     });
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape' && createCompanyModal?.classList.contains('is-open')) {

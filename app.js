@@ -170,6 +170,8 @@ const openCreateUserModal = document.getElementById('openCreateUserModal');
 const usersTable = document.querySelector('#page-users .users-table');
 const organizationsTable = document.querySelector('#page-organizations .organizations-table');
 const companiesTable = document.querySelector('#page-companies .companies-table');
+const openCompanySwitchModal = document.getElementById('openCompanySwitchModal');
+const companySelectGrid = document.getElementById('companySelectGrid');
 const historyTabs = document.querySelectorAll('#page-agent-history .tab');
 const historyPanels = document.querySelectorAll('#page-agent-history .tab-panel');
 const historyAuditPanel = document.getElementById('historyAuditPanel');
@@ -211,6 +213,9 @@ const companyAddUserButton = document.getElementById('companyAddUserButton');
 const companyUsersList = document.getElementById('companyUsersList');
 const companyUsersCount = document.getElementById('companyUsersCount');
 const companyUsersSaveButton = document.getElementById('companyUsersSaveButton');
+const companyDetailsName = document.getElementById('companyDetailsName');
+const companyDetailsOrganization = document.getElementById('companyDetailsOrganization');
+const companyDetailsResponsible = document.getElementById('companyDetailsResponsible');
 const createUserModal = document.getElementById('createUserModal');
 const createUserModalForm = document.getElementById('createUserModalForm');
 const createUserTitle = document.getElementById('createUserTitle');
@@ -1340,6 +1345,7 @@ const PROJECT_ENVIRONMENT_OVERRIDES_STORAGE_KEY = 'wesProjectEnvironmentOverride
 const PROJECT_PROMPT_OVERRIDES_STORAGE_KEY = 'wesProjectPromptOverrides';
 const TELEGRAM_HELP_CARD_DISMISSED_STORAGE_KEY = 'wesTelegramHelpCardDismissed';
 const SELECTED_ORG_ACCESS_STORAGE_KEY = 'wes_selected_organization_access';
+const SELECTED_COMPANY_ACCESS_STORAGE_KEY = 'wes_selected_company_access';
 const DEFAULT_LANGUAGE = 'pt-BR';
 const LANGUAGE_STORAGE_KEY = 'wes-language';
 const LANGUAGE_QUERY_KEY = 'lang';
@@ -6416,6 +6422,12 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     if (countCell) countCell.textContent = String(count);
   };
 
+  const getCompanyDetailsFromRow = (row) => ({
+    name: row?.dataset.companyName || row?.querySelector('strong')?.textContent?.trim() || 'Empresa',
+    organization: row?.children?.[1]?.textContent?.trim() || row?.dataset.companyOrganization || 'Organização',
+    responsible: row?.children?.[2]?.textContent?.trim() || 'Não informado',
+  });
+
   const closeCompanyUserLookup = () => {
     companyUserLookupMenu?.classList.remove('open');
   };
@@ -6549,10 +6561,14 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     activeCompanyRow = companyRow;
     activeCompanyId = companyRow.dataset.companyId || '';
     const companyName = companyRow.dataset.companyName || companyRow.querySelector('strong')?.textContent?.trim() || 'Empresa';
+    const companyDetails = getCompanyDetailsFromRow(companyRow);
     const currentUsers = companyUsersByCompany[activeCompanyId] || [];
     draftCompanyUsers = currentUsers.map((item) => ({ ...item, userId: normalizeCompanyUserId(item.userId) }));
 
     if (companyUsersModalTitle) companyUsersModalTitle.textContent = `Editar empresa · ${companyName}`;
+    if (companyDetailsName) companyDetailsName.textContent = companyDetails.name;
+    if (companyDetailsOrganization) companyDetailsOrganization.textContent = companyDetails.organization;
+    if (companyDetailsResponsible) companyDetailsResponsible.textContent = companyDetails.responsible;
     renderCompanyUsers();
     companyUsersModal.classList.add('open');
     companyUsersModal.setAttribute('aria-hidden', 'false');
@@ -6576,6 +6592,9 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     const companyName = row.dataset.companyName || row.querySelector('strong')?.textContent?.trim() || 'esta empresa';
     if (!(await confirmDeletionAction(`a empresa "${companyName}"`))) return;
     row.remove();
+    const access = getSelectedOrganizationAccess();
+    if (!getSelectedCompanyAccess(access)) writeSelectedCompanyAccess(null);
+    applyOrganizationAccessControls((window.location.hash || '#/dashboard').replace(/^#\/?/, '') || 'dashboard');
     showAppToast('Empresa excluída');
   });
 
@@ -7923,7 +7942,9 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   };
 
   const applyEnvironmentCompanyFilter = () => {
-    const organizationScope = String(document.body.dataset.organizationScope || 'all').trim() || 'all';
+    const organizationScope = String(
+      document.body.dataset.companyOrganizationScope || document.body.dataset.organizationScope || 'all'
+    ).trim() || 'all';
     const selectorVisible = Boolean(
       environmentsCompanySelectWrap
       && !environmentsCompanySelectWrap.hidden
@@ -13378,11 +13399,17 @@ function hubCustomSelectRefresh(wrap) {
   const menu = wrap.querySelector('.hub-custom-menu');
   const label = wrap.querySelector('.hub-custom-label');
   if (!sel || !menu || !label) return;
+  const trigger = wrap.querySelector('.hub-custom-trigger');
   const v = sel.value;
   const optSel = sel.options[sel.selectedIndex];
   label.textContent = optSel ? optSel.textContent : '';
+  if (trigger) {
+    trigger.disabled = sel.disabled;
+    trigger.setAttribute('aria-disabled', sel.disabled ? 'true' : 'false');
+  }
   menu.innerHTML = '';
   Array.from(sel.options).forEach((opt) => {
+    if (opt.disabled || opt.hidden) return;
     const li = document.createElement('li');
     li.setAttribute('role', 'none');
     const btn = document.createElement('button');
@@ -14467,8 +14494,12 @@ function applyVmOrganizationAccessScope(access) {
   });
 
   if (organizationScope === 'all') {
+    const selectedCompanyAccess = getSelectedCompanyAccess(access);
+    const selectedCompanyOrganization = String(selectedCompanyAccess?.organization || '').trim();
     const selectedOption = vmOrganizationFilter.selectedOptions[0];
-    if (wasRestricted || !selectedOption || selectedOption.disabled || selectedOption.hidden) {
+    if (selectedCompanyOrganization && selectedCompanyOrganization !== 'all') {
+      vmOrganizationFilter.value = selectedCompanyOrganization;
+    } else if (wasRestricted || !selectedOption || selectedOption.disabled || selectedOption.hidden) {
       vmOrganizationFilter.value = 'all';
     }
     vmOrganizationFilter.disabled = false;
@@ -18465,10 +18496,224 @@ const isInOrganizationScope = (organizationId, access) => {
   return String(organizationId || '').trim() === scope;
 };
 
+const getCompanyRows = () => Array.from(companiesTable?.querySelectorAll('[data-company-row]') || []);
+
+const getCompanyOrganizationLabel = (row) => {
+  const fallback = String(row?.dataset?.companyOrganization || '').trim();
+  return row?.children?.[1]?.textContent?.trim() || fallback;
+};
+
+const getCompanyRecordFromRow = (row) => {
+  if (!row) return null;
+  const id = String(row.dataset.companyId || '').trim();
+  if (!id) return null;
+  return {
+    id,
+    name: row.dataset.companyName || row.querySelector('strong')?.textContent?.trim() || 'Empresa',
+    organization: String(row.dataset.companyOrganization || '').trim(),
+    organizationName: getCompanyOrganizationLabel(row),
+  };
+};
+
+const getCompanyRecordsForAccess = (access) => getCompanyRows()
+  .map(getCompanyRecordFromRow)
+  .filter(Boolean)
+  .filter((company) => isInOrganizationScope(company.organization, access));
+
+const refreshHubSelectForNativeSelect = (select) => {
+  const wrap = select?.closest('.hub-select-wrap');
+  if (wrap && typeof hubEnhanceSelectWrap === 'function') hubEnhanceSelectWrap(wrap);
+};
+
+const setSelectOptions = (select, options, preferredValue = '') => {
+  if (!select) return '';
+  const fallbackValue = options[0]?.value || '';
+  const nextValue = options.some((option) => option.value === preferredValue)
+    ? preferredValue
+    : fallbackValue;
+  select.innerHTML = '';
+  options.forEach((option) => {
+    const el = document.createElement('option');
+    el.value = option.value;
+    el.textContent = option.label;
+    if (option.organization) el.dataset.organization = option.organization;
+    select.appendChild(el);
+  });
+  select.value = nextValue;
+  refreshHubSelectForNativeSelect(select);
+  return nextValue;
+};
+
+const findCompanyRecordForAccess = (companyId, access) => {
+  const id = String(companyId || '').trim();
+  if (!id || id === 'all') return null;
+  return getCompanyRecordsForAccess(access).find((company) => company.id === id) || null;
+};
+
+const getOrganizationOptionsForCompanies = (access) => {
+  const organizationScope = String(access?.organizationScope || 'all').trim() || 'all';
+  const organizations = new Map();
+  getCompanyRecordsForAccess(access).forEach((company) => {
+    if (!company.organization || organizations.has(company.organization)) return;
+    organizations.set(company.organization, company.organizationName || company.organization);
+  });
+  if (organizationScope === 'all') {
+    return [
+      { value: 'all', label: 'Todas as organizações' },
+      ...Array.from(organizations, ([value, label]) => ({ value, label })),
+    ];
+  }
+  return Array.from(organizations, ([value, label]) => ({ value, label }));
+};
+
+const getOrganizationNameForCompanyScope = (organizationId, access) => {
+  const value = String(organizationId || '').trim();
+  if (!value || value === 'all') return 'Todas as organizações';
+  return getOrganizationOptionsForCompanies(access).find((option) => option.value === value)?.label || value;
+};
+
+const getSelectedCompanyAccess = (access = getSelectedOrganizationAccess()) => {
+  try {
+    const raw = sessionStorage.getItem(SELECTED_COMPANY_ACCESS_STORAGE_KEY);
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (!parsed?.id) return null;
+    const organization = String(parsed.organization || '').trim();
+    if (organization && organization !== 'all' && !isInOrganizationScope(organization, access)) return null;
+    if (parsed.id === 'all') {
+      return {
+        id: 'all',
+        name: parsed.name || 'Todas as empresas',
+        organization: organization || String(access?.organizationScope || 'all').trim() || 'all',
+        organizationName: parsed.organizationName || getOrganizationNameForCompanyScope(organization, access),
+      };
+    }
+    return findCompanyRecordForAccess(parsed.id, access);
+  } catch {
+    return null;
+  }
+};
+
+const writeSelectedCompanyAccess = (company) => {
+  try {
+    if (!company?.id) {
+      sessionStorage.removeItem(SELECTED_COMPANY_ACCESS_STORAGE_KEY);
+      return;
+    }
+    sessionStorage.setItem(SELECTED_COMPANY_ACCESS_STORAGE_KEY, JSON.stringify({
+      id: company.id,
+      name: company.name,
+      organization: company.organization || 'all',
+      organizationName: company.organizationName || '',
+    }));
+  } catch {
+    /* ignore */
+  }
+};
+
+const getCompanyAccessFromSelection = (organizationId, companyId, access) => {
+  const selectedOrganization = String(organizationId || '').trim() || 'all';
+  const selectedCompany = String(companyId || '').trim() || 'all';
+  if (selectedCompany !== 'all') return findCompanyRecordForAccess(selectedCompany, access);
+  return {
+    id: 'all',
+    name: 'Todas as empresas',
+    organization: selectedOrganization,
+    organizationName: getOrganizationNameForCompanyScope(selectedOrganization, access),
+  };
+};
+
+const syncUserContextLabel = (access) => {
+  const tenantEl = document.querySelector('#userMenu .user-tenant');
+  const companyChip = document.getElementById('userCompanyChip');
+  const currentCompanyName = document.querySelector('[data-company-current-name]');
+  const selectedCompany = getSelectedCompanyAccess(access);
+  if (tenantEl) {
+    tenantEl.textContent = access?.name || 'ADM WES';
+  }
+  if (currentCompanyName) {
+    currentCompanyName.textContent = selectedCompany?.id && selectedCompany.id !== 'all'
+      ? selectedCompany.name
+      : 'Nenhuma selecionada';
+  }
+  if (!companyChip) return;
+  if (selectedCompany?.id && selectedCompany.id !== 'all') {
+    companyChip.textContent = selectedCompany.name;
+    companyChip.hidden = false;
+    companyChip.setAttribute('aria-label', `Empresa selecionada: ${selectedCompany.name}`);
+    return;
+  }
+  companyChip.textContent = 'Não selecionada';
+  companyChip.hidden = false;
+  companyChip.setAttribute('aria-label', 'Empresa não selecionada');
+};
+
+const getEffectiveCompanyOrganizationFilter = (access) => {
+  const organizationScope = String(access?.organizationScope || 'all').trim() || 'all';
+  if (organizationScope !== 'all') return organizationScope;
+  const selectedCompany = getSelectedCompanyAccess(access);
+  const selectedOrganization = String(selectedCompany?.organization || '').trim();
+  if (selectedOrganization && selectedOrganization !== 'all') return selectedOrganization;
+  return 'all';
+};
+
+const getCompanyAvatarText = (name) => String(name || 'Empresa')
+  .split(/\s+/)
+  .filter(Boolean)
+  .slice(0, 2)
+  .map((part) => part.charAt(0).toUpperCase())
+  .join('') || 'E';
+
+const renderCompanySelectScreen = () => {
+  if (!companySelectGrid) return;
+  const access = getSelectedOrganizationAccess();
+  const companies = getCompanyRecordsForAccess(access);
+  if (!companies.length) {
+    companySelectGrid.innerHTML = `
+      <div class="org-choice-card company-choice-empty" aria-live="polite">
+        <span class="org-avatar org-avatar-blue">0</span>
+        <strong>Nenhuma empresa</strong>
+        <span class="org-tags">
+          <span>${escapeHtmlWes(access.name || 'Perfil')}</span>
+        </span>
+        <span class="org-access">Volte ao painel</span>
+      </div>
+    `;
+    return;
+  }
+
+  const avatarClasses = ['org-avatar-red', 'org-avatar-blue', 'org-avatar-purple'];
+  companySelectGrid.innerHTML = companies.map((company, index) => {
+    const avatarClass = avatarClasses[index % avatarClasses.length];
+    const organizationTag = access.organizationScope === 'all'
+      ? `<span>${escapeHtmlWes(company.organizationName || company.organization)}</span>`
+      : '';
+    return `
+      <a class="org-choice-card" href="#/dashboard" data-company-choice="${escapeHtmlWes(company.id)}">
+        <span class="org-avatar ${avatarClass}">${escapeHtmlWes(getCompanyAvatarText(company.name))}</span>
+        <strong>${escapeHtmlWes(company.name)}</strong>
+        <span class="org-tags">
+          <span>Empresa</span>
+          ${organizationTag}
+        </span>
+        <span class="org-access">Acessar empresa <span class="material-symbols-rounded" aria-hidden="true">arrow_forward</span></span>
+      </a>
+    `;
+  }).join('');
+};
+
+const applySelectedCompanyContext = (company) => {
+  writeSelectedCompanyAccess(company);
+  const routeKey = (window.location.hash || '#/dashboard').replace(/^#\/?/, '') || 'dashboard';
+  applyOrganizationAccessControls(routeKey);
+};
+
 const applyCompaniesOrganizationScope = (access) => {
   if (!companiesTable) return;
-  companiesTable.querySelectorAll('[data-company-row]').forEach((row) => {
-    const showRow = isInOrganizationScope(row.dataset.companyOrganization, access);
+  const effectiveOrganization = getEffectiveCompanyOrganizationFilter(access);
+  getCompanyRows().forEach((row) => {
+    const rowOrganization = String(row.dataset.companyOrganization || '').trim();
+    const showRow = isInOrganizationScope(rowOrganization, access)
+      && (effectiveOrganization === 'all' || rowOrganization === effectiveOrganization);
     row.hidden = !showRow;
     row.classList.toggle('is-hidden', !showRow);
   });
@@ -18476,9 +18721,15 @@ const applyCompaniesOrganizationScope = (access) => {
 
 const applyEnvironmentCompanyOptionsScope = (access) => {
   if (!environmentsCompanySelect) return;
+  const selectedCompany = getSelectedCompanyAccess(access);
+  const selectedOrganization = String(selectedCompany?.organization || '').trim();
   Array.from(environmentsCompanySelect.options).forEach((option) => {
     const organizationId = option.dataset.organization || '';
-    const showOption = option.value === 'all' || isInOrganizationScope(organizationId, access);
+    const showOption = option.value === 'all'
+      || (
+        isInOrganizationScope(organizationId, access)
+        && (!selectedOrganization || selectedOrganization === 'all' || organizationId === selectedOrganization)
+      );
     option.hidden = !showOption;
     option.disabled = !showOption;
   });
@@ -18486,21 +18737,29 @@ const applyEnvironmentCompanyOptionsScope = (access) => {
   if (!selected || selected.disabled || selected.hidden) {
     environmentsCompanySelect.value = 'all';
   }
+  refreshHubSelectForNativeSelect(environmentsCompanySelect);
 };
 
 const applyOrganizationAccessControls = (routeKey) => {
   const access = getSelectedOrganizationAccess();
+  let selectedCompany = getSelectedCompanyAccess(access);
+  if (!selectedCompany && routeKey !== 'select-company' && access.canManageCompanies) {
+    selectedCompany = getCompanyRecordsForAccess(access)[0] || null;
+    if (selectedCompany) writeSelectedCompanyAccess(selectedCompany);
+  }
   const administrationGroup = document.querySelector('[data-access-section="administration"]');
   const organizationsPage = document.getElementById('page-organizations');
   const peopleManagementLinks = document.querySelectorAll('[data-access-item="people-management"]');
   const organizationsLinks = document.querySelectorAll('[data-access-item="organizations"]');
   const companiesLinks = document.querySelectorAll('[data-access-item="companies"]');
   const switchOrganizationLinks = document.querySelectorAll('[data-access-item="switch-organization"]');
-  const tenantEl = document.querySelector('#userMenu .user-tenant');
+  const switchCompanyLinks = document.querySelectorAll('[data-access-item="switch-company"]');
 
   document.body.dataset.organizationAccess = access.id;
   document.body.dataset.organizationScope = access.organizationScope || access.id || 'all';
-  if (tenantEl) tenantEl.textContent = access.name;
+  document.body.dataset.companyScope = selectedCompany?.id || 'all';
+  document.body.dataset.companyOrganizationScope = selectedCompany?.organization || document.body.dataset.organizationScope;
+  syncUserContextLabel(access);
   syncDashboardHomeForAccess(access);
 
   setAccessVisibility(administrationGroup, access.showAdministration);
@@ -18509,12 +18768,19 @@ const applyOrganizationAccessControls = (routeKey) => {
   setAccessVisibilityForAll(organizationsLinks, access.showAdministration && access.canManageOrganizations);
   setAccessVisibilityForAll(companiesLinks, access.showAdministration && access.canManageCompanies);
   setAccessVisibilityForAll(switchOrganizationLinks, access.canSwitchOrganization);
+  setAccessVisibilityForAll(switchCompanyLinks, access.showAdministration && access.canManageCompanies);
   setAccessVisibility(environmentsCompanySelectWrap, access.showAdministration && access.canManageCompanies);
   applyCompaniesOrganizationScope(access);
   applyEnvironmentCompanyOptionsScope(access);
   applyVmOrganizationAccessScope(access);
   if (environmentsCompanySelect) {
-    environmentsCompanySelect.value = 'all';
+    const selectedEnvironmentOption = selectedCompany?.id && selectedCompany.id !== 'all'
+      ? environmentsCompanySelect.querySelector(`option[value="${CSS.escape(selectedCompany.id)}"]`)
+      : null;
+    environmentsCompanySelect.value = selectedEnvironmentOption && !selectedEnvironmentOption.disabled && !selectedEnvironmentOption.hidden
+      ? selectedCompany.id
+      : 'all';
+    refreshHubSelectForNativeSelect(environmentsCompanySelect);
     environmentsCompanySelect.dispatchEvent(new Event('change'));
   }
 
@@ -18533,6 +18799,20 @@ const applyOrganizationAccessControls = (routeKey) => {
 
   return true;
 };
+
+openCompanySwitchModal?.addEventListener('click', (event) => {
+  event.stopPropagation();
+  renderCompanySelectScreen();
+  userDropdown?.classList.remove('open');
+});
+
+companySelectGrid?.addEventListener('click', (event) => {
+  const choice = event.target.closest('[data-company-choice]');
+  if (!choice) return;
+  const access = getSelectedOrganizationAccess();
+  const company = findCompanyRecordForAccess(choice.dataset.companyChoice, access);
+  if (company) writeSelectedCompanyAccess(company);
+});
 
 const normalizeAutomationLabels = () => {
   const automationTrigger = document.querySelector('.nav-trigger[data-menu="automation"] .nav-label');
@@ -18587,6 +18867,9 @@ const updateActivePage = () => {
   const pageRouteKey = routeKey === 'dashboard/people-management'
     ? getPeopleManagementDefaultRoute()
     : routeKey;
+  if (routeKey === 'select-company') {
+    renderCompanySelectScreen();
+  }
   if (!isStandaloneChatRoute(routeKey) && agentChatModal?.classList.contains('agent-chat-modal--standalone')) {
     agentChatModal.classList.remove('open', 'agent-chat-modal--standalone', 'voice-mode', 'voice-history-open', 'has-voice-transcript');
     agentChatModal.setAttribute('aria-hidden', 'true');

@@ -1658,6 +1658,11 @@ body {
   outline: none;
 }
 
+.hub-custom-trigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
 .hub-custom-label {
   flex: 1;
   min-width: 0;
@@ -2252,6 +2257,35 @@ body {
   font-size: var(--md-body-small);
   line-height: 16px;
   color: var(--muted);
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.user-context-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.user-company-chip {
+  width: fit-content;
+  max-width: 120px;
+  min-height: 20px;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #e6f0ff;
+  color: #0d47a1;
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 
@@ -5977,11 +6011,55 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .people-management-tab-description {
-  margin: -6px 0 16px;
+  margin: 0;
   max-width: 860px;
   color: #64748b;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.company-description-row {
+  display: grid;
+  gap: 6px;
+  margin: -6px 0 16px;
+}
+
+.company-current-context {
+  width: fit-content;
+  max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: #334155;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.company-current-context > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.company-current-context .material-symbols-rounded {
+  color: #016ff4;
+  font-size: 18px;
+}
+
+.company-current-context strong {
+  color: #0d47a1;
+}
+
+@media (max-width: 760px) {
+  .company-current-context {
+    max-width: 100%;
+  }
 }
 
 .tab-panel {
@@ -7106,7 +7184,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
     minmax(90px, 0.6fr)
     minmax(70px, 0.45fr)
     minmax(70px, 0.45fr)
-    minmax(82px, 0.55fr);
+    minmax(120px, 0.72fr);
 }
 
 .organizations-table .row-actions,
@@ -14586,11 +14664,48 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   gap: 12px;
 }
 
+.company-details-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.company-detail-item {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #ffffff;
+}
+
+.company-detail-item span {
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  font-weight: 700;
+}
+
+.company-detail-item strong {
+  min-width: 0;
+  overflow: hidden;
+  color: #111827;
+  font-size: var(--md-body-medium);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .company-users-section-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.company-sectors-actions {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .company-users-list {
@@ -14640,9 +14755,18 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 @media (max-width: 760px) {
+  .company-details-grid,
   .company-users-add-row,
   .company-user-row {
     grid-template-columns: 1fr;
+  }
+
+  .company-sectors-actions {
+    justify-content: stretch;
+  }
+
+  .company-sectors-actions .btn {
+    width: 100%;
   }
 
   .company-user-status {
@@ -20057,6 +20181,10 @@ body.agent-chat-standalone .chat-thread {
   font-size: var(--md-body-small);
   line-height: 16px;
   color: var(--muted);
+  max-width: 110px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (max-width: 960px) {
@@ -21280,6 +21408,27 @@ body.route-automation-create #directChatFab {
   padding: 16px 20px 20px;
 }
 
+.create-company-details-section,
+.create-company-sectors-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.create-company-details-section[hidden],
+.create-company-sectors-panel[hidden] {
+  display: none;
+}
+
+.create-company-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.create-company-sectors-panel {
+  padding-top: 2px;
+}
+
 .public-modal-field {
   display: grid;
   gap: 8px;
@@ -21289,7 +21438,8 @@ body.route-automation-create #directChatFab {
   line-height: 1.4;
 }
 
-.public-modal-field input {
+.public-modal-field input,
+.public-modal-field textarea {
   width: 100%;
   min-height: 44px;
   border: 1px solid #d9dee8;
@@ -21302,7 +21452,13 @@ body.route-automation-create #directChatFab {
   font-weight: 500;
 }
 
-.public-modal-field input:focus {
+.public-modal-field textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.public-modal-field input:focus,
+.public-modal-field textarea:focus {
   outline: none;
   border-color: #3478f6;
   box-shadow: 0 0 0 3px rgba(52, 120, 246, 0.14);
@@ -21490,12 +21646,19 @@ body.route-automation-create #directChatFab {
   font-weight: 600;
 }
 
-.public-modal.public-modal--app .public-modal-field input {
+.public-modal.public-modal--app .public-modal-field input,
+.public-modal.public-modal--app .public-modal-field textarea {
   min-height: 44px;
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 14px;
   font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .create-company-details-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .public-modal.public-modal--app .public-modal-admin-link {

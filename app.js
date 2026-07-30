@@ -13542,60 +13542,65 @@ function initDocClassesMultiSelect() {
   updateLabel();
 }
 
-function initDocumentAnalysisValidation() {
-  const page = document.getElementById('page-document-analysis');
+function initDocumentAnalysisValidationPage(page) {
   if (!page || page.dataset.validationBound === 'true') return;
   page.dataset.validationBound = 'true';
+  const fieldPrefix = page.dataset.docAnalysisPrefix || 'doc';
+  const isExamMode = page.dataset.docAnalysisContext === 'exam';
+  const byPrefixedId = (docId) => {
+    const prefixedId = `${fieldPrefix}${docId.slice(3)}`;
+    return page.querySelector(`#${CSS.escape(prefixedId)}`) || page.querySelector(`#${CSS.escape(docId)}`);
+  };
 
-  const uploadInput = page.querySelector('#docUploadInput');
-  const chooseLink = page.querySelector('#docUploadChooseLink');
+  const uploadInput = byPrefixedId('docUploadInput');
+  const chooseLink = byPrefixedId('docUploadChooseLink');
   const uploadDropzone = page.querySelector('.document-upload-dropzone');
-  const fileNameEl = page.querySelector('#docUploadFileName');
-  const processBtn = page.querySelector('#docProcessButton');
-  const formAreaEl = page.querySelector('#docAnalysisFormArea');
-  const resultEl = page.querySelector('#docAnalysisResult');
-  const statusCardEl = page.querySelector('#docAnalysisStatusCard');
-  const resultContentEl = page.querySelector('#docAnalysisResultContent');
-  const progressBarEl = page.querySelector('#docAnalysisProgressBar');
-  const progressTextEl = page.querySelector('#docAnalysisProgressText');
-  const exportBtn = page.querySelector('#docExportJsonButton');
-  const changeFileBtn = page.querySelector('#docChangeFileButton');
-  const skipPreprocessInput = page.querySelector('#docSkipPreprocessing');
-  const handwritingHintsInput = page.querySelector('#docHandwritingHints');
-  const resultFileNameEl = page.querySelector('#docResultFileName');
-  const resultSummaryEl = page.querySelector('#docResultSummary');
-  const resultClassesEl = page.querySelector('#docResultClasses');
-  const resultClassEl = page.querySelector('#docResultClass');
-  const resultConfidenceEl = page.querySelector('#docResultConfidence');
-  const resultNeedsReviewEl = page.querySelector('#docResultNeedsReview');
-  const resultOcrTextEl = page.querySelector('#docResultOcrText');
-  const resultPage1El = page.querySelector('#docResultPage1');
-  const resultPage2El = page.querySelector('#docResultPage2');
-  const resultPage3El = page.querySelector('#docResultPage3');
-  const resultFieldsEl = page.querySelector('#docResultFields');
-  const resultTablesEl = page.querySelector('#docResultTables');
-  const resultAlertsListEl = page.querySelector('#docResultAlertsList');
-  const resultErrorsEl = page.querySelector('#docResultErrors');
-  const resultCorrelationIdEl = page.querySelector('#docResultCorrelationId');
-  const resultProcessingMsEl = page.querySelector('#docResultProcessingMs');
-  const resultModelInfoEl = page.querySelector('#docResultModelInfo');
-  const stepValidationEl = page.querySelector('#docStepValidation');
-  const stepPreprocessEl = page.querySelector('#docStepPreprocess');
-  const stepOcrEl = page.querySelector('#docStepOcr');
-  const stepChunksEl = page.querySelector('#docStepChunks');
-  const stepLlmChunksEl = page.querySelector('#docStepLlmChunks');
-  const stepLlmConsolidationEl = page.querySelector('#docStepLlmConsolidation');
-  const stepNormalizationEl = page.querySelector('#docStepNormalization');
-  const stepTotalEl = page.querySelector('#docStepTotal');
-  const stepOverheadEl = page.querySelector('#docStepOverhead');
-  const resultThresholdEl = page.querySelector('#docResultThreshold');
-  const resultLocaleEl = page.querySelector('#docResultLocale');
-  const resultPreprocessEl = page.querySelector('#docResultPreprocess');
-  const resultSkipPreprocessEl = page.querySelector('#docResultSkipPreprocess');
-  const resultHandwritingHintsEl = page.querySelector('#docResultHandwritingHints');
-  const thresholdInput = page.querySelector('#docClassificationThreshold');
-  const localeSelect = page.querySelector('#docOcrLocale');
-  const preprocessSelect = page.querySelector('#docPreprocessProfile');
+  const fileNameEl = byPrefixedId('docUploadFileName');
+  const processBtn = byPrefixedId('docProcessButton');
+  const formAreaEl = byPrefixedId('docAnalysisFormArea');
+  const resultEl = byPrefixedId('docAnalysisResult');
+  const statusCardEl = byPrefixedId('docAnalysisStatusCard');
+  const resultContentEl = byPrefixedId('docAnalysisResultContent');
+  const progressBarEl = byPrefixedId('docAnalysisProgressBar');
+  const progressTextEl = byPrefixedId('docAnalysisProgressText');
+  const exportBtn = byPrefixedId('docExportJsonButton');
+  const changeFileBtn = byPrefixedId('docChangeFileButton');
+  const skipPreprocessInput = byPrefixedId('docSkipPreprocessing');
+  const handwritingHintsInput = byPrefixedId('docHandwritingHints');
+  const resultFileNameEl = byPrefixedId('docResultFileName');
+  const resultSummaryEl = byPrefixedId('docResultSummary');
+  const resultClassesEl = byPrefixedId('docResultClasses');
+  const resultClassEl = byPrefixedId('docResultClass');
+  const resultConfidenceEl = byPrefixedId('docResultConfidence');
+  const resultNeedsReviewEl = byPrefixedId('docResultNeedsReview');
+  const resultOcrTextEl = byPrefixedId('docResultOcrText');
+  const resultPage1El = byPrefixedId('docResultPage1');
+  const resultPage2El = byPrefixedId('docResultPage2');
+  const resultPage3El = byPrefixedId('docResultPage3');
+  const resultFieldsEl = byPrefixedId('docResultFields');
+  const resultTablesEl = byPrefixedId('docResultTables');
+  const resultAlertsListEl = byPrefixedId('docResultAlertsList');
+  const resultErrorsEl = byPrefixedId('docResultErrors');
+  const resultCorrelationIdEl = byPrefixedId('docResultCorrelationId');
+  const resultProcessingMsEl = byPrefixedId('docResultProcessingMs');
+  const resultModelInfoEl = byPrefixedId('docResultModelInfo');
+  const stepValidationEl = byPrefixedId('docStepValidation');
+  const stepPreprocessEl = byPrefixedId('docStepPreprocess');
+  const stepOcrEl = byPrefixedId('docStepOcr');
+  const stepChunksEl = byPrefixedId('docStepChunks');
+  const stepLlmChunksEl = byPrefixedId('docStepLlmChunks');
+  const stepLlmConsolidationEl = byPrefixedId('docStepLlmConsolidation');
+  const stepNormalizationEl = byPrefixedId('docStepNormalization');
+  const stepTotalEl = byPrefixedId('docStepTotal');
+  const stepOverheadEl = byPrefixedId('docStepOverhead');
+  const resultThresholdEl = byPrefixedId('docResultThreshold');
+  const resultLocaleEl = byPrefixedId('docResultLocale');
+  const resultPreprocessEl = byPrefixedId('docResultPreprocess');
+  const resultSkipPreprocessEl = byPrefixedId('docResultSkipPreprocess');
+  const resultHandwritingHintsEl = byPrefixedId('docResultHandwritingHints');
+  const thresholdInput = byPrefixedId('docClassificationThreshold');
+  const localeSelect = byPrefixedId('docOcrLocale');
+  const preprocessSelect = byPrefixedId('docPreprocessProfile');
   const classOptions = Array.from(page.querySelectorAll('[data-doc-class-option]'));
   if (
     !uploadInput ||
@@ -13757,54 +13762,106 @@ function initDocumentAnalysisValidation() {
     progressTextEl.textContent = `${bounded}%`;
   };
 
-  const buildMockResult = () => ({
-    resumo:
-      'Documento processado em modo demonstração. A estrutura exibe resumo, classificação, OCR consolidado e detalhes por página para validação de layout e fluxo.',
-    classificacao: {
-      classePrevista: 'Documento Geral',
-      confianca: 0.93,
-      revisaoNecessaria: 'Não'
-    },
-    ocr: {
-      textoCompleto:
-        'Texto OCR mockado para demonstração.\n\nEste conteúdo simula a extração integral do documento com quebras de linha e organização pronta para leitura.',
-      paginas: [
-        'Página 1: Cabeçalho, identificação e contexto inicial do documento.',
-        'Página 2: Corpo principal com informações organizadas por blocos.',
-        'Página 3: Encerramento, observações e seção final.'
-      ]
-    },
-    extracaoEstruturada: {
-      campos: 'Nenhum campo',
-      tabelas: 'Nenhuma tabela'
-    },
-    alertas: [
-      'page 1: preprocess: upscaled low-resolution image',
-      'page 2: preprocess: upscaled low-resolution image',
-      'page 3: preprocess: upscaled low-resolution image'
-    ],
-    erros: 'Nenhum',
-    metadados: {
-      correlationId: 'de6f1fe2-ed48-4d8b-a5b5-33754d377426',
-      processingMs: 27330,
-      timings: {
-        validation: 0,
-        preprocess: 16819,
-        ocr: 4890,
-        chunks: 0,
-        llmChunks: 5373,
-        llmConsolidation: 0,
-        normalization: 0,
-        total: 27082,
-        overhead: 248
-      }
-    },
-    modelInfo: {
-      wesOcrModel: 'prebuilt-read',
-      wesAiApiVersion: '2024-12-01-preview',
-      wesAiDeployment: 'wes-ai-gpt-5.2-chat'
+  const buildMockResult = () => {
+    if (isExamMode) {
+      return {
+        resumo:
+          'Exame processado em modo demonstração. A estrutura exibe leitura OCR, classificação do tipo de exame, achados principais e dados estruturados para apoio à triagem clínica.',
+        classificacao: {
+          classePrevista: 'Hemograma',
+          confianca: 0.94,
+          revisaoNecessaria: 'Sim'
+        },
+        ocr: {
+          textoCompleto:
+            'Texto OCR mockado para demonstração clínica.\n\nPaciente: Ana Beatriz Lima\nExame: Hemograma completo\nObservação: valores de referência e achados destacados para revisão profissional.',
+          paginas: [
+            'Página 1: Identificação do paciente, laboratório, data de coleta e dados do exame.',
+            'Página 2: Série vermelha, série branca, plaquetas e valores de referência.',
+            'Página 3: Observações técnicas, assinatura do responsável e validação laboratorial.'
+          ]
+        },
+        extracaoEstruturada: {
+          campos: 'Paciente: Ana Beatriz Lima; Exame: Hemograma completo; Coleta: 22/07/2026; Laboratório: WES Lab',
+          tabelas: 'Hemoglobina | 13,4 g/dL; Leucócitos | 7.200/mm³; Plaquetas | 248.000/mm³'
+        },
+        alertas: [
+          'page 1: conferir identificação do paciente antes de anexar ao prontuário',
+          'page 2: revisar valores fora da faixa de referência quando houver',
+          'page 3: validar assinatura ou autenticação do laboratório'
+        ],
+        erros: 'Nenhum',
+        metadados: {
+          correlationId: 'exam-9f3b6c31-0ef8-4e9d-93ea-733967dcf426',
+          processingMs: 18420,
+          timings: {
+            validation: 0,
+            preprocess: 9210,
+            ocr: 3180,
+            chunks: 0,
+            llmChunks: 4820,
+            llmConsolidation: 910,
+            normalization: 120,
+            total: 18240,
+            overhead: 180
+          }
+        },
+        modelInfo: {
+          wesOcrModel: 'prebuilt-read',
+          wesAiApiVersion: '2024-12-01-preview',
+          wesAiDeployment: 'wes-ai-gpt-5.2-chat'
+        }
+      };
     }
-  });
+    return {
+      resumo:
+        'Documento processado em modo demonstração. A estrutura exibe resumo, classificação, OCR consolidado e detalhes por página para validação de layout e fluxo.',
+      classificacao: {
+        classePrevista: 'Documento Geral',
+        confianca: 0.93,
+        revisaoNecessaria: 'Não'
+      },
+      ocr: {
+        textoCompleto:
+          'Texto OCR mockado para demonstração.\n\nEste conteúdo simula a extração integral do documento com quebras de linha e organização pronta para leitura.',
+        paginas: [
+          'Página 1: Cabeçalho, identificação e contexto inicial do documento.',
+          'Página 2: Corpo principal com informações organizadas por blocos.',
+          'Página 3: Encerramento, observações e seção final.'
+        ]
+      },
+      extracaoEstruturada: {
+        campos: 'Nenhum campo',
+        tabelas: 'Nenhuma tabela'
+      },
+      alertas: [
+        'page 1: preprocess: upscaled low-resolution image',
+        'page 2: preprocess: upscaled low-resolution image',
+        'page 3: preprocess: upscaled low-resolution image'
+      ],
+      erros: 'Nenhum',
+      metadados: {
+        correlationId: 'de6f1fe2-ed48-4d8b-a5b5-33754d377426',
+        processingMs: 27330,
+        timings: {
+          validation: 0,
+          preprocess: 16819,
+          ocr: 4890,
+          chunks: 0,
+          llmChunks: 5373,
+          llmConsolidation: 0,
+          normalization: 0,
+          total: 27082,
+          overhead: 248
+        }
+      },
+      modelInfo: {
+        wesOcrModel: 'prebuilt-read',
+        wesAiApiVersion: '2024-12-01-preview',
+        wesAiDeployment: 'wes-ai-gpt-5.2-chat'
+      }
+    };
+  };
 
   const getSelectedClasses = () =>
     classOptions
@@ -13864,7 +13921,9 @@ function initDocumentAnalysisValidation() {
   processBtn.addEventListener('click', async () => {
     if (processBtn.disabled || isProcessing) return;
     isProcessing = true;
-    processBtn.textContent = 'Processando documento...';
+    const defaultProcessLabel = processBtn.dataset.defaultLabel || processBtn.textContent || 'Processar documento';
+    processBtn.dataset.defaultLabel = defaultProcessLabel;
+    processBtn.textContent = isExamMode ? 'Processando exame...' : 'Processando documento...';
     fillResultMeta();
     formAreaEl.hidden = true;
     resultEl.hidden = false;
@@ -13881,7 +13940,7 @@ function initDocumentAnalysisValidation() {
     }
     statusCardEl.hidden = true;
     resultContentEl.hidden = false;
-    processBtn.textContent = 'Processar documento';
+    processBtn.textContent = defaultProcessLabel;
     isProcessing = false;
     updateButtonState();
   });
@@ -13896,7 +13955,7 @@ function initDocumentAnalysisValidation() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
-    anchor.download = 'document-analysis-result.json';
+    anchor.download = isExamMode ? 'exam-reading-result.json' : 'document-analysis-result.json';
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -13905,6 +13964,324 @@ function initDocumentAnalysisValidation() {
 
   updateFileVisual();
   updateButtonState();
+}
+
+function initDocumentAnalysisValidation() {
+  [
+    document.getElementById('page-document-analysis')
+  ].forEach(initDocumentAnalysisValidationPage);
+}
+
+function initHealthExamReadingWorkflow() {
+  const page = document.getElementById('page-health-exam-reading');
+  const modal = document.getElementById('healthExamReadingModal');
+  if (!page || !modal || modal.dataset.bound === 'true') return;
+  modal.dataset.bound = 'true';
+
+  const openBtn = document.getElementById('openHealthExamReadingModal');
+  const closeButtons = Array.from(modal.querySelectorAll('[data-health-exam-reading-close]'));
+  const fileInput = document.getElementById('healthExamReadingFileInput');
+  const dropzone = document.getElementById('healthExamReadingDropzone');
+  const fileNameEl = document.getElementById('healthExamReadingFileName');
+  const operatorInput = document.getElementById('healthExamOperatorInput');
+  const feedbackEl = document.getElementById('healthExamReadingFeedback');
+  const loadingEl = document.getElementById('healthExamReadingLoading');
+  const processBtn = document.getElementById('processHealthExamReadingBtn');
+  const testPdfBtn = document.getElementById('generateHealthExamTestPdfBtn');
+  const historyTable = document.getElementById('healthExamReadingHistoryTable');
+  const resultsTable = document.getElementById('healthExamResultsTable');
+  const resultsEmpty = document.getElementById('healthExamResultsEmpty');
+  const resultsSearchInput = document.getElementById('healthExamMnemonicSearchInput');
+  const resultFileEl = document.querySelector('[data-health-exam-result-file]');
+  const resultOperatorEl = document.querySelector('[data-health-exam-result-operator]');
+  const resultStatusEl = document.querySelector('[data-health-exam-result-status]');
+  const resultCountEl = document.querySelector('[data-health-exam-result-count]');
+  const downloadReportBtn = document.getElementById('downloadHealthExamReportBtn');
+  const allowedExtensions = new Set(['pdf', 'png', 'jpg', 'jpeg']);
+  const mockMnemonics = [
+    { code: 'HEM', name: 'Hemograma completo' },
+    { code: 'HGB', name: 'Hemoglobina' },
+    { code: 'HTC', name: 'Hematócrito' },
+    { code: 'LEU', name: 'Leucócitos' },
+    { code: 'PLAQ', name: 'Plaquetas' },
+    { code: 'GLI', name: 'Glicemia' }
+  ];
+  let selectedFile = null;
+  let currentMnemonics = [];
+  let latestResult = {
+    fileName: 'exame-mnemonicos-teste.pdf',
+    operatorNumber: '48291',
+    processedAt: '30/07/2026 • 10:15',
+    status: 'Concluído',
+    mnemonics: mockMnemonics
+  };
+
+  const getFileExtension = (file) => String(file?.name || '').toLowerCase().split('.').pop() || '';
+  const isAllowedFile = (file) => Boolean(file?.name) && allowedExtensions.has(getFileExtension(file));
+  const setFeedback = (message = '', type = 'info') => {
+    if (!feedbackEl) return;
+    feedbackEl.hidden = !message;
+    feedbackEl.textContent = message;
+    feedbackEl.dataset.type = type;
+  };
+  const setSelectedFile = (file) => {
+    selectedFile = file;
+    currentMnemonics = [];
+    if (!file) {
+      if (fileNameEl) fileNameEl.textContent = 'Arraste o arquivo ou clique para selecionar.';
+      setFeedback('', 'info');
+      return;
+    }
+    if (fileNameEl) fileNameEl.textContent = file.name;
+    if (isAllowedFile(file)) {
+      setFeedback(`Formato validado: ${getFileExtension(file).toUpperCase()}.`, 'success');
+      return;
+    }
+    setFeedback('Formato inválido. Envie PDF, PNG ou JPG.', 'error');
+  };
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    operatorInput?.focus();
+  };
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (loadingEl) loadingEl.hidden = true;
+    if (processBtn) {
+      processBtn.disabled = false;
+      processBtn.textContent = 'Processar exames';
+    }
+  };
+  const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+  const readFileAsDataUrl = (file) => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(reader.error);
+    reader.readAsDataURL(file);
+  });
+  const getFilteredResultMnemonics = () => {
+    const query = String(resultsSearchInput?.value || '').trim().toLowerCase();
+    const items = latestResult.mnemonics || [];
+    if (!query) return items;
+    return items.filter((item) => (
+      String(item.code || '').toLowerCase().includes(query) ||
+      String(item.name || '').toLowerCase().includes(query)
+    ));
+  };
+  const renderResultsPage = () => {
+    const items = getFilteredResultMnemonics();
+    if (resultFileEl) resultFileEl.textContent = latestResult.fileName || '-';
+    if (resultOperatorEl) resultOperatorEl.textContent = latestResult.operatorNumber || '-';
+    if (resultStatusEl) resultStatusEl.textContent = latestResult.status || 'Concluído';
+    if (resultCountEl) resultCountEl.textContent = `${latestResult.mnemonics?.length || 0} encontrados`;
+    if (!resultsTable) return;
+    resultsTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+    items.forEach((item) => {
+      const row = document.createElement('div');
+      row.className = 'data-row';
+      row.dataset.healthExamMnemonicSearch = `${item.code} ${item.name}`;
+      row.innerHTML = `
+        <span><strong>${escapeHtmlWes(item.code)}</strong></span>
+        <span>${escapeHtmlWes(item.name)}</span>
+        <span class="row-actions">
+          <button class="icon-btn action-icon" type="button" aria-label="Copiar ${escapeHtmlWes(item.code)}" data-health-exam-copy-result="${escapeHtmlWes(`${item.code} - ${item.name}`)}">
+            <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+          </button>
+        </span>
+      `;
+      resultsTable.appendChild(row);
+    });
+    resultsEmpty?.classList.toggle('is-hidden', items.length > 0);
+  };
+  const addHistoryRow = (file, operatorNumber, items) => {
+    if (!historyTable) return;
+    const row = document.createElement('div');
+    row.className = 'data-row';
+    const now = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date()).replace(',', ' •');
+    const codes = items.map((item) => item.code).join(',');
+    row.innerHTML = `
+      <span><strong>${escapeHtmlWes(file.name)}</strong></span>
+      <span>${escapeHtmlWes(operatorNumber)}</span>
+      <span>${escapeHtmlWes(now)}</span>
+      <span><span class="chip success">Concluído</span></span>
+      <span>${escapeHtmlWes(String(items.length))} encontrados</span>
+      <span class="row-actions">
+        <button class="icon-btn action-icon" type="button" aria-label="Copiar mnemônicos" data-health-exam-copy-history="${escapeHtmlWes(codes)}">
+          <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+        </button>
+      </span>
+    `;
+    const firstDataRow = historyTable.querySelector('.data-row:not(.header)');
+    historyTable.insertBefore(row, firstDataRow || null);
+  };
+  const buildTestPdfBlob = () => {
+    const content = [
+      'BT',
+      '/F1 16 Tf',
+      '72 720 Td',
+      '(Exame de teste - Mnemonicos) Tj',
+      '0 -28 Td',
+      '(HEM Hemograma completo) Tj',
+      '0 -22 Td',
+      '(HGB Hemoglobina | LEU Leucocitos | PLAQ Plaquetas) Tj',
+      'ET'
+    ].join('\n');
+    const objects = [
+      '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj',
+      '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj',
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj',
+      `4 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj`,
+      '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj'
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((object) => {
+      offsets.push(pdf.length);
+      pdf += `${object}\n`;
+    });
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n`;
+    pdf += '0000000000 65535 f \n';
+    offsets.slice(1).forEach((offset) => {
+      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer\n<< /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    return new Blob([pdf], { type: 'application/pdf' });
+  };
+  const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  };
+  const downloadResultsReport = () => {
+    const lines = [
+      'Relatório de leitura de exames',
+      `Arquivo: ${latestResult.fileName || '-'}`,
+      `Operador: ${latestResult.operatorNumber || '-'}`,
+      `Processado em: ${latestResult.processedAt || '-'}`,
+      `Status: ${latestResult.status || '-'}`,
+      '',
+      'Mnemônico;Nome',
+      ...(latestResult.mnemonics || []).map((item) => `${item.code};${item.name}`)
+    ];
+    downloadBlob(new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' }), 'relatorio-mnemonicos.csv');
+  };
+
+  openBtn?.addEventListener('click', openModal);
+  closeButtons.forEach((button) => button.addEventListener('click', closeModal));
+  modal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-exam-reading-close]')) closeModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+  dropzone?.addEventListener('click', () => fileInput?.click());
+  dropzone?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    fileInput?.click();
+  });
+  dropzone?.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    dropzone.classList.add('is-dragover');
+  });
+  dropzone?.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+  dropzone?.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropzone.classList.remove('is-dragover');
+    setSelectedFile(event.dataTransfer?.files?.[0] || null);
+  });
+  fileInput?.addEventListener('change', () => setSelectedFile(fileInput.files?.[0] || null));
+  testPdfBtn?.addEventListener('click', () => {
+    const blob = buildTestPdfBlob();
+    const file = typeof File === 'function'
+      ? new File([blob], 'exame-mnemonicos-teste.pdf', { type: 'application/pdf' })
+      : Object.assign(blob, { name: 'exame-mnemonicos-teste.pdf' });
+    setSelectedFile(file);
+    downloadBlob(blob, 'exame-mnemonicos-teste.pdf');
+    showAppToast('PDF de teste gerado');
+  });
+  processBtn?.addEventListener('click', async () => {
+    const operatorNumber = String(operatorInput?.value || '').trim();
+    if (!selectedFile) {
+      setFeedback('Selecione um arquivo antes de processar.', 'error');
+      return;
+    }
+    if (!isAllowedFile(selectedFile)) {
+      setFeedback('Formato inválido. Envie PDF, PNG ou JPG.', 'error');
+      return;
+    }
+    if (!/^\d{2,}$/.test(operatorNumber)) {
+      setFeedback('Informe um número de operador válido.', 'error');
+      operatorInput?.focus();
+      return;
+    }
+    processBtn.disabled = true;
+    processBtn.textContent = 'Processando...';
+    loadingEl.hidden = false;
+    setFeedback('Arquivo validado. Convertendo para base64...', 'success');
+    try {
+      await readFileAsDataUrl(selectedFile);
+      await wait(1200);
+      currentMnemonics = mockMnemonics;
+      const processedAt = new Intl.DateTimeFormat('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(new Date()).replace(',', ' •');
+      latestResult = {
+        fileName: selectedFile.name,
+        operatorNumber,
+        processedAt,
+        status: 'Concluído',
+        mnemonics: currentMnemonics
+      };
+      if (resultsSearchInput) resultsSearchInput.value = '';
+      renderResultsPage();
+      loadingEl.hidden = true;
+      setFeedback('POST /mnemonics concluído com sucesso.', 'success');
+      addHistoryRow(selectedFile, operatorNumber, currentMnemonics);
+      showAppToast('Mnemônicos encontrados');
+      closeModal();
+      window.location.hash = '#/dashboard/health/exam-reading/results';
+    } catch {
+      loadingEl.hidden = true;
+      setFeedback('Não foi possível processar o arquivo.', 'error');
+    } finally {
+      processBtn.disabled = false;
+      processBtn.textContent = 'Processar exames';
+    }
+  });
+  downloadReportBtn?.addEventListener('click', downloadResultsReport);
+  resultsSearchInput?.addEventListener('input', renderResultsPage);
+  resultsTable?.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-health-exam-copy-result]');
+    if (!button || !resultsTable.contains(button)) return;
+    const copied = await copyTextToClipboard(button.dataset.healthExamCopyResult || '');
+    showAppToast(copied ? 'Mnemônico copiado' : 'Não foi possível copiar');
+  });
+  historyTable?.addEventListener('click', async (event) => {
+    const button = event.target.closest('[data-health-exam-copy-history]');
+    if (!button || !historyTable.contains(button)) return;
+    const codes = String(button.dataset.healthExamCopyHistory || '').split(',').filter(Boolean).join('\n');
+    const copied = await copyTextToClipboard(codes);
+    showAppToast(copied ? 'Mnemônicos copiados' : 'Não foi possível copiar');
+  });
+  renderResultsPage();
 }
 
 /** Markup do icone de pasta (Lucide `folder`) para projetos - usar ao criar cards/detalhes via JS; depois chame `lucide.createIcons()`. */
@@ -13934,6 +14311,7 @@ function ensureProjectCardEditButtons(root = document) {
 
 initDocClassesMultiSelect();
 initDocumentAnalysisValidation();
+initHealthExamReadingWorkflow();
 
 function hubCloseDropdowns() {
   if (hubOrgMenu) hubOrgMenu.hidden = true;
@@ -15524,6 +15902,29 @@ const healthServicePatientRecords = [
     plan: 'Bradesco Saúde',
   },
 ];
+const healthServiceAttendanceRecords = [
+  {
+    id: 'marina-costa-2026-07-22',
+    cpf: '45678912300',
+    patientName: 'Marina Costa',
+    plan: 'Unimed Fortaleza',
+    occurredAt: '2026-07-22T10:48:00-03:00',
+  },
+  {
+    id: 'roberto-lima-2026-07-21',
+    cpf: '98765432100',
+    patientName: 'Roberto Lima',
+    plan: 'Bradesco Saúde',
+    occurredAt: '2026-07-21T16:12:00-03:00',
+  },
+  {
+    id: 'ana-beatriz-2026-07-20',
+    cpf: '12345678900',
+    patientName: 'Ana Beatriz',
+    plan: 'SulAmérica Saúde',
+    occurredAt: '2026-07-20T09:35:00-03:00',
+  },
+];
 const healthServiceExamRecords = {
   'metabolic-panel': {
     title: 'Painel metabólico',
@@ -16001,6 +16402,92 @@ function getHealthServicePatientByCpf(cpf) {
     age: '42 anos',
     plan: 'Unimed Premium',
   };
+}
+
+function formatHealthServiceAttendanceDateTime(value) {
+  const date = value ? new Date(value) : null;
+  if (!date || Number.isNaN(date.getTime())) return '-';
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(date);
+}
+
+function getHealthServiceAttendancePatient(record = {}) {
+  const patient = getHealthServicePatientByCpf(record.cpf);
+  return {
+    ...patient,
+    cpf: record.cpf || patient.cpf,
+    name: record.patientName || patient.name,
+    plan: record.plan || patient.plan,
+  };
+}
+
+function isHealthServiceDateInPeriod(value) {
+  const periodMenu = document.getElementById('healthServicePeriodMenu');
+  const activePeriodMode = periodMenu?.dataset.mode === 'single' ? 'single' : 'range';
+  const startDateValue = String(document.getElementById('healthServiceStartDate')?.value || '').trim();
+  const endDateValue = String(document.getElementById('healthServiceEndDate')?.value || '').trim();
+  const singleDateValue = String(document.getElementById('healthServiceSingleDate')?.value || '').trim();
+  const startDate = startDateValue ? new Date(`${startDateValue}T00:00:00`) : null;
+  const endDate = endDateValue ? new Date(`${endDateValue}T23:59:59`) : null;
+  const singleDate = singleDateValue ? new Date(`${singleDateValue}T00:00:00`) : null;
+  const rowDate = value ? new Date(value) : null;
+
+  if (!rowDate || Number.isNaN(rowDate.getTime())) {
+    return !(singleDate || startDate || endDate);
+  }
+  if (activePeriodMode === 'single' && singleDate) {
+    return rowDate >= singleDate && rowDate < new Date(singleDate.getTime() + 86400000);
+  }
+  if (activePeriodMode === 'range') {
+    if (startDate && endDate) return rowDate >= startDate && rowDate <= endDate;
+    if (startDate) return rowDate >= startDate;
+    if (endDate) return rowDate <= endDate;
+  }
+  return true;
+}
+
+function applyHealthServiceAttendanceFilters() {
+  const table = document.getElementById('healthServiceTable');
+  if (!table) return;
+  const query = normalizeHealthPatientSearch(document.getElementById('healthServiceSearchInput')?.value || '');
+  table.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])').forEach((row) => {
+    const matchesSearch = !query || normalizeHealthPatientSearch(row.dataset.healthServiceSearch || '').includes(query);
+    const matchesPeriod = isHealthServiceDateInPeriod(row.dataset.healthServiceOccurredAt);
+    row.hidden = !(matchesSearch && matchesPeriod);
+  });
+  if (typeof syncTableEmptyState === 'function') syncTableEmptyState(table);
+}
+
+function renderHealthServiceAttendanceTable() {
+  const table = document.getElementById('healthServiceTable');
+  if (!table) return;
+  table.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])').forEach((row) => row.remove());
+  const emptyRow = table.querySelector('[data-table-empty-state="true"]');
+  const rows = healthServiceAttendanceRecords.map((record, index) => {
+    const row = document.createElement('div');
+    row.className = 'data-row';
+    row.dataset.healthServiceAttendanceIndex = String(index);
+    row.dataset.healthServiceSearch = record.patientName || '';
+    row.dataset.healthServiceOccurredAt = record.occurredAt || '';
+    row.innerHTML = `
+      <span>${escapeHtmlWes(record.patientName || '-')}</span>
+      <span>${escapeHtmlWes(record.plan || '-')}</span>
+      <span>${escapeHtmlWes(formatHealthServiceAttendanceDateTime(record.occurredAt))}</span>
+      <span class="row-actions">
+        <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do auxiliar médico de ${escapeHtmlWes(record.patientName || 'paciente')}" data-health-service-open-chat-history>
+          <span class="material-symbols-rounded" aria-hidden="true">history</span>
+        </button>
+        <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do paciente ${escapeHtmlWes(record.patientName || '')}" data-health-service-open-patient-history>
+          <span class="material-symbols-rounded" aria-hidden="true">assignment_ind</span>
+        </button>
+      </span>
+    `;
+    return row;
+  });
+  rows.forEach((row) => table.insertBefore(row, emptyRow || null));
+  applyHealthServiceAttendanceFilters();
 }
 
 function renderHealthServicePatientRecord(patient = {}) {
@@ -16546,17 +17033,75 @@ function initHealthServiceControls() {
   const modal = document.getElementById('healthServiceCpfModal');
   const examModal = document.getElementById('healthServiceExamModal');
   const timelineModal = document.getElementById('healthServiceTimelineModal');
+  const attendanceTable = document.getElementById('healthServiceTable');
+  const serviceSearchInput = document.getElementById('healthServiceSearchInput');
+  const periodBtn = document.getElementById('healthServicePeriodBtn');
+  const periodMenu = document.getElementById('healthServicePeriodMenu');
+  const periodOptions = Array.from(periodMenu?.querySelectorAll('.audit-period-option') || []);
+  const rangeFields = Array.from(periodMenu?.querySelectorAll('.audit-range-only') || []);
+  const singleField = periodMenu?.querySelector('.audit-single-only');
+  const periodStartInput = document.getElementById('healthServiceStartDate');
+  const periodEndInput = document.getElementById('healthServiceEndDate');
+  const periodSingleInput = document.getElementById('healthServiceSingleDate');
+  const periodApplyBtn = document.getElementById('healthServiceApplyPeriodBtn');
   const timelineGraph = document.querySelector('[data-health-service-timeline-graph]');
   const timelineFilterBtn = document.querySelector('[data-health-service-timeline-filter-btn]');
   const timelineFilterMenu = document.querySelector('[data-health-service-timeline-filter-menu]');
   const timelineFilterClear = document.querySelector('[data-health-service-timeline-filter-clear]');
   const form = document.getElementById('healthServiceCpfForm');
   const input = document.getElementById('healthServiceCpfInput');
+  renderHealthServiceAttendanceTable();
   renderHealthServiceTimelineYearOptions();
   syncFilterMenuLayout(timelineFilterMenu);
   syncHealthServiceTimelineFilterOptions();
   renderHealthServiceTimeline();
   document.querySelector('[data-health-service-start]')?.addEventListener('click', openHealthServiceCpfModal);
+  serviceSearchInput?.addEventListener('input', applyHealthServiceAttendanceFilters);
+  serviceSearchInput?.addEventListener('search', applyHealthServiceAttendanceFilters);
+  if (periodMenu && !periodMenu.dataset.mode) periodMenu.dataset.mode = 'range';
+  const syncHealthServicePeriodMode = () => {
+    const isSingle = periodMenu?.dataset.mode === 'single';
+    rangeFields.forEach((field) => field.classList.toggle('is-hidden', isSingle));
+    if (singleField) singleField.classList.toggle('is-hidden', !isSingle);
+  };
+  periodBtn?.addEventListener('click', (event) => {
+    event.stopPropagation();
+    periodMenu?.classList.toggle('open');
+  });
+  periodMenu?.addEventListener('click', (event) => {
+    event.stopPropagation();
+  });
+  document.addEventListener('click', () => {
+    periodMenu?.classList.remove('open');
+  });
+  periodOptions.forEach((button) => {
+    button.addEventListener('click', () => {
+      periodOptions.forEach((item) => item.classList.remove('active'));
+      button.classList.add('active');
+      if (periodMenu) periodMenu.dataset.mode = button.dataset.mode === 'single' ? 'single' : 'range';
+      syncHealthServicePeriodMode();
+      applyHealthServiceAttendanceFilters();
+    });
+  });
+  [periodStartInput, periodEndInput, periodSingleInput].forEach((periodInput) => {
+    periodInput?.addEventListener('change', applyHealthServiceAttendanceFilters);
+  });
+  periodApplyBtn?.addEventListener('click', () => {
+    applyHealthServiceAttendanceFilters();
+    periodMenu?.classList.remove('open');
+  });
+  periodMenu?.querySelector('.filter-clear')?.addEventListener('click', () => {
+    if (periodStartInput) periodStartInput.value = '';
+    if (periodEndInput) periodEndInput.value = '';
+    if (periodSingleInput) periodSingleInput.value = '';
+    if (periodMenu) periodMenu.dataset.mode = 'range';
+    periodOptions.forEach((item) => item.classList.remove('active'));
+    periodOptions.find((item) => item.dataset.mode === 'range')?.classList.add('active');
+    syncHealthServicePeriodMode();
+    periodMenu.classList.remove('open');
+    applyHealthServiceAttendanceFilters();
+  });
+  syncHealthServicePeriodMode();
   form?.addEventListener('submit', (event) => {
     event.preventDefault();
     const digits = String(input?.value || '').replace(/\D/g, '').slice(0, 11);
@@ -16628,26 +17173,18 @@ function initHealthServiceControls() {
   document.querySelectorAll('[data-health-service-exam-id]').forEach((button) => {
     button.addEventListener('click', () => openHealthServiceExamModal(button.dataset.healthServiceExamId));
   });
-  document.querySelectorAll('[data-health-service-open-patient-history]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const row = button.closest('.data-row');
-      const cells = row ? Array.from(row.children) : [];
-      const name = cells[0]?.textContent?.trim() || 'Ana Beatriz Lima';
-      const plan = cells[1]?.textContent?.trim() || 'Unimed Premium';
-      const initials = name
-        .split(/\s+/)
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0])
-        .join('')
-        .toUpperCase() || 'AB';
-      openHealthServicePatientPage({ cpf: '12345678900', name, initials, age: '42 anos', plan });
-    });
-  });
-  document.querySelectorAll('[data-health-service-open-chat-history]').forEach((button) => {
-    button.addEventListener('click', () => {
+  attendanceTable?.addEventListener('click', (event) => {
+    const chatButton = event.target.closest('[data-health-service-open-chat-history]');
+    if (chatButton && attendanceTable.contains(chatButton)) {
       window.location.hash = '#/dashboard/health/whatsapp/history';
-    });
+      return;
+    }
+    const patientButton = event.target.closest('[data-health-service-open-patient-history]');
+    if (!patientButton || !attendanceTable.contains(patientButton)) return;
+    const row = patientButton.closest('[data-health-service-attendance-index]');
+    const record = healthServiceAttendanceRecords[Number(row?.dataset.healthServiceAttendanceIndex)];
+    if (!record) return;
+    openHealthServicePatientPage(getHealthServiceAttendancePatient(record));
   });
   document.querySelector('[data-health-service-consult-chat]')?.addEventListener('click', () => {
     showAppToast('Consulta iniciada no chat com o histórico do paciente');
@@ -18334,7 +18871,9 @@ const routeMap = {
   'dashboard/health/service': 'page-health-service',
   'dashboard/health/service/patient': 'page-health-service-patient',
   'dashboard/health/agenda': 'page-health-agenda',
-  'dashboard/health/integrations': 'page-health-integrations',
+  'dashboard/health/accountability': 'page-health-accountability',
+  'dashboard/health/exam-reading': 'page-health-exam-reading',
+  'dashboard/health/exam-reading/results': 'page-health-exam-reading-results',
   'dashboard/vm-monitoring': 'page-vm-monitoring',
   'dashboard/executors': 'page-executors',
   'dashboard/packages': 'page-packages',
@@ -18347,6 +18886,9 @@ const routeMap = {
   'dashboard/users': 'page-users',
   'dashboard/roles': 'page-roles',
   'dashboard/mcps': 'page-mcps',
+  'dashboard/integrations/documentation': 'page-integrations-docs',
+  'dashboard/integrations/apis': 'page-integrations-apis',
+  'dashboard/health/integrations': 'page-integrations-apis',
   'dashboard/skills': 'page-skills',
   'dashboard/audit': 'page-agent-history',
   'dashboard/agent-history': 'page-agent-history',
@@ -18384,7 +18926,9 @@ const sectionMap = {
   'dashboard/health/whatsapp/history': 'Saúde',
   'dashboard/health/service': 'Saúde',
   'dashboard/health/agenda': 'Saúde',
-  'dashboard/health/integrations': 'Saúde',
+  'dashboard/health/accountability': 'Saúde',
+  'dashboard/health/exam-reading': 'Saúde',
+  'dashboard/health/exam-reading/results': 'Saúde',
   'dashboard/vm-monitoring': 'Máquinas virtuais',
   'dashboard/executors': 'Infraestrutura',
   'dashboard/packages': 'Infraestrutura',
@@ -18395,6 +18939,9 @@ const sectionMap = {
   'dashboard/users': 'Administração',
   'dashboard/roles': 'Administração',
   'dashboard/mcps': 'Administração',
+  'dashboard/integrations/documentation': 'Integrações',
+  'dashboard/integrations/apis': 'Integrações',
+  'dashboard/health/integrations': 'Integrações',
   'dashboard/skills': 'Administração',
   'dashboard/audit': 'Administração',
   'dashboard/agent-history': 'Administração',
@@ -18829,6 +19376,14 @@ const normalizeVisiblePortugueseLabels = () => {
   normalizeAutomationLabels();
 
   const replacements = [
+    ['.nav-trigger[data-menu="dynamic-service"] .nav-label', 'Atendimento din\u00e2mico'],
+    ['#submenu-dynamic-service a[href="#/dashboard/campaigns"] .submenu-label', 'Campanhas'],
+    ['#submenu-dynamic-service a[href="#/dashboard/channels"] .submenu-label', 'Canais'],
+    ['#submenu-dynamic-service a[href="#/dashboard/hybrid-flows"] .submenu-label', 'Fluxos h\u00edbridos'],
+    ['#submenu-dynamic-service a[href="#/dashboard/voice-messaging"] .submenu-label', 'Mensageria por voz'],
+    ['.nav-trigger[data-menu="integrations"] .nav-label', 'Integra\u00e7\u00f5es'],
+    ['#submenu-integrations a[href="#/dashboard/integrations/documentation"] .submenu-label', 'Documenta\u00e7\u00e3o'],
+    ['#submenu-integrations a[href="#/dashboard/integrations/apis"] .submenu-label', "API's"],
     ['.nav-trigger[data-menu="administration"] .nav-label', 'Administra\u00e7\u00e3o'],
     ['#submenu-administration a[href="#/dashboard/audit"] .submenu-label', 'Auditoria'],
     ['#submenu-administration a[href="#/dashboard/mcps"] .submenu-label', 'Conex\u00f5es'],
@@ -18838,7 +19393,8 @@ const normalizeVisiblePortugueseLabels = () => {
     ['#submenu-health a[href="#/dashboard/health/whatsapp"] .submenu-label', 'Agente do paciente'],
     ['#submenu-health a[href="#/dashboard/health/service"] .submenu-label', 'Atendimento'],
     ['#submenu-health a[href="#/dashboard/health/agenda"] .submenu-label', 'Agenda'],
-    ['#submenu-health a[href="#/dashboard/health/integrations"] .submenu-label', 'Integra\u00e7\u00f5es'],
+    ['#submenu-health a[href="#/dashboard/health/accountability"] .submenu-label', 'Presta\u00e7\u00e3o de contas'],
+    ['#submenu-health a[href="#/dashboard/health/exam-reading"] .submenu-label', 'Leitura de exames'],
     ['#wesProjectDescription', null],
   ];
 
@@ -18863,8 +19419,14 @@ const normalizeVisiblePortugueseLabels = () => {
 
 const updateActivePage = () => {
   normalizeVisiblePortugueseLabels();
-  const { routeKey } = getHashRouteInfo();
-  const pageRouteKey = routeKey === 'dashboard/people-management'
+  const { routeKey, queryParams } = getHashRouteInfo();
+  const pageRouteKey = routeKey === 'dashboard/mcps' && queryParams.get('tab') === 'integrations'
+    ? 'dashboard/integrations/apis'
+    : routeKey === 'dashboard/health/integrations'
+    ? 'dashboard/integrations/apis'
+    : routeKey === 'dashboard/integrations'
+    ? 'dashboard/integrations/documentation'
+    : routeKey === 'dashboard/people-management'
     ? getPeopleManagementDefaultRoute()
     : routeKey;
   if (routeKey === 'select-company') {
@@ -18914,6 +19476,10 @@ const updateActivePage = () => {
       ? 'dashboard/health/whatsapp'
     : pageRouteKey.startsWith('dashboard/health/service/')
       ? 'dashboard/health/service'
+    : pageRouteKey.startsWith('dashboard/health/exam-reading/')
+      ? 'dashboard/health/exam-reading'
+    : pageRouteKey.startsWith('dashboard/integrations/')
+      ? pageRouteKey
       : pageRouteKey;
 
   if (hubScopeBar) {
@@ -18928,7 +19494,8 @@ const updateActivePage = () => {
       'dashboard/health/whatsapp',
       'dashboard/health/service',
       'dashboard/health/agenda',
-      'dashboard/health/integrations',
+      'dashboard/health/accountability',
+      'dashboard/health/exam-reading',
       'dashboard/agents',
       'dashboard/vm-monitoring',
       'dashboard/environments'

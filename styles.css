@@ -8541,7 +8541,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .health-exam-reading-table .data-row {
-  grid-template-columns: minmax(220px, 1.35fr) minmax(100px, 0.7fr) minmax(150px, 0.9fr) minmax(110px, 0.7fr) minmax(120px, 0.75fr) minmax(90px, 0.45fr);
+  grid-template-columns: minmax(240px, 1.45fr) minmax(100px, 0.7fr) minmax(160px, 0.95fr) minmax(130px, 0.8fr) minmax(90px, 0.45fr);
 }
 
 .health-exam-results-page {
@@ -8559,13 +8559,38 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   gap: 6px;
   min-width: 0;
   padding: 14px;
-  border: 1px solid rgba(207, 216, 228, 0.92);
+  border: 1px solid var(--border);
   border-radius: 12px;
   background: #ffffff;
-  box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
+  box-shadow: var(--shadow);
 }
 
-.health-exam-results-summary span {
+.health-exam-results-summary--list {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+  margin-top: -16px;
+}
+
+.health-exam-results-summary-list {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.health-exam-results-summary-item {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.health-exam-results-summary article > span:not(.material-symbols-rounded),
+.health-exam-results-summary article > div > span,
+.health-exam-results-summary-item > span {
   color: #64748b;
   font-size: var(--md-body-small);
   font-weight: 700;
@@ -8578,8 +8603,56 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   overflow-wrap: anywhere;
 }
 
+.health-exam-results-summary--list strong {
+  color: #0f172a;
+  font-size: var(--md-body-small);
+  line-height: 18px;
+  font-weight: 700;
+}
+
+.health-exam-results-summary--list .health-exam-results-summary-item > span {
+  color: #016ff4;
+}
+
 .health-exam-results-toolbar {
   margin-bottom: 0;
+}
+
+#page-health-exam-reading-results .health-exam-results-toolbar {
+  grid-template-columns: minmax(260px, 520px) 1fr max-content;
+  align-items: center;
+  max-width: none;
+}
+
+.health-exam-copy-all-btn {
+  grid-column: 3;
+  justify-self: end;
+  min-height: 0;
+  padding: 0 8px;
+  border: 0;
+  background: transparent;
+  color: #016ff4;
+  font: inherit;
+  font-size: var(--md-label-large);
+  line-height: 20px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.health-exam-copy-all-btn:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  #page-health-exam-reading-results .health-exam-results-toolbar {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .health-exam-copy-all-btn {
+    grid-column: auto;
+    justify-self: start;
+  }
 }
 
 .health-exam-results-table .data-row {
@@ -8722,6 +8795,111 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .health-exam-mnemonics-table .data-row {
   grid-template-columns: minmax(120px, 0.45fr) minmax(220px, 1fr);
+}
+
+.health-accountability-history-table .data-row {
+  grid-template-columns: minmax(240px, 1.4fr) minmax(140px, 0.8fr) minmax(170px, 0.9fr) minmax(170px, 0.95fr) minmax(90px, 0.45fr);
+}
+
+.health-accountability-results-page {
+  align-content: start;
+}
+
+.health-accountability-results-summary strong {
+  overflow-wrap: anywhere;
+}
+
+.health-accountability-result-head,
+.health-accountability-result-section {
+  display: grid;
+  gap: 10px;
+}
+
+.health-accountability-result-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.health-accountability-result-head h3,
+.health-accountability-result-section h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: var(--md-title-medium);
+  line-height: 24px;
+  font-weight: 700;
+}
+
+.health-accountability-result-head .chip {
+  margin-top: 2px;
+}
+
+.health-accountability-results-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.health-accountability-pages-table,
+.health-accountability-checklist-table {
+  overflow-x: auto;
+}
+
+.health-accountability-pages-table .data-row {
+  grid-template-columns: minmax(80px, 0.35fr) minmax(220px, 1fr) minmax(100px, 0.45fr) minmax(110px, 0.5fr);
+  min-width: 560px;
+}
+
+.health-accountability-checklist-table .data-row {
+  grid-template-columns: minmax(220px, 1fr) minmax(110px, 0.45fr);
+  min-width: 380px;
+}
+
+.health-accountability-audit-table {
+  overflow-x: auto;
+}
+
+.health-accountability-audit-table .data-row {
+  grid-template-columns: minmax(180px, 0.8fr) minmax(320px, 1.4fr) minmax(90px, 0.35fr);
+  min-width: 720px;
+}
+
+.health-accountability-audit-table .data-row:not(.header) > span:nth-child(2) {
+  white-space: normal;
+  line-height: 19px;
+}
+
+.health-accountability-loading {
+  align-items: start;
+}
+
+.health-accountability-progress {
+  height: 8px;
+  margin-top: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #dbeafe;
+}
+
+.health-accountability-progress span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: #016ff4;
+  transition: width 0.28s ease;
+}
+
+@media (max-width: 1100px) {
+  .health-accountability-results-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .health-accountability-result-head {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 @keyframes health-exam-spin {

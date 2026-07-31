@@ -13972,6 +13972,449 @@ function initDocumentAnalysisValidation() {
   ].forEach(initDocumentAnalysisValidationPage);
 }
 
+function initHealthAccountabilityWorkflow() {
+  const page = document.getElementById('page-health-accountability');
+  const modal = document.getElementById('healthAccountabilityModal');
+  if (!page || !modal || modal.dataset.bound === 'true') return;
+  modal.dataset.bound = 'true';
+
+  const openBtn = document.getElementById('openHealthAccountabilityModal');
+  const closeButtons = Array.from(modal.querySelectorAll('[data-health-accountability-close]'));
+  const fileInput = document.getElementById('healthAccountabilityFileInput');
+  const dropzone = document.getElementById('healthAccountabilityDropzone');
+  const fileNameEl = document.getElementById('healthAccountabilityFileName');
+  const hospitalInput = document.getElementById('healthAccountabilityHospitalInput');
+  const validationSelect = document.getElementById('healthAccountabilityValidationSelect');
+  const feedbackEl = document.getElementById('healthAccountabilityFeedback');
+  const loadingEl = document.getElementById('healthAccountabilityLoading');
+  const loadingTextEl = document.getElementById('healthAccountabilityLoadingText');
+  const progressBar = document.getElementById('healthAccountabilityProgressBar');
+  const processBtn = document.getElementById('processHealthAccountabilityBtn');
+  const historyTable = document.getElementById('healthAccountabilityHistoryTable');
+  const pagesTable = document.getElementById('healthAccountabilityPagesTable');
+  const checklistTable = document.getElementById('healthAccountabilityChecklistTable');
+  const auditTable = document.getElementById('healthAccountabilityAuditTable');
+  const resultSearchInput = document.getElementById('healthAccountabilityResultSearchInput');
+  const downloadReportBtn = document.getElementById('downloadHealthAccountabilityReportBtn');
+  const resultFileEl = document.querySelector('[data-health-accountability-result-file]');
+  const resultHospitalEl = document.querySelector('[data-health-accountability-result-hospital]');
+  const resultTypeEl = document.querySelector('[data-health-accountability-result-type]');
+  const resultStatusEl = document.querySelector('[data-health-accountability-result-status]');
+  const resultChipEl = document.querySelector('[data-health-accountability-result-chip]');
+  const resultPagesEl = document.querySelector('[data-health-accountability-result-pages]');
+  const resultChecklistEl = document.querySelector('[data-health-accountability-result-checklist]');
+  const resultOracleEl = document.querySelector('[data-health-accountability-result-oracle]');
+  let selectedFile = null;
+  let selectedResultIndex = 0;
+
+  const initialRecords = [
+    {
+      fileName: 'guia-intercambio-10482.pdf',
+      hospital: 'HMoinhos',
+      validationType: 'Validação 1',
+      processedAt: '30/07/2026 • 14:22',
+      status: 'SUCCESS',
+      pages: [
+        { page: '1', category: 'Conta analítica', confidence: '96%', status: 'SUCCESS' },
+        { page: '2', category: 'Descrição cirúrgica', confidence: '94%', status: 'SUCCESS' },
+        { page: '3', category: 'Ficha anestésica', confidence: '91%', status: 'SUCCESS' },
+        { page: '4', category: 'Laudo de anatomia patológica', confidence: '89%', status: 'SUCCESS' }
+      ],
+      checklist: [
+        { document: 'Conta analítica', found: true },
+        { document: 'Descrição cirúrgica', found: true },
+        { document: 'Ficha anestésica', found: true },
+        { document: 'Laudo de anatomia patológica', found: true }
+      ],
+      audit: [
+        { title: 'PDF extraído', detail: '12 páginas identificadas no pacote hospitalar.', time: '14:22' },
+        { title: 'Categorias classificadas', detail: 'WES Classifier categorizou as páginas obrigatórias.', time: '14:23' },
+        { title: 'Checklist aprovado', detail: 'Todas as categorias obrigatórias foram encontradas.', time: '14:24' },
+        { title: 'Oracle atualizado', detail: 'MERGE em valid_docs finalizado com status SUCCESS.', time: '14:24' }
+      ]
+    },
+    {
+      fileName: 'pacote-hospitalar-8831.pdf',
+      hospital: 'Rede Sul',
+      validationType: 'Validação 2',
+      processedAt: '29/07/2026 • 16:08',
+      status: 'REVISÃO',
+      pages: [
+        { page: '1', category: 'Conta analítica', confidence: '93%', status: 'SUCCESS' },
+        { page: '2', category: 'Laudo AP', confidence: '68%', status: 'REVISÃO' },
+        { page: '3', category: 'Prescrição', confidence: '88%', status: 'SUCCESS' }
+      ],
+      checklist: [
+        { document: 'Conta analítica', found: true },
+        { document: 'Laudo AP', found: true },
+        { document: 'Prescrição', found: true },
+        { document: 'Evolução médica', found: false }
+      ],
+      audit: [
+        { title: 'PDF extraído', detail: '8 páginas identificadas no pacote hospitalar.', time: '16:08' },
+        { title: 'Fallback aplicado', detail: 'OCR + WES AI Review usado para confirmar laudo AP.', time: '16:09' },
+        { title: 'Checklist parcial', detail: 'Evolução médica não encontrada com confiança suficiente.', time: '16:10' },
+        { title: 'Oracle atualizado', detail: 'MERGE em valid_docs finalizado com status REVISÃO.', time: '16:10' }
+      ]
+    },
+    {
+      fileName: 'conta-cirurgica-7720.pdf',
+      hospital: 'São Lucas',
+      validationType: 'Validação 3',
+      processedAt: '28/07/2026 • 10:35',
+      status: 'ERROR',
+      pages: [
+        { page: '1', category: 'Conta analítica', confidence: '95%', status: 'SUCCESS' },
+        { page: '2', category: 'Descrição cirúrgica', confidence: '92%', status: 'SUCCESS' },
+        { page: '3', category: 'Documento não aceito', confidence: '52%', status: 'ERROR' }
+      ],
+      checklist: [
+        { document: 'Conta analítica', found: true },
+        { document: 'Descrição cirúrgica', found: true },
+        { document: 'Ficha anestésica', found: false },
+        { document: 'Laudo de anatomia patológica', found: false }
+      ],
+      audit: [
+        { title: 'PDF extraído', detail: '6 páginas identificadas no pacote hospitalar.', time: '10:35' },
+        { title: 'Categoria recusada', detail: 'Uma página permaneceu sem categoria aceita.', time: '10:36' },
+        { title: 'Checklist reprovado', detail: 'Documentos obrigatórios não encontrados.', time: '10:37' },
+        { title: 'Oracle atualizado', detail: 'MERGE em valid_docs finalizado com status ERROR.', time: '10:37' }
+      ]
+    }
+  ];
+  const records = [...initialRecords];
+
+  const statusClass = (status) => {
+    const normalized = String(status || '').toUpperCase();
+    if (normalized === 'SUCCESS') return 'success';
+    if (normalized === 'ERROR') return 'danger';
+    if (normalized === 'RUNNING') return 'running';
+    return 'warning';
+  };
+  const getCurrentResult = () => records[selectedResultIndex] || records[0];
+  const isPdfFile = (file) => Boolean(file?.name) && String(file.name).toLowerCase().endsWith('.pdf');
+  const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+  const setFeedback = (message = '', type = 'info') => {
+    if (!feedbackEl) return;
+    feedbackEl.hidden = !message;
+    feedbackEl.textContent = message;
+    feedbackEl.dataset.type = type;
+  };
+  const setProgress = (value, text) => {
+    if (progressBar) progressBar.style.width = `${value}%`;
+    if (loadingTextEl && text) loadingTextEl.textContent = text;
+  };
+  const setSelectedFile = (file) => {
+    selectedFile = file;
+    if (!file) {
+      if (fileNameEl) fileNameEl.textContent = 'Arraste o PDF ou clique para selecionar.';
+      setFeedback('', 'info');
+      return;
+    }
+    if (fileNameEl) fileNameEl.textContent = file.name;
+    setFeedback(isPdfFile(file) ? 'PDF validado para processamento.' : 'Formato inválido. Envie apenas PDF.', isPdfFile(file) ? 'success' : 'error');
+  };
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    hospitalInput?.focus();
+  };
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (loadingEl) loadingEl.hidden = true;
+    setProgress(0, 'Extraindo páginas do PDF.');
+    if (processBtn) {
+      processBtn.disabled = false;
+      processBtn.textContent = 'Processar prestação';
+    }
+  };
+  const renderHistory = () => {
+    if (!historyTable) return;
+    historyTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
+    historyTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+    records.forEach((record, index) => {
+      const row = document.createElement('div');
+      row.className = 'data-row';
+      row.dataset.healthAccountabilityHistoryIndex = String(index);
+      row.innerHTML = `
+        <span><strong>${escapeHtmlWes(record.fileName)}</strong></span>
+        <span>${escapeHtmlWes(record.hospital)}</span>
+        <span>${escapeHtmlWes(record.validationType)}</span>
+        <span>${escapeHtmlWes(record.processedAt)}</span>
+        <span class="row-actions">
+          <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
+            <span class="material-symbols-rounded" aria-hidden="true">article</span>
+          </button>
+        </span>
+      `;
+      historyTable.appendChild(row);
+    });
+  };
+  const renderResultPage = () => {
+    const result = getCurrentResult();
+    if (!result) return;
+    const query = String(resultSearchInput?.value || '').trim().toLowerCase();
+    const matchesQuery = (...values) => {
+      if (!query) return true;
+      return values.some((value) => String(value || '').toLowerCase().includes(query));
+    };
+    const visiblePages = result.pages.filter((item) => matchesQuery(item.page, item.category, item.confidence, item.status));
+    const visibleChecklist = result.checklist.filter((item) => matchesQuery(item.document, item.found ? 'Encontrado' : 'Ausente'));
+    const visibleAudit = result.audit.filter((item) => matchesQuery(item.title, item.detail, item.time));
+    if (resultFileEl) resultFileEl.textContent = result.fileName;
+    if (resultHospitalEl) resultHospitalEl.textContent = result.hospital;
+    if (resultTypeEl) resultTypeEl.textContent = result.validationType;
+    if (resultStatusEl) resultStatusEl.textContent = result.status;
+    if (resultChipEl) {
+      resultChipEl.textContent = result.status;
+      resultChipEl.className = `chip ${statusClass(result.status)}`;
+    }
+    const foundCount = result.checklist.filter((item) => item.found).length;
+    if (resultPagesEl) resultPagesEl.textContent = `${result.pages.length} páginas classificadas`;
+    if (resultChecklistEl) resultChecklistEl.textContent = `${foundCount} de ${result.checklist.length} obrigatórios encontrados`;
+    if (resultOracleEl) resultOracleEl.textContent = `Status ${result.status} gravado em ${result.processedAt}.`;
+
+    if (pagesTable) {
+      pagesTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
+      pagesTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+      visiblePages.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'data-row';
+        row.innerHTML = `
+          <span><strong>${escapeHtmlWes(item.page)}</strong></span>
+          <span>${escapeHtmlWes(item.category)}</span>
+          <span>${escapeHtmlWes(item.confidence)}</span>
+          <span><span class="chip ${statusClass(item.status)}">${escapeHtmlWes(item.status)}</span></span>
+        `;
+        pagesTable.appendChild(row);
+      });
+    }
+    if (checklistTable) {
+      checklistTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
+      checklistTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+      visibleChecklist.forEach((item) => {
+        const status = item.found ? 'Encontrado' : 'Ausente';
+        const row = document.createElement('div');
+        row.className = 'data-row';
+        row.innerHTML = `
+          <span><strong>${escapeHtmlWes(item.document)}</strong></span>
+          <span><span class="chip ${item.found ? 'success' : 'danger'}">${status}</span></span>
+        `;
+        checklistTable.appendChild(row);
+      });
+    }
+    if (auditTable) {
+      auditTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
+      auditTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+      visibleAudit.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'data-row';
+        row.innerHTML = `
+          <span><strong>${escapeHtmlWes(item.title)}</strong></span>
+          <span>${escapeHtmlWes(item.detail)}</span>
+          <span>${escapeHtmlWes(item.time)}</span>
+        `;
+        auditTable.appendChild(row);
+      });
+    }
+  };
+  const createMockResult = (file, hospital, validationType) => {
+    const now = new Intl.DateTimeFormat('pt-BR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(new Date()).replace(',', ' •');
+    const status = validationType === 'Validação 3' ? 'ERROR' : 'SUCCESS';
+    const checklist = validationType === 'Validação 3'
+      ? [
+        { document: 'Conta analítica', found: true },
+        { document: 'Descrição cirúrgica', found: true },
+        { document: 'Ficha anestésica', found: false }
+      ]
+      : [
+        { document: 'Conta analítica', found: true },
+        { document: 'Descrição cirúrgica', found: true },
+        { document: 'Ficha anestésica', found: true },
+        { document: 'Laudo de anatomia patológica', found: validationType === 'Validação 1' }
+      ];
+    const pages = [
+      { page: '1', category: 'Conta analítica', confidence: '96%', status: 'SUCCESS' },
+      { page: '2', category: 'Descrição cirúrgica', confidence: '93%', status: 'SUCCESS' },
+      { page: '3', category: validationType === 'Validação 3' ? 'Categoria não aceita' : 'Ficha anestésica', confidence: validationType === 'Validação 3' ? '55%' : '90%', status: validationType === 'Validação 3' ? 'ERROR' : 'SUCCESS' }
+    ];
+    if (validationType === 'Validação 1') {
+      pages.push({ page: '4', category: 'Laudo de anatomia patológica', confidence: '88%', status: 'SUCCESS' });
+    }
+    return {
+      fileName: file.name,
+      hospital,
+      validationType,
+      processedAt: now,
+      status,
+      pages,
+      checklist,
+      audit: [
+        { title: 'PDF extraído', detail: `${pages.length + 5} páginas identificadas no pacote hospitalar.`, time: now.split(' • ')[1] || 'Agora' },
+        { title: 'Categorias classificadas', detail: 'WES Classifier categorizou página por página.', time: now.split(' • ')[1] || 'Agora' },
+        { title: status === 'SUCCESS' ? 'Checklist aprovado' : 'Checklist reprovado', detail: status === 'SUCCESS' ? 'Categorias obrigatórias encontradas para o tipo de validação.' : 'Uma ou mais categorias obrigatórias não foram encontradas.', time: now.split(' • ')[1] || 'Agora' },
+        { title: 'Oracle atualizado', detail: `MERGE em valid_docs finalizado com status ${status}.`, time: now.split(' • ')[1] || 'Agora' }
+      ]
+    };
+  };
+  const escapePdfText = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7e]/g, '')
+    .replace(/[\\()]/g, '\\$&');
+  const buildResultPdfBlob = (result) => {
+    const lines = [
+      'Resultado da prestacao de contas',
+      `Arquivo: ${result.fileName}`,
+      `Hospital: ${result.hospital}`,
+      `Tipo de validacao: ${result.validationType}`,
+      `Status: ${result.status}`,
+      '',
+      'Categorias por pagina:',
+      ...result.pages.map((item) => `Pag. ${item.page} - ${item.category} - ${item.confidence} - ${item.status}`),
+      '',
+      'Checklist documental:',
+      ...result.checklist.map((item) => `${item.found ? '[OK]' : '[ERRO]'} ${item.document}`),
+      '',
+      'Audit trail:',
+      ...result.audit.map((item) => `${item.time} - ${item.title}: ${item.detail}`),
+      '',
+      `Producao Oracle: MERGE em valid_docs com status ${result.status}.`
+    ];
+    const contentLines = lines.slice(0, 32).map((line, index) => {
+      const y = 742 - (index * 20);
+      return `72 ${y} Td (${escapePdfText(line)}) Tj`;
+    });
+    const content = ['BT', '/F1 12 Tf', ...contentLines, 'ET'].join('\n');
+    const objects = [
+      '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj',
+      '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj',
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj',
+      `4 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj`,
+      '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj'
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((object) => {
+      offsets.push(pdf.length);
+      pdf += `${object}\n`;
+    });
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n`;
+    pdf += '0000000000 65535 f \n';
+    offsets.slice(1).forEach((offset) => {
+      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer\n<< /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    return new Blob([pdf], { type: 'application/pdf' });
+  };
+  const downloadBlob = (blob, filename) => {
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  openBtn?.addEventListener('click', openModal);
+  closeButtons.forEach((button) => button.addEventListener('click', closeModal));
+  modal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-accountability-close]')) closeModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+  dropzone?.addEventListener('click', () => fileInput?.click());
+  dropzone?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    event.preventDefault();
+    fileInput?.click();
+  });
+  dropzone?.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    dropzone.classList.add('is-dragover');
+  });
+  dropzone?.addEventListener('dragleave', () => dropzone.classList.remove('is-dragover'));
+  dropzone?.addEventListener('drop', (event) => {
+    event.preventDefault();
+    dropzone.classList.remove('is-dragover');
+    setSelectedFile(event.dataTransfer?.files?.[0] || null);
+  });
+  fileInput?.addEventListener('change', () => setSelectedFile(fileInput.files?.[0] || null));
+  historyTable?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-health-accountability-open-result]');
+    if (!button || !historyTable.contains(button)) return;
+    const row = button.closest('[data-health-accountability-history-index]');
+    selectedResultIndex = Number(row?.dataset.healthAccountabilityHistoryIndex || 0);
+    renderResultPage();
+    window.location.hash = '#/dashboard/health/accountability/results';
+  });
+  processBtn?.addEventListener('click', async () => {
+    const hospital = String(hospitalInput?.value || '').trim();
+    const validationType = String(validationSelect?.value || '').trim();
+    if (!selectedFile) {
+      setFeedback('Selecione um PDF antes de processar.', 'error');
+      return;
+    }
+    if (!isPdfFile(selectedFile)) {
+      setFeedback('Formato inválido. Envie apenas PDF.', 'error');
+      return;
+    }
+    if (!hospital) {
+      setFeedback('Informe o nome do hospital.', 'error');
+      hospitalInput?.focus();
+      return;
+    }
+    if (!validationType) {
+      setFeedback('Selecione o tipo de validação.', 'error');
+      validationSelect?.focus();
+      return;
+    }
+    processBtn.disabled = true;
+    processBtn.textContent = 'Processando...';
+    if (loadingEl) loadingEl.hidden = false;
+    setFeedback('PDF validado. Iniciando conferência documental.', 'success');
+    setProgress(12, 'Extraindo páginas do PDF.');
+    await wait(550);
+    setProgress(38, 'Enviando páginas ao WES Classifier.');
+    await wait(650);
+    setProgress(68, 'Executando OCR e WES AI Review quando necessário.');
+    await wait(650);
+    setProgress(88, 'Aplicando checklist documental.');
+    await wait(550);
+    setProgress(100, 'Gravando resultado no Oracle valid_docs.');
+    await wait(350);
+
+    const result = createMockResult(selectedFile, hospital, validationType);
+    records.unshift(result);
+    selectedResultIndex = 0;
+    renderHistory();
+    renderResultPage();
+    closeModal();
+    showAppToast('Prestação de contas processada');
+    window.location.hash = '#/dashboard/health/accountability/results';
+  });
+  downloadReportBtn?.addEventListener('click', () => {
+    const result = getCurrentResult();
+    if (!result) return;
+    downloadBlob(buildResultPdfBlob(result), 'resultado-prestacao-contas.pdf');
+  });
+  resultSearchInput?.addEventListener('input', renderResultPage);
+
+  renderHistory();
+  renderResultPage();
+}
+
 function initHealthExamReadingWorkflow() {
   const page = document.getElementById('page-health-exam-reading');
   const modal = document.getElementById('healthExamReadingModal');
@@ -13979,6 +14422,7 @@ function initHealthExamReadingWorkflow() {
   modal.dataset.bound = 'true';
 
   const openBtn = document.getElementById('openHealthExamReadingModal');
+  const openFromResultsBtn = document.getElementById('openHealthExamReadingModalFromResults');
   const closeButtons = Array.from(modal.querySelectorAll('[data-health-exam-reading-close]'));
   const fileInput = document.getElementById('healthExamReadingFileInput');
   const dropzone = document.getElementById('healthExamReadingDropzone');
@@ -13992,11 +14436,13 @@ function initHealthExamReadingWorkflow() {
   const resultsTable = document.getElementById('healthExamResultsTable');
   const resultsEmpty = document.getElementById('healthExamResultsEmpty');
   const resultsSearchInput = document.getElementById('healthExamMnemonicSearchInput');
+  const copyAllResultsBtn = document.getElementById('copyAllHealthExamMnemonicsBtn');
   const resultFileEl = document.querySelector('[data-health-exam-result-file]');
   const resultOperatorEl = document.querySelector('[data-health-exam-result-operator]');
   const resultStatusEl = document.querySelector('[data-health-exam-result-status]');
   const resultCountEl = document.querySelector('[data-health-exam-result-count]');
-  const downloadReportBtn = document.getElementById('downloadHealthExamReportBtn');
+  const downloadReportCsvBtn = document.getElementById('downloadHealthExamReportCsvBtn');
+  const downloadReportPdfBtn = document.getElementById('downloadHealthExamReportPdfBtn');
   const allowedExtensions = new Set(['pdf', 'png', 'jpg', 'jpeg']);
   const mockMnemonics = [
     { code: 'HEM', name: 'Hemograma completo' },
@@ -14006,10 +14452,24 @@ function initHealthExamReadingWorkflow() {
     { code: 'PLAQ', name: 'Plaquetas' },
     { code: 'GLI', name: 'Glicemia' }
   ];
+  const mnemonicNameByCode = {
+    HEM: 'Hemograma completo',
+    HGB: 'Hemoglobina',
+    HTC: 'Hematócrito',
+    LEU: 'Leucócitos',
+    PLAQ: 'Plaquetas',
+    GLI: 'Glicemia',
+    CRE: 'Creatinina',
+    URE: 'Ureia',
+    TGO: 'Transaminase oxalacética',
+    RXTO: 'Raio-X de tórax',
+    OBS: 'Observação clínica',
+    LAU: 'Laudo médico'
+  };
   let selectedFile = null;
   let currentMnemonics = [];
   let latestResult = {
-    fileName: 'exame-mnemonicos-teste.pdf',
+    fileName: 'exame-codigos-teste.pdf',
     operatorNumber: '48291',
     processedAt: '30/07/2026 • 10:15',
     status: 'Concluído',
@@ -14050,7 +14510,7 @@ function initHealthExamReadingWorkflow() {
     if (loadingEl) loadingEl.hidden = true;
     if (processBtn) {
       processBtn.disabled = false;
-      processBtn.textContent = 'Processar exames';
+      processBtn.textContent = 'Processar leitura';
     }
   };
   const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -14069,12 +14529,30 @@ function initHealthExamReadingWorkflow() {
       String(item.name || '').toLowerCase().includes(query)
     ));
   };
+  const getHistoryRowResult = (row) => {
+    const cells = Array.from(row?.children || []);
+    const copyButton = row?.querySelector('[data-health-exam-copy-history]');
+    const codes = String(copyButton?.dataset.healthExamCopyHistory || '')
+      .split(',')
+      .map((code) => code.trim())
+      .filter(Boolean);
+    return {
+      fileName: cells[0]?.querySelector('strong')?.textContent?.trim() || cells[0]?.textContent?.trim() || '-',
+      operatorNumber: cells[1]?.textContent?.trim() || '-',
+      processedAt: cells[2]?.textContent?.trim() || '-',
+      status: 'Concluído',
+      mnemonics: codes.map((code) => ({
+        code,
+        name: mnemonicNameByCode[code] || code
+      }))
+    };
+  };
   const renderResultsPage = () => {
     const items = getFilteredResultMnemonics();
     if (resultFileEl) resultFileEl.textContent = latestResult.fileName || '-';
     if (resultOperatorEl) resultOperatorEl.textContent = latestResult.operatorNumber || '-';
     if (resultStatusEl) resultStatusEl.textContent = latestResult.status || 'Concluído';
-    if (resultCountEl) resultCountEl.textContent = `${latestResult.mnemonics?.length || 0} encontrados`;
+    if (resultCountEl) resultCountEl.textContent = String(latestResult.mnemonics?.length || 0);
     if (!resultsTable) return;
     resultsTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
     items.forEach((item) => {
@@ -14085,7 +14563,7 @@ function initHealthExamReadingWorkflow() {
         <span><strong>${escapeHtmlWes(item.code)}</strong></span>
         <span>${escapeHtmlWes(item.name)}</span>
         <span class="row-actions">
-          <button class="icon-btn action-icon" type="button" aria-label="Copiar ${escapeHtmlWes(item.code)}" data-health-exam-copy-result="${escapeHtmlWes(`${item.code} - ${item.name}`)}">
+          <button class="icon-btn action-icon" type="button" aria-label="Copiar código ${escapeHtmlWes(item.code)}" data-health-exam-copy-result="${escapeHtmlWes(`${item.code} - ${item.name}`)}">
             <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
           </button>
         </span>
@@ -14110,10 +14588,12 @@ function initHealthExamReadingWorkflow() {
       <span><strong>${escapeHtmlWes(file.name)}</strong></span>
       <span>${escapeHtmlWes(operatorNumber)}</span>
       <span>${escapeHtmlWes(now)}</span>
-      <span><span class="chip success">Concluído</span></span>
       <span>${escapeHtmlWes(String(items.length))} encontrados</span>
       <span class="row-actions">
-        <button class="icon-btn action-icon" type="button" aria-label="Copiar mnemônicos" data-health-exam-copy-history="${escapeHtmlWes(codes)}">
+        <button class="icon-btn action-icon" type="button" aria-label="Ver resultado" data-health-exam-open-history-result>
+          <span class="material-symbols-rounded" aria-hidden="true">article</span>
+        </button>
+        <button class="icon-btn action-icon" type="button" aria-label="Copiar todos os códigos identificados" data-health-exam-copy-history="${escapeHtmlWes(codes)}">
           <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
         </button>
       </span>
@@ -14165,7 +14645,25 @@ function initHealthExamReadingWorkflow() {
     anchor.remove();
     URL.revokeObjectURL(url);
   };
-  const downloadResultsReport = () => {
+  const getReportLines = () => [
+    'Relatório de leitura de exames',
+    `Arquivo: ${latestResult.fileName || '-'}`,
+    `Operador: ${latestResult.operatorNumber || '-'}`,
+    `Processado em: ${latestResult.processedAt || '-'}`,
+    `Status: ${latestResult.status || '-'}`,
+    '',
+    'Código identificado;Nome',
+    ...(latestResult.mnemonics || []).map((item) => `${item.code};${item.name}`)
+  ];
+  const downloadResultsCsvReport = () => {
+    downloadBlob(new Blob([getReportLines().join('\n')], { type: 'text/csv;charset=utf-8' }), 'relatorio-codigos-exames.csv');
+  };
+  const escapeExamPdfText = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\x20-\x7e]/g, '')
+    .replace(/[\\()]/g, '\\$&');
+  const buildExamResultsPdfBlob = () => {
     const lines = [
       'Relatório de leitura de exames',
       `Arquivo: ${latestResult.fileName || '-'}`,
@@ -14173,13 +14671,42 @@ function initHealthExamReadingWorkflow() {
       `Processado em: ${latestResult.processedAt || '-'}`,
       `Status: ${latestResult.status || '-'}`,
       '',
-      'Mnemônico;Nome',
-      ...(latestResult.mnemonics || []).map((item) => `${item.code};${item.name}`)
+      'Códigos identificados:',
+      ...(latestResult.mnemonics || []).map((item) => `${item.code} - ${item.name}`)
     ];
-    downloadBlob(new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' }), 'relatorio-mnemonicos.csv');
+    const contentLines = lines.slice(0, 34).map((line, index) => {
+      const y = 742 - (index * 20);
+      return `1 0 0 1 72 ${y} Tm (${escapeExamPdfText(line)}) Tj`;
+    });
+    const content = ['BT', '/F1 12 Tf', ...contentLines, 'ET'].join('\n');
+    const objects = [
+      '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj',
+      '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj',
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj',
+      `4 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj`,
+      '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj'
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((object) => {
+      offsets.push(pdf.length);
+      pdf += `${object}\n`;
+    });
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n`;
+    pdf += '0000000000 65535 f \n';
+    offsets.slice(1).forEach((offset) => {
+      pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+    });
+    pdf += `trailer\n<< /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    return new Blob([pdf], { type: 'application/pdf' });
+  };
+  const downloadResultsPdfReport = () => {
+    downloadBlob(buildExamResultsPdfBlob(), 'relatorio-codigos-exames.pdf');
   };
 
   openBtn?.addEventListener('click', openModal);
+  openFromResultsBtn?.addEventListener('click', openModal);
   closeButtons.forEach((button) => button.addEventListener('click', closeModal));
   modal.addEventListener('click', (event) => {
     if (event.target.closest('[data-health-exam-reading-close]')) closeModal();
@@ -14207,10 +14734,10 @@ function initHealthExamReadingWorkflow() {
   testPdfBtn?.addEventListener('click', () => {
     const blob = buildTestPdfBlob();
     const file = typeof File === 'function'
-      ? new File([blob], 'exame-mnemonicos-teste.pdf', { type: 'application/pdf' })
-      : Object.assign(blob, { name: 'exame-mnemonicos-teste.pdf' });
+      ? new File([blob], 'exame-codigos-teste.pdf', { type: 'application/pdf' })
+      : Object.assign(blob, { name: 'exame-codigos-teste.pdf' });
     setSelectedFile(file);
-    downloadBlob(blob, 'exame-mnemonicos-teste.pdf');
+    downloadBlob(blob, 'exame-codigos-teste.pdf');
     showAppToast('PDF de teste gerado');
   });
   processBtn?.addEventListener('click', async () => {
@@ -14253,9 +14780,9 @@ function initHealthExamReadingWorkflow() {
       if (resultsSearchInput) resultsSearchInput.value = '';
       renderResultsPage();
       loadingEl.hidden = true;
-      setFeedback('POST /mnemonics concluído com sucesso.', 'success');
+      setFeedback('Leitura concluída com sucesso.', 'success');
       addHistoryRow(selectedFile, operatorNumber, currentMnemonics);
-      showAppToast('Mnemônicos encontrados');
+      showAppToast('Códigos identificados');
       closeModal();
       window.location.hash = '#/dashboard/health/exam-reading/results';
     } catch {
@@ -14263,23 +14790,42 @@ function initHealthExamReadingWorkflow() {
       setFeedback('Não foi possível processar o arquivo.', 'error');
     } finally {
       processBtn.disabled = false;
-      processBtn.textContent = 'Processar exames';
+      processBtn.textContent = 'Processar leitura';
     }
   });
-  downloadReportBtn?.addEventListener('click', downloadResultsReport);
+  downloadReportCsvBtn?.addEventListener('click', downloadResultsCsvReport);
+  downloadReportPdfBtn?.addEventListener('click', downloadResultsPdfReport);
+  copyAllResultsBtn?.addEventListener('click', async () => {
+    const codes = (latestResult.mnemonics || []).map((item) => item.code).filter(Boolean).join('\n');
+    if (!codes) {
+      showAppToast('Nenhum código identificado para copiar');
+      return;
+    }
+    const copied = await copyTextToClipboard(codes);
+    showAppToast(copied ? 'Códigos identificados copiados' : 'Não foi possível copiar');
+  });
   resultsSearchInput?.addEventListener('input', renderResultsPage);
   resultsTable?.addEventListener('click', async (event) => {
     const button = event.target.closest('[data-health-exam-copy-result]');
     if (!button || !resultsTable.contains(button)) return;
     const copied = await copyTextToClipboard(button.dataset.healthExamCopyResult || '');
-    showAppToast(copied ? 'Mnemônico copiado' : 'Não foi possível copiar');
+    showAppToast(copied ? 'Código copiado' : 'Não foi possível copiar');
   });
   historyTable?.addEventListener('click', async (event) => {
+    const openButton = event.target.closest('[data-health-exam-open-history-result]');
+    if (openButton && historyTable.contains(openButton)) {
+      const row = openButton.closest('.data-row');
+      latestResult = getHistoryRowResult(row);
+      if (resultsSearchInput) resultsSearchInput.value = '';
+      renderResultsPage();
+      window.location.hash = '#/dashboard/health/exam-reading/results';
+      return;
+    }
     const button = event.target.closest('[data-health-exam-copy-history]');
     if (!button || !historyTable.contains(button)) return;
     const codes = String(button.dataset.healthExamCopyHistory || '').split(',').filter(Boolean).join('\n');
     const copied = await copyTextToClipboard(codes);
-    showAppToast(copied ? 'Mnemônicos copiados' : 'Não foi possível copiar');
+    showAppToast(copied ? 'Códigos identificados copiados' : 'Não foi possível copiar');
   });
   renderResultsPage();
 }
@@ -14311,6 +14857,7 @@ function ensureProjectCardEditButtons(root = document) {
 
 initDocClassesMultiSelect();
 initDocumentAnalysisValidation();
+initHealthAccountabilityWorkflow();
 initHealthExamReadingWorkflow();
 
 function hubCloseDropdowns() {
@@ -18872,6 +19419,7 @@ const routeMap = {
   'dashboard/health/service/patient': 'page-health-service-patient',
   'dashboard/health/agenda': 'page-health-agenda',
   'dashboard/health/accountability': 'page-health-accountability',
+  'dashboard/health/accountability/results': 'page-health-accountability-results',
   'dashboard/health/exam-reading': 'page-health-exam-reading',
   'dashboard/health/exam-reading/results': 'page-health-exam-reading-results',
   'dashboard/vm-monitoring': 'page-vm-monitoring',
@@ -19476,6 +20024,8 @@ const updateActivePage = () => {
       ? 'dashboard/health/whatsapp'
     : pageRouteKey.startsWith('dashboard/health/service/')
       ? 'dashboard/health/service'
+    : pageRouteKey.startsWith('dashboard/health/accountability/')
+      ? 'dashboard/health/accountability'
     : pageRouteKey.startsWith('dashboard/health/exam-reading/')
       ? 'dashboard/health/exam-reading'
     : pageRouteKey.startsWith('dashboard/integrations/')

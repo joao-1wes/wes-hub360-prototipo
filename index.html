@@ -9337,7 +9337,7 @@
                 </div>
                 <div class="page-actions">
                   <button class="btn primary" id="openHealthAccountabilityModal" type="button">
-                    Iniciar prestação de contas
+                    Iniciar prestação
                   </button>
                 </div>
               </div>
@@ -9346,40 +9346,53 @@
                 <div class="data-row header">
                   <span>Arquivo</span>
                   <span>Hospital</span>
-                  <span>Tipo de validação</span>
+                  <span>Operador</span>
+                  <span>Classificação</span>
                   <span>Processado em</span>
                   <span>Ações</span>
                 </div>
                 <div class="data-row" data-health-accountability-history-index="0">
                   <span><strong>guia-intercambio-10482.pdf</strong></span>
                   <span>HMoinhos</span>
-                  <span>Validação 1</span>
+                  <span>48291</span>
+                  <span>Conta analítica, Descrição cirúrgica, Folha anestésica, Pré-anestésica</span>
                   <span>30/07/2026 • 14:22</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
                       <span class="material-symbols-rounded" aria-hidden="true">article</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Baixar PDF da prestação" data-health-accountability-download-result>
+                      <span class="material-symbols-rounded" aria-hidden="true">download</span>
                     </button>
                   </span>
                 </div>
                 <div class="data-row" data-health-accountability-history-index="1">
                   <span><strong>pacote-hospitalar-8831.pdf</strong></span>
                   <span>Rede Sul</span>
-                  <span>Validação 2</span>
+                  <span>Ana Silva</span>
+                  <span>Conta analítica, Endoscopia, Outro exame</span>
                   <span>29/07/2026 • 16:08</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
                       <span class="material-symbols-rounded" aria-hidden="true">article</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Baixar PDF da prestação" data-health-accountability-download-result>
+                      <span class="material-symbols-rounded" aria-hidden="true">download</span>
                     </button>
                   </span>
                 </div>
                 <div class="data-row" data-health-accountability-history-index="2">
                   <span><strong>conta-cirurgica-7720.pdf</strong></span>
                   <span>São Lucas</span>
-                  <span>Validação 3</span>
+                  <span>39107</span>
+                  <span>Conta analítica, Descrição cirúrgica</span>
                   <span>28/07/2026 • 10:35</span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
                       <span class="material-symbols-rounded" aria-hidden="true">article</span>
+                    </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Baixar PDF da prestação" data-health-accountability-download-result>
+                      <span class="material-symbols-rounded" aria-hidden="true">download</span>
                     </button>
                   </span>
                 </div>
@@ -9399,7 +9412,7 @@
               <div class="page-header">
                 <div>
                   <h2>Resultado da prestação</h2>
-                  <p class="page-subtitle">Categorias por página, checklist documental e trilha de auditoria gravada para a guia.</p>
+                  <p class="page-subtitle">Classificação por página e resumo da conta analítica do PDF processado.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn primary" id="downloadHealthAccountabilityReportBtn" type="button">
@@ -9409,38 +9422,27 @@
                 </div>
               </div>
 
-              <div class="health-exam-results-summary health-accountability-results-summary" id="healthAccountabilityResultsSummary">
-                <article>
-                  <span>Arquivo</span>
-                  <strong data-health-accountability-result-file>guia-intercambio-10482.pdf</strong>
-                </article>
-                <article>
-                  <span>Hospital</span>
-                  <strong data-health-accountability-result-hospital>HMoinhos</strong>
-                </article>
-                <article>
-                  <span>Tipo</span>
-                  <strong data-health-accountability-result-type>Validação 1</strong>
-                </article>
-                <article>
-                  <span>Status</span>
-                  <strong data-health-accountability-result-status>SUCCESS</strong>
-                </article>
-              </div>
-
-              <div class="health-accountability-result-head">
-                <div>
-                  <h3>Resultado da análise</h3>
-                  <p class="page-subtitle"><span data-health-accountability-result-pages>12 páginas classificadas</span> • <span data-health-accountability-result-checklist>4 de 4 obrigatórios encontrados</span> • <span data-health-accountability-result-oracle>Status da guia atualizado com trilha de auditoria.</span></p>
-                </div>
-                <span class="chip success" data-health-accountability-result-chip>SUCCESS</span>
-              </div>
-
-              <div class="filters-grid filters-single health-exam-results-toolbar">
-                <div class="form-field">
-                  <div class="search-field">
-                    <span class="material-symbols-rounded" aria-hidden="true">search</span>
-                    <input id="healthAccountabilityResultSearchInput" type="search" placeholder="Buscar por página, categoria ou documento" autocomplete="off" aria-label="Buscar por página, categoria ou documento" />
+              <div class="health-exam-results-summary health-exam-results-summary--list health-accountability-results-summary" id="healthAccountabilityResultsSummary">
+                <div class="health-exam-results-summary-list">
+                  <div class="health-exam-results-summary-item">
+                    <span>Arquivo:</span>
+                    <strong data-health-accountability-result-file>guia-intercambio-10482.pdf</strong>
+                  </div>
+                  <div class="health-exam-results-summary-item">
+                    <span>Hospital:</span>
+                    <strong data-health-accountability-result-hospital>HMoinhos</strong>
+                  </div>
+                  <div class="health-exam-results-summary-item">
+                    <span>Operador:</span>
+                    <strong data-health-accountability-result-operator>48291</strong>
+                  </div>
+                  <div class="health-exam-results-summary-item">
+                    <span>Páginas classificadas:</span>
+                    <strong data-health-accountability-result-pages>12</strong>
+                  </div>
+                  <div class="health-exam-results-summary-item">
+                    <span>Processado em:</span>
+                    <strong data-health-accountability-result-processed-at>30/07/2026 • 14:22</strong>
                   </div>
                 </div>
               </div>
@@ -9448,46 +9450,33 @@
               <div class="health-accountability-results-grid">
                 <div class="health-accountability-result-section">
                   <div>
-                    <h3>Categorias por página</h3>
-                    <p class="page-subtitle">Classificação consolidada do PDF processado.</p>
+                    <h3>Documentos por página</h3>
+                    <p class="page-subtitle">Classificação automática consolidada do PDF processado.</p>
                   </div>
                   <div class="data-table health-accountability-pages-table" id="healthAccountabilityPagesTable" data-table-empty-state-disabled="true">
                     <div class="data-row header">
                       <span>Página</span>
                       <span>Categoria</span>
                       <span>Confiança</span>
-                      <span>Status</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="health-accountability-result-section">
-                  <div>
-                    <h3>Documentos obrigatórios</h3>
-                    <p class="page-subtitle">Checklist aplicado para o tipo de validação selecionado.</p>
-                  </div>
-                  <div class="data-table health-accountability-checklist-table" id="healthAccountabilityChecklistTable" data-table-empty-state-disabled="true">
-                    <div class="data-row header">
-                      <span>Documento</span>
-                      <span>Status</span>
+                      <span>Resumo</span>
                     </div>
                   </div>
                 </div>
               </div>
 
-              <div class="health-accountability-result-section">
+              <div class="health-accountability-result-section" id="healthAccountabilityAccountSection">
                 <div>
-                  <h3>Trilha de processamento</h3>
-                  <p class="page-subtitle">Etapas executadas pelo orquestrador até a gravação do resultado.</p>
+                  <h3>Resumo da conta analítica</h3>
+                  <p class="page-subtitle">Indicadores extraídos quando a conta analítica é encontrada no pacote.</p>
                 </div>
-                <div class="data-table health-accountability-audit-table" id="healthAccountabilityAuditTable" data-table-empty-state-disabled="true">
+                <div class="data-table health-accountability-account-table" id="healthAccountabilityAccountTable" data-table-empty-state-disabled="true">
                   <div class="data-row header">
-                    <span>Etapa</span>
-                    <span>Detalhe</span>
-                    <span>Horário</span>
+                    <span>Indicador</span>
+                    <span>Valor</span>
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
 
@@ -9497,7 +9486,7 @@
               <div class="modal-header">
                 <div>
                   <h3 id="healthAccountabilityModalTitle">Nova prestação de contas</h3>
-                  <p class="modal-subtitle">Envie o PDF hospitalar, informe o hospital e escolha um tipo de validação para executar a conferência documental.</p>
+                  <p class="modal-subtitle">Envie o PDF hospitalar, informe o hospital e identifique o operador responsável pela prestação.</p>
                 </div>
                 <button class="icon-btn" aria-label="Fechar" data-health-accountability-close type="button">
                   <span class="material-symbols-rounded" aria-hidden="true">close</span>
@@ -9520,13 +9509,8 @@
                     <input class="modal-input" id="healthAccountabilityHospitalInput" type="text" placeholder="Ex.: HMoinhos" />
                   </div>
                   <div>
-                    <label class="modal-label modal-label--required" for="healthAccountabilityValidationSelect">Tipo de validação</label>
-                    <select class="modal-input" id="healthAccountabilityValidationSelect">
-                      <option value="">Selecione</option>
-                      <option value="Validação 1">Validação 1</option>
-                      <option value="Validação 2">Validação 2</option>
-                      <option value="Validação 3">Validação 3</option>
-                    </select>
+                    <label class="modal-label modal-label--required" for="healthAccountabilityOperatorInput">Identificação do operador</label>
+                    <input class="modal-input" id="healthAccountabilityOperatorInput" type="text" placeholder="Ex.: 48291 ou Ana Silva" />
                   </div>
                 </div>
 

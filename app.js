@@ -13984,7 +13984,7 @@ function initHealthAccountabilityWorkflow() {
   const dropzone = document.getElementById('healthAccountabilityDropzone');
   const fileNameEl = document.getElementById('healthAccountabilityFileName');
   const hospitalInput = document.getElementById('healthAccountabilityHospitalInput');
-  const validationSelect = document.getElementById('healthAccountabilityValidationSelect');
+  const operatorInput = document.getElementById('healthAccountabilityOperatorInput');
   const feedbackEl = document.getElementById('healthAccountabilityFeedback');
   const loadingEl = document.getElementById('healthAccountabilityLoading');
   const loadingTextEl = document.getElementById('healthAccountabilityLoadingText');
@@ -13992,105 +13992,117 @@ function initHealthAccountabilityWorkflow() {
   const processBtn = document.getElementById('processHealthAccountabilityBtn');
   const historyTable = document.getElementById('healthAccountabilityHistoryTable');
   const pagesTable = document.getElementById('healthAccountabilityPagesTable');
-  const checklistTable = document.getElementById('healthAccountabilityChecklistTable');
-  const auditTable = document.getElementById('healthAccountabilityAuditTable');
-  const resultSearchInput = document.getElementById('healthAccountabilityResultSearchInput');
+  const accountSection = document.getElementById('healthAccountabilityAccountSection');
+  const accountTable = document.getElementById('healthAccountabilityAccountTable');
   const downloadReportBtn = document.getElementById('downloadHealthAccountabilityReportBtn');
   const resultFileEl = document.querySelector('[data-health-accountability-result-file]');
   const resultHospitalEl = document.querySelector('[data-health-accountability-result-hospital]');
-  const resultTypeEl = document.querySelector('[data-health-accountability-result-type]');
-  const resultStatusEl = document.querySelector('[data-health-accountability-result-status]');
-  const resultChipEl = document.querySelector('[data-health-accountability-result-chip]');
+  const resultOperatorEl = document.querySelector('[data-health-accountability-result-operator]');
+  const resultProcessedAtEl = document.querySelector('[data-health-accountability-result-processed-at]');
   const resultPagesEl = document.querySelector('[data-health-accountability-result-pages]');
-  const resultChecklistEl = document.querySelector('[data-health-accountability-result-checklist]');
-  const resultOracleEl = document.querySelector('[data-health-accountability-result-oracle]');
   let selectedFile = null;
   let selectedResultIndex = 0;
+
+  const documentCatalog = [
+    { key: 'conta_analitica', label: 'Conta analítica', canonical: 'ContaAnalitica', tokens: ['conta', 'analitica', 'analitica hospitalar', 'faturamento'] },
+    { key: 'descricao_cirurgica', label: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', tokens: ['descricao cirurgica', 'cirurgia', 'cirurgica', 'procedimento'] },
+    { key: 'folha_anestesica', label: 'Folha anestésica', canonical: 'FolhaAnestesica', tokens: ['folha anestesica', 'anestesica', 'anestesia'] },
+    { key: 'pre_anestesica', label: 'Pré-anestésica', canonical: 'PreAnestesica', tokens: ['pre anestesica', 'pre-anestesica', 'preanestesica', 'pre anestesia'] },
+    { key: 'endoscopia', label: 'Endoscopia', canonical: 'Endoscopia', tokens: ['endoscopia', 'endoscopico'] },
+    { key: 'outro_exame', label: 'Outro exame', canonical: 'OutroExame', tokens: ['exame', 'laudo', 'imagem', 'laboratorio', 'rx', 'tomografia'] }
+  ];
 
   const initialRecords = [
     {
       fileName: 'guia-intercambio-10482.pdf',
       hospital: 'HMoinhos',
-      validationType: 'Validação 1',
+      operatorId: '48291',
+      documentSummary: 'Conta analítica, Descrição cirúrgica, Folha anestésica, Pré-anestésica',
       processedAt: '30/07/2026 • 14:22',
-      status: 'SUCCESS',
       pages: [
-        { page: '1', category: 'Conta analítica', confidence: '96%', status: 'SUCCESS' },
-        { page: '2', category: 'Descrição cirúrgica', confidence: '94%', status: 'SUCCESS' },
-        { page: '3', category: 'Ficha anestésica', confidence: '91%', status: 'SUCCESS' },
-        { page: '4', category: 'Laudo de anatomia patológica', confidence: '89%', status: 'SUCCESS' }
+        { page: '1', category: 'Conta analítica', confidence: '96%', summary: 'Conta hospitalar detectada com valores e itens faturados.' },
+        { page: '2', category: 'Descrição cirúrgica', confidence: '94%', summary: 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.' },
+        { page: '3', category: 'Folha anestésica', confidence: '91%', summary: 'Resumo da folha anestésica com tipo de anestesia, monitorização, medicamentos e intercorrências registradas.' },
+        { page: '4', category: 'Pré-anestésica', confidence: '88%', summary: 'Resumo da avaliação pré-anestésica com risco anestésico, antecedentes, jejum e liberação para o procedimento.' }
       ],
-      checklist: [
-        { document: 'Conta analítica', found: true },
-        { document: 'Descrição cirúrgica', found: true },
-        { document: 'Ficha anestésica', found: true },
-        { document: 'Laudo de anatomia patológica', found: true }
+      documents: [
+        { document: 'Conta analítica', canonical: 'ContaAnalitica', summary: 'Conta hospitalar detectada com valores e itens faturados.' },
+        { document: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', summary: 'Descrição do procedimento localizada no pacote.' },
+        { document: 'Folha anestésica', canonical: 'FolhaAnestesica', summary: 'Registro anestésico encontrado.' },
+        { document: 'Pré-anestésica', canonical: 'PreAnestesica', summary: 'Avaliação pré-anestésica encontrada.' }
+      ],
+      accountSummary: [
+        { label: 'Valor total', value: 'R$ 18.742,35' },
+        { label: 'Média por item', value: 'R$ 426,19' },
+        { label: 'Itens faturados', value: '44' },
+        { label: 'Materiais e medicamentos', value: 'R$ 6.380,10' }
       ],
       audit: [
         { title: 'PDF extraído', detail: '12 páginas identificadas no pacote hospitalar.', time: '14:22' },
-        { title: 'Categorias classificadas', detail: 'WES Classifier categorizou as páginas obrigatórias.', time: '14:23' },
-        { title: 'Checklist aprovado', detail: 'Todas as categorias obrigatórias foram encontradas.', time: '14:24' },
-        { title: 'Oracle atualizado', detail: 'MERGE em valid_docs finalizado com status SUCCESS.', time: '14:24' }
+        { title: 'Documentos classificados', detail: 'ContaAnalitica, DescricaoCirurgica, FolhaAnestesica e PreAnestesica encontrados.', time: '14:23' },
+        { title: 'Conta resumida', detail: 'Valores da conta analítica consolidados para revisão.', time: '14:24' },
+        { title: 'Resultado gravado', detail: 'Classificação documental salva.', time: '14:24' }
       ]
     },
     {
       fileName: 'pacote-hospitalar-8831.pdf',
       hospital: 'Rede Sul',
-      validationType: 'Validação 2',
+      operatorId: 'Ana Silva',
+      documentSummary: 'Conta analítica, Endoscopia, Outro exame',
       processedAt: '29/07/2026 • 16:08',
-      status: 'REVISÃO',
       pages: [
-        { page: '1', category: 'Conta analítica', confidence: '93%', status: 'SUCCESS' },
-        { page: '2', category: 'Laudo AP', confidence: '68%', status: 'REVISÃO' },
-        { page: '3', category: 'Prescrição', confidence: '88%', status: 'SUCCESS' }
+        { page: '1', category: 'Conta analítica', confidence: '93%', summary: 'Conta hospitalar detectada com resumo financeiro.' },
+        { page: '2', category: 'Endoscopia', confidence: '87%', summary: 'Resumo da endoscopia com indicação, descrição do exame e conclusão do laudo.' },
+        { page: '3', category: 'Outro exame', confidence: '72%', summary: 'Exame adicional identificado com categoria ampla e resumo pendente de revisão.' }
       ],
-      checklist: [
-        { document: 'Conta analítica', found: true },
-        { document: 'Laudo AP', found: true },
-        { document: 'Prescrição', found: true },
-        { document: 'Evolução médica', found: false }
+      documents: [
+        { document: 'Conta analítica', canonical: 'ContaAnalitica', summary: 'Conta hospitalar detectada com resumo financeiro.' },
+        { document: 'Endoscopia', canonical: 'Endoscopia', summary: 'Laudo de endoscopia identificado no arquivo.' },
+        { document: 'Outro exame', canonical: 'OutroExame', summary: 'Exame adicional exige revisão de categoria.' }
+      ],
+      accountSummary: [
+        { label: 'Valor total', value: 'R$ 9.814,70' },
+        { label: 'Média por item', value: 'R$ 327,16' },
+        { label: 'Itens faturados', value: '30' },
+        { label: 'Materiais e medicamentos', value: 'R$ 2.960,45' }
       ],
       audit: [
         { title: 'PDF extraído', detail: '8 páginas identificadas no pacote hospitalar.', time: '16:08' },
-        { title: 'Fallback aplicado', detail: 'OCR + WES AI Review usado para confirmar laudo AP.', time: '16:09' },
-        { title: 'Checklist parcial', detail: 'Evolução médica não encontrada com confiança suficiente.', time: '16:10' },
-        { title: 'Oracle atualizado', detail: 'MERGE em valid_docs finalizado com status REVISÃO.', time: '16:10' }
+        { title: 'Documentos classificados', detail: 'ContaAnalitica, Endoscopia e OutroExame encontrados.', time: '16:09' },
+        { title: 'Revisão indicada', detail: 'Outro exame ficou com confiança moderada.', time: '16:10' },
+        { title: 'Resultado gravado', detail: 'Classificação documental salva para revisão.', time: '16:10' }
       ]
     },
     {
       fileName: 'conta-cirurgica-7720.pdf',
       hospital: 'São Lucas',
-      validationType: 'Validação 3',
+      operatorId: '39107',
+      documentSummary: 'Conta analítica, Descrição cirúrgica',
       processedAt: '28/07/2026 • 10:35',
-      status: 'ERROR',
       pages: [
-        { page: '1', category: 'Conta analítica', confidence: '95%', status: 'SUCCESS' },
-        { page: '2', category: 'Descrição cirúrgica', confidence: '92%', status: 'SUCCESS' },
-        { page: '3', category: 'Documento não aceito', confidence: '52%', status: 'ERROR' }
+        { page: '1', category: 'Conta analítica', confidence: '95%', summary: 'Conta hospitalar detectada com valores principais.' },
+        { page: '2', category: 'Descrição cirúrgica', confidence: '92%', summary: 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.' }
       ],
-      checklist: [
-        { document: 'Conta analítica', found: true },
-        { document: 'Descrição cirúrgica', found: true },
-        { document: 'Ficha anestésica', found: false },
-        { document: 'Laudo de anatomia patológica', found: false }
+      documents: [
+        { document: 'Conta analítica', canonical: 'ContaAnalitica', summary: 'Conta hospitalar detectada com valores principais.' },
+        { document: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', summary: 'Descrição cirúrgica encontrada.' }
+      ],
+      accountSummary: [
+        { label: 'Valor total', value: 'R$ 14.205,88' },
+        { label: 'Média por item', value: 'R$ 394,61' },
+        { label: 'Itens faturados', value: '36' },
+        { label: 'Materiais e medicamentos', value: 'R$ 4.210,32' }
       ],
       audit: [
         { title: 'PDF extraído', detail: '6 páginas identificadas no pacote hospitalar.', time: '10:35' },
-        { title: 'Categoria recusada', detail: 'Uma página permaneceu sem categoria aceita.', time: '10:36' },
-        { title: 'Checklist reprovado', detail: 'Documentos obrigatórios não encontrados.', time: '10:37' },
-        { title: 'Oracle atualizado', detail: 'MERGE em valid_docs finalizado com status ERROR.', time: '10:37' }
+        { title: 'Documentos classificados', detail: 'ContaAnalitica e DescricaoCirurgica encontrados.', time: '10:36' },
+        { title: 'Conta resumida', detail: 'Valores da conta analítica consolidados para revisão.', time: '10:37' },
+        { title: 'Resultado gravado', detail: 'Classificação documental salva.', time: '10:37' }
       ]
     }
   ];
   const records = [...initialRecords];
 
-  const statusClass = (status) => {
-    const normalized = String(status || '').toUpperCase();
-    if (normalized === 'SUCCESS') return 'success';
-    if (normalized === 'ERROR') return 'danger';
-    if (normalized === 'RUNNING') return 'running';
-    return 'warning';
-  };
   const getCurrentResult = () => records[selectedResultIndex] || records[0];
   const isPdfFile = (file) => Boolean(file?.name) && String(file.name).toLowerCase().endsWith('.pdf');
   const wait = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -14103,6 +14115,28 @@ function initHealthAccountabilityWorkflow() {
   const setProgress = (value, text) => {
     if (progressBar) progressBar.style.width = `${value}%`;
     if (loadingTextEl && text) loadingTextEl.textContent = text;
+  };
+  const normalizeSearchText = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase();
+  const formatCurrency = (value) => new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(value);
+  const buildDocumentSummary = (documents) => {
+    const labels = (documents || []).map((item) => item.document).filter(Boolean);
+    if (!labels.length) return 'Nenhum documento classificado';
+    return labels.join(', ');
+  };
+  const getDocumentSummaryText = (type) => {
+    if (!type) return 'Documento classificado no pacote hospitalar.';
+    if (type.key === 'conta_analitica') return 'Conta hospitalar detectada com valor total, média por item e agrupamentos principais.';
+    if (type.key === 'descricao_cirurgica') return 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.';
+    if (type.key === 'folha_anestesica') return 'Resumo da folha anestésica com tipo de anestesia, monitorização, medicamentos e intercorrências registradas.';
+    if (type.key === 'pre_anestesica') return 'Resumo da avaliação pré-anestésica com risco anestésico, antecedentes, jejum e liberação para o procedimento.';
+    if (type.key === 'endoscopia') return 'Resumo da endoscopia com indicação, descrição do exame e conclusão do laudo.';
+    return 'Exame adicional identificado com categoria ampla e resumo pendente de revisão.';
   };
   const setSelectedFile = (file) => {
     selectedFile = file;
@@ -14140,11 +14174,15 @@ function initHealthAccountabilityWorkflow() {
       row.innerHTML = `
         <span><strong>${escapeHtmlWes(record.fileName)}</strong></span>
         <span>${escapeHtmlWes(record.hospital)}</span>
-        <span>${escapeHtmlWes(record.validationType)}</span>
+        <span>${escapeHtmlWes(record.operatorId || '-')}</span>
+        <span>${escapeHtmlWes(record.documentSummary || buildDocumentSummary(record.documents))}</span>
         <span>${escapeHtmlWes(record.processedAt)}</span>
         <span class="row-actions">
           <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
             <span class="material-symbols-rounded" aria-hidden="true">article</span>
+          </button>
+          <button class="icon-btn action-icon" type="button" aria-label="Baixar PDF da prestação" data-health-accountability-download-result>
+            <span class="material-symbols-rounded" aria-hidden="true">download</span>
           </button>
         </span>
       `;
@@ -14154,72 +14192,71 @@ function initHealthAccountabilityWorkflow() {
   const renderResultPage = () => {
     const result = getCurrentResult();
     if (!result) return;
-    const query = String(resultSearchInput?.value || '').trim().toLowerCase();
-    const matchesQuery = (...values) => {
-      if (!query) return true;
-      return values.some((value) => String(value || '').toLowerCase().includes(query));
-    };
-    const visiblePages = result.pages.filter((item) => matchesQuery(item.page, item.category, item.confidence, item.status));
-    const visibleChecklist = result.checklist.filter((item) => matchesQuery(item.document, item.found ? 'Encontrado' : 'Ausente'));
-    const visibleAudit = result.audit.filter((item) => matchesQuery(item.title, item.detail, item.time));
     if (resultFileEl) resultFileEl.textContent = result.fileName;
     if (resultHospitalEl) resultHospitalEl.textContent = result.hospital;
-    if (resultTypeEl) resultTypeEl.textContent = result.validationType;
-    if (resultStatusEl) resultStatusEl.textContent = result.status;
-    if (resultChipEl) {
-      resultChipEl.textContent = result.status;
-      resultChipEl.className = `chip ${statusClass(result.status)}`;
-    }
-    const foundCount = result.checklist.filter((item) => item.found).length;
-    if (resultPagesEl) resultPagesEl.textContent = `${result.pages.length} páginas classificadas`;
-    if (resultChecklistEl) resultChecklistEl.textContent = `${foundCount} de ${result.checklist.length} obrigatórios encontrados`;
-    if (resultOracleEl) resultOracleEl.textContent = `Status ${result.status} gravado em ${result.processedAt}.`;
+    if (resultOperatorEl) resultOperatorEl.textContent = result.operatorId || '-';
+    if (resultProcessedAtEl) resultProcessedAtEl.textContent = result.processedAt;
+    if (resultPagesEl) resultPagesEl.textContent = String(result.pages.length);
 
     if (pagesTable) {
       pagesTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
       pagesTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
-      visiblePages.forEach((item) => {
+      result.pages.forEach((item) => {
         const row = document.createElement('div');
         row.className = 'data-row';
         row.innerHTML = `
           <span><strong>${escapeHtmlWes(item.page)}</strong></span>
           <span>${escapeHtmlWes(item.category)}</span>
           <span>${escapeHtmlWes(item.confidence)}</span>
-          <span><span class="chip ${statusClass(item.status)}">${escapeHtmlWes(item.status)}</span></span>
+          <span>${escapeHtmlWes(item.summary)}</span>
         `;
         pagesTable.appendChild(row);
       });
     }
-    if (checklistTable) {
-      checklistTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
-      checklistTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
-      visibleChecklist.forEach((item) => {
-        const status = item.found ? 'Encontrado' : 'Ausente';
+    if (accountSection) accountSection.hidden = !(result.accountSummary || []).length;
+    if (accountTable) {
+      accountTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
+      accountTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+      (result.accountSummary || []).forEach((item) => {
         const row = document.createElement('div');
         row.className = 'data-row';
         row.innerHTML = `
-          <span><strong>${escapeHtmlWes(item.document)}</strong></span>
-          <span><span class="chip ${item.found ? 'success' : 'danger'}">${status}</span></span>
+          <span><strong>${escapeHtmlWes(item.label)}</strong></span>
+          <span>${escapeHtmlWes(item.value)}</span>
         `;
-        checklistTable.appendChild(row);
-      });
-    }
-    if (auditTable) {
-      auditTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
-      auditTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
-      visibleAudit.forEach((item) => {
-        const row = document.createElement('div');
-        row.className = 'data-row';
-        row.innerHTML = `
-          <span><strong>${escapeHtmlWes(item.title)}</strong></span>
-          <span>${escapeHtmlWes(item.detail)}</span>
-          <span>${escapeHtmlWes(item.time)}</span>
-        `;
-        auditTable.appendChild(row);
+        accountTable.appendChild(row);
       });
     }
   };
-  const createMockResult = (file, hospital, validationType) => {
+  const inferDocumentTypes = (file, hospital) => {
+    const haystack = normalizeSearchText(`${file?.name || ''} ${hospital || ''}`);
+    const detectedKeys = documentCatalog
+      .filter((type) => type.tokens.some((token) => haystack.includes(normalizeSearchText(token))))
+      .map((type) => type.key);
+    const fallbackKeys = ['conta_analitica', 'descricao_cirurgica', 'folha_anestesica', 'pre_anestesica', 'endoscopia'];
+    const keys = detectedKeys.length ? detectedKeys : fallbackKeys;
+    if (keys.includes('folha_anestesica') && !keys.includes('pre_anestesica')) keys.push('pre_anestesica');
+    if (keys.includes('descricao_cirurgica') && !keys.includes('conta_analitica')) keys.unshift('conta_analitica');
+    return Array.from(new Set(keys))
+      .map((key) => documentCatalog.find((type) => type.key === key))
+      .filter(Boolean);
+  };
+  const createAccountSummary = (file, hospital, hasAccount) => {
+    if (!hasAccount) return [];
+    const seed = `${file?.name || ''}${hospital || ''}`.length;
+    const itemCount = 28 + (seed % 23);
+    const total = 8200 + (seed * 137.43);
+    const materialValue = total * 0.34;
+    const dailyValue = total * 0.18;
+    return [
+      { label: 'Valor total', value: formatCurrency(total) },
+      { label: 'Média por item', value: formatCurrency(total / itemCount) },
+      { label: 'Itens faturados', value: String(itemCount) },
+      { label: 'Diárias e taxas', value: formatCurrency(dailyValue) },
+      { label: 'Materiais e medicamentos', value: formatCurrency(materialValue) }
+    ];
+  };
+  const createMockResult = (file, hospital, operatorId) => {
     const now = new Intl.DateTimeFormat('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -14227,40 +14264,40 @@ function initHealthAccountabilityWorkflow() {
       hour: '2-digit',
       minute: '2-digit'
     }).format(new Date()).replace(',', ' •');
-    const status = validationType === 'Validação 3' ? 'ERROR' : 'SUCCESS';
-    const checklist = validationType === 'Validação 3'
-      ? [
-        { document: 'Conta analítica', found: true },
-        { document: 'Descrição cirúrgica', found: true },
-        { document: 'Ficha anestésica', found: false }
-      ]
-      : [
-        { document: 'Conta analítica', found: true },
-        { document: 'Descrição cirúrgica', found: true },
-        { document: 'Ficha anestésica', found: true },
-        { document: 'Laudo de anatomia patológica', found: validationType === 'Validação 1' }
-      ];
-    const pages = [
-      { page: '1', category: 'Conta analítica', confidence: '96%', status: 'SUCCESS' },
-      { page: '2', category: 'Descrição cirúrgica', confidence: '93%', status: 'SUCCESS' },
-      { page: '3', category: validationType === 'Validação 3' ? 'Categoria não aceita' : 'Ficha anestésica', confidence: validationType === 'Validação 3' ? '55%' : '90%', status: validationType === 'Validação 3' ? 'ERROR' : 'SUCCESS' }
-    ];
-    if (validationType === 'Validação 1') {
-      pages.push({ page: '4', category: 'Laudo de anatomia patológica', confidence: '88%', status: 'SUCCESS' });
-    }
+    const foundTypes = inferDocumentTypes(file, hospital);
+    const hasAccount = foundTypes.some((type) => type.key === 'conta_analitica');
+    const documents = foundTypes.map((type) => ({
+      document: type.label,
+      canonical: type.canonical,
+      summary: getDocumentSummaryText(type)
+    }));
+    const pages = foundTypes.map((type, index) => {
+      const confidence = Math.max(72, 96 - (index * 5));
+      return {
+        page: String(index + 1),
+        category: type.label,
+        confidence: `${confidence}%`,
+        summary: getDocumentSummaryText(type)
+      };
+    });
+    const accountSummary = createAccountSummary(file, hospital, hasAccount);
+    const needsReview = foundTypes.some((type, index) => type.key === 'outro_exame' || Math.max(72, 96 - (index * 5)) < 80);
+    const documentSummary = buildDocumentSummary(documents);
     return {
       fileName: file.name,
       hospital,
-      validationType,
+      operatorId,
+      documentSummary,
       processedAt: now,
-      status,
       pages,
-      checklist,
+      documents,
+      accountSummary,
       audit: [
         { title: 'PDF extraído', detail: `${pages.length + 5} páginas identificadas no pacote hospitalar.`, time: now.split(' • ')[1] || 'Agora' },
-        { title: 'Categorias classificadas', detail: 'WES Classifier categorizou página por página.', time: now.split(' • ')[1] || 'Agora' },
-        { title: status === 'SUCCESS' ? 'Checklist aprovado' : 'Checklist reprovado', detail: status === 'SUCCESS' ? 'Categorias obrigatórias encontradas para o tipo de validação.' : 'Uma ou mais categorias obrigatórias não foram encontradas.', time: now.split(' • ')[1] || 'Agora' },
-        { title: 'Oracle atualizado', detail: `MERGE em valid_docs finalizado com status ${status}.`, time: now.split(' • ')[1] || 'Agora' }
+        { title: 'Leitura integral', detail: 'OCR percorreu o arquivo completo antes da classificação.', time: now.split(' • ')[1] || 'Agora' },
+        { title: 'Documentos classificados', detail: documents.map((item) => item.canonical).join(', '), time: now.split(' • ')[1] || 'Agora' },
+        { title: hasAccount ? 'Conta resumida' : 'Conta não encontrada', detail: hasAccount ? 'Indicadores financeiros da conta analítica foram consolidados.' : 'Resumo financeiro não foi gerado porque não há ContaAnalitica.', time: now.split(' • ')[1] || 'Agora' },
+        { title: 'Resultado gravado', detail: needsReview ? 'Classificação documental salva para revisão.' : 'Classificação documental salva.', time: now.split(' • ')[1] || 'Agora' }
       ]
     };
   };
@@ -14274,19 +14311,19 @@ function initHealthAccountabilityWorkflow() {
       'Resultado da prestacao de contas',
       `Arquivo: ${result.fileName}`,
       `Hospital: ${result.hospital}`,
-      `Tipo de validacao: ${result.validationType}`,
-      `Status: ${result.status}`,
+      `Operador: ${result.operatorId || '-'}`,
+      `Classificacao: ${result.documentSummary || buildDocumentSummary(result.documents)}`,
       '',
-      'Categorias por pagina:',
-      ...result.pages.map((item) => `Pag. ${item.page} - ${item.category} - ${item.confidence} - ${item.status}`),
+      'Documentos por pagina:',
+      ...result.pages.map((item) => `Pag. ${item.page} - ${item.category} - ${item.confidence} - ${item.summary}`),
       '',
-      'Checklist documental:',
-      ...result.checklist.map((item) => `${item.found ? '[OK]' : '[ERRO]'} ${item.document}`),
+      'Resumo da conta analitica:',
+      ...((result.accountSummary || []).length ? result.accountSummary.map((item) => `${item.label}: ${item.value}`) : ['ContaAnalitica nao encontrada']),
       '',
       'Audit trail:',
       ...result.audit.map((item) => `${item.time} - ${item.title}: ${item.detail}`),
       '',
-      `Producao Oracle: MERGE em valid_docs com status ${result.status}.`
+      'Producao Oracle: classificacao documental salva.'
     ];
     const contentLines = lines.slice(0, 32).map((line, index) => {
       const y = 742 - (index * 20);
@@ -14325,6 +14362,14 @@ function initHealthAccountabilityWorkflow() {
     anchor.remove();
     URL.revokeObjectURL(url);
   };
+  const getResultPdfFilename = (result) => {
+    const baseName = String(result?.fileName || 'prestacao-contas')
+      .replace(/\.pdf$/i, '')
+      .replace(/[^\w-]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .toLowerCase();
+    return `resultado-${baseName || 'prestacao-contas'}.pdf`;
+  };
 
   openBtn?.addEventListener('click', openModal);
   closeButtons.forEach((button) => button.addEventListener('click', closeModal));
@@ -14359,9 +14404,17 @@ function initHealthAccountabilityWorkflow() {
     renderResultPage();
     window.location.hash = '#/dashboard/health/accountability/results';
   });
+  historyTable?.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-health-accountability-download-result]');
+    if (!button || !historyTable.contains(button)) return;
+    const row = button.closest('[data-health-accountability-history-index]');
+    const result = records[Number(row?.dataset.healthAccountabilityHistoryIndex || 0)];
+    if (!result) return;
+    downloadBlob(buildResultPdfBlob(result), getResultPdfFilename(result));
+  });
   processBtn?.addEventListener('click', async () => {
     const hospital = String(hospitalInput?.value || '').trim();
-    const validationType = String(validationSelect?.value || '').trim();
+    const operatorId = String(operatorInput?.value || '').trim();
     if (!selectedFile) {
       setFeedback('Selecione um PDF antes de processar.', 'error');
       return;
@@ -14375,27 +14428,27 @@ function initHealthAccountabilityWorkflow() {
       hospitalInput?.focus();
       return;
     }
-    if (!validationType) {
-      setFeedback('Selecione o tipo de validação.', 'error');
-      validationSelect?.focus();
+    if (!operatorId) {
+      setFeedback('Informe a identificação do operador.', 'error');
+      operatorInput?.focus();
       return;
     }
     processBtn.disabled = true;
     processBtn.textContent = 'Processando...';
     if (loadingEl) loadingEl.hidden = false;
-    setFeedback('PDF validado. Iniciando conferência documental.', 'success');
+    setFeedback('PDF validado. Iniciando classificação documental.', 'success');
     setProgress(12, 'Extraindo páginas do PDF.');
     await wait(550);
-    setProgress(38, 'Enviando páginas ao WES Classifier.');
+    setProgress(38, 'Lendo o PDF completo com OCR.');
     await wait(650);
-    setProgress(68, 'Executando OCR e WES AI Review quando necessário.');
+    setProgress(68, 'Classificando ContaAnalitica, DescricaoCirurgica, FolhaAnestesica, PreAnestesica e exames.');
     await wait(650);
-    setProgress(88, 'Aplicando checklist documental.');
+    setProgress(88, 'Consolidando documentos encontrados e resumo da conta analítica.');
     await wait(550);
-    setProgress(100, 'Gravando resultado no Oracle valid_docs.');
+    setProgress(100, 'Gravando resultado classificatório.');
     await wait(350);
 
-    const result = createMockResult(selectedFile, hospital, validationType);
+    const result = createMockResult(selectedFile, hospital, operatorId);
     records.unshift(result);
     selectedResultIndex = 0;
     renderHistory();
@@ -14407,10 +14460,8 @@ function initHealthAccountabilityWorkflow() {
   downloadReportBtn?.addEventListener('click', () => {
     const result = getCurrentResult();
     if (!result) return;
-    downloadBlob(buildResultPdfBlob(result), 'resultado-prestacao-contas.pdf');
+    downloadBlob(buildResultPdfBlob(result), getResultPdfFilename(result));
   });
-  resultSearchInput?.addEventListener('input', renderResultPage);
-
   renderHistory();
   renderResultPage();
 }

@@ -8798,7 +8798,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 }
 
 .health-accountability-history-table .data-row {
-  grid-template-columns: minmax(240px, 1.4fr) minmax(140px, 0.8fr) minmax(170px, 0.9fr) minmax(170px, 0.95fr) minmax(90px, 0.45fr);
+  grid-template-columns: minmax(210px, 1.1fr) minmax(120px, 0.58fr) minmax(120px, 0.55fr) minmax(240px, 1.15fr) minmax(150px, 0.72fr) minmax(104px, 0.4fr);
+}
+
+.health-accountability-history-table .data-row > span:last-child {
+  justify-content: flex-end;
+  text-align: right;
 }
 
 .health-accountability-results-page {
@@ -8809,18 +8814,11 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   overflow-wrap: anywhere;
 }
 
-.health-accountability-result-head,
 .health-accountability-result-section {
   display: grid;
   gap: 10px;
 }
 
-.health-accountability-result-head {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-}
-
-.health-accountability-result-head h3,
 .health-accountability-result-section h3 {
   margin: 0;
   color: #0f172a;
@@ -8829,44 +8827,26 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   font-weight: 700;
 }
 
-.health-accountability-result-head .chip {
-  margin-top: 2px;
-}
-
 .health-accountability-results-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   align-items: start;
 }
 
 .health-accountability-pages-table,
-.health-accountability-checklist-table {
+.health-accountability-account-table {
   overflow-x: auto;
 }
 
 .health-accountability-pages-table .data-row {
-  grid-template-columns: minmax(80px, 0.35fr) minmax(220px, 1fr) minmax(100px, 0.45fr) minmax(110px, 0.5fr);
-  min-width: 560px;
+  grid-template-columns: minmax(80px, 0.3fr) minmax(180px, 0.7fr) minmax(100px, 0.35fr) minmax(360px, 1.4fr);
+  min-width: 780px;
 }
 
-.health-accountability-checklist-table .data-row {
-  grid-template-columns: minmax(220px, 1fr) minmax(110px, 0.45fr);
-  min-width: 380px;
-}
-
-.health-accountability-audit-table {
-  overflow-x: auto;
-}
-
-.health-accountability-audit-table .data-row {
-  grid-template-columns: minmax(180px, 0.8fr) minmax(320px, 1.4fr) minmax(90px, 0.35fr);
-  min-width: 720px;
-}
-
-.health-accountability-audit-table .data-row:not(.header) > span:nth-child(2) {
-  white-space: normal;
-  line-height: 19px;
+.health-accountability-account-table .data-row {
+  grid-template-columns: minmax(180px, 0.75fr) minmax(180px, 1fr);
+  min-width: 420px;
 }
 
 .health-accountability-loading {
@@ -8892,12 +8872,6 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 @media (max-width: 1100px) {
   .health-accountability-results-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .health-accountability-result-head {
     grid-template-columns: minmax(0, 1fr);
   }
 }

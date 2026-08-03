@@ -168,6 +168,7 @@ const manageRolesDescription = document.getElementById('manageRolesDescription')
 const manageRolesSubmit = document.getElementById('manageRolesSubmit');
 const openCreateUserModal = document.getElementById('openCreateUserModal');
 const usersTable = document.querySelector('#page-users .users-table');
+const usersSearchInput = document.querySelector('#page-users .search-field input');
 const organizationsTable = document.querySelector('#page-organizations .organizations-table');
 const companiesTable = document.querySelector('#page-companies .companies-table');
 const openCompanySwitchModal = document.getElementById('openCompanySwitchModal');
@@ -223,6 +224,10 @@ const createUserName = document.getElementById('createUserName');
 const createUserEmail = document.getElementById('createUserEmail');
 const createUserPassword = document.getElementById('createUserPassword');
 const createUserStatus = document.getElementById('createUserStatus');
+const createUserStatusSelectWrap = document.getElementById('createUserStatusSelectWrap');
+const createUserEditStatusToggle = document.getElementById('createUserEditStatusToggle');
+const createUserEditStatusInput = document.getElementById('createUserEditStatusInput');
+const createUserEditStatusValue = document.getElementById('createUserEditStatusValue');
 const createUserRole = document.getElementById('createUserRole');
 const createUserSubmit = document.getElementById('createUserSubmit');
 const createUserModeSwitch = document.getElementById('createUserModeSwitch');
@@ -478,6 +483,7 @@ const chatVoiceAgentLine = document.getElementById('chatVoiceAgentLine');
 const openBillingModal = document.getElementById('openBillingModal');
 const billingModal = document.getElementById('billingModal');
 const confirmActionModal = document.getElementById('confirmActionModal');
+const confirmActionModalTitle = document.getElementById('confirmActionModalTitle');
 const confirmActionModalMessage = document.getElementById('confirmActionModalMessage');
 const confirmActionModalConfirm = document.getElementById('confirmActionModalConfirm');
 const rotatePublicLinkModal = document.getElementById('rotatePublicLinkModal');
@@ -3159,15 +3165,20 @@ if (dashboardQuickActionsEditButtons.length && dashboardQuickActionsModal) {
   });
 }
 
-function confirmDeletionAction(targetLabel = 'este item') {
-  const message =
-    `Você tem certeza que deseja excluir ${targetLabel}? ` +
-    'Se você excluir ficará registrado que seu usuário fez isso e a ação não poderá ser desfeita.';
+function confirmActionPrompt({
+  title = 'Confirmar ação',
+  message = 'Você tem certeza que deseja continuar?',
+  confirmText = 'Confirmar',
+  variant = 'default',
+} = {}) {
   if (!confirmActionModal || !confirmActionModalMessage || !confirmActionModalConfirm) {
     return Promise.resolve(window.confirm(message));
   }
 
+  if (confirmActionModalTitle) confirmActionModalTitle.textContent = title;
   confirmActionModalMessage.textContent = message;
+  confirmActionModalConfirm.textContent = confirmText;
+  confirmActionModal.dataset.confirmActionVariant = variant;
   confirmActionModal.classList.add('open');
   confirmActionModal.setAttribute('aria-hidden', 'false');
 
@@ -3175,6 +3186,7 @@ function confirmDeletionAction(targetLabel = 'este item') {
     const close = (confirmed) => {
       confirmActionModal.classList.remove('open');
       confirmActionModal.setAttribute('aria-hidden', 'true');
+      confirmActionModal.dataset.confirmActionVariant = 'default';
       confirmActionModalConfirm.removeEventListener('click', onConfirm);
       confirmActionModal.removeEventListener('click', onCancelClick);
       document.removeEventListener('keydown', onEsc);
@@ -3191,6 +3203,27 @@ function confirmDeletionAction(targetLabel = 'este item') {
     confirmActionModalConfirm.addEventListener('click', onConfirm);
     confirmActionModal.addEventListener('click', onCancelClick);
     document.addEventListener('keydown', onEsc);
+  });
+}
+
+function confirmDeletionAction(targetLabel = 'este item') {
+  const message =
+    `Você tem certeza que deseja excluir ${targetLabel}? ` +
+    'Se você excluir ficará registrado que seu usuário fez isso e a ação não poderá ser desfeita.';
+  return confirmActionPrompt({
+    title: 'Confirmar exclusão',
+    message,
+    confirmText: 'Excluir',
+    variant: 'danger',
+  });
+}
+
+function confirmDisableUserAction(userName = 'este usuário') {
+  return confirmActionPrompt({
+    title: 'Desabilitar usuário',
+    message: `Você tem certeza que deseja desabilitar o usuário "${userName}"? A ação é reversível: o usuário ficará sem acesso, mas o histórico dele na empresa será preservado.`,
+    confirmText: 'Desabilitar',
+    variant: 'danger',
   });
 }
 
@@ -5343,6 +5376,7 @@ if (openManageRolesModal && manageRolesModal && manageRolesModalForm) {
 
 if (openCreateUserModal && createUserModal && createUserModalForm) {
   let editingUserRow = null;
+  let editingUserOriginalStatusValue = '';
   let createUserBulkRows = [];
   let createUserBulkErrors = [];
   let createUserBulkTotalRows = 0;
@@ -5362,6 +5396,75 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
   const statusTextToValue = (value) => {
     const normalized = String(value || '').trim().toLowerCase();
     return normalized.includes('inativo') ? 'inactive' : 'active';
+  };
+
+  const getUserStatusMeta = (statusValue = 'active') => {
+    const isInactive = String(statusValue || '').trim() === 'inactive';
+    return {
+      value: isInactive ? 'inactive' : 'active',
+      label: isInactive ? 'Inativo' : 'Ativo',
+      chipClass: isInactive ? 'warning' : 'success',
+    };
+  };
+
+  const getUserRowStatusValue = (row) => (
+    row?.dataset?.userStatus || statusTextToValue(row?.children?.[3]?.textContent || '')
+  );
+
+  const setUserRowStatus = (row, statusValue) => {
+    if (!row) return;
+    const meta = getUserStatusMeta(statusValue);
+    row.dataset.userStatus = meta.value;
+    const statusCell = row.children?.[3];
+    if (statusCell) {
+      statusCell.className = `chip ${meta.chipClass}`;
+      statusCell.textContent = meta.label;
+    }
+    row.querySelectorAll('.details-item').forEach((item) => {
+      const label = item.querySelector('span')?.textContent?.trim().toLowerCase();
+      const value = item.querySelector('strong');
+      if (label === 'status' && value) value.textContent = meta.label;
+    });
+  };
+
+  const syncAllUserStatusRows = () => {
+    usersTable?.querySelectorAll('.data-row:not(.header)').forEach((row) => {
+      setUserRowStatus(row, getUserRowStatusValue(row));
+    });
+  };
+
+  const getActiveUserFilterValue = (filterName) => (
+    usersFilterMenu?.querySelector(`.filter-option[data-filter="${filterName}"].active`)?.dataset.value || ''
+  );
+
+  const applyUsersTableFilters = () => {
+    const statusFilter = getActiveUserFilterValue('status');
+    const roleFilter = getActiveUserFilterValue('role');
+    const query = String(usersSearchInput?.value || '').trim().toLowerCase();
+    usersTable?.querySelectorAll('.data-row:not(.header)').forEach((row) => {
+      const name = row.querySelector('.user-cell strong')?.textContent?.trim().toLowerCase() || '';
+      const email = row.children?.[1]?.textContent?.trim().toLowerCase() || '';
+      const role = roleTextToValue(row.children?.[2]?.textContent || '');
+      const status = getUserRowStatusValue(row);
+      const matchesSearch = !query || name.includes(query) || email.includes(query);
+      const matchesRole = !roleFilter || role === roleFilter;
+      const matchesStatus = !statusFilter || status === statusFilter;
+      row.hidden = !(matchesSearch && matchesRole && matchesStatus);
+    });
+  };
+
+  const syncCreateUserEditStatusSwitch = () => {
+    const isActive = String(createUserStatus?.value || 'active') !== 'inactive';
+    if (createUserEditStatusInput) createUserEditStatusInput.checked = isActive;
+    if (createUserEditStatusValue) createUserEditStatusValue.textContent = isActive ? 'Usuário habilitado' : 'Usuário desabilitado';
+    createUserEditStatusToggle?.classList.toggle('is-active', isActive);
+    createUserEditStatusToggle?.classList.toggle('is-inactive', !isActive);
+  };
+
+  const setCreateUserStatusEditMode = (isEditing) => {
+    if (createUserStatusSelectWrap) createUserStatusSelectWrap.hidden = Boolean(isEditing);
+    if (createUserEditStatusToggle) createUserEditStatusToggle.hidden = !isEditing;
+    syncCreateUserEditStatusSwitch();
   };
 
   const clearCreateUserProgressTimers = () => {
@@ -5609,8 +5712,9 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     const row = document.createElement('div');
     row.className = 'data-row';
     row.dataset.userCreated = 'true';
+    row.dataset.userStatus = statusValue === 'inactive' ? 'inactive' : 'active';
     const userId = Math.random().toString(16).slice(2, 10);
-    const isActive = statusValue !== 'inactive';
+    const statusMeta = getUserStatusMeta(statusValue);
     row.innerHTML = `
       <span class="user-cell">
         <span class="user-avatar small">${escapeHtmlWes(getUserInitial(name, email))}</span>
@@ -5621,7 +5725,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
       </span>
       <span>${escapeHtmlWes(email)}</span>
       <span class="chip">${escapeHtmlWes(roleLabel)}</span>
-      <span class="chip ${isActive ? 'success' : ''}">${escapeHtmlWes(statusLabel)}</span>
+      <span class="chip ${escapeHtmlWes(statusMeta.chipClass)}">${escapeHtmlWes(statusMeta.label)}</span>
       <span>${escapeHtmlWes(formatUserCreatedDate())}</span>
       <span class="row-actions has-details">
         <button class="icon-btn action-icon" aria-label="Editar">
@@ -5735,6 +5839,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
       if (createUserProgressBar) createUserProgressBar.style.width = '100%';
       if (createUserProgressLabel) createUserProgressLabel.textContent = 'Processando 100%';
       appendUserRows(createUserBulkRows, { roleLabel, statusLabel, statusValue });
+      applyUsersTableFilters();
       renderCreateUserReview();
       setCreateUserModalStep('review');
       showAppToast(`${createUserBulkRows.length} usuário(s) adicionados com senha enviada por e-mail; ${createUserBulkErrors.length} com erro`);
@@ -5744,9 +5849,11 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
   const closeCreateUserModal = () => {
     clearCreateUserProgressTimers();
     editingUserRow = null;
+    editingUserOriginalStatusValue = '';
     createUserModal.classList.remove('open');
     createUserModal.classList.remove('modal--stacked');
     createUserModal.setAttribute('aria-hidden', 'true');
+    setCreateUserStatusEditMode(false);
     setCreateUserModalStep('form');
   };
 
@@ -5773,6 +5880,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
 
   const openCreateUserDialog = ({ prefillName = '', prefillEmail = '', stacked = false } = {}) => {
     editingUserRow = null;
+    editingUserOriginalStatusValue = '';
     createUserModalForm.reset();
     resetCreateUserBulkState();
     if (createUserModeSwitch) createUserModeSwitch.hidden = false;
@@ -5780,6 +5888,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     if (createUserSubmit) createUserSubmit.textContent = 'Criar usuário';
     setCreateUserModalStep('form');
     setCreateUserMode('single');
+    setCreateUserStatusEditMode(false);
     createUserModal.classList.toggle('modal--stacked', Boolean(stacked));
     if (createUserName) createUserName.value = prefillName;
     if (createUserEmail) createUserEmail.value = prefillEmail;
@@ -5805,6 +5914,13 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
   [createUserName, createUserEmail, createUserPassword, createUserRole, createUserStatus].forEach((field) => {
     field?.addEventListener('input', syncCreateUserSubmit);
     field?.addEventListener('change', syncCreateUserSubmit);
+  });
+
+  createUserStatus?.addEventListener('change', syncCreateUserEditStatusSwitch);
+  createUserEditStatusInput?.addEventListener('change', () => {
+    if (createUserStatus) createUserStatus.value = createUserEditStatusInput.checked ? 'active' : 'inactive';
+    syncCreateUserEditStatusSwitch();
+    syncCreateUserSubmit();
   });
 
   createUserModeInputs.forEach((input) => {
@@ -5876,7 +5992,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     if (event.target.closest('[data-modal-close]')) closeCreateUserModal();
   });
 
-  createUserModalForm.addEventListener('submit', (event) => {
+  createUserModalForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (createUserModalStep === 'progress') return;
     if (createUserModalStep === 'review') {
@@ -5889,19 +6005,20 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
       const name = String(createUserName?.value || '').trim();
       const email = String(createUserEmail?.value || '').trim();
       const roleLabel = createUserRole?.selectedOptions?.[0]?.textContent?.trim() || '';
-      const statusLabel = createUserStatus?.selectedOptions?.[0]?.textContent?.trim() || '';
       const nameCell = editingUserRow.querySelector('.user-cell strong');
       const emailCell = editingUserRow.children[1];
       const roleCell = editingUserRow.children[2];
-      const statusCell = editingUserRow.children[3];
+      const statusValue = String(createUserStatus?.value || 'active');
+      if (editingUserOriginalStatusValue !== 'inactive' && statusValue === 'inactive') {
+        const userName = name || editingUserRow.querySelector('.user-cell strong')?.textContent?.trim() || 'este usuário';
+        if (!(await confirmDisableUserAction(userName))) return;
+      }
 
       if (nameCell) nameCell.textContent = name;
       if (emailCell) emailCell.textContent = email;
       if (roleCell) roleCell.textContent = roleLabel;
-      if (statusCell) {
-        statusCell.textContent = statusLabel;
-        statusCell.classList.toggle('success', String(createUserStatus?.value || '') === 'active');
-      }
+      setUserRowStatus(editingUserRow, statusValue);
+      applyUsersTableFilters();
 
       closeCreateUserModal();
       showAppToast('Usuário atualizado com sucesso');
@@ -5920,6 +6037,7 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     const name = String(createUserName?.value || '').trim();
     const email = String(createUserEmail?.value || '').trim();
     appendUserRows([{ name, email }], { roleLabel, statusLabel, statusValue });
+    applyUsersTableFilters();
     document.dispatchEvent(new CustomEvent('wes:user-created', {
       detail: {
         id: normalizeUserDirectoryId(email),
@@ -5944,8 +6062,10 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     const email = row.children[1]?.textContent?.trim() || '';
     const roleText = row.children[2]?.textContent?.trim() || '';
     const statusText = row.children[3]?.textContent?.trim() || '';
+    const statusValue = getUserRowStatusValue(row);
 
     editingUserRow = row;
+    editingUserOriginalStatusValue = statusValue;
     createUserModalForm.reset();
     resetCreateUserBulkState();
     if (createUserModeSwitch) createUserModeSwitch.hidden = true;
@@ -5955,9 +6075,10 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     if (createUserSubmit) createUserSubmit.textContent = 'Salvar alterações';
     if (createUserName) createUserName.value = name;
     if (createUserEmail) createUserEmail.value = email;
-    if (createUserStatus) createUserStatus.value = statusTextToValue(statusText);
+    if (createUserStatus) createUserStatus.value = statusValue || statusTextToValue(statusText);
     if (createUserRole) createUserRole.value = roleTextToValue(roleText);
     if (createUserPassword) createUserPassword.value = '';
+    setCreateUserStatusEditMode(true);
 
     syncCreateUserSubmit();
     createUserModal.classList.add('open');
@@ -5977,8 +6098,18 @@ if (openCreateUserModal && createUserModal && createUserModalForm) {
     if (!(await confirmDeletionAction(`o usuário "${userName}"`))) return;
 
     row.remove();
+    applyUsersTableFilters();
     showAppToast('Usuário excluído');
   });
+
+  syncAllUserStatusRows();
+  applyUsersTableFilters();
+  usersSearchInput?.addEventListener('input', applyUsersTableFilters);
+  usersSearchInput?.addEventListener('search', applyUsersTableFilters);
+  usersFilterMenu?.querySelectorAll('.filter-option').forEach((button) => {
+    button.addEventListener('click', applyUsersTableFilters);
+  });
+  usersFilterMenu?.querySelector('.filter-clear')?.addEventListener('click', applyUsersTableFilters);
 }
 
 if (openSkillModal && skillModal && skillModalForm && skillsTable) {
@@ -6373,6 +6504,24 @@ if (organizationsTable) {
   });
 }
 
+const updateOrganizationUserCounts = () => {
+  if (!organizationsTable || !companiesTable) return;
+  organizationsTable.querySelectorAll('[data-organization-row]').forEach((organizationRow) => {
+    const organizationId = String(organizationRow.dataset.organizationId || '').trim();
+    const countCell = organizationRow.querySelector('[data-organization-user-count]');
+    if (!organizationId || !countCell) return;
+    const totalUsers = Array.from(companiesTable.querySelectorAll('[data-company-row]'))
+      .filter((companyRow) => String(companyRow.dataset.companyOrganization || '').trim() === organizationId)
+      .reduce((total, companyRow) => {
+        const value = Number.parseInt(companyRow.querySelector('[data-company-user-count]')?.textContent || '0', 10);
+        return total + (Number.isFinite(value) ? value : 0);
+      }, 0);
+    countCell.textContent = String(totalUsers);
+  });
+};
+
+updateOrganizationUserCounts();
+
 if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect) {
   let activeCompanyRow = null;
   let activeCompanyId = '';
@@ -6592,6 +6741,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     const companyName = row.dataset.companyName || row.querySelector('strong')?.textContent?.trim() || 'esta empresa';
     if (!(await confirmDeletionAction(`a empresa "${companyName}"`))) return;
     row.remove();
+    updateOrganizationUserCounts();
     const access = getSelectedOrganizationAccess();
     if (!getSelectedCompanyAccess(access)) writeSelectedCompanyAccess(null);
     applyOrganizationAccessControls((window.location.hash || '#/dashboard').replace(/^#\/?/, '') || 'dashboard');
@@ -6692,6 +6842,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     if (!activeCompanyId) return;
     companyUsersByCompany[activeCompanyId] = draftCompanyUsers.map((item) => ({ ...item }));
     updateCompanyUserCount(activeCompanyId, draftCompanyUsers.length);
+    updateOrganizationUserCounts();
     closeCompanyUsersModal();
     showAppToast('Usuários da empresa atualizados');
   });
@@ -13992,6 +14143,7 @@ function initHealthAccountabilityWorkflow() {
   const processBtn = document.getElementById('processHealthAccountabilityBtn');
   const historyTable = document.getElementById('healthAccountabilityHistoryTable');
   const pagesTable = document.getElementById('healthAccountabilityPagesTable');
+  const documentsTable = document.getElementById('healthAccountabilityDocumentsTable');
   const accountSection = document.getElementById('healthAccountabilityAccountSection');
   const accountTable = document.getElementById('healthAccountabilityAccountTable');
   const downloadReportBtn = document.getElementById('downloadHealthAccountabilityReportBtn');
@@ -14000,6 +14152,7 @@ function initHealthAccountabilityWorkflow() {
   const resultOperatorEl = document.querySelector('[data-health-accountability-result-operator]');
   const resultProcessedAtEl = document.querySelector('[data-health-accountability-result-processed-at]');
   const resultPagesEl = document.querySelector('[data-health-accountability-result-pages]');
+  const resultDocumentsEl = document.querySelector('[data-health-accountability-result-documents]');
   let selectedFile = null;
   let selectedResultIndex = 0;
 
@@ -14027,9 +14180,9 @@ function initHealthAccountabilityWorkflow() {
       ],
       documents: [
         { document: 'Conta analítica', canonical: 'ContaAnalitica', summary: 'Conta hospitalar detectada com valores e itens faturados.' },
-        { document: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', summary: 'Descrição do procedimento localizada no pacote.' },
-        { document: 'Folha anestésica', canonical: 'FolhaAnestesica', summary: 'Registro anestésico encontrado.' },
-        { document: 'Pré-anestésica', canonical: 'PreAnestesica', summary: 'Avaliação pré-anestésica encontrada.' }
+        { document: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', summary: 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.' },
+        { document: 'Folha anestésica', canonical: 'FolhaAnestesica', summary: 'Resumo da folha anestésica com tipo de anestesia, monitorização, medicamentos e intercorrências registradas.' },
+        { document: 'Pré-anestésica', canonical: 'PreAnestesica', summary: 'Resumo da avaliação pré-anestésica com risco anestésico, antecedentes, jejum e liberação para o procedimento.' }
       ],
       accountSummary: [
         { label: 'Valor total', value: 'R$ 18.742,35' },
@@ -14057,8 +14210,8 @@ function initHealthAccountabilityWorkflow() {
       ],
       documents: [
         { document: 'Conta analítica', canonical: 'ContaAnalitica', summary: 'Conta hospitalar detectada com resumo financeiro.' },
-        { document: 'Endoscopia', canonical: 'Endoscopia', summary: 'Laudo de endoscopia identificado no arquivo.' },
-        { document: 'Outro exame', canonical: 'OutroExame', summary: 'Exame adicional exige revisão de categoria.' }
+        { document: 'Endoscopia', canonical: 'Endoscopia', summary: 'Resumo da endoscopia com indicação, descrição do exame e conclusão do laudo.' },
+        { document: 'Outro exame', canonical: 'OutroExame', summary: 'Exame adicional identificado com categoria ampla e resumo pendente de revisão.' }
       ],
       accountSummary: [
         { label: 'Valor total', value: 'R$ 9.814,70' },
@@ -14085,7 +14238,7 @@ function initHealthAccountabilityWorkflow() {
       ],
       documents: [
         { document: 'Conta analítica', canonical: 'ContaAnalitica', summary: 'Conta hospitalar detectada com valores principais.' },
-        { document: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', summary: 'Descrição cirúrgica encontrada.' }
+        { document: 'Descrição cirúrgica', canonical: 'DescricaoCirurgica', summary: 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.' }
       ],
       accountSummary: [
         { label: 'Valor total', value: 'R$ 14.205,88' },
@@ -14128,6 +14281,92 @@ function initHealthAccountabilityWorkflow() {
     const labels = (documents || []).map((item) => item.document).filter(Boolean);
     if (!labels.length) return 'Nenhum documento classificado';
     return labels.join(', ');
+  };
+  const getResultDocuments = (result) => {
+    if ((result?.documents || []).length) return result.documents;
+    return (result?.pages || []).map((item) => {
+      const catalogItem = documentCatalog.find((type) => type.label === item.category);
+      return {
+        document: item.category,
+        canonical: catalogItem?.canonical || item.category,
+        summary: item.summary
+      };
+    });
+  };
+  const getDocumentCanonical = (documentItem) => {
+    const rawCanonical = String(documentItem?.canonical || '').trim();
+    if (rawCanonical) return rawCanonical;
+    const rawLabel = String(documentItem?.document || '').trim();
+    return documentCatalog.find((type) => type.label === rawLabel)?.canonical || rawLabel;
+  };
+  const getDetailedDocumentSummary = (documentItem, result) => {
+    const canonical = getDocumentCanonical(documentItem);
+    if (canonical === 'ContaAnalitica') {
+      return {
+        summary: documentItem.summary || 'Conta hospitalar consolidada com valores principais, volume de itens e agrupamentos financeiros extraídos para conferência.',
+        details: (result.accountSummary || []).length ? result.accountSummary : [
+          { label: 'Status', value: 'ContaAnalitica encontrada, mas sem indicadores financeiros extraídos.' }
+        ]
+      };
+    }
+    if (canonical === 'DescricaoCirurgica') {
+      return {
+        summary: documentItem.summary || 'Descrição cirúrgica resumida com procedimento, técnica, achados operatórios e pontos de atenção para auditoria.',
+        details: [
+          { label: 'Procedimento', value: 'Procedimento cirúrgico identificado e compatível com o pacote analisado.' },
+          { label: 'Técnica registrada', value: 'Descrição técnica localizada com etapas principais do ato cirúrgico.' },
+          { label: 'Achados operatórios', value: 'Achados relevantes consolidados para comparação com a cobrança.' },
+          { label: 'Intercorrências', value: 'Sem intercorrência crítica destacada no trecho classificado.' },
+          { label: 'Conferência sugerida', value: 'Validar coerência entre procedimento, materiais cobrados e tempo de sala.' }
+        ]
+      };
+    }
+    if (canonical === 'FolhaAnestesica') {
+      return {
+        summary: documentItem.summary || 'Folha anestésica resumida com tipo de anestesia, medicamentos, monitorização e intercorrências registradas.',
+        details: [
+          { label: 'Tipo de anestesia', value: 'Anestesia identificada no registro assistencial do procedimento.' },
+          { label: 'Medicamentos', value: 'Fármacos anestésicos e adjuvantes consolidados para conferência.' },
+          { label: 'Monitorização', value: 'Sinais e controles intraoperatórios presentes na folha.' },
+          { label: 'Horários', value: 'Período anestésico localizado para cruzamento com taxas e sala.' },
+          { label: 'Intercorrências', value: 'Sem alerta crítico destacado no resumo automático.' }
+        ]
+      };
+    }
+    if (canonical === 'PreAnestesica') {
+      return {
+        summary: documentItem.summary || 'Avaliação pré-anestésica resumida com risco, antecedentes, jejum e liberação para o procedimento.',
+        details: [
+          { label: 'Risco anestésico', value: 'Classificação de risco identificada para validação clínica.' },
+          { label: 'Antecedentes', value: 'Comorbidades, alergias e histórico relevante consolidados quando presentes.' },
+          { label: 'Jejum', value: 'Informação de jejum localizada para checagem pré-procedimento.' },
+          { label: 'Via aérea', value: 'Avaliação prévia registrada no documento classificado.' },
+          { label: 'Conclusão', value: 'Documento indica avaliação prévia e liberação registradas no pacote.' }
+        ]
+      };
+    }
+    if (canonical === 'Endoscopia') {
+      return {
+        summary: documentItem.summary || 'Laudo de endoscopia resumido com indicação, achados, conclusão e recomendações do exame.',
+        details: [
+          { label: 'Indicação', value: 'Motivo do exame identificado no laudo.' },
+          { label: 'Achados', value: 'Descrição endoscópica consolidada para leitura rápida.' },
+          { label: 'Biópsia/coleta', value: 'Informação de coleta destacada quando presente no documento.' },
+          { label: 'Conclusão', value: 'Conclusão do laudo extraída para conferência assistencial.' },
+          { label: 'Recomendação', value: 'Orientações do exame mantidas para revisão clínica.' }
+        ]
+      };
+    }
+    return {
+      summary: documentItem.summary || 'Documento adicional classificado com categoria ampla e pontos mínimos para revisão humana.',
+      details: [
+        { label: 'Tipo provável', value: canonical || 'OutroExame' },
+        { label: 'Conteúdo localizado', value: 'Trechos relevantes do exame foram associados ao pacote processado.' },
+        { label: 'Confiança', value: 'Categoria ampla; exige validação de classificação.' },
+        { label: 'Pendência', value: 'Revisar se o documento deve ser recategorizado antes de enviar ao Oracle.' },
+        { label: 'Ação sugerida', value: 'Conferir nome do exame, data e vínculo com a conta.' }
+      ]
+    };
   };
   const getDocumentSummaryText = (type) => {
     if (!type) return 'Documento classificado no pacote hospitalar.';
@@ -14197,6 +14436,8 @@ function initHealthAccountabilityWorkflow() {
     if (resultOperatorEl) resultOperatorEl.textContent = result.operatorId || '-';
     if (resultProcessedAtEl) resultProcessedAtEl.textContent = result.processedAt;
     if (resultPagesEl) resultPagesEl.textContent = String(result.pages.length);
+    const resultDocuments = getResultDocuments(result);
+    if (resultDocumentsEl) resultDocumentsEl.textContent = String(resultDocuments.length);
 
     if (pagesTable) {
       pagesTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
@@ -14211,6 +14452,31 @@ function initHealthAccountabilityWorkflow() {
           <span>${escapeHtmlWes(item.summary)}</span>
         `;
         pagesTable.appendChild(row);
+      });
+    }
+    if (documentsTable) {
+      documentsTable.innerHTML = '';
+      resultDocuments.forEach((item, index) => {
+        const detailedSummary = getDetailedDocumentSummary(item, result);
+        const card = document.createElement('article');
+        card.className = 'health-accountability-document-summary';
+        card.innerHTML = `
+          <div class="health-accountability-document-summary-head">
+            <div>
+              <h4>${escapeHtmlWes(item.document || `Documento ${index + 1}`)}</h4>
+              <p>${escapeHtmlWes(detailedSummary.summary)}</p>
+            </div>
+          </div>
+          <div class="health-accountability-document-detail-grid">
+            ${(detailedSummary.details || []).map((detail) => `
+              <div class="health-accountability-document-detail">
+                <span>${escapeHtmlWes(detail.label)}</span>
+                <strong>${escapeHtmlWes(detail.value)}</strong>
+              </div>
+            `).join('')}
+          </div>
+        `;
+        documentsTable.appendChild(card);
       });
     }
     if (accountSection) accountSection.hidden = !(result.accountSummary || []).length;
@@ -14307,6 +14573,7 @@ function initHealthAccountabilityWorkflow() {
     .replace(/[^\x20-\x7e]/g, '')
     .replace(/[\\()]/g, '\\$&');
   const buildResultPdfBlob = (result) => {
+    const resultDocuments = getResultDocuments(result);
     const lines = [
       'Resultado da prestacao de contas',
       `Arquivo: ${result.fileName}`,
@@ -14317,6 +14584,15 @@ function initHealthAccountabilityWorkflow() {
       'Documentos por pagina:',
       ...result.pages.map((item) => `Pag. ${item.page} - ${item.category} - ${item.confidence} - ${item.summary}`),
       '',
+      'Resumo por documento:',
+      ...resultDocuments.flatMap((item) => {
+        const detailedSummary = getDetailedDocumentSummary(item, result);
+        return [
+          `${item.document} (${getDocumentCanonical(item) || '-'}) - ${detailedSummary.summary}`,
+          ...(detailedSummary.details || []).map((detail) => `  ${detail.label}: ${detail.value}`)
+        ];
+      }),
+      '',
       'Resumo da conta analitica:',
       ...((result.accountSummary || []).length ? result.accountSummary.map((item) => `${item.label}: ${item.value}`) : ['ContaAnalitica nao encontrada']),
       '',
@@ -14325,11 +14601,11 @@ function initHealthAccountabilityWorkflow() {
       '',
       'Producao Oracle: classificacao documental salva.'
     ];
-    const contentLines = lines.slice(0, 32).map((line, index) => {
-      const y = 742 - (index * 20);
+    const contentLines = lines.slice(0, 52).map((line, index) => {
+      const y = 760 - (index * 14);
       return `72 ${y} Td (${escapePdfText(line)}) Tj`;
     });
-    const content = ['BT', '/F1 12 Tf', ...contentLines, 'ET'].join('\n');
+    const content = ['BT', '/F1 9 Tf', ...contentLines, 'ET'].join('\n');
     const objects = [
       '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj',
       '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj',
@@ -14443,7 +14719,7 @@ function initHealthAccountabilityWorkflow() {
     await wait(650);
     setProgress(68, 'Classificando ContaAnalitica, DescricaoCirurgica, FolhaAnestesica, PreAnestesica e exames.');
     await wait(650);
-    setProgress(88, 'Consolidando documentos encontrados e resumo da conta analítica.');
+    setProgress(88, 'Consolidando resumos individuais e resumo da conta analítica.');
     await wait(550);
     setProgress(100, 'Gravando resultado classificatório.');
     await wait(350);
@@ -16807,6 +17083,8 @@ let healthServiceTimelineKindFilter = '';
 let healthServiceCpfLookupTimer = null;
 let healthServiceExamPdfUrl = '';
 let healthServiceExamImageUrl = '';
+let healthServiceEndRecognition = null;
+let healthServiceEndDictationActive = false;
 
 function normalizeHealthPatientSearch(value) {
   return String(value || '')
@@ -17138,6 +17416,165 @@ function closeHealthServiceCpfModal() {
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
   setHealthServiceCpfStep('input');
+}
+
+function openHealthServiceEndModal() {
+  const modal = document.getElementById('healthServiceEndModal');
+  const textarea = document.getElementById('healthServiceEndDescription');
+  if (!modal || !textarea) return;
+  textarea.value = '';
+  setHealthServiceEndDictationStatus('');
+  syncHealthServiceEndDictationButton(false);
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  window.setTimeout(() => textarea.focus(), 0);
+}
+
+function closeHealthServiceEndModal() {
+  const modal = document.getElementById('healthServiceEndModal');
+  if (!modal) return;
+  stopHealthServiceEndDictation();
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+function getHealthServiceSpeechRecognition() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function setHealthServiceEndDictationStatus(message, tone = '') {
+  const status = document.getElementById('healthServiceEndDictationStatus');
+  if (!status) return;
+  status.textContent = message || '';
+  status.dataset.tone = tone;
+  status.hidden = !message;
+}
+
+function syncHealthServiceEndDictationButton(isActive = healthServiceEndDictationActive) {
+  const button = document.getElementById('healthServiceEndDictationBtn');
+  const label = button?.querySelector('[data-health-service-end-dictation-label]');
+  if (!button) return;
+  const isSupported = Boolean(getHealthServiceSpeechRecognition());
+  button.disabled = !isSupported;
+  button.classList.toggle('is-active', Boolean(isActive));
+  button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  if (label) label.textContent = isActive ? 'Parar ditado' : 'Ditar';
+  if (!isSupported) {
+    button.title = 'Ditado não disponível neste navegador';
+    setHealthServiceEndDictationStatus('Ditado não disponível neste navegador. Você ainda pode digitar a descrição.', 'warning');
+  } else if (!isActive && !document.getElementById('healthServiceEndDictationStatus')?.textContent) {
+    setHealthServiceEndDictationStatus('');
+  }
+}
+
+function appendHealthServiceEndTranscript(transcript) {
+  const textarea = document.getElementById('healthServiceEndDescription');
+  const text = String(transcript || '').trim();
+  if (!textarea || !text) return;
+  const current = textarea.value.trim();
+  textarea.value = current ? `${current} ${text}` : text;
+  textarea.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
+function stopHealthServiceEndDictation() {
+  if (!healthServiceEndRecognition || !healthServiceEndDictationActive) return;
+  try {
+    healthServiceEndRecognition.stop();
+  } catch {
+    healthServiceEndDictationActive = false;
+    syncHealthServiceEndDictationButton(false);
+  }
+}
+
+function startHealthServiceEndDictation() {
+  const SpeechRecognition = getHealthServiceSpeechRecognition();
+  const textarea = document.getElementById('healthServiceEndDescription');
+  if (!SpeechRecognition || !textarea) {
+    showAppToast('Ditado não disponível neste navegador');
+    syncHealthServiceEndDictationButton(false);
+    return;
+  }
+  if (healthServiceEndDictationActive) {
+    stopHealthServiceEndDictation();
+    return;
+  }
+  healthServiceEndRecognition = new SpeechRecognition();
+  healthServiceEndRecognition.lang = 'pt-BR';
+  healthServiceEndRecognition.continuous = true;
+  healthServiceEndRecognition.interimResults = true;
+  healthServiceEndRecognition.onstart = () => {
+    healthServiceEndDictationActive = true;
+    syncHealthServiceEndDictationButton(true);
+    setHealthServiceEndDictationStatus('Ouvindo... fale o resumo do atendimento.', 'active');
+  };
+  healthServiceEndRecognition.onresult = (event) => {
+    let finalTranscript = '';
+    let interimTranscript = '';
+    for (let index = event.resultIndex; index < event.results.length; index += 1) {
+      const transcript = event.results[index]?.[0]?.transcript || '';
+      if (event.results[index].isFinal) {
+        finalTranscript += transcript;
+      } else {
+        interimTranscript += transcript;
+      }
+    }
+    appendHealthServiceEndTranscript(finalTranscript);
+    if (interimTranscript.trim()) {
+      setHealthServiceEndDictationStatus(`Transcrevendo: ${interimTranscript.trim()}`, 'active');
+    } else if (finalTranscript.trim()) {
+      setHealthServiceEndDictationStatus('Transcrição adicionada à descrição.', 'success');
+    }
+  };
+  healthServiceEndRecognition.onerror = (event) => {
+    const error = String(event.error || '');
+    const message = error === 'not-allowed' || error === 'service-not-allowed'
+      ? 'Permita o acesso ao microfone para usar o ditado.'
+      : 'Não foi possível transcrever o áudio. Tente novamente ou digite a descrição.';
+    setHealthServiceEndDictationStatus(message, 'warning');
+    showAppToast(message);
+  };
+  healthServiceEndRecognition.onend = () => {
+    healthServiceEndDictationActive = false;
+    syncHealthServiceEndDictationButton(false);
+  };
+  try {
+    healthServiceEndRecognition.start();
+  } catch {
+    setHealthServiceEndDictationStatus('Não foi possível iniciar o ditado agora. Tente novamente.', 'warning');
+    syncHealthServiceEndDictationButton(false);
+  }
+}
+
+function recordHealthServiceEndSummary(description) {
+  const now = new Date();
+  const pad = (value) => String(value).padStart(2, '0');
+  const isoDate = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const date = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()}`;
+  const patientName = document.querySelector('[data-health-service-patient-name]')?.textContent?.trim() || 'Paciente';
+  const event = {
+    id: 'current-care-finished',
+    kind: 'current',
+    label: 'Atual',
+    title: 'Consulta encerrada',
+    date,
+    isoDate,
+    icon: 'check_circle',
+    summary: description,
+    details: [
+      { label: 'Paciente', value: patientName },
+      { label: 'Status', value: 'Atendimento encerrado' },
+    ],
+    notes: [description],
+  };
+  const existingIndex = healthServiceTimelineEvents.findIndex((item) => item.id === event.id);
+  if (existingIndex >= 0) {
+    healthServiceTimelineEvents.splice(existingIndex, 1, event);
+  } else {
+    healthServiceTimelineEvents.push(event);
+  }
+  renderHealthServiceTimelineYearOptions();
+  syncHealthServiceTimelineFilterOptions();
+  renderHealthServiceTimeline();
 }
 
 function openHealthServicePatientPage(patient) {
@@ -17629,6 +18066,7 @@ function closeHealthServiceTimelineFilterMenus() {
 
 function initHealthServiceControls() {
   const modal = document.getElementById('healthServiceCpfModal');
+  const endModal = document.getElementById('healthServiceEndModal');
   const examModal = document.getElementById('healthServiceExamModal');
   const timelineModal = document.getElementById('healthServiceTimelineModal');
   const attendanceTable = document.getElementById('healthServiceTable');
@@ -17648,12 +18086,17 @@ function initHealthServiceControls() {
   const timelineFilterClear = document.querySelector('[data-health-service-timeline-filter-clear]');
   const form = document.getElementById('healthServiceCpfForm');
   const input = document.getElementById('healthServiceCpfInput');
+  const endForm = document.getElementById('healthServiceEndForm');
+  const endDescription = document.getElementById('healthServiceEndDescription');
+  const endDictationBtn = document.getElementById('healthServiceEndDictationBtn');
   renderHealthServiceAttendanceTable();
   renderHealthServiceTimelineYearOptions();
   syncFilterMenuLayout(timelineFilterMenu);
   syncHealthServiceTimelineFilterOptions();
   renderHealthServiceTimeline();
   document.querySelector('[data-health-service-start]')?.addEventListener('click', openHealthServiceCpfModal);
+  document.querySelector('[data-health-service-end]')?.addEventListener('click', openHealthServiceEndModal);
+  endDictationBtn?.addEventListener('click', startHealthServiceEndDictation);
   serviceSearchInput?.addEventListener('input', applyHealthServiceAttendanceFilters);
   serviceSearchInput?.addEventListener('search', applyHealthServiceAttendanceFilters);
   if (periodMenu && !periodMenu.dataset.mode) periodMenu.dataset.mode = 'range';
@@ -17718,6 +18161,23 @@ function initHealthServiceControls() {
   });
   modal?.addEventListener('click', (event) => {
     if (event.target.closest('[data-health-service-cpf-close]')) closeHealthServiceCpfModal();
+  });
+  endModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-service-end-close]')) closeHealthServiceEndModal();
+  });
+  endForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const description = String(endDescription?.value || '').trim();
+    if (!description) {
+      showAppToast('Informe a descrição do atendimento');
+      endDescription?.focus();
+      return;
+    }
+    stopHealthServiceEndDictation();
+    recordHealthServiceEndSummary(description);
+    closeHealthServiceEndModal();
+    showAppToast('Atendimento encerrado com resumo registrado');
+    window.location.hash = '#/dashboard/health/service';
   });
   examModal?.addEventListener('click', (event) => {
     if (event.target.closest('[data-health-service-exam-close]')) closeHealthServiceExamModal();
@@ -17789,6 +18249,7 @@ function initHealthServiceControls() {
   });
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape' && modal?.classList.contains('open')) closeHealthServiceCpfModal();
+    if (event.key === 'Escape' && endModal?.classList.contains('open')) closeHealthServiceEndModal();
     if (event.key === 'Escape' && examModal?.classList.contains('open')) closeHealthServiceExamModal();
     if (event.key === 'Escape' && timelineModal?.classList.contains('open')) closeHealthServiceTimelineModal();
   });

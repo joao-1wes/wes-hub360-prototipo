@@ -4372,6 +4372,12 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   gap: 14px;
 }
 
+.health-service-end-btn {
+  gap: 8px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .health-service-patient-layout {
   display: grid;
   grid-template-columns: minmax(420px, 1.25fr) minmax(320px, 0.9fr);
@@ -5265,9 +5271,81 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   max-width: min(560px, 92vw);
 }
 
-.health-service-cpf-body {
+.modal-dialog.health-service-end-dialog {
+  width: min(640px, 92vw);
+  max-width: min(640px, 92vw);
+}
+
+.health-service-cpf-body,
+.health-service-end-body {
   display: grid;
   gap: 14px;
+}
+
+.health-service-end-textarea {
+  min-height: 168px;
+  resize: vertical;
+}
+
+.health-service-end-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.health-service-end-label-row .modal-label {
+  margin: 0;
+}
+
+.health-service-dictation-btn {
+  gap: 7px;
+  flex: 0 0 auto;
+  min-height: 34px;
+  padding: 6px 10px;
+  white-space: nowrap;
+}
+
+.health-service-dictation-btn.is-active {
+  border-color: #0f766e;
+  background: #ecfdf5;
+  color: #0f766e;
+}
+
+.health-service-dictation-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.62;
+}
+
+.health-service-dictation-status {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
+}
+
+.health-service-dictation-status:empty,
+.health-service-dictation-status[hidden] {
+  display: none;
+}
+
+.health-service-dictation-status[data-tone="active"] {
+  color: #0f54b6;
+}
+
+.health-service-dictation-status[data-tone="success"] {
+  color: #166534;
+}
+
+.health-service-dictation-status[data-tone="warning"] {
+  color: #8b3f0a;
+}
+
+.health-service-end-body .modal-field-hint {
+  margin: 0;
+  color: var(--muted);
+  font-size: var(--md-body-small);
+  line-height: 18px;
 }
 
 .health-service-cpf-step {
@@ -5339,7 +5417,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   line-height: 20px;
 }
 
-.health-service-cpf-footer .btn.primary {
+.health-service-cpf-footer .btn.primary,
+.health-service-end-footer .btn.primary {
   gap: 8px;
 }
 
@@ -6732,6 +6811,37 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   text-align: left;
 }
 
+.doc-result-table .data-row > span:nth-child(2),
+.executions-table .data-row > span:nth-child(4),
+.packages-table .data-row > span:nth-child(2),
+.roles-table .data-row > span:nth-child(3),
+.roles-table .data-row > span:nth-child(4),
+.organizations-table .data-row > span:nth-child(3),
+.organizations-table .data-row > span:nth-child(4),
+.organizations-table .data-row > span:nth-child(5),
+.companies-table .data-row > span:nth-child(5),
+.companies-table .data-row > span:nth-child(6),
+.environments-table .data-row > span:nth-child(5),
+.environments-table .data-row > span:nth-child(6),
+.environments-table .data-row > span:nth-child(7),
+.agent-history-table .data-row > span:nth-child(6),
+.agent-history-table .data-row > span:nth-child(7),
+.agent-history-table .data-row > span:nth-child(8),
+.hybrid-flows-data-table .data-row > span:nth-child(3),
+.monitoring-table .data-row > span:nth-child(6),
+.monitoring-table .data-row > span:nth-child(7),
+.monitoring-table .data-row > span:nth-child(8),
+.health-patient-audit-table .data-row > span:nth-child(2),
+.health-exam-reading-table .data-row > span:nth-child(4),
+.health-exam-results-table .data-row > span:nth-child(1),
+.health-accountability-pages-table .data-row > span:nth-child(1),
+.health-accountability-pages-table .data-row > span:nth-child(3),
+.health-accountability-account-table .data-row > span:nth-child(2) {
+  justify-self: center;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
 .agent-history-table .data-row {
   grid-template-columns: 1.15fr 0.95fr 0.9fr 1.1fr 0.95fr 0.68fr 0.8fr 0.8fr 0.55fr;
   min-width: 1440px;
@@ -7115,6 +7225,7 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   grid-template-columns:
     minmax(190px, 1.35fr)
     minmax(170px, 1.1fr)
+    minmax(80px, 0.5fr)
     minmax(80px, 0.5fr)
     minmax(80px, 0.5fr)
     minmax(90px, 0.6fr)
@@ -8844,6 +8955,71 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   min-width: 780px;
 }
 
+.health-accountability-documents-list {
+  display: grid;
+  gap: 12px;
+}
+
+.health-accountability-document-summary {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #d9e2f2;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.health-accountability-document-summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.health-accountability-document-summary-head h4 {
+  margin: 0;
+  color: #0f172a;
+  font-size: var(--md-title-small);
+  line-height: 22px;
+  font-weight: 700;
+}
+
+.health-accountability-document-summary-head p {
+  margin: 4px 0 0;
+  color: #42526b;
+  font-size: var(--md-body-medium);
+  line-height: 20px;
+}
+
+.health-accountability-document-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.health-accountability-document-detail {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.health-accountability-document-detail span {
+  color: #64748b;
+  font-size: var(--md-label-small);
+  line-height: 16px;
+  font-weight: 700;
+}
+
+.health-accountability-document-detail strong {
+  color: #162033;
+  font-size: var(--md-body-small);
+  line-height: 18px;
+  font-weight: 600;
+}
+
 .health-accountability-account-table .data-row {
   grid-template-columns: minmax(180px, 0.75fr) minmax(180px, 1fr);
   min-width: 420px;
@@ -8872,6 +9048,14 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 @media (max-width: 1100px) {
   .health-accountability-results-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .health-accountability-document-summary-head {
+    display: grid;
+  }
+
+  .health-accountability-document-detail-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 }
@@ -10008,6 +10192,20 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 
 .users-table .data-row {
   grid-template-columns: 1.6fr 1.4fr 0.8fr 0.8fr 0.8fr 0.6fr;
+}
+
+.create-user-edit-status-toggle {
+  min-height: 44px;
+}
+
+.create-user-edit-status-toggle.is-active .switch-label {
+  color: #166534;
+  font-weight: 700;
+}
+
+.create-user-edit-status-toggle.is-inactive .switch-label {
+  color: #a05a00;
+  font-weight: 700;
 }
 
 .skills-table .data-row {
@@ -12440,6 +12638,11 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
 .hybrid-history-table tbody td:nth-child(1),
 .hybrid-history-table tbody td:nth-child(4) {
   white-space: nowrap;
+}
+
+.hybrid-history-table thead th:nth-child(4),
+.hybrid-history-table tbody td:nth-child(4) {
+  text-align: center;
 }
 
 .hybrid-history-table tbody tr:last-child td {
@@ -19684,12 +19887,12 @@ body.agent-chat-standalone .chat-thread {
   background: #fdecec;
 }
 
-#confirmActionModalConfirm.btn.primary {
+#confirmActionModal[data-confirm-action-variant="danger"] #confirmActionModalConfirm.btn.primary {
   background: #dc5f5f;
   color: #ffffff;
 }
 
-#confirmActionModalConfirm.btn.primary:hover {
+#confirmActionModal[data-confirm-action-variant="danger"] #confirmActionModalConfirm.btn.primary:hover {
   background: #c54f4f;
 }
 
@@ -21862,6 +22065,11 @@ body.route-automation-create #directChatFab {
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
+}
+
+.public-modal-field-label--required::after {
+  content: " *";
+  color: #dc2626;
 }
 
 .public-modal-field input,

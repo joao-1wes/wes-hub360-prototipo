@@ -189,11 +189,11 @@
             <section class="create-company-details-section" aria-label="Dados da empresa">
               <div class="create-company-details-grid">
                 <label class="public-modal-field" for="companyName">
-                  <span>Nome da empresa</span>
+                  <span class="public-modal-field-label--required">Nome da empresa</span>
                   <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
                 </label>
                 <label class="public-modal-field" for="companyAdminEmail">
-                  <span>Responsável</span>
+                  <span class="public-modal-field-label--required">Responsável</span>
                   <input id="companyAdminEmail" name="company_admin_email" type="text" autocomplete="name" required />
                 </label>
               </div>
@@ -3381,13 +3381,20 @@
                     </div>
                     <div class="create-user-single-only">
                       <label class="modal-label modal-label--required" for="createUserStatus">Status</label>
-                      <div class="hub-select-wrap hub-select-wrap--block">
+                      <div class="hub-select-wrap hub-select-wrap--block" id="createUserStatusSelectWrap">
                         <span class="material-symbols-rounded hub-select-icon" aria-hidden="true">verified_user</span>
                         <select id="createUserStatus" class="hub-select" name="status" aria-label="Status do usuário" required>
                           <option value="active">Ativo</option>
                           <option value="inactive">Inativo</option>
                         </select>
                         <span class="material-symbols-rounded hub-select-chevron" aria-hidden="true">expand_more</span>
+                      </div>
+                      <div class="modal-toggle create-user-edit-status-toggle" id="createUserEditStatusToggle" hidden>
+                        <label class="switch" for="createUserEditStatusInput">
+                          <input type="checkbox" id="createUserEditStatusInput" checked />
+                          <span class="switch-track"></span>
+                        </label>
+                        <span class="switch-label" id="createUserEditStatusValue">Usuário habilitado</span>
                       </div>
                     </div>
                   </div>
@@ -7668,13 +7675,14 @@
                 <a class="tab" href="#/dashboard/users">Usuários</a>
                 <a class="tab" href="#/dashboard/roles">Funções</a>
               </div>
-              <p class="people-management-tab-description">Organizações representam clientes ou unidades administradas no HUB 360. Esta visão é exclusiva do ADM WES; ADMs de cliente e usuários comuns não acessam esta aba.</p>
+              <p class="people-management-tab-description">Organizações representam clientes ou unidades administradas no HUB 360.</p>
               <div class="data-table organizations-table">
                 <div class="data-row header">
                   <span>Organização</span>
                   <span>ADM responsável</span>
                   <span>Empresas</span>
                   <span>Setores</span>
+                  <span>Usuários</span>
                   <span>Status</span>
                   <span>Ações</span>
                 </div>
@@ -7683,6 +7691,7 @@
                   <span>admin@cedae.com</span>
                   <span>3</span>
                   <span>9</span>
+                  <span data-organization-user-count>9</span>
                   <span><span class="chip success">Ativa</span></span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Editar organização" data-organization-edit>
@@ -7698,6 +7707,7 @@
                   <span>admin@avas.com</span>
                   <span>2</span>
                   <span>6</span>
+                  <span data-organization-user-count>7</span>
                   <span><span class="chip success">Ativa</span></span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Editar organização" data-organization-edit>
@@ -8917,7 +8927,9 @@
                   <h2>Histórico médico</h2>
                   <p class="page-subtitle">Paciente carregado pelo CPF para iniciar o atendimento com contexto clínico.</p>
                 </div>
-                <span class="health-patient-period-chip">CPF carregado</span>
+                <button class="btn primary health-service-end-btn" type="button" data-health-service-end>
+                  Encerrar atendimento
+                </button>
               </div>
 
               <div class="health-service-patient-layout">
@@ -9412,7 +9424,7 @@
               <div class="page-header">
                 <div>
                   <h2>Resultado da prestação</h2>
-                  <p class="page-subtitle">Classificação por página e resumo da conta analítica do PDF processado.</p>
+                  <p class="page-subtitle">Classificação por página, resumo por documento e resumo da conta analítica do PDF processado.</p>
                 </div>
                 <div class="page-actions">
                   <button class="btn primary" id="downloadHealthAccountabilityReportBtn" type="button">
@@ -9441,6 +9453,10 @@
                     <strong data-health-accountability-result-pages>12</strong>
                   </div>
                   <div class="health-exam-results-summary-item">
+                    <span>Documentos encontrados:</span>
+                    <strong data-health-accountability-result-documents>4</strong>
+                  </div>
+                  <div class="health-exam-results-summary-item">
                     <span>Processado em:</span>
                     <strong data-health-accountability-result-processed-at>30/07/2026 • 14:22</strong>
                   </div>
@@ -9462,6 +9478,14 @@
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div class="health-accountability-result-section">
+                <div>
+                  <h3>Resumo detalhado por documento</h3>
+                  <p class="page-subtitle">Síntese individual e campos extraídos de cada documento classificado no pacote.</p>
+                </div>
+                <div class="health-accountability-documents-list" id="healthAccountabilityDocumentsTable"></div>
               </div>
 
               <div class="health-accountability-result-section" id="healthAccountabilityAccountSection">
@@ -10163,6 +10187,42 @@
 	                <button type="submit" class="btn primary" id="healthServiceCpfSubmitBtn">
 	                  <span class="material-symbols-rounded" aria-hidden="true">search</span>
 	                  Buscar paciente
+	                </button>
+	              </div>
+	            </form>
+	          </div>
+	        </div>
+
+	        <div class="modal" id="healthServiceEndModal" aria-hidden="true">
+	          <div class="modal-backdrop" data-health-service-end-close></div>
+	          <div class="modal-dialog health-service-end-dialog" role="dialog" aria-modal="true" aria-labelledby="healthServiceEndTitle">
+	            <form id="healthServiceEndForm">
+	              <div class="modal-header">
+	                <div>
+	                  <h3 id="healthServiceEndTitle">Encerrar atendimento</h3>
+	                  <p class="modal-subtitle">Registre um resumo do que foi feito nesta consulta.</p>
+	                </div>
+	                <button type="button" class="icon-btn" aria-label="Fechar" data-health-service-end-close>
+	                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+	                </button>
+	              </div>
+	              <div class="modal-body health-service-end-body">
+	                <div class="health-service-end-label-row">
+	                  <label class="modal-label modal-label--required" for="healthServiceEndDescription">Descrição do atendimento</label>
+	                  <button class="btn outline health-service-dictation-btn" id="healthServiceEndDictationBtn" type="button" aria-pressed="false">
+	                    <span class="material-symbols-rounded" aria-hidden="true">mic</span>
+	                    <span data-health-service-end-dictation-label>Ditar</span>
+	                  </button>
+	                </div>
+	                <textarea class="modal-textarea health-service-end-textarea" id="healthServiceEndDescription" rows="7" maxlength="1200" placeholder="Descreva o que o paciente relatou, condutas realizadas, orientações dadas, medicamentos ou exames solicitados." required></textarea>
+	                <p class="modal-field-hint">Esse resumo ficará vinculado ao histórico médico do paciente.</p>
+	                <p class="health-service-dictation-status" id="healthServiceEndDictationStatus" aria-live="polite"></p>
+	              </div>
+	              <div class="modal-footer health-service-end-footer">
+	                <button type="button" class="btn outline" data-health-service-end-close>Cancelar</button>
+	                <button type="submit" class="btn primary">
+	                  <span class="material-symbols-rounded" aria-hidden="true">done_all</span>
+	                  Finalizar
 	                </button>
 	              </div>
 	            </form>

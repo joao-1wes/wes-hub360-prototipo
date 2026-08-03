@@ -1,0 +1,214 @@
+DOCUMENTO DE REGRAS - ORGANIZACAO, EMPRESA, SETORES, USUARIOS E FUNCOES
+
+Objetivo
+--------
+Este documento explica como deve funcionar a estrutura de acesso e gestao do HUB 360 envolvendo organizacoes, empresas, setores, usuarios e funcoes.
+
+A ideia principal e separar a administracao em niveis:
+
+1. Organizacao
+2. Empresa
+3. Setor
+4. Usuario
+5. Funcao
+
+Cada nivel tem um papel especifico e influencia o que o usuario visualiza e gerencia dentro do sistema.
+
+
+1. Organizacao
+-------------
+A organizacao representa o cliente, grupo, unidade ou conta principal dentro do HUB 360.
+
+Exemplos:
+- Grupo AVAS
+- ADM Cliente
+
+A organizacao e o nivel mais alto da estrutura. Ela agrupa empresas, usuarios, setores e regras de permissao.
+
+Regras principais:
+- O ADM WES pode visualizar e alternar entre organizacoes.
+- O ADM Cliente nao alterna entre organizacoes.
+- O ADM Cliente fica restrito a organizacao dele.
+- Usuarios comuns tambem ficam restritos ao escopo da organizacao deles.
+
+Quando o ADM WES seleciona uma organizacao, o sistema deve assumir automaticamente a primeira empresa disponivel daquela organizacao como empresa atual.
+
+
+2. Empresa
+----------
+A empresa representa uma divisao operacional dentro de uma organizacao.
+
+Exemplos dentro de uma organizacao:
+- Aguas Rio
+- CEDAE Saneamento
+- AVAS Energia
+- TechCorp Brasil
+
+Empresas sao opcionais para a organizacao.
+
+Se nenhuma empresa for criada, o sistema deve considerar apenas uma empresa padrao com o mesmo nome da organizacao.
+
+Regras principais:
+- Toda operacao sensivel ao contexto deve saber qual e a empresa atual.
+- O ADM Cliente pode visualizar e gerenciar todas as empresas da sua organizacao.
+- O ADM Cliente nao deve ver empresas de outras organizacoes.
+- O ADM WES pode navegar entre organizacoes e empresas.
+- Ao entrar em uma organizacao, o ADM WES entra automaticamente na primeira empresa daquela organizacao.
+- Se quiser trabalhar em outra empresa, o ADM WES deve usar a acao de alternar empresa.
+- O usuario deve sempre ter clareza de qual empresa esta usando no momento.
+
+Contexto de empresa atual:
+- A empresa atual aparece no perfil do usuario.
+- A empresa atual tambem aparece na aba Empresas, logo abaixo da descricao.
+- O texto deve indicar algo como: "Empresa atual: Aguas Rio".
+
+Alternancia de empresa:
+- A acao deve se chamar "Alternar empresa".
+- Ao clicar em "Alternar empresa", o sistema mostra uma lista de empresas disponiveis para o perfil atual.
+- Para ADM Cliente, a lista deve conter apenas empresas da organizacao dele.
+- Para ADM WES, a lista pode conter empresas de organizacoes disponiveis conforme o escopo dele.
+
+
+3. Setores
+----------
+Setores organizam a operacao interna de uma empresa.
+
+Exemplos:
+- Marketing
+- Financeiro
+- Operacoes
+- RH
+
+Setores sao usados para separar areas que podem ter projetos, agentes, usuarios, auditoria e outras operacoes proprias.
+
+Regras principais:
+- Setores pertencem a uma empresa.
+- Painel de agentes, auditoria e outras areas operacionais podem funcionar por empresa e por setor.
+- Para visualizar agentes criados para uma empresa, o usuario precisa estar no contexto daquela empresa.
+- A tela de Setores deve respeitar a empresa atual.
+- O ADM Cliente pode gerenciar setores das empresas da sua organizacao.
+- O ADM WES pode gerenciar setores conforme a organizacao e empresa em que estiver navegando.
+
+Importante:
+- A empresa atual define o contexto principal.
+- Os setores ficam abaixo da empresa.
+- Setores nao devem misturar dados de empresas diferentes quando a operacao for dependente de empresa.
+
+
+4. Usuarios
+-----------
+Usuarios sao os acessos individuais ao sistema.
+
+Cada usuario pertence a um contexto de organizacao e pode ser vinculado a empresas, setores e funcoes.
+
+Regras principais:
+- O usuario comum acessa apenas o que sua funcao permite.
+- O ADM Cliente gerencia usuarios dentro da propria organizacao.
+- O ADM Cliente nao deve gerenciar usuarios de outras organizacoes.
+- O ADM WES pode gerenciar usuarios em diferentes organizacoes, conforme o contexto selecionado.
+- Um usuario pode estar associado a uma empresa para operar dentro daquele contexto.
+- Um usuario tambem pode estar associado a setores especificos quando a regra do sistema exigir separacao por area.
+
+No modal de edicao de empresa:
+- Deve mostrar o nome da empresa.
+- Deve mostrar a organizacao.
+- Deve mostrar o responsavel.
+- Deve permitir gerenciar usuarios vinculados a empresa.
+- Nao deve mostrar a lista grande de setores dentro desse modal, para evitar duplicidade com a tela propria de Setores.
+
+
+5. Funcoes
+----------
+Funcoes definem o que cada usuario pode visualizar, criar, editar, excluir ou administrar.
+
+Exemplos:
+- ADM WES
+- ADM Cliente
+- Usuario Cliente
+- Operador
+- Gestor
+
+Regras principais:
+- A funcao define o nivel de permissao.
+- A organizacao define o escopo principal.
+- A empresa atual define o contexto operacional.
+- Os setores refinam a separacao dentro da empresa.
+
+Funcao ADM WES:
+- Pode alternar entre organizacoes.
+- Pode alternar entre empresas.
+- Ao entrar em uma organizacao, deve cair automaticamente na primeira empresa daquela organizacao.
+- Pode administrar a estrutura geral.
+
+Funcao ADM Cliente:
+- Nao alterna entre organizacoes.
+- Pode alternar entre empresas da propria organizacao.
+- Pode visualizar e gerenciar todas as empresas da sua organizacao.
+- Deve enxergar de forma explicita qual empresa esta ativa.
+
+Funcao Usuario Cliente:
+- Nao alterna entre organizacoes.
+- Nao deve acessar areas administrativas que nao fazem parte da sua permissao.
+- Deve respeitar a organizacao, empresa e setores definidos para ele.
+
+
+6. Hierarquia resumida
+----------------------
+Organizacao
+  Empresa
+    Setor
+      Projetos
+      Agentes
+      Usuarios
+      Auditoria
+
+Usuario
+  Funcao
+  Organizacao
+  Empresa atual
+  Setores permitidos
+
+
+7. Regras de navegacao e contexto
+---------------------------------
+Login como ADM Cliente:
+- O sistema pergunta qual empresa da organizacao o usuario deseja acessar.
+- A lista deve conter somente empresas da organizacao do ADM Cliente.
+- Depois da escolha, essa empresa se torna a empresa atual.
+
+Login como ADM WES:
+- O sistema permite navegar entre organizacoes.
+- Ao entrar em uma organizacao, o sistema assume automaticamente a primeira empresa daquela organizacao.
+- Para acessar outra empresa, o usuario usa "Alternar empresa".
+
+Tela Empresas:
+- Deve mostrar as empresas permitidas pelo contexto do usuario.
+- Para ADM Cliente, mostra empresas da sua organizacao.
+- Para ADM WES, mostra empresas conforme a organizacao/empresa atual.
+- Deve mostrar logo abaixo da descricao qual e a empresa atual.
+- Deve ter acao para alternar empresa.
+
+Tela Setores:
+- Deve respeitar a empresa atual.
+- Quando necessario, deve permitir visualizar os setores da empresa selecionada.
+
+
+8. Regra pratica para nao confundir o usuario
+---------------------------------------------
+Sempre que uma area do sistema depender de empresa, a empresa atual precisa estar clara.
+
+Isso evita problemas em:
+- Agentes
+- Auditoria
+- Setores
+- Usuarios
+- Relatorios
+- Permissoes
+- Configuracoes operacionais
+
+O usuario deve entender rapidamente:
+- Em qual organizacao esta.
+- Em qual empresa esta.
+- Quais setores pertencem a essa empresa.
+- Quais usuarios e funcoes podem atuar naquele contexto.
+

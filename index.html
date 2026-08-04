@@ -7750,7 +7750,12 @@
             <div class="modal-dialog company-users-dialog organization-details-dialog" role="dialog" aria-modal="true" aria-labelledby="organizationDetailsModalTitle">
               <div class="modal-header">
                 <div>
-                  <h3 id="organizationDetailsModalTitle">Visualizar e editar organização</h3>
+                  <div class="company-modal-title-row">
+                    <h3 id="organizationDetailsModalTitle">Organização</h3>
+                    <button type="button" class="icon-btn action-icon company-modal-edit-icon" id="organizationDetailsEditButton" aria-label="Editar organização" title="Editar organização">
+                      <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                    </button>
+                  </div>
                   <p class="modal-subtitle" id="organizationDetailsModalSubtitle">Consulte empresas, setores e usuários vinculados.</p>
                 </div>
                 <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
@@ -7800,11 +7805,24 @@
                   </div>
                   <div class="company-users-list organization-company-list" id="organizationDetailsCompaniesList"></div>
                 </section>
+                <section class="users-modal-section">
+                  <div class="company-users-section-head">
+                    <h4 class="users-modal-section-title">Setores da organização</h4>
+                    <span class="chip" id="organizationDetailsSectorsChip">0 setores</span>
+                  </div>
+                  <div class="company-users-list organization-sector-list" id="organizationDetailsSectorsList"></div>
+                </section>
+                <section class="users-modal-section users-modal-section--last">
+                  <div class="company-users-section-head">
+                    <h4 class="users-modal-section-title">Usuários da organização</h4>
+                    <span class="chip" id="organizationDetailsUsersChip">0 usuários</span>
+                  </div>
+                  <div class="company-users-list organization-user-list" id="organizationDetailsUsersList"></div>
+                </section>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn outline" data-modal-close>Fechar</button>
                 <button type="button" class="btn outline organization-edit-only" id="organizationDetailsCancelEditButton" hidden>Cancelar edição</button>
-                <button type="button" class="btn primary" id="organizationDetailsEditButton">Editar</button>
                 <button type="button" class="btn primary organization-edit-only" id="organizationDetailsSaveButton" hidden>Salvar alterações</button>
               </div>
             </div>

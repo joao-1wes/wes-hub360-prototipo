@@ -15427,6 +15427,16 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   grid-template-columns: minmax(220px, 1.5fr) minmax(140px, 0.8fr) minmax(120px, auto);
 }
 
+.organization-sector-row,
+.organization-user-row {
+  grid-template-columns: minmax(220px, 1.4fr) minmax(150px, 0.75fr) minmax(170px, auto);
+}
+
+.organization-sector-row .company-user-status,
+.organization-user-row .company-user-status {
+  flex-wrap: wrap;
+}
+
 .company-sector-row {
   grid-template-columns: minmax(0, 1fr);
   align-items: stretch;

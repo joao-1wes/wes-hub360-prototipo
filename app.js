@@ -238,6 +238,10 @@ const organizationDetailsSectorsCount = document.getElementById('organizationDet
 const organizationDetailsUsersCount = document.getElementById('organizationDetailsUsersCount');
 const organizationDetailsCompaniesChip = document.getElementById('organizationDetailsCompaniesChip');
 const organizationDetailsCompaniesList = document.getElementById('organizationDetailsCompaniesList');
+const organizationDetailsSectorsChip = document.getElementById('organizationDetailsSectorsChip');
+const organizationDetailsSectorsList = document.getElementById('organizationDetailsSectorsList');
+const organizationDetailsUsersChip = document.getElementById('organizationDetailsUsersChip');
+const organizationDetailsUsersList = document.getElementById('organizationDetailsUsersList');
 const organizationDetailsSaveButton = document.getElementById('organizationDetailsSaveButton');
 const organizationDetailsEditButton = document.getElementById('organizationDetailsEditButton');
 const organizationDetailsCancelEditButton = document.getElementById('organizationDetailsCancelEditButton');
@@ -6540,6 +6544,24 @@ const writeStructureStatusCell = (row, statusValue, statusIndex, datasetKey) => 
   if (statusCell) statusCell.innerHTML = `<span class="chip ${meta.chipClass}">${meta.label}</span>`;
 };
 
+const companyUsersByCompany = {
+  avas: [
+    { userId: 'admin@wes.com', active: true },
+    { userId: 'viniciusaires@hotmail.com', active: true },
+  ],
+  techcorp: [
+    { userId: 'admin@wes.com', active: false },
+    { userId: 'ana.silva@cedae.com', active: true },
+  ],
+  'aguas-rio': [
+    { userId: 'ana.silva@cedae.com', active: true },
+    { userId: 'carlos.santos@cedae.com', active: true },
+  ],
+  'cedae-saneamento': [
+    { userId: 'ana.silva@cedae.com', active: true },
+  ],
+};
+
 if (organizationsTable && organizationDetailsModal) {
   let activeOrganizationRow = null;
   let isOrganizationModalEditing = false;
@@ -6547,9 +6569,30 @@ if (organizationsTable && organizationDetailsModal) {
   const getOrganizationCompanies = (organizationId) => Array.from(companiesTable?.querySelectorAll('[data-company-row]') || [])
     .filter((companyRow) => String(companyRow.dataset.companyOrganization || '').trim() === organizationId);
 
-  const getOrganizationSectorsCount = (organizationId) => Array.from(environmentsTable?.querySelectorAll('.environment-row') || [])
-    .filter((environmentRow) => String(environmentRow.dataset.environmentOrganization || '').trim() === organizationId)
-    .length;
+  const getOrganizationSectors = (organizationId) => Array.from(environmentsTable?.querySelectorAll('.environment-row') || [])
+    .filter((environmentRow) => String(environmentRow.dataset.environmentOrganization || '').trim() === organizationId);
+
+  const getOrganizationSectorsCount = (organizationId) => getOrganizationSectors(organizationId).length;
+
+  const findOrganizationUser = (userId) => {
+    const normalizedId = normalizeUserDirectoryId(userId);
+    return getUserDirectoryRecords().find((user) => user.id === normalizedId) || {
+      id: normalizedId,
+      name: normalizedId,
+      email: normalizedId,
+      role: 'Usuário',
+    };
+  };
+
+  const getOrganizationUserMemberships = (organizationId) => getOrganizationCompanies(organizationId).flatMap((companyRow) => {
+    const companyId = String(companyRow.dataset.companyId || '').trim();
+    const companyName = companyRow.dataset.companyName || companyRow.querySelector('strong')?.textContent?.trim() || 'Empresa';
+    return (companyUsersByCompany[companyId] || []).map((membership) => ({
+      ...membership,
+      companyId,
+      companyName,
+    }));
+  });
 
   const syncOrganizationRowActionAttributes = (row) => {
     if (!row) return;
@@ -6590,6 +6633,77 @@ if (organizationsTable && organizationDetailsModal) {
     }
   };
 
+  const renderOrganizationSectorsList = (organizationId) => {
+    if (!organizationDetailsSectorsList) return;
+    const sectors = getOrganizationSectors(organizationId);
+    organizationDetailsSectorsList.replaceChildren();
+    sectors.forEach((sectorRow) => {
+      const item = document.createElement('div');
+      item.className = 'company-user-row organization-sector-row';
+      const sectorName = sectorRow.dataset.environmentName || sectorRow.querySelector('strong')?.textContent?.trim() || 'Setor';
+      const companyId = String(sectorRow.dataset.environmentCompany || '').trim();
+      const companyRow = companiesTable?.querySelector(`[data-company-row][data-company-id="${CSS.escape(companyId)}"]`);
+      const companyName = companyRow?.dataset.companyName || companyRow?.querySelector('strong')?.textContent?.trim() || 'Empresa não informada';
+      const owner = sectorRow.dataset.environmentOwner || sectorRow.querySelector('.environment-owner-cell')?.textContent?.trim() || 'Responsável não informado';
+      const projects = sectorRow.querySelector('.environment-projects-cell')?.textContent?.trim() || sectorRow.dataset.environmentProjects || '0';
+      const agents = sectorRow.querySelector('.environment-agents-cell')?.textContent?.trim() || sectorRow.dataset.environmentAgents || '0';
+      const users = sectorRow.querySelector('.environment-users-cell')?.textContent?.trim() || sectorRow.dataset.environmentUsers || '0';
+      item.innerHTML = `
+        <span class="company-user-identity">
+          <span class="user-avatar small">${escapeHtmlWes(getCompanyAvatarText(sectorName))}</span>
+          <span>
+            <strong>${escapeHtmlWes(sectorName)}</strong>
+            <span class="muted">${escapeHtmlWes(companyName)} · ${escapeHtmlWes(owner)}</span>
+          </span>
+        </span>
+        <span class="company-user-email">${escapeHtmlWes(projects)} projetos</span>
+        <span class="company-user-status">
+          <span class="chip">${escapeHtmlWes(agents)} agentes</span>
+          <span class="chip">${escapeHtmlWes(users)} usuários</span>
+        </span>
+      `;
+      organizationDetailsSectorsList.appendChild(item);
+    });
+    if (!sectors.length) {
+      const empty = document.createElement('div');
+      empty.className = 'user-lookup-empty';
+      empty.textContent = 'Nenhum setor vinculado';
+      organizationDetailsSectorsList.appendChild(empty);
+    }
+  };
+
+  const renderOrganizationUsersList = (organizationId) => {
+    if (!organizationDetailsUsersList) return;
+    const memberships = getOrganizationUserMemberships(organizationId);
+    organizationDetailsUsersList.replaceChildren();
+    memberships.forEach((membership) => {
+      const user = findOrganizationUser(membership.userId);
+      const item = document.createElement('div');
+      item.className = 'company-user-row organization-user-row';
+      item.innerHTML = `
+        <span class="company-user-identity">
+          <span class="user-avatar small">${escapeHtmlWes(getUserInitialFromDirectory(user))}</span>
+          <span>
+            <strong>${escapeHtmlWes(user.name)}</strong>
+            <span class="muted">${escapeHtmlWes(user.role || 'Usuário')}</span>
+          </span>
+        </span>
+        <span class="company-user-email">${escapeHtmlWes(user.email)}</span>
+        <span class="company-user-status">
+          <span class="chip">${escapeHtmlWes(membership.companyName)}</span>
+          <span class="chip ${membership.active ? 'success' : 'warning'}">${membership.active ? 'Ativo' : 'Inativo'}</span>
+        </span>
+      `;
+      organizationDetailsUsersList.appendChild(item);
+    });
+    if (!memberships.length) {
+      const empty = document.createElement('div');
+      empty.className = 'user-lookup-empty';
+      empty.textContent = 'Nenhum usuário vinculado';
+      organizationDetailsUsersList.appendChild(empty);
+    }
+  };
+
   const openOrganizationDetailsModal = (row) => {
     activeOrganizationRow = row;
     const organizationId = String(row.dataset.organizationId || '').trim();
@@ -6597,11 +6711,11 @@ if (organizationsTable && organizationDetailsModal) {
     const admin = row.dataset.organizationAdmin || row.children?.[1]?.textContent?.trim() || '';
     const companiesCount = getOrganizationCompanies(organizationId).length;
     const sectorsCount = getOrganizationSectorsCount(organizationId);
-    const usersCount = row.querySelector('[data-organization-user-count]')?.textContent?.trim() || '0';
+    const usersCount = getOrganizationUserMemberships(organizationId).length;
     const status = getStructureRowStatusValue(row, 5);
 
-    if (organizationDetailsModalTitle) organizationDetailsModalTitle.textContent = `Visualizar e editar organização · ${organizationName}`;
-    if (organizationDetailsModalSubtitle) organizationDetailsModalSubtitle.textContent = 'Consulte empresas, setores e usuários vinculados e ajuste os dados da organização.';
+    if (organizationDetailsModalTitle) organizationDetailsModalTitle.textContent = organizationName;
+    if (organizationDetailsModalSubtitle) organizationDetailsModalSubtitle.textContent = 'Consulte detalhes, vínculos e usuários da organização.';
     if (organizationDetailsNameInput) organizationDetailsNameInput.value = organizationName;
     if (organizationDetailsAdminInput) organizationDetailsAdminInput.value = admin;
     if (organizationDetailsStatusInput) organizationDetailsStatusInput.value = status;
@@ -6609,7 +6723,11 @@ if (organizationsTable && organizationDetailsModal) {
     if (organizationDetailsSectorsCount) organizationDetailsSectorsCount.textContent = String(sectorsCount);
     if (organizationDetailsUsersCount) organizationDetailsUsersCount.textContent = String(usersCount);
     if (organizationDetailsCompaniesChip) organizationDetailsCompaniesChip.textContent = `${companiesCount} ${companiesCount === 1 ? 'empresa' : 'empresas'}`;
+    if (organizationDetailsSectorsChip) organizationDetailsSectorsChip.textContent = `${sectorsCount} ${sectorsCount === 1 ? 'setor' : 'setores'}`;
+    if (organizationDetailsUsersChip) organizationDetailsUsersChip.textContent = `${usersCount} ${usersCount === 1 ? 'usuário' : 'usuários'}`;
     renderOrganizationCompaniesList(organizationId);
+    renderOrganizationSectorsList(organizationId);
+    renderOrganizationUsersList(organizationId);
     setOrganizationModalEditMode(false);
     organizationDetailsModal.classList.add('open');
     organizationDetailsModal.setAttribute('aria-hidden', 'false');
@@ -6720,6 +6838,9 @@ const updateOrganizationUserCounts = () => {
     const totalUsers = Array.from(companiesTable.querySelectorAll('[data-company-row]'))
       .filter((companyRow) => String(companyRow.dataset.companyOrganization || '').trim() === organizationId)
       .reduce((total, companyRow) => {
+        const companyId = String(companyRow.dataset.companyId || '').trim();
+        const linkedUsers = companyUsersByCompany[companyId];
+        if (Array.isArray(linkedUsers)) return total + linkedUsers.length;
         const value = Number.parseInt(companyRow.querySelector('[data-company-user-count]')?.textContent || '0', 10);
         return total + (Number.isFinite(value) ? value : 0);
       }, 0);
@@ -6736,24 +6857,6 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
   let selectedCompanyUserId = '';
   let shouldAttachNextCreatedUserToCompany = false;
   let isCompanyModalEditing = false;
-
-  const companyUsersByCompany = {
-    avas: [
-      { userId: 'admin@wes.com', active: true },
-      { userId: 'viniciusaires@hotmail.com', active: true },
-    ],
-    techcorp: [
-      { userId: 'admin@wes.com', active: false },
-      { userId: 'ana.silva@cedae.com', active: true },
-    ],
-    'aguas-rio': [
-      { userId: 'ana.silva@cedae.com', active: true },
-      { userId: 'carlos.santos@cedae.com', active: true },
-    ],
-    'cedae-saneamento': [
-      { userId: 'ana.silva@cedae.com', active: true },
-    ],
-  };
 
   const normalizeCompanyUserId = normalizeUserDirectoryId;
 

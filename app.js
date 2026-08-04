@@ -233,9 +233,6 @@ const organizationDetailsModalSubtitle = document.getElementById('organizationDe
 const organizationDetailsNameInput = document.getElementById('organizationDetailsNameInput');
 const organizationDetailsAdminInput = document.getElementById('organizationDetailsAdminInput');
 const organizationDetailsStatusInput = document.getElementById('organizationDetailsStatusInput');
-const organizationDetailsCompaniesCount = document.getElementById('organizationDetailsCompaniesCount');
-const organizationDetailsSectorsCount = document.getElementById('organizationDetailsSectorsCount');
-const organizationDetailsUsersCount = document.getElementById('organizationDetailsUsersCount');
 const organizationDetailsCompaniesChip = document.getElementById('organizationDetailsCompaniesChip');
 const organizationDetailsCompaniesList = document.getElementById('organizationDetailsCompaniesList');
 const organizationDetailsSectorsChip = document.getElementById('organizationDetailsSectorsChip');
@@ -6719,12 +6716,9 @@ if (organizationsTable && organizationDetailsModal) {
     if (organizationDetailsNameInput) organizationDetailsNameInput.value = organizationName;
     if (organizationDetailsAdminInput) organizationDetailsAdminInput.value = admin;
     if (organizationDetailsStatusInput) organizationDetailsStatusInput.value = status;
-    if (organizationDetailsCompaniesCount) organizationDetailsCompaniesCount.textContent = String(companiesCount);
-    if (organizationDetailsSectorsCount) organizationDetailsSectorsCount.textContent = String(sectorsCount);
-    if (organizationDetailsUsersCount) organizationDetailsUsersCount.textContent = String(usersCount);
-    if (organizationDetailsCompaniesChip) organizationDetailsCompaniesChip.textContent = `${companiesCount} ${companiesCount === 1 ? 'empresa' : 'empresas'}`;
-    if (organizationDetailsSectorsChip) organizationDetailsSectorsChip.textContent = `${sectorsCount} ${sectorsCount === 1 ? 'setor' : 'setores'}`;
-    if (organizationDetailsUsersChip) organizationDetailsUsersChip.textContent = `${usersCount} ${usersCount === 1 ? 'usuário' : 'usuários'}`;
+    if (organizationDetailsCompaniesChip) organizationDetailsCompaniesChip.textContent = String(companiesCount);
+    if (organizationDetailsSectorsChip) organizationDetailsSectorsChip.textContent = String(sectorsCount);
+    if (organizationDetailsUsersChip) organizationDetailsUsersChip.textContent = String(usersCount);
     renderOrganizationCompaniesList(organizationId);
     renderOrganizationSectorsList(organizationId);
     renderOrganizationUsersList(organizationId);

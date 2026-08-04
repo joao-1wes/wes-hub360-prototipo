@@ -15303,6 +15303,48 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   flex: 0 0 auto;
 }
 
+.organization-details-dialog .modal-header h3 {
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.organization-details-dialog .modal-subtitle {
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.organization-details-dialog .users-modal-section {
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.organization-details-dialog .users-modal-section-title {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.organization-details-dialog .company-user-row {
+  padding: 10px;
+}
+
+.organization-details-dialog .company-user-identity strong,
+.organization-details-dialog .company-user-email {
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.organization-details-dialog .company-user-identity .muted,
+.organization-details-dialog .company-user-status,
+.organization-details-dialog .chip {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.organization-details-count {
+  min-width: 28px;
+  justify-content: center;
+}
+
 .company-edit-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

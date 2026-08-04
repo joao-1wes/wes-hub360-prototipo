@@ -208,15 +208,39 @@ const agentHistoryKnowledgeList = document.getElementById('agentHistoryKnowledge
 const agentHistoryOpenConversationBtn = document.getElementById('agentHistoryOpenConversationBtn');
 const companyUsersModal = document.getElementById('companyUsersModal');
 const companyUsersModalTitle = document.getElementById('companyUsersModalTitle');
+const companyUsersModalSubtitle = document.getElementById('companyUsersModalSubtitle');
 const companyUserSelect = document.getElementById('companyUserSelect');
 const companyUserLookupMenu = document.getElementById('companyUserLookupMenu');
 const companyAddUserButton = document.getElementById('companyAddUserButton');
 const companyUsersList = document.getElementById('companyUsersList');
 const companyUsersCount = document.getElementById('companyUsersCount');
+const companySectorsList = document.getElementById('companySectorsList');
+const companySectorsCount = document.getElementById('companySectorsCount');
 const companyUsersSaveButton = document.getElementById('companyUsersSaveButton');
+const companyUsersEditButton = document.getElementById('companyUsersEditButton');
+const companyUsersCancelEditButton = document.getElementById('companyUsersCancelEditButton');
+const companyUsersCloseButton = document.getElementById('companyUsersCloseButton');
 const companyDetailsName = document.getElementById('companyDetailsName');
 const companyDetailsOrganization = document.getElementById('companyDetailsOrganization');
 const companyDetailsResponsible = document.getElementById('companyDetailsResponsible');
+const companyDetailsNameInput = document.getElementById('companyDetailsNameInput');
+const companyDetailsOrganizationInput = document.getElementById('companyDetailsOrganizationInput');
+const companyDetailsResponsibleInput = document.getElementById('companyDetailsResponsibleInput');
+const companyDetailsStatusInput = document.getElementById('companyDetailsStatusInput');
+const organizationDetailsModal = document.getElementById('organizationDetailsModal');
+const organizationDetailsModalTitle = document.getElementById('organizationDetailsModalTitle');
+const organizationDetailsModalSubtitle = document.getElementById('organizationDetailsModalSubtitle');
+const organizationDetailsNameInput = document.getElementById('organizationDetailsNameInput');
+const organizationDetailsAdminInput = document.getElementById('organizationDetailsAdminInput');
+const organizationDetailsStatusInput = document.getElementById('organizationDetailsStatusInput');
+const organizationDetailsCompaniesCount = document.getElementById('organizationDetailsCompaniesCount');
+const organizationDetailsSectorsCount = document.getElementById('organizationDetailsSectorsCount');
+const organizationDetailsUsersCount = document.getElementById('organizationDetailsUsersCount');
+const organizationDetailsCompaniesChip = document.getElementById('organizationDetailsCompaniesChip');
+const organizationDetailsCompaniesList = document.getElementById('organizationDetailsCompaniesList');
+const organizationDetailsSaveButton = document.getElementById('organizationDetailsSaveButton');
+const organizationDetailsEditButton = document.getElementById('organizationDetailsEditButton');
+const organizationDetailsCancelEditButton = document.getElementById('organizationDetailsCancelEditButton');
 const createUserModal = document.getElementById('createUserModal');
 const createUserModalForm = document.getElementById('createUserModalForm');
 const createUserTitle = document.getElementById('createUserTitle');
@@ -669,6 +693,8 @@ const environmentName = document.getElementById('environmentName');
 const environmentOwner = document.getElementById('environmentOwner');
 const environmentDescription = document.getElementById('environmentDescription');
 const environmentModalSubmit = document.getElementById('environmentModalSubmit');
+const environmentModalEditButton = document.getElementById('environmentModalEditButton');
+const environmentModalCancelEditButton = document.getElementById('environmentModalCancelEditButton');
 const environmentProjectsSummary = document.getElementById('environmentProjectsSummary');
 const environmentAgentsSummary = document.getElementById('environmentAgentsSummary');
 const environmentUsersSummary = document.getElementById('environmentUsersSummary');
@@ -6490,8 +6516,143 @@ if (openSkillModal && skillModal && skillModalForm && skillsTable) {
   });
 }
 
-if (organizationsTable) {
+const getStructureStatusMeta = (statusValue = 'active') => {
+  const isInactive = String(statusValue || '').trim() === 'inactive';
+  return {
+    value: isInactive ? 'inactive' : 'active',
+    label: isInactive ? 'Inativa' : 'Ativa',
+    chipClass: isInactive ? 'warning' : 'success',
+  };
+};
+
+const getStructureRowStatusValue = (row, fallbackIndex) => {
+  const explicitStatus = row?.dataset?.companyStatus || row?.dataset?.organizationStatus || '';
+  if (explicitStatus) return explicitStatus;
+  const text = row?.children?.[fallbackIndex]?.textContent?.trim().toLowerCase() || '';
+  return text.includes('inativ') ? 'inactive' : 'active';
+};
+
+const writeStructureStatusCell = (row, statusValue, statusIndex, datasetKey) => {
+  if (!row) return;
+  const meta = getStructureStatusMeta(statusValue);
+  row.dataset[datasetKey] = meta.value;
+  const statusCell = row.children?.[statusIndex];
+  if (statusCell) statusCell.innerHTML = `<span class="chip ${meta.chipClass}">${meta.label}</span>`;
+};
+
+if (organizationsTable && organizationDetailsModal) {
+  let activeOrganizationRow = null;
+  let isOrganizationModalEditing = false;
+
+  const getOrganizationCompanies = (organizationId) => Array.from(companiesTable?.querySelectorAll('[data-company-row]') || [])
+    .filter((companyRow) => String(companyRow.dataset.companyOrganization || '').trim() === organizationId);
+
+  const getOrganizationSectorsCount = (organizationId) => Array.from(environmentsTable?.querySelectorAll('.environment-row') || [])
+    .filter((environmentRow) => String(environmentRow.dataset.environmentOrganization || '').trim() === organizationId)
+    .length;
+
+  const syncOrganizationRowActionAttributes = (row) => {
+    if (!row) return;
+    row.removeAttribute('role');
+    row.removeAttribute('tabindex');
+    row.removeAttribute('aria-label');
+  };
+
+  const renderOrganizationCompaniesList = (organizationId) => {
+    if (!organizationDetailsCompaniesList) return;
+    const companies = getOrganizationCompanies(organizationId);
+    organizationDetailsCompaniesList.replaceChildren();
+    companies.forEach((companyRow) => {
+      const item = document.createElement('div');
+      item.className = 'company-user-row organization-company-row';
+      const companyName = companyRow.dataset.companyName || companyRow.querySelector('strong')?.textContent?.trim() || 'Empresa';
+      const admin = companyRow.children?.[2]?.textContent?.trim() || 'Administrador não informado';
+      const sectors = companyRow.children?.[4]?.textContent?.trim() || '0';
+      const users = companyRow.querySelector('[data-company-user-count]')?.textContent?.trim() || '0';
+      item.innerHTML = `
+        <span class="company-user-identity">
+          <span class="user-avatar small">${escapeHtmlWes(getCompanyAvatarText(companyName))}</span>
+          <span>
+            <strong>${escapeHtmlWes(companyName)}</strong>
+            <span class="muted">${escapeHtmlWes(admin)}</span>
+          </span>
+        </span>
+        <span class="company-user-email">${escapeHtmlWes(sectors)} setores</span>
+        <span class="company-user-status"><span class="chip">${escapeHtmlWes(users)} usuários</span></span>
+      `;
+      organizationDetailsCompaniesList.appendChild(item);
+    });
+    if (!companies.length) {
+      const empty = document.createElement('div');
+      empty.className = 'user-lookup-empty';
+      empty.textContent = 'Nenhuma empresa vinculada';
+      organizationDetailsCompaniesList.appendChild(empty);
+    }
+  };
+
+  const openOrganizationDetailsModal = (row) => {
+    activeOrganizationRow = row;
+    const organizationId = String(row.dataset.organizationId || '').trim();
+    const organizationName = row.dataset.organizationName || row.querySelector('strong')?.textContent?.trim() || 'Organização';
+    const admin = row.dataset.organizationAdmin || row.children?.[1]?.textContent?.trim() || '';
+    const companiesCount = getOrganizationCompanies(organizationId).length;
+    const sectorsCount = getOrganizationSectorsCount(organizationId);
+    const usersCount = row.querySelector('[data-organization-user-count]')?.textContent?.trim() || '0';
+    const status = getStructureRowStatusValue(row, 5);
+
+    if (organizationDetailsModalTitle) organizationDetailsModalTitle.textContent = `Visualizar e editar organização · ${organizationName}`;
+    if (organizationDetailsModalSubtitle) organizationDetailsModalSubtitle.textContent = 'Consulte empresas, setores e usuários vinculados e ajuste os dados da organização.';
+    if (organizationDetailsNameInput) organizationDetailsNameInput.value = organizationName;
+    if (organizationDetailsAdminInput) organizationDetailsAdminInput.value = admin;
+    if (organizationDetailsStatusInput) organizationDetailsStatusInput.value = status;
+    if (organizationDetailsCompaniesCount) organizationDetailsCompaniesCount.textContent = String(companiesCount);
+    if (organizationDetailsSectorsCount) organizationDetailsSectorsCount.textContent = String(sectorsCount);
+    if (organizationDetailsUsersCount) organizationDetailsUsersCount.textContent = String(usersCount);
+    if (organizationDetailsCompaniesChip) organizationDetailsCompaniesChip.textContent = `${companiesCount} ${companiesCount === 1 ? 'empresa' : 'empresas'}`;
+    renderOrganizationCompaniesList(organizationId);
+    setOrganizationModalEditMode(false);
+    organizationDetailsModal.classList.add('open');
+    organizationDetailsModal.setAttribute('aria-hidden', 'false');
+    organizationDetailsEditButton?.focus();
+  };
+
+  const closeOrganizationDetailsModal = () => {
+    organizationDetailsModal.classList.remove('open');
+    organizationDetailsModal.setAttribute('aria-hidden', 'true');
+    activeOrganizationRow = null;
+    isOrganizationModalEditing = false;
+  };
+
+  const setOrganizationModalEditMode = (isEditing) => {
+    isOrganizationModalEditing = Boolean(isEditing);
+    organizationDetailsModal.dataset.mode = isOrganizationModalEditing ? 'edit' : 'view';
+    [organizationDetailsNameInput, organizationDetailsAdminInput, organizationDetailsStatusInput].forEach((field) => {
+      if (field) field.disabled = !isOrganizationModalEditing;
+    });
+    organizationDetailsModal.querySelectorAll('.organization-edit-only').forEach((element) => {
+      element.hidden = !isOrganizationModalEditing;
+    });
+    if (organizationDetailsEditButton) organizationDetailsEditButton.hidden = isOrganizationModalEditing;
+  };
+
   organizationsTable.addEventListener('click', async (event) => {
+    const detailsButton = event.target.closest('[data-organization-details]');
+    if (detailsButton) {
+      const row = detailsButton.closest('[data-organization-row]');
+      if (row) openOrganizationDetailsModal(row);
+      return;
+    }
+
+    const editButton = event.target.closest('[data-organization-edit]');
+    if (editButton) {
+      const row = editButton.closest('[data-organization-row]');
+      if (row) {
+        openOrganizationDetailsModal(row);
+        setOrganizationModalEditMode(true);
+      }
+      return;
+    }
+
     const deleteButton = event.target.closest('.row-actions .action-icon.danger[aria-label="Excluir organização"]');
     if (!deleteButton) return;
     if (deleteButton.disabled || deleteButton.getAttribute('disabled') !== null || deleteButton.classList.contains('muted-icon')) return;
@@ -6502,6 +6663,52 @@ if (organizationsTable) {
     row.remove();
     showAppToast('Organização excluída');
   });
+
+  organizationDetailsModal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeOrganizationDetailsModal();
+  });
+
+  organizationDetailsEditButton?.addEventListener('click', () => {
+    if (!activeOrganizationRow) return;
+    setOrganizationModalEditMode(true);
+    organizationDetailsNameInput?.focus();
+  });
+
+  organizationDetailsCancelEditButton?.addEventListener('click', () => {
+    if (!activeOrganizationRow) return;
+    openOrganizationDetailsModal(activeOrganizationRow);
+  });
+
+  organizationDetailsSaveButton?.addEventListener('click', () => {
+    if (!isOrganizationModalEditing || !activeOrganizationRow) return;
+    const name = String(organizationDetailsNameInput?.value || '').trim();
+    const admin = String(organizationDetailsAdminInput?.value || '').trim();
+    const status = String(organizationDetailsStatusInput?.value || 'active');
+    if (!name || !admin) {
+      showAppToast('Informe nome e ADM responsável da organização');
+      return;
+    }
+
+    const organizationId = String(activeOrganizationRow.dataset.organizationId || '').trim();
+    const previousName = activeOrganizationRow.dataset.organizationName || '';
+    activeOrganizationRow.dataset.organizationName = name;
+    activeOrganizationRow.dataset.organizationAdmin = admin;
+    writeStructureStatusCell(activeOrganizationRow, status, 5, 'organizationStatus');
+
+    const nameCell = activeOrganizationRow.querySelector('.environment-name-cell strong');
+    const adminCell = activeOrganizationRow.children?.[1];
+    if (nameCell) nameCell.textContent = name;
+    if (adminCell) adminCell.textContent = admin;
+    getOrganizationCompanies(organizationId).forEach((companyRow) => {
+      const organizationCell = companyRow.children?.[1];
+      if (organizationCell && organizationCell.textContent.trim() === previousName) organizationCell.textContent = name;
+    });
+    syncOrganizationRowActionAttributes(activeOrganizationRow);
+    closeOrganizationDetailsModal();
+    showAppToast('Organização atualizada com sucesso');
+  });
+
+  organizationsTable.querySelectorAll('[data-organization-row]').forEach(syncOrganizationRowActionAttributes);
 }
 
 const updateOrganizationUserCounts = () => {
@@ -6528,6 +6735,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
   let draftCompanyUsers = [];
   let selectedCompanyUserId = '';
   let shouldAttachNextCreatedUserToCompany = false;
+  let isCompanyModalEditing = false;
 
   const companyUsersByCompany = {
     avas: [
@@ -6575,7 +6783,37 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     name: row?.dataset.companyName || row?.querySelector('strong')?.textContent?.trim() || 'Empresa',
     organization: row?.children?.[1]?.textContent?.trim() || row?.dataset.companyOrganization || 'Organização',
     responsible: row?.children?.[2]?.textContent?.trim() || 'Não informado',
+    status: getStructureRowStatusValue(row, 3),
   });
+
+  const syncCompanyRowActionAttributes = (row) => {
+    if (!row) return;
+    row.removeAttribute('role');
+    row.removeAttribute('tabindex');
+    row.removeAttribute('aria-label');
+  };
+
+  const syncCompanyOrganizationOptions = (selectedOrganizationId = '') => {
+    if (!companyDetailsOrganizationInput) return;
+    const access = getSelectedOrganizationAccess();
+    const options = Array.from(organizationsTable?.querySelectorAll('[data-organization-row]') || []).map((row) => ({
+      value: String(row.dataset.organizationId || '').trim(),
+      label: row.dataset.organizationName || row.querySelector('strong')?.textContent?.trim() || 'Organização',
+    })).filter((option) => option.value && isInOrganizationScope(option.value, access));
+    if (!options.some((option) => option.value === selectedOrganizationId) && selectedOrganizationId) {
+      options.push({ value: selectedOrganizationId, label: getOrganizationNameForCompanyScope(selectedOrganizationId, access) });
+    }
+    companyDetailsOrganizationInput.innerHTML = '';
+    options.forEach((option) => {
+      const el = document.createElement('option');
+      el.value = option.value;
+      el.textContent = option.label;
+      companyDetailsOrganizationInput.appendChild(el);
+    });
+    companyDetailsOrganizationInput.value = options.some((option) => option.value === selectedOrganizationId)
+      ? selectedOrganizationId
+      : (options[0]?.value || '');
+  };
 
   const closeCompanyUserLookup = () => {
     companyUserLookupMenu?.classList.remove('open');
@@ -6674,13 +6912,13 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
         <span class="company-user-email">${escapeHtmlWes(user.email)}</span>
         <span class="company-user-status">
           <label class="switch small" for="${escapeHtmlWes(switchId)}">
-            <input type="checkbox" id="${escapeHtmlWes(switchId)}" data-company-user-status ${membership.active ? 'checked' : ''} />
+            <input type="checkbox" id="${escapeHtmlWes(switchId)}" data-company-user-status ${membership.active ? 'checked' : ''} ${isCompanyModalEditing ? '' : 'disabled'} />
             <span class="switch-track"></span>
           </label>
           <span class="switch-label">${membership.active ? 'Ativo' : 'Inativo'}</span>
         </span>
         <span class="row-actions">
-          <button class="icon-btn action-icon danger" type="button" data-company-user-remove aria-label="Remover usuário da empresa">
+          <button class="icon-btn action-icon danger company-users-edit-only" type="button" data-company-user-remove aria-label="Remover usuário da empresa" ${isCompanyModalEditing ? '' : 'hidden disabled'}>
             <span class="material-symbols-rounded">delete</span>
           </button>
         </span>
@@ -6695,6 +6933,178 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     resetCompanyUserLookup();
   };
 
+  const companySectorDetailsByCode = {
+    'env-operacoes': {
+      projects: [
+        'Operações integradas',
+        'Backoffice comercial',
+        'Atendimento multicanal',
+        'Controle de filas',
+        'Qualidade operacional',
+        'SLA e escalonamento',
+      ],
+      agents: [
+        'Atlas Core',
+        'Nimbus Ops',
+        'Queue Watch',
+        'SLA Sentinel',
+        'Triagem Assistida',
+        'Orquestrador de Tarefas',
+        'Backoffice Helper',
+        'Monitor de Incidentes',
+        'Qualidade de Atendimento',
+        'Resumo de Plantão',
+        'Classificador de Chamados',
+        'Roteador de Prioridade',
+        'Validador de Evidências',
+        'Auditor Operacional',
+      ],
+    },
+    'env-financeiro': {
+      projects: [
+        'Controladoria e fechamento',
+        'Conciliação bancária',
+        'Contas a pagar',
+        'Relatórios financeiros',
+      ],
+      agents: [
+        'Pulse Finance',
+        'Ledger Check',
+        'Conciliação Express',
+        'Fechamento Mensal',
+        'Analista de Despesas',
+        'Previsor de Caixa',
+        'Validador Fiscal',
+        'Resumo Financeiro',
+      ],
+    },
+    'env-marketing': {
+      projects: [
+        'Campanhas digitais',
+        'Segmentação de clientes',
+        'Performance e mídia',
+      ],
+      agents: [
+        'Campaign Copilot',
+        'Segment Builder',
+        'Mídia Performance',
+        'Copy Review',
+        'Lead Scoring',
+      ],
+    },
+    'env-rh': {
+      projects: [
+        'Admissões e onboarding',
+        'Comunicação interna',
+      ],
+      agents: [
+        'People Assist',
+        'Onboarding Guide',
+        'Comunicados RH',
+        'Trilhas de Desenvolvimento',
+      ],
+    },
+  };
+
+  const buildCompanySectorFallbackItems = (sectorName, type, count) => {
+    const total = Number.parseInt(count || '0', 10);
+    if (!Number.isFinite(total) || total <= 0) return [];
+    const label = type === 'projects' ? 'Projeto' : 'Agente';
+    return Array.from({ length: total }, (_, index) => `${label} ${index + 1} · ${sectorName}`);
+  };
+
+  const getCompanySectorDetails = (sectorRow, sectorName, projectCount, agentCount) => {
+    const code = String(sectorRow.dataset.environmentCode || '').trim();
+    const details = companySectorDetailsByCode[code] || {};
+    return {
+      projects: Array.isArray(details.projects) && details.projects.length
+        ? details.projects
+        : buildCompanySectorFallbackItems(sectorName, 'projects', projectCount),
+      agents: Array.isArray(details.agents) && details.agents.length
+        ? details.agents
+        : buildCompanySectorFallbackItems(sectorName, 'agents', agentCount),
+    };
+  };
+
+  const renderCompanySectorDetailList = (title, items, emptyText) => `
+    <div class="company-sector-detail-group">
+      <span>${escapeHtmlWes(title)}</span>
+      <div class="company-sector-detail-tags">
+        ${(items || []).length
+          ? items.map((item) => `<strong>${escapeHtmlWes(item)}</strong>`).join('')
+          : `<em>${escapeHtmlWes(emptyText)}</em>`}
+      </div>
+    </div>
+  `;
+
+  const renderCompanySectors = () => {
+    if (!companySectorsList) return;
+    const sectors = Array.from(environmentsTable?.querySelectorAll('.environment-row') || [])
+      .filter((row) => String(row.dataset.environmentCompany || '').trim() === activeCompanyId);
+    companySectorsList.replaceChildren();
+    sectors.forEach((sectorRow) => {
+      const item = document.createElement('div');
+      item.className = 'company-user-row company-sector-row';
+      const sectorName = sectorRow.dataset.environmentName || sectorRow.querySelector('strong')?.textContent?.trim() || 'Setor';
+      const owner = sectorRow.dataset.environmentOwner || sectorRow.querySelector('.environment-owner-cell')?.textContent?.trim() || 'Responsável não informado';
+      const projects = sectorRow.querySelector('.environment-projects-cell')?.textContent?.trim() || '0';
+      const agents = sectorRow.querySelector('.environment-agents-cell')?.textContent?.trim() || '0';
+      const users = sectorRow.querySelector('.environment-users-cell')?.textContent?.trim() || '0';
+      const details = getCompanySectorDetails(sectorRow, sectorName, projects, agents);
+      item.innerHTML = `
+        <div class="company-sector-row-head">
+          <span class="company-user-identity">
+            <span class="user-avatar small">${escapeHtmlWes(getCompanyAvatarText(sectorName))}</span>
+            <span>
+              <strong>${escapeHtmlWes(sectorName)}</strong>
+              <span class="muted">${escapeHtmlWes(owner)}</span>
+            </span>
+          </span>
+          <span class="company-sector-summary">
+            <span class="chip">${escapeHtmlWes(projects)} projetos</span>
+            <span class="chip">${escapeHtmlWes(agents)} agentes</span>
+            <span class="chip">${escapeHtmlWes(users)} usuários</span>
+          </span>
+        </div>
+        <div class="company-sector-detail-grid">
+          ${renderCompanySectorDetailList('Projetos do setor', details.projects, 'Nenhum projeto vinculado')}
+          ${renderCompanySectorDetailList('Agentes do setor', details.agents, 'Nenhum agente vinculado')}
+        </div>
+      `;
+      companySectorsList.appendChild(item);
+    });
+    if (!sectors.length) {
+      const empty = document.createElement('div');
+      empty.className = 'user-lookup-empty';
+      empty.textContent = 'Nenhum setor vinculado';
+      companySectorsList.appendChild(empty);
+    }
+    if (companySectorsCount) {
+      const count = sectors.length;
+      companySectorsCount.textContent = `${count} ${count === 1 ? 'setor' : 'setores'}`;
+    }
+  };
+
+  const setCompanyModalEditMode = (isEditing) => {
+    isCompanyModalEditing = Boolean(isEditing);
+    companyUsersModal.dataset.mode = isCompanyModalEditing ? 'edit' : 'view';
+    const editGrid = companyUsersModal.querySelector('.company-details-section > .company-edit-grid');
+    const detailsGrid = companyUsersModal.querySelector('.company-details-section > .company-details-grid');
+    if (editGrid) editGrid.hidden = !isCompanyModalEditing;
+    if (detailsGrid) detailsGrid.hidden = isCompanyModalEditing;
+    [companyDetailsNameInput, companyDetailsOrganizationInput, companyDetailsResponsibleInput, companyDetailsStatusInput].forEach((field) => {
+      if (field) field.disabled = !isCompanyModalEditing;
+    });
+    companyUsersModal.querySelectorAll('.company-users-edit-only').forEach((element) => {
+      element.hidden = !isCompanyModalEditing;
+    });
+    if (companyUsersEditButton) companyUsersEditButton.hidden = isCompanyModalEditing;
+    if (companyUsersCloseButton) companyUsersCloseButton.textContent = isCompanyModalEditing ? 'Fechar' : 'Fechar';
+    if (companyUserSelect) companyUserSelect.disabled = !isCompanyModalEditing;
+    if (companyAddUserButton) companyAddUserButton.disabled = !isCompanyModalEditing || !selectedCompanyUserId;
+    renderCompanyUsers();
+  };
+
   const closeCompanyUsersModal = () => {
     companyUsersModal.classList.remove('open');
     companyUsersModal.setAttribute('aria-hidden', 'true');
@@ -6703,6 +7113,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     draftCompanyUsers = [];
     selectedCompanyUserId = '';
     shouldAttachNextCreatedUserToCompany = false;
+    isCompanyModalEditing = false;
     closeCompanyUserLookup();
   };
 
@@ -6714,22 +7125,36 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     const currentUsers = companyUsersByCompany[activeCompanyId] || [];
     draftCompanyUsers = currentUsers.map((item) => ({ ...item, userId: normalizeCompanyUserId(item.userId) }));
 
-    if (companyUsersModalTitle) companyUsersModalTitle.textContent = `Editar empresa · ${companyName}`;
+    if (companyUsersModalTitle) companyUsersModalTitle.textContent = companyName;
+    if (companyUsersModalSubtitle) companyUsersModalSubtitle.textContent = 'Consulte detalhes da empresa e ajuste usuários vinculados.';
+    if (companyDetailsNameInput) companyDetailsNameInput.value = companyDetails.name;
+    syncCompanyOrganizationOptions(companyRow.dataset.companyOrganization || '');
+    if (companyDetailsResponsibleInput) companyDetailsResponsibleInput.value = companyDetails.responsible;
+    if (companyDetailsStatusInput) companyDetailsStatusInput.value = companyDetails.status;
     if (companyDetailsName) companyDetailsName.textContent = companyDetails.name;
     if (companyDetailsOrganization) companyDetailsOrganization.textContent = companyDetails.organization;
     if (companyDetailsResponsible) companyDetailsResponsible.textContent = companyDetails.responsible;
-    renderCompanyUsers();
+    renderCompanySectors();
+    setCompanyModalEditMode(false);
     companyUsersModal.classList.add('open');
     companyUsersModal.setAttribute('aria-hidden', 'false');
-    companyUserSelect.focus();
+    companyUsersEditButton?.focus();
   };
 
   companiesTable.addEventListener('click', async (event) => {
+    const detailsButton = event.target.closest('[data-company-details]');
+    if (detailsButton) {
+      const row = detailsButton.closest('[data-company-row]');
+      if (row) openCompanyUsersModal(row);
+      return;
+    }
+
     const editButton = event.target.closest('[data-company-edit]');
     if (editButton) {
       const row = editButton.closest('[data-company-row]');
       if (!row) return;
       openCompanyUsersModal(row);
+      setCompanyModalEditMode(true);
       return;
     }
 
@@ -6838,14 +7263,53 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     if (event.target.closest('[data-modal-close]')) closeCompanyUsersModal();
   });
 
+  companyUsersEditButton?.addEventListener('click', () => {
+    if (!activeCompanyRow) return;
+    setCompanyModalEditMode(true);
+    companyDetailsNameInput?.focus();
+  });
+
+  companyUsersCancelEditButton?.addEventListener('click', () => {
+    if (!activeCompanyRow) return;
+    openCompanyUsersModal(activeCompanyRow);
+  });
+
   companyUsersSaveButton?.addEventListener('click', () => {
-    if (!activeCompanyId) return;
+    if (!isCompanyModalEditing || !activeCompanyId || !activeCompanyRow) return;
+    const name = String(companyDetailsNameInput?.value || '').trim();
+    const organizationId = String(companyDetailsOrganizationInput?.value || activeCompanyRow.dataset.companyOrganization || '').trim();
+    const responsible = String(companyDetailsResponsibleInput?.value || '').trim();
+    const status = String(companyDetailsStatusInput?.value || 'active');
+    const organizationLabel = companyDetailsOrganizationInput?.selectedOptions?.[0]?.textContent?.trim()
+      || getOrganizationNameForCompanyScope(organizationId, getSelectedOrganizationAccess());
+    if (!name || !organizationId || !responsible) {
+      showAppToast('Informe nome, organização e administrador da empresa');
+      return;
+    }
+
+    activeCompanyRow.dataset.companyName = name;
+    activeCompanyRow.dataset.companyOrganization = organizationId;
+    activeCompanyRow.dataset.companyStatus = status;
+    const nameCell = activeCompanyRow.querySelector('.environment-name-cell strong');
+    const organizationCell = activeCompanyRow.children?.[1];
+    const responsibleCell = activeCompanyRow.children?.[2];
+    if (nameCell) nameCell.textContent = name;
+    if (organizationCell) organizationCell.textContent = organizationLabel;
+    if (responsibleCell) responsibleCell.textContent = responsible;
+    writeStructureStatusCell(activeCompanyRow, status, 3, 'companyStatus');
+    environmentsTable?.querySelectorAll(`.environment-row[data-environment-company="${CSS.escape(activeCompanyId)}"]`).forEach((environmentRow) => {
+      environmentRow.dataset.environmentOrganization = organizationId;
+    });
+    syncCompanyRowActionAttributes(activeCompanyRow);
     companyUsersByCompany[activeCompanyId] = draftCompanyUsers.map((item) => ({ ...item }));
     updateCompanyUserCount(activeCompanyId, draftCompanyUsers.length);
     updateOrganizationUserCounts();
+    applyOrganizationAccessControls((window.location.hash || '#/dashboard').replace(/^#\/?/, '') || 'dashboard');
     closeCompanyUsersModal();
-    showAppToast('Usuários da empresa atualizados');
+    showAppToast('Empresa atualizada com sucesso');
   });
+
+  companiesTable.querySelectorAll('[data-company-row]').forEach(syncCompanyRowActionAttributes);
 }
 
 bindStaticTableDeleteConfirmation(document.querySelector('#page-schedules .data-table'), {
@@ -7597,6 +8061,8 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   let activeRelationPickerType = '';
   let activeRelationPickerButton = null;
   let shouldAttachNextCreatedUserToEnvironment = false;
+  let isEnvironmentModalEditing = false;
+  let environmentEditSnapshot = null;
 
   const environmentRelations = {
     'env-operacoes': {
@@ -7709,6 +8175,8 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       removeBtn.dataset.relationType = type;
       removeBtn.dataset.relationIndex = String(index);
       removeBtn.setAttribute('aria-label', `Remover ${item}`);
+      removeBtn.hidden = !isEnvironmentModalEditing;
+      removeBtn.disabled = !isEnvironmentModalEditing;
       removeIcon.className = 'material-symbols-rounded';
       removeIcon.setAttribute('aria-hidden', 'true');
       removeIcon.textContent = 'delete';
@@ -8075,6 +8543,25 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     return environmentRelations[code];
   };
 
+  const cloneEnvironmentRelation = (code) => {
+    const relation = ensureEnvironmentRelationRecord(code);
+    return {
+      projects: [...relation.projects],
+      agents: [...relation.agents],
+      users: [...relation.users],
+    };
+  };
+
+  const restoreEnvironmentEditSnapshot = () => {
+    if (!environmentEditSnapshot?.code) return;
+    environmentRelations[environmentEditSnapshot.code] = {
+      projects: [...(environmentEditSnapshot.relation?.projects || [])],
+      agents: [...(environmentEditSnapshot.relation?.agents || [])],
+      users: [...(environmentEditSnapshot.relation?.users || [])],
+    };
+    environmentEditSnapshot = null;
+  };
+
   const syncEnvironmentRowMetrics = (row) => {
     if (!row) return;
     const relation = ensureEnvironmentRelationRecord(row.dataset.environmentCode || '');
@@ -8144,10 +8631,12 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
   const closeEnvironmentModal = () => {
     closeEnvironmentRelationPicker();
+    if (isEnvironmentModalEditing && !isCreatingEnvironment) restoreEnvironmentEditSnapshot();
     activeEnvironmentRow = null;
     isCreatingEnvironment = false;
     activeEnvironmentCode = '';
     shouldAttachNextCreatedUserToEnvironment = false;
+    isEnvironmentModalEditing = false;
     if (draftEnvironmentCode) {
       delete environmentRelations[draftEnvironmentCode];
       draftEnvironmentCode = '';
@@ -8156,10 +8645,37 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     environmentModal.setAttribute('aria-hidden', 'true');
   };
 
+  const syncEnvironmentRowActionAttributes = (row) => {
+    if (!row) return;
+    row.removeAttribute('role');
+    row.removeAttribute('tabindex');
+    row.removeAttribute('aria-label');
+  };
+
   const syncEnvironmentSubmit = () => {
     const hasName = Boolean(String(environmentName?.value || '').trim());
     const hasOwner = Boolean(String(environmentOwner?.value || '').trim());
     if (environmentModalSubmit) environmentModalSubmit.disabled = !(hasName && hasOwner);
+  };
+
+  const setEnvironmentModalEditMode = (isEditing) => {
+    if (isEditing && !isEnvironmentModalEditing && activeEnvironmentCode && !isCreatingEnvironment) {
+      environmentEditSnapshot = {
+        code: activeEnvironmentCode,
+        relation: cloneEnvironmentRelation(activeEnvironmentCode),
+      };
+    }
+    isEnvironmentModalEditing = Boolean(isEditing);
+    environmentModal.dataset.mode = isEnvironmentModalEditing ? 'edit' : 'view';
+    [environmentName, environmentOwner, environmentDescription].forEach((field) => {
+      if (field) field.disabled = !isEnvironmentModalEditing;
+    });
+    environmentModal.querySelectorAll('.environment-edit-only').forEach((element) => {
+      element.hidden = !isEnvironmentModalEditing;
+    });
+    if (environmentModalEditButton) environmentModalEditButton.hidden = isEnvironmentModalEditing;
+    renderEnvironmentRelations(activeEnvironmentRow);
+    syncEnvironmentSubmit();
   };
 
   const openEnvironmentModal = (row) => {
@@ -8167,16 +8683,21 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     activeEnvironmentRow = row;
     environmentModalForm.reset();
     const modalTitle = document.getElementById('environmentModalTitle');
-    if (modalTitle) modalTitle.textContent = 'Editar setor';
+    const modalSubtitle = document.getElementById('environmentModalSubtitle');
+    if (modalTitle) modalTitle.textContent = 'Visualizar e editar setor';
+    if (modalSubtitle) modalSubtitle.textContent = 'Consulte projetos, agentes e usuários vinculados e ajuste as informações do setor.';
     if (environmentModalSubmit) environmentModalSubmit.textContent = 'Salvar alterações';
     if (environmentName) environmentName.value = row.dataset.environmentName || '';
     if (environmentOwner) environmentOwner.value = row.dataset.environmentOwner || '';
     if (environmentDescription) environmentDescription.value = row.dataset.environmentDescription || '';
     renderEnvironmentRelations(row);
-    syncEnvironmentSubmit();
+    ['environmentProjectsList', 'environmentAgentsList', 'environmentUsersList'].forEach((listId) => {
+      setEnvironmentRelationExpanded(listId, true);
+    });
+    setEnvironmentModalEditMode(false);
     environmentModal.classList.add('open');
     environmentModal.setAttribute('aria-hidden', 'false');
-    environmentName?.focus();
+    environmentModalEditButton?.focus();
   };
 
   const openCreateEnvironmentDialog = () => {
@@ -8186,11 +8707,13 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     activeEnvironmentCode = draftEnvironmentCode;
     environmentModalForm.reset();
     const modalTitle = document.getElementById('environmentModalTitle');
+    const modalSubtitle = document.getElementById('environmentModalSubtitle');
     if (modalTitle) modalTitle.textContent = 'Criar setor';
+    if (modalSubtitle) modalSubtitle.textContent = 'Cadastre um setor e vincule projetos, agentes e usuários conforme a estrutura da empresa.';
     environmentRelations[draftEnvironmentCode] = { projects: [], agents: [], users: [] };
     renderEnvironmentRelations();
     if (environmentModalSubmit) environmentModalSubmit.textContent = 'Criar setor';
-    syncEnvironmentSubmit();
+    setEnvironmentModalEditMode(true);
     environmentModal.classList.add('open');
     environmentModal.setAttribute('aria-hidden', 'false');
     environmentName?.focus();
@@ -8200,10 +8723,20 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   environmentsCompanySelect?.addEventListener('change', applyEnvironmentCompanyFilter);
 
   environmentsTable.addEventListener('click', async (event) => {
+    const detailsButton = event.target.closest('.environment-details-trigger');
+    if (detailsButton) {
+      const row = detailsButton.closest('.environment-row');
+      if (row) openEnvironmentModal(row);
+      return;
+    }
+
     const editButton = event.target.closest('.environment-edit-trigger');
     if (editButton) {
       const row = editButton.closest('.environment-row');
-      if (row) openEnvironmentModal(row);
+      if (row) {
+        openEnvironmentModal(row);
+        setEnvironmentModalEditMode(true);
+      }
       return;
     }
 
@@ -8227,6 +8760,24 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   });
 
   environmentModal.addEventListener('click', async (event) => {
+    const editButton = event.target.closest('#environmentModalEditButton');
+    if (editButton) {
+      setEnvironmentModalEditMode(true);
+      environmentName?.focus();
+      return;
+    }
+
+    const cancelEditButton = event.target.closest('#environmentModalCancelEditButton');
+    if (cancelEditButton) {
+      if (isCreatingEnvironment) {
+        closeEnvironmentModal();
+      } else if (activeEnvironmentRow) {
+        restoreEnvironmentEditSnapshot();
+        openEnvironmentModal(activeEnvironmentRow);
+      }
+      return;
+    }
+
     const relationToggle = event.target.closest('.environment-relation-toggle');
     if (relationToggle) {
       const listId = relationToggle.dataset.relationTarget;
@@ -8265,6 +8816,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
   environmentModalForm.addEventListener('submit', (event) => {
     event.preventDefault();
+    if (!isEnvironmentModalEditing) return;
     const name = String(environmentName?.value || '').trim();
     const owner = String(environmentOwner?.value || '').trim();
     const description = String(environmentDescription?.value || '').trim();
@@ -8291,6 +8843,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       }
       syncEnvironmentRowMetrics(createdRow);
       applyEnvironmentCompanyFilter();
+      environmentEditSnapshot = null;
       closeEnvironmentModal();
       showAppToast('Setor criado com sucesso');
       return;
@@ -8301,6 +8854,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     activeEnvironmentRow.dataset.environmentName = name;
     activeEnvironmentRow.dataset.environmentOwner = owner;
     activeEnvironmentRow.dataset.environmentDescription = description;
+    syncEnvironmentRowActionAttributes(activeEnvironmentRow);
 
     const nameCell = activeEnvironmentRow.querySelector('.environment-name-cell strong');
     const ownerCell = activeEnvironmentRow.querySelector('.environment-owner-cell');
@@ -8311,6 +8865,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     if (descriptionCell) descriptionCell.textContent = description || '-';
     syncEnvironmentRowMetrics(activeEnvironmentRow);
 
+    environmentEditSnapshot = null;
     closeEnvironmentModal();
     showAppToast('Setor atualizado com sucesso');
   });
@@ -8320,7 +8875,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   });
 
   environmentRelationPickerSearch?.addEventListener('input', renderEnvironmentRelationPickerItems);
-  environmentsTable.querySelectorAll('.environment-row').forEach(syncEnvironmentRowMetrics);
+  environmentsTable.querySelectorAll('.environment-row').forEach((row) => {
+    syncEnvironmentRowMetrics(row);
+    syncEnvironmentRowActionAttributes(row);
+  });
   applyEnvironmentCompanyFilter();
   window.addEventListener('resize', positionEnvironmentRelationPicker);
   environmentRelationPickerSearch?.addEventListener('keydown', (event) => {
@@ -20885,6 +21443,9 @@ document.addEventListener('click', (event) => {
         </button>
         <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
           <span class="material-symbols-rounded">delete</span>
+        </button>
+        <button class="icon-btn action-icon environment-details-trigger" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" type="button">
+          <span class="material-symbols-rounded">more_vert</span>
         </button>
       </span>
     `;

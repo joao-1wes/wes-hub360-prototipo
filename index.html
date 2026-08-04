@@ -7013,6 +7013,9 @@
                     <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon environment-details-trigger" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" type="button">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
                 <div class="data-row environment-row" data-environment-company="avas" data-environment-organization="avas-group" data-environment-name="Financeiro" data-environment-code="env-financeiro" data-environment-description="Conciliação, fechamento mensal e relatórios financeiros." data-environment-owner="financeiro@1wes.com" data-environment-projects="4" data-environment-agents="8" data-environment-users="2">
@@ -7033,6 +7036,9 @@
                     </button>
                     <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
+                    </button>
+                    <button class="icon-btn action-icon environment-details-trigger" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" type="button">
+                      <span class="material-symbols-rounded">more_vert</span>
                     </button>
                   </span>
                 </div>
@@ -7055,6 +7061,9 @@
                     <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon environment-details-trigger" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" type="button">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
                 <div class="data-row environment-row" data-environment-company="cedae-saneamento" data-environment-organization="cedae" data-environment-name="RH" data-environment-code="env-rh" data-environment-description="Admissões, comunicações internas e trilhas de pessoas." data-environment-owner="rh@1wes.com" data-environment-projects="2" data-environment-agents="4" data-environment-users="2">
@@ -7076,6 +7085,9 @@
                     <button class="icon-btn action-icon danger environment-delete-trigger" aria-label="Excluir setor" type="button">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon environment-details-trigger" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" type="button">
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
               </div>
@@ -7086,7 +7098,10 @@
             <div class="modal-backdrop" data-modal-close></div>
             <div class="modal-dialog environment-dialog" role="dialog" aria-modal="true" aria-labelledby="environmentModalTitle">
               <div class="modal-header">
-                <h3 id="environmentModalTitle">Editar setor</h3>
+                <div>
+                  <h3 id="environmentModalTitle">Visualizar e editar setor</h3>
+                  <p class="modal-subtitle" id="environmentModalSubtitle">Consulte e ajuste projetos, agentes e usuários vinculados.</p>
+                </div>
                 <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
                   <span class="material-symbols-rounded">close</span>
                 </button>
@@ -7118,7 +7133,7 @@
                           <h4>Projetos neste setor</h4>
                           <p id="environmentProjectsSummary">0 projetos vinculados</p>
                         </div>
-                        <button type="button" class="icon-btn action-icon environment-relation-add" data-relation-type="projects" aria-label="Adicionar projeto">
+                        <button type="button" class="icon-btn action-icon environment-relation-add environment-edit-only" data-relation-type="projects" aria-label="Adicionar projeto">
                           <span class="material-symbols-rounded">add</span>
                         </button>
                         <button
@@ -7140,7 +7155,7 @@
                           <h4>Agentes neste setor</h4>
                           <p id="environmentAgentsSummary">0 agentes vinculados</p>
                         </div>
-                        <button type="button" class="icon-btn action-icon environment-relation-add" data-relation-type="agents" aria-label="Adicionar agente">
+                        <button type="button" class="icon-btn action-icon environment-relation-add environment-edit-only" data-relation-type="agents" aria-label="Adicionar agente">
                           <span class="material-symbols-rounded">add</span>
                         </button>
                         <button
@@ -7162,7 +7177,7 @@
                           <h4>Usuários neste setor</h4>
                           <p id="environmentUsersSummary">0 usuários vinculados</p>
                         </div>
-                        <button type="button" class="icon-btn action-icon environment-relation-add" data-relation-type="users" aria-label="Adicionar usuário">
+                        <button type="button" class="icon-btn action-icon environment-relation-add environment-edit-only" data-relation-type="users" aria-label="Adicionar usuário">
                           <span class="material-symbols-rounded">add</span>
                         </button>
                         <button
@@ -7181,8 +7196,10 @@
                 </section>
               </form>
               <div class="modal-footer">
-                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
-                <button type="submit" form="environmentModalForm" class="btn primary" id="environmentModalSubmit">Salvar alterações</button>
+                <button type="button" class="btn outline" data-modal-close>Fechar</button>
+                <button type="button" class="btn outline environment-edit-only" id="environmentModalCancelEditButton" hidden>Cancelar edição</button>
+                <button type="button" class="btn primary" id="environmentModalEditButton">Editar</button>
+                <button type="submit" form="environmentModalForm" class="btn primary environment-edit-only" id="environmentModalSubmit" hidden>Salvar alterações</button>
               </div>
             </div>
           </div>
@@ -7686,7 +7703,7 @@
                   <span>Status</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row" data-organization-row data-organization-id="cedae" data-organization-name="ADM Cliente" data-organization-admin="admin@cedae.com">
+                <div class="data-row" data-organization-row data-organization-id="cedae" data-organization-name="ADM Cliente" data-organization-admin="admin@cedae.com" data-organization-status="active">
                   <span class="environment-name-cell"><span><strong>ADM Cliente</strong><small>Organização cliente</small></span></span>
                   <span>admin@cedae.com</span>
                   <span>3</span>
@@ -7700,9 +7717,12 @@
                     <button class="icon-btn action-icon danger" aria-label="Excluir organização">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes da organização" title="Ver detalhes da organização" data-organization-details>
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
-                <div class="data-row" data-organization-row data-organization-id="avas-group" data-organization-name="Grupo AVAS" data-organization-admin="admin@avas.com">
+                <div class="data-row" data-organization-row data-organization-id="avas-group" data-organization-name="Grupo AVAS" data-organization-admin="admin@avas.com" data-organization-status="active">
                   <span class="environment-name-cell"><span><strong>Grupo AVAS</strong><small>Organização cliente</small></span></span>
                   <span>admin@avas.com</span>
                   <span>2</span>
@@ -7716,8 +7736,76 @@
                     <button class="icon-btn action-icon danger" aria-label="Excluir organização">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes da organização" title="Ver detalhes da organização" data-organization-details>
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="organizationDetailsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog company-users-dialog organization-details-dialog" role="dialog" aria-modal="true" aria-labelledby="organizationDetailsModalTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="organizationDetailsModalTitle">Visualizar e editar organização</h3>
+                  <p class="modal-subtitle" id="organizationDetailsModalSubtitle">Consulte empresas, setores e usuários vinculados.</p>
+                </div>
+                <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body company-users-body organization-details-body">
+                <section class="users-modal-section">
+                  <div class="company-edit-grid">
+                    <label>
+                      <span class="modal-label modal-label--required">Nome da organização</span>
+                      <input class="modal-input" id="organizationDetailsNameInput" type="text" maxlength="120" autocomplete="organization" />
+                    </label>
+                    <label>
+                      <span class="modal-label modal-label--required">ADM responsável</span>
+                      <input class="modal-input" id="organizationDetailsAdminInput" type="email" maxlength="160" autocomplete="email" />
+                    </label>
+                    <label>
+                      <span class="modal-label modal-label--required">Status</span>
+                      <select class="modal-input" id="organizationDetailsStatusInput">
+                        <option value="active">Ativa</option>
+                        <option value="inactive">Inativa</option>
+                      </select>
+                    </label>
+                  </div>
+                </section>
+                <section class="users-modal-section">
+                  <div class="company-details-grid" aria-label="Indicadores da organização">
+                    <div class="company-detail-item">
+                      <span>Empresas</span>
+                      <strong id="organizationDetailsCompaniesCount">0</strong>
+                    </div>
+                    <div class="company-detail-item">
+                      <span>Setores</span>
+                      <strong id="organizationDetailsSectorsCount">0</strong>
+                    </div>
+                    <div class="company-detail-item">
+                      <span>Usuários</span>
+                      <strong id="organizationDetailsUsersCount">0</strong>
+                    </div>
+                  </div>
+                </section>
+                <section class="users-modal-section users-modal-section--last">
+                  <div class="company-users-section-head">
+                    <h4 class="users-modal-section-title">Empresas da organização</h4>
+                    <span class="chip" id="organizationDetailsCompaniesChip">0 empresas</span>
+                  </div>
+                  <div class="company-users-list organization-company-list" id="organizationDetailsCompaniesList"></div>
+                </section>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn outline" data-modal-close>Fechar</button>
+                <button type="button" class="btn outline organization-edit-only" id="organizationDetailsCancelEditButton" hidden>Cancelar edição</button>
+                <button type="button" class="btn primary" id="organizationDetailsEditButton">Editar</button>
+                <button type="button" class="btn primary organization-edit-only" id="organizationDetailsSaveButton" hidden>Salvar alterações</button>
               </div>
             </div>
           </div>
@@ -7763,7 +7851,7 @@
                   <span>Usuários</span>
                   <span>Ações</span>
                 </div>
-                <div class="data-row" data-company-row data-company-id="avas" data-company-name="AVAS Energia" data-company-organization="avas-group">
+                <div class="data-row" data-company-row data-company-id="avas" data-company-name="AVAS Energia" data-company-organization="avas-group" data-company-status="active">
                   <span class="environment-name-cell">
                     <span>
                       <strong>AVAS Energia</strong>
@@ -7781,9 +7869,12 @@
                     <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes da empresa" title="Ver detalhes da empresa" data-company-details>
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
-                <div class="data-row" data-company-row data-company-id="techcorp" data-company-name="TechCorp Brasil" data-company-organization="avas-group">
+                <div class="data-row" data-company-row data-company-id="techcorp" data-company-name="TechCorp Brasil" data-company-organization="avas-group" data-company-status="active">
                   <span class="environment-name-cell">
                     <span>
                       <strong>TechCorp Brasil</strong>
@@ -7801,9 +7892,12 @@
                     <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes da empresa" title="Ver detalhes da empresa" data-company-details>
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
-                <div class="data-row" data-company-row data-company-id="aguas-rio" data-company-name="Águas Rio" data-company-organization="cedae">
+                <div class="data-row" data-company-row data-company-id="aguas-rio" data-company-name="Águas Rio" data-company-organization="cedae" data-company-status="active">
                   <span class="environment-name-cell">
                     <span>
                       <strong>Águas Rio</strong>
@@ -7821,9 +7915,12 @@
                     <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes da empresa" title="Ver detalhes da empresa" data-company-details>
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
-                <div class="data-row" data-company-row data-company-id="cedae-saneamento" data-company-name="CEDAE Saneamento" data-company-organization="cedae">
+                <div class="data-row" data-company-row data-company-id="cedae-saneamento" data-company-name="CEDAE Saneamento" data-company-organization="cedae" data-company-status="active">
                   <span class="environment-name-cell">
                     <span>
                       <strong>CEDAE Saneamento</strong>
@@ -7841,6 +7938,9 @@
                     <button class="icon-btn action-icon danger" aria-label="Excluir empresa">
                       <span class="material-symbols-rounded">delete</span>
                     </button>
+                    <button class="icon-btn action-icon" type="button" aria-label="Ver detalhes da empresa" title="Ver detalhes da empresa" data-company-details>
+                      <span class="material-symbols-rounded">more_vert</span>
+                    </button>
                   </span>
                 </div>
               </div>
@@ -7851,13 +7951,42 @@
             <div class="modal-backdrop" data-modal-close></div>
             <div class="modal-dialog company-users-dialog" role="dialog" aria-modal="true" aria-labelledby="companyUsersModalTitle">
               <div class="modal-header">
-                <h3 id="companyUsersModalTitle">Editar empresa</h3>
+                <div>
+                  <div class="company-modal-title-row">
+                    <h3 id="companyUsersModalTitle">Empresa</h3>
+                    <button type="button" class="icon-btn action-icon company-modal-edit-icon" id="companyUsersEditButton" aria-label="Editar empresa">
+                      <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                    </button>
+                  </div>
+                  <p class="modal-subtitle" id="companyUsersModalSubtitle">Consulte detalhes e usuários vinculados à empresa.</p>
+                </div>
                 <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
                   <span class="material-symbols-rounded">close</span>
                 </button>
               </div>
               <div class="modal-body company-users-body">
                 <section class="users-modal-section company-details-section">
+                  <div class="company-edit-grid">
+                    <label>
+                      <span class="modal-label modal-label--required">Nome da empresa</span>
+                      <input class="modal-input" id="companyDetailsNameInput" type="text" maxlength="120" autocomplete="organization" />
+                    </label>
+                    <label>
+                      <span class="modal-label modal-label--required">Organização</span>
+                      <select class="modal-input" id="companyDetailsOrganizationInput"></select>
+                    </label>
+                    <label>
+                      <span class="modal-label modal-label--required">Administrador</span>
+                      <input class="modal-input" id="companyDetailsResponsibleInput" type="email" maxlength="160" autocomplete="email" />
+                    </label>
+                    <label>
+                      <span class="modal-label modal-label--required">Status</span>
+                      <select class="modal-input" id="companyDetailsStatusInput">
+                        <option value="active">Ativa</option>
+                        <option value="inactive">Inativa</option>
+                      </select>
+                    </label>
+                  </div>
                   <div class="company-details-grid" aria-label="Dados da empresa">
                     <div class="company-detail-item">
                       <span>Nome</span>
@@ -7874,6 +8003,13 @@
                   </div>
                 </section>
                 <section class="users-modal-section">
+                  <div class="company-users-section-head">
+                    <h4 class="users-modal-section-title">Setores da empresa</h4>
+                    <span class="chip" id="companySectorsCount">0 setores</span>
+                  </div>
+                  <div class="company-users-list company-sectors-list" id="companySectorsList"></div>
+                </section>
+                <section class="users-modal-section company-users-edit-only">
                   <div class="company-users-add-row">
                     <div>
                       <label class="modal-label" for="companyUserSelect">Adicionar usuário</label>
@@ -7897,8 +8033,9 @@
                 </section>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn outline" data-modal-close>Cancelar</button>
-                <button type="button" class="btn primary" id="companyUsersSaveButton">Salvar alterações</button>
+                <button type="button" class="btn outline" data-modal-close id="companyUsersCloseButton">Fechar</button>
+                <button type="button" class="btn outline company-users-edit-only" id="companyUsersCancelEditButton" hidden>Cancelar edição</button>
+                <button type="button" class="btn primary company-users-edit-only" id="companyUsersSaveButton" hidden>Salvar alterações</button>
               </div>
             </div>
           </div>

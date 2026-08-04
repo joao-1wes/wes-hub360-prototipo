@@ -7253,6 +7253,11 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   justify-content: flex-start;
 }
 
+.organizations-table .data-row > span:nth-child(6) {
+  justify-self: center;
+  text-align: center;
+}
+
 .environments-table .data-row {
   grid-template-columns:
     minmax(180px, 1.2fr)
@@ -15323,6 +15328,11 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   line-height: 16px;
 }
 
+.organization-details-dialog .company-users-section-head {
+  justify-content: flex-start;
+  gap: 8px;
+}
+
 .organization-details-dialog .company-user-row {
   padding: 10px;
 }
@@ -15340,9 +15350,17 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   line-height: 16px;
 }
 
-.organization-details-count {
-  min-width: 28px;
+.organization-details-dialog .organization-details-count {
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
 }
 
 .company-edit-grid {
@@ -15351,10 +15369,20 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   gap: 12px;
 }
 
-.company-edit-grid label {
+.company-edit-grid label,
+.company-edit-grid .organization-status-field {
   display: grid;
   gap: 7px;
   min-width: 0;
+}
+
+.organization-status-toggle {
+  min-height: 38px;
+}
+
+.organization-status-toggle .switch input:disabled + .switch-track {
+  opacity: 0.72;
+  cursor: default;
 }
 
 .company-users-dialog select.modal-input {
@@ -15465,13 +15493,44 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   gap: 8px;
 }
 
-.organization-company-row {
-  grid-template-columns: minmax(220px, 1.5fr) minmax(140px, 0.8fr) minmax(120px, auto);
-}
-
+.organization-company-row,
 .organization-sector-row,
 .organization-user-row {
-  grid-template-columns: minmax(220px, 1.4fr) minmax(150px, 0.75fr) minmax(170px, auto);
+  grid-template-columns: minmax(320px, 1fr) minmax(190px, 0.45fr) minmax(220px, auto);
+}
+
+.organization-details-dialog .company-user-email {
+  justify-self: start;
+}
+
+.organization-details-dialog .organization-metric-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  overflow: visible;
+}
+
+.organization-details-dialog .company-user-status {
+  justify-self: end;
+}
+
+.organization-sector-row .company-sector-detail-grid {
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.organization-sector-details[hidden] {
+  display: none;
+}
+
+.organization-sector-toggle {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+}
+
+.organization-sector-toggle .material-symbols-rounded {
+  font-size: 20px;
 }
 
 .organization-sector-row .company-user-status,

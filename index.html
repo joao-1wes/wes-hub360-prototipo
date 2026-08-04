@@ -7703,7 +7703,7 @@
                   <span>Ações</span>
                 </div>
                 <div class="data-row" data-organization-row data-organization-id="cedae" data-organization-name="ADM Cliente" data-organization-admin="admin@cedae.com" data-organization-status="active">
-                  <span class="environment-name-cell"><span><strong>ADM Cliente</strong><small>Organização cliente</small></span></span>
+                  <span class="environment-name-cell"><span><strong>ADM Cliente</strong></span></span>
                   <span>admin@cedae.com</span>
                   <span>3</span>
                   <span>9</span>
@@ -7722,7 +7722,7 @@
                   </span>
                 </div>
                 <div class="data-row" data-organization-row data-organization-id="avas-group" data-organization-name="Grupo AVAS" data-organization-admin="admin@avas.com" data-organization-status="active">
-                  <span class="environment-name-cell"><span><strong>Grupo AVAS</strong><small>Organização cliente</small></span></span>
+                  <span class="environment-name-cell"><span><strong>Grupo AVAS</strong></span></span>
                   <span>admin@avas.com</span>
                   <span>2</span>
                   <span>6</span>
@@ -7772,13 +7772,16 @@
                       <span class="modal-label modal-label--required">ADM responsável</span>
                       <input class="modal-input" id="organizationDetailsAdminInput" type="email" maxlength="160" autocomplete="email" />
                     </label>
-                    <label>
+                    <div class="organization-status-field">
                       <span class="modal-label modal-label--required">Status</span>
-                      <select class="modal-input" id="organizationDetailsStatusInput">
-                        <option value="active">Ativa</option>
-                        <option value="inactive">Inativa</option>
-                      </select>
-                    </label>
+                      <span class="modal-toggle organization-status-toggle">
+                        <label class="switch small" for="organizationDetailsStatusInput">
+                          <input type="checkbox" id="organizationDetailsStatusInput" />
+                          <span class="switch-track"></span>
+                        </label>
+                        <span class="switch-label" id="organizationDetailsStatusValue">Ativa</span>
+                      </span>
+                    </div>
                   </div>
                 </section>
                 <section class="users-modal-section">

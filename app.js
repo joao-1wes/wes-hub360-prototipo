@@ -1,3 +1,35 @@
+// Base de mnemônicos (código -> nome) compartilhada entre a leitura de exames e os ajustes/importação CSV.
+const healthExamMnemonicBase = {
+  HEM: 'Hemograma completo',
+  HGB: 'Hemoglobina',
+  HTC: 'Hematócrito',
+  LEU: 'Leucócitos',
+  PLAQ: 'Plaquetas',
+  GLI: 'Glicemia',
+  CRE: 'Creatinina',
+  URE: 'Ureia',
+  TGO: 'Transaminase oxalacética',
+  RXTO: 'Raio-X de tórax',
+  OBS: 'Observação clínica',
+  LAU: 'Laudo médico'
+};
+
+// Sinônimos de cada mnemônico (código -> lista). 1 nome padrão + X sinônimos possíveis.
+const healthExamMnemonicSynonyms = {
+  HEM: ['Hemograma', 'HMG', 'Hemograma com plaquetas', 'CBC'],
+  HGB: ['Hb', 'Hemoglobina sérica', 'Hgb'],
+  HTC: ['Ht', 'Hematócrito sérico'],
+  LEU: ['Leucograma', 'WBC', 'Glóbulos brancos'],
+  PLAQ: ['Plaquetometria', 'PLT', 'Contagem de plaquetas'],
+  GLI: ['Glicose', 'Glicemia de jejum', 'GJ'],
+  CRE: ['Creatinina sérica', 'Cr'],
+  URE: ['Ureia sérica'],
+  TGO: ['AST', 'Aspartato aminotransferase'],
+  RXTO: ['RX tórax', 'Radiografia de tórax', 'Raio X torácico'],
+  OBS: [],
+  LAU: ['Laudo', 'Parecer médico']
+};
+
 const filterBtn = document.getElementById('alertFilterBtn');
 const filterMenu = document.getElementById('alertFilterMenu');
 const menuToggle = document.getElementById('menuToggle');
@@ -219,7 +251,6 @@ const companySectorsCount = document.getElementById('companySectorsCount');
 const companyUsersSaveButton = document.getElementById('companyUsersSaveButton');
 const companyUsersEditButton = document.getElementById('companyUsersEditButton');
 const companyUsersCancelEditButton = document.getElementById('companyUsersCancelEditButton');
-const companyUsersCloseButton = document.getElementById('companyUsersCloseButton');
 const companyDetailsName = document.getElementById('companyDetailsName');
 const companyDetailsOrganization = document.getElementById('companyDetailsOrganization');
 const companyDetailsResponsible = document.getElementById('companyDetailsResponsible');
@@ -1450,6 +1481,10 @@ let appToastTimer = null;
 let telegramConnectionValidated = false;
 let telegramTestSent = false;
 let voiceMessagingInsightsChart = null;
+let healthOverviewWhatsappChart = null;
+let healthOverviewDoctorsChart = null;
+let healthOverviewAccountabilityChart = null;
+let healthOverviewExamsChart = null;
 const CHAT_SKILL_CATALOG = Object.freeze([
   {
     id: 'cep',
@@ -2636,6 +2671,279 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
       },
     },
   });
+}
+
+function destroyHealthOverviewCharts() {
+  [
+    healthOverviewWhatsappChart,
+    healthOverviewDoctorsChart,
+    healthOverviewAccountabilityChart,
+    healthOverviewExamsChart,
+  ].forEach((chart) => {
+    if (chart) chart.destroy();
+  });
+  healthOverviewWhatsappChart = null;
+  healthOverviewDoctorsChart = null;
+  healthOverviewAccountabilityChart = null;
+  healthOverviewExamsChart = null;
+}
+
+function syncHealthOverviewCharts(routeKey = '') {
+  if (routeKey !== 'dashboard/health/overview') {
+    destroyHealthOverviewCharts();
+    return;
+  }
+  if (!window.Chart) return;
+  if (healthOverviewWhatsappChart) return;
+
+  // Em carregamento direto na rota, os canvases ainda podem estar sem altura (layout não aplicado).
+  // Nesse caso, aguarda o próximo frame e só cria os gráficos quando o container já tiver dimensão.
+  const probeWrap = document.getElementById('healthOverviewWhatsappChart')?.closest('.health-overview-chart-wrap');
+  if (!probeWrap || probeWrap.clientHeight === 0) {
+    if (document.getElementById('page-health-overview')?.classList.contains('is-active')) {
+      window.requestAnimationFrame(() => syncHealthOverviewCharts('dashboard/health/overview'));
+    }
+    return;
+  }
+
+  const axisTick = { family: 'inherit', size: 12, weight: '600' };
+  const gridColor = 'rgba(214, 224, 237, 0.9)';
+  const tooltipStyle = {
+    backgroundColor: '#0f172a',
+    titleColor: '#f8fafc',
+    bodyColor: '#e2e8f0',
+    padding: 12,
+  };
+
+  const whatsappCanvas = document.getElementById('healthOverviewWhatsappChart');
+  if (whatsappCanvas) {
+    healthOverviewWhatsappChart = new window.Chart(whatsappCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Envio de exames', 'Dúvidas', 'Encaixe para renovação'],
+        datasets: [
+          {
+            data: [58, 49, 35],
+            backgroundColor: ['#016ff4', '#22c55e', '#f59e0b'],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '56%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 10,
+              boxHeight: 10,
+              color: '#475569',
+              font: { family: 'inherit', size: 12, weight: '600' },
+              padding: 14,
+            },
+          },
+          tooltip: {
+            ...tooltipStyle,
+            callbacks: {
+              label(context) {
+                const dataset = context.dataset.data || [];
+                const total = dataset.reduce((sum, value) => sum + Number(value || 0), 0);
+                const value = Number(context.parsed || 0);
+                const pct = total ? Math.round((value / total) * 100) : 0;
+                return ` ${context.label}: ${value} (${pct}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  const doctorsCanvas = document.getElementById('healthOverviewDoctorsChart');
+  if (doctorsCanvas) {
+    healthOverviewDoctorsChart = new window.Chart(doctorsCanvas, {
+      type: 'bar',
+      data: {
+        labels: [
+          'Dra. Helena Prado',
+          'Dr. Rafael Duarte',
+          'Dra. Camila Nunes',
+          'Dr. Marcos Vinícius',
+          'Dra. Luciana Martins',
+          'Dr. Paulo Reis',
+        ],
+        datasets: [
+          {
+            label: 'Consultas com assistente',
+            data: [28, 21, 16, 12, 8, 4],
+            backgroundColor: '#0b82f9',
+            hoverBackgroundColor: '#016ff4',
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 22,
+          },
+        ],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { right: 12 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            ...tooltipStyle,
+            callbacks: {
+              label(context) {
+                const value = Number(context.parsed.x || 0);
+                const suffix = value === 1 ? 'consulta' : 'consultas';
+                return ` ${value} ${suffix}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: gridColor, drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#64748b', precision: 0, font: { family: 'inherit', size: 12, weight: '500' } },
+          },
+          y: {
+            grid: { display: false, drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#334155', font: axisTick },
+          },
+        },
+      },
+    });
+  }
+
+  const accountabilityCanvas = document.getElementById('healthOverviewAccountabilityChart');
+  if (accountabilityCanvas) {
+    healthOverviewAccountabilityChart = new window.Chart(accountabilityCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: ['Risco alto', 'Risco médio', 'Risco baixo'],
+        datasets: [
+          {
+            data: [58, 79, 183],
+            backgroundColor: ['#ef4444', '#f59e0b', '#22c55e'],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverOffset: 6,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '56%',
+        // Ao clicar em um segmento, leva para a Prestação de contas já filtrada pelo risco.
+        onClick(event, elements) {
+          if (!elements || !elements.length) return;
+          const riskByIndex = ['high', 'medium', 'low'];
+          const tone = riskByIndex[elements[0].index];
+          if (!tone) return;
+          const menu = document.getElementById('healthAccountabilityFilterMenu');
+          const option = menu?.querySelector(`.filter-option[data-filter="risk"][data-value="${tone}"]`);
+          // O clic aplica o filtro (o handler do menu ativa a opção e re-renderiza a lista).
+          if (option) option.click();
+          window.location.hash = '#/dashboard/health/accountability';
+        },
+        // Cursor de "clicável" quando o ponteiro está sobre um segmento.
+        onHover(event, elements) {
+          const target = event?.native?.target;
+          if (target) target.style.cursor = elements && elements.length ? 'pointer' : 'default';
+        },
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 10,
+              boxHeight: 10,
+              color: '#475569',
+              font: { family: 'inherit', size: 12, weight: '600' },
+              padding: 14,
+            },
+          },
+          tooltip: {
+            ...tooltipStyle,
+            callbacks: {
+              label(context) {
+                const dataset = context.dataset.data || [];
+                const total = dataset.reduce((sum, value) => sum + Number(value || 0), 0);
+                const value = Number(context.parsed || 0);
+                const pct = total ? Math.round((value / total) * 100) : 0;
+                return ` ${context.label}: ${value} documentos (${pct}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  const examsCanvas = document.getElementById('healthOverviewExamsChart');
+  if (examsCanvas) {
+    healthOverviewExamsChart = new window.Chart(examsCanvas, {
+      type: 'bar',
+      data: {
+        labels: ['Hemoglobina (HB)', 'Glicemia (GLI)', 'Colesterol (COL)', 'TSH (tireoide)', 'Creatinina (CREA)', 'Ureia (URE)'],
+        datasets: [
+          {
+            label: 'Ocorrências identificadas',
+            data: [412, 388, 351, 298, 254, 208],
+            backgroundColor: '#16a34a',
+            hoverBackgroundColor: '#15803d',
+            borderRadius: 6,
+            borderSkipped: false,
+            maxBarThickness: 22,
+          },
+        ],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        layout: { padding: { right: 12 } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            ...tooltipStyle,
+            callbacks: {
+              label(context) {
+                const value = Number(context.parsed.x || 0);
+                return ` ${value} ocorrências`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            beginAtZero: true,
+            grid: { color: gridColor, drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#64748b', precision: 0, font: { family: 'inherit', size: 12, weight: '500' } },
+          },
+          y: {
+            grid: { display: false, drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#334155', font: axisTick },
+          },
+        },
+      },
+    });
+  }
+
 }
 
 function normalizeTelegramUsername(value) {
@@ -6852,14 +7160,14 @@ if (organizationsTable && organizationDetailsModal) {
             <span class="muted">${escapeHtmlWes(sector.companyName)} · ${escapeHtmlWes(sector.owner)}</span>
           </span>
         </span>
-        <span class="company-user-email organization-metric-cell"><span class="chip">${escapeHtmlWes(sector.projects)} projetos</span></span>
-        <span class="company-user-status">
+        <span class="organization-sector-metrics">
+          <span class="chip">${escapeHtmlWes(sector.projects)} projetos</span>
           <span class="chip">${escapeHtmlWes(sector.agents)} agentes</span>
           <span class="chip">${escapeHtmlWes(sector.users)} usuários</span>
-          <button class="icon-btn action-icon organization-sector-toggle" type="button" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" aria-expanded="false" aria-controls="${escapeHtmlWes(detailsId)}" data-organization-sector-toggle>
-            <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
-          </button>
         </span>
+        <button class="icon-btn action-icon organization-sector-toggle" type="button" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" aria-expanded="false" aria-controls="${escapeHtmlWes(detailsId)}" data-organization-sector-toggle>
+          <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+        </button>
         <div class="company-sector-detail-grid organization-sector-details" id="${escapeHtmlWes(detailsId)}" hidden>
           ${renderOrganizationSectorDetailList('Projetos do setor', sector.projects, sector.projectNames, 'Nenhum projeto vinculado')}
           ${renderOrganizationSectorDetailList('Agentes do setor', sector.agents, sector.agentNames, 'Nenhum agente vinculado')}
@@ -7247,7 +7555,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
 
     if (companyUsersCount) {
       const count = draftCompanyUsers.length;
-      companyUsersCount.textContent = `${count} ${count === 1 ? 'usuário' : 'usuários'}`;
+      companyUsersCount.textContent = String(count);
     }
     resetCompanyUserLookup();
   };
@@ -7257,11 +7565,11 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
   const buildCompanySectorFallbackItems = (sectorName, type, count) => {
     const total = Number.parseInt(count || '0', 10);
     if (!Number.isFinite(total) || total <= 0) return [];
-    const label = type === 'projects' ? 'Projeto' : 'Agente';
+    const label = type === 'projects' ? 'Projeto' : type === 'agents' ? 'Agente' : 'Usuário';
     return Array.from({ length: total }, (_, index) => `${label} ${index + 1} · ${sectorName}`);
   };
 
-  const getCompanySectorDetails = (sectorRow, sectorName, projectCount, agentCount) => {
+  const getCompanySectorDetails = (sectorRow, sectorName, projectCount, agentCount, userCount) => {
     const code = String(sectorRow.dataset.environmentCode || '').trim();
     const details = companySectorDetailsByCode[code] || {};
     return {
@@ -7271,6 +7579,9 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
       agents: Array.isArray(details.agents) && details.agents.length
         ? details.agents
         : buildCompanySectorFallbackItems(sectorName, 'agents', agentCount),
+      users: Array.isArray(details.users) && details.users.length
+        ? details.users
+        : buildCompanySectorFallbackItems(sectorName, 'users', userCount),
     };
   };
 
@@ -7290,7 +7601,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     const sectors = Array.from(environmentsTable?.querySelectorAll('.environment-row') || [])
       .filter((row) => String(row.dataset.environmentCompany || '').trim() === activeCompanyId);
     companySectorsList.replaceChildren();
-    sectors.forEach((sectorRow) => {
+    sectors.forEach((sectorRow, index) => {
       const item = document.createElement('div');
       item.className = 'company-user-row company-sector-row';
       const sectorName = sectorRow.dataset.environmentName || sectorRow.querySelector('strong')?.textContent?.trim() || 'Setor';
@@ -7298,25 +7609,28 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
       const projects = sectorRow.querySelector('.environment-projects-cell')?.textContent?.trim() || '0';
       const agents = sectorRow.querySelector('.environment-agents-cell')?.textContent?.trim() || '0';
       const users = sectorRow.querySelector('.environment-users-cell')?.textContent?.trim() || '0';
-      const details = getCompanySectorDetails(sectorRow, sectorName, projects, agents);
+      const details = getCompanySectorDetails(sectorRow, sectorName, projects, agents, users);
+      const detailsId = `companySectorDetails${activeCompanyId}${index}`.replace(/[^a-zA-Z0-9]+/g, '');
       item.innerHTML = `
-        <div class="company-sector-row-head">
-          <span class="company-user-identity">
-            <span class="user-avatar small">${escapeHtmlWes(getCompanyAvatarText(sectorName))}</span>
-            <span>
-              <strong>${escapeHtmlWes(sectorName)}</strong>
-              <span class="muted">${escapeHtmlWes(owner)}</span>
-            </span>
+        <span class="company-user-identity">
+          <span class="user-avatar small">${escapeHtmlWes(getCompanyAvatarText(sectorName))}</span>
+          <span>
+            <strong>${escapeHtmlWes(sectorName)}</strong>
+            <span class="muted">${escapeHtmlWes(owner)}</span>
           </span>
-          <span class="company-sector-summary">
-            <span class="chip">${escapeHtmlWes(projects)} projetos</span>
-            <span class="chip">${escapeHtmlWes(agents)} agentes</span>
-            <span class="chip">${escapeHtmlWes(users)} usuários</span>
-          </span>
-        </div>
-        <div class="company-sector-detail-grid">
+        </span>
+        <span class="company-sector-summary">
+          <span class="chip">${escapeHtmlWes(projects)} projetos</span>
+          <span class="chip">${escapeHtmlWes(agents)} agentes</span>
+          <span class="chip">${escapeHtmlWes(users)} usuários</span>
+        </span>
+        <button class="icon-btn action-icon company-sector-toggle" type="button" aria-label="Ver detalhes do setor" title="Ver detalhes do setor" aria-expanded="false" aria-controls="${escapeHtmlWes(detailsId)}" data-company-sector-toggle>
+          <span class="material-symbols-rounded" aria-hidden="true">expand_more</span>
+        </button>
+        <div class="company-sector-detail-grid company-sector-details" id="${escapeHtmlWes(detailsId)}" hidden>
           ${renderCompanySectorDetailList('Projetos do setor', details.projects, 'Nenhum projeto vinculado')}
           ${renderCompanySectorDetailList('Agentes do setor', details.agents, 'Nenhum agente vinculado')}
+          ${renderCompanySectorDetailList('Usuários do setor', details.users, 'Nenhum usuário vinculado')}
         </div>
       `;
       companySectorsList.appendChild(item);
@@ -7329,7 +7643,7 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     }
     if (companySectorsCount) {
       const count = sectors.length;
-      companySectorsCount.textContent = `${count} ${count === 1 ? 'setor' : 'setores'}`;
+      companySectorsCount.textContent = String(count);
     }
   };
 
@@ -7347,7 +7661,6 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
       element.hidden = !isCompanyModalEditing;
     });
     if (companyUsersEditButton) companyUsersEditButton.hidden = isCompanyModalEditing;
-    if (companyUsersCloseButton) companyUsersCloseButton.textContent = isCompanyModalEditing ? 'Fechar' : 'Fechar';
     if (companyUserSelect) companyUserSelect.disabled = !isCompanyModalEditing;
     if (companyAddUserButton) companyAddUserButton.disabled = !isCompanyModalEditing || !selectedCompanyUserId;
     renderCompanyUsers();
@@ -7505,6 +7818,20 @@ if (companiesTable && companyUsersModal && companyUsersList && companyUserSelect
     if (!(await confirmDeletionAction('este usuário da empresa'))) return;
     draftCompanyUsers = draftCompanyUsers.filter((item) => normalizeCompanyUserId(item.userId) !== userId);
     renderCompanyUsers();
+  });
+
+  companySectorsList?.addEventListener('click', (event) => {
+    const toggle = event.target.closest('[data-company-sector-toggle]');
+    if (!toggle) return;
+    const details = document.getElementById(toggle.getAttribute('aria-controls'));
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    const nextExpanded = !isExpanded;
+    toggle.setAttribute('aria-expanded', String(nextExpanded));
+    toggle.setAttribute('aria-label', nextExpanded ? 'Ocultar detalhes do setor' : 'Ver detalhes do setor');
+    toggle.title = nextExpanded ? 'Ocultar detalhes do setor' : 'Ver detalhes do setor';
+    const icon = toggle.querySelector('.material-symbols-rounded');
+    if (icon) icon.textContent = nextExpanded ? 'expand_less' : 'expand_more';
+    if (details) details.hidden = !nextExpanded;
   });
 
   companyUsersModal.addEventListener('click', (event) => {
@@ -8311,6 +8638,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
   let shouldAttachNextCreatedUserToEnvironment = false;
   let isEnvironmentModalEditing = false;
   let environmentEditSnapshot = null;
+  let pendingSectorRelation = null;
 
   const environmentRelations = {
     'env-operacoes': {
@@ -8408,14 +8736,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
 
     items.forEach((item, index) => {
       const li = document.createElement('li');
-      const iconEl = document.createElement('span');
       const labelEl = document.createElement('span');
       const removeBtn = document.createElement('button');
       const removeIcon = document.createElement('span');
 
-      iconEl.className = 'material-symbols-rounded';
-      iconEl.setAttribute('aria-hidden', 'true');
-      iconEl.textContent = icon;
       labelEl.className = 'environment-relation-label';
       labelEl.textContent = item;
       removeBtn.className = 'icon-btn action-icon danger environment-relation-remove';
@@ -8430,7 +8754,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       removeIcon.textContent = 'delete';
       removeBtn.appendChild(removeIcon);
 
-      li.append(iconEl, labelEl, removeBtn);
+      li.append(labelEl, removeBtn);
       listEl.appendChild(li);
     });
   };
@@ -8649,10 +8973,15 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       }
 
       if (!environmentRelationPickerList.childElementCount) {
-        const empty = document.createElement('div');
-        empty.className = 'environment-relation-picker-empty';
-        empty.textContent = 'Nenhum usuário disponível';
-        environmentRelationPickerList.appendChild(empty);
+        const createOption = document.createElement('button');
+        createOption.type = 'button';
+        createOption.className = 'ui-menu-item environment-relation-create-user';
+        createOption.dataset.relationCreateUser = rawQuery;
+        createOption.innerHTML = `
+          <span class="material-symbols-rounded" aria-hidden="true">person_add</span>
+          <span>Nenhum usuário disponível. Criar novo usuário</span>
+        `;
+        environmentRelationPickerList.appendChild(createOption);
       }
       return;
     }
@@ -8680,9 +9009,27 @@ if (environmentsTable && environmentModal && environmentModalForm) {
       return option;
     };
 
+    const singularLabelByType = { projects: 'projeto', agents: 'agente' };
+    const singular = singularLabelByType[activeRelationPickerType] || 'item';
+
+    const createEntityOption = (label) => {
+      const option = document.createElement('button');
+      option.type = 'button';
+      option.className = 'ui-menu-item environment-relation-create-entity';
+      option.dataset.relationCreateEntity = activeRelationPickerType;
+      const icon = document.createElement('span');
+      icon.className = 'material-symbols-rounded';
+      icon.setAttribute('aria-hidden', 'true');
+      icon.textContent = 'add_circle';
+      const text = document.createElement('span');
+      text.textContent = label;
+      option.append(icon, text);
+      return option;
+    };
+
     if (query && !hasExactMatch) {
       environmentRelationPickerList.appendChild(
-        createPickerOption(rawQuery, 'add', `Adicionar "${environmentRelationPickerSearch.value.trim()}"`)
+        createEntityOption(`Criar ${singular} "${environmentRelationPickerSearch.value.trim()}"`)
       );
     }
 
@@ -8697,10 +9044,7 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     }
 
     if (!environmentRelationPickerList.childElementCount) {
-      const empty = document.createElement('div');
-      empty.className = 'environment-relation-picker-empty';
-      empty.textContent = 'Nenhum item encontrado';
-      environmentRelationPickerList.appendChild(empty);
+      environmentRelationPickerList.appendChild(createEntityOption(`Criar ${singular}`));
     }
   };
 
@@ -8932,9 +9276,10 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     environmentModalForm.reset();
     const modalTitle = document.getElementById('environmentModalTitle');
     const modalSubtitle = document.getElementById('environmentModalSubtitle');
-    if (modalTitle) modalTitle.textContent = 'Visualizar e editar setor';
+    const environmentTitleName = row.dataset.environmentName || row.querySelector('strong')?.textContent?.trim() || 'Setor';
+    if (modalTitle) modalTitle.textContent = environmentTitleName;
     if (modalSubtitle) modalSubtitle.textContent = 'Consulte projetos, agentes e usuários vinculados e ajuste as informações do setor.';
-    if (environmentModalSubmit) environmentModalSubmit.textContent = 'Salvar alterações';
+    if (environmentModalSubmit) environmentModalSubmit.textContent = 'Salvar';
     if (environmentName) environmentName.value = row.dataset.environmentName || '';
     if (environmentOwner) environmentOwner.value = row.dataset.environmentOwner || '';
     if (environmentDescription) environmentDescription.value = row.dataset.environmentDescription || '';
@@ -9160,12 +9505,118 @@ if (environmentsTable && environmentModal && environmentModalForm) {
     }
   });
 
+  const relationCreateModalIds = ['agentModal', 'projectModal', 'createUserModal'];
+
+  const restoreSectorFromPage = () => {
+    environmentModal.classList.remove('environment-modal--as-page');
+    relationCreateModalIds.forEach((id) => document.getElementById(id)?.classList.remove('modal--stacked'));
+  };
+
+  // Espera o modal de criação abrir para pré-preencher o nome digitado no seletor do setor
+  const prefillCreateModalWhenOpen = (modalId, inputId, value) => {
+    let tries = 0;
+    const tick = () => {
+      const modal = document.getElementById(modalId);
+      const input = document.getElementById(inputId);
+      if (modal?.classList.contains('open')) {
+        modal.classList.add('modal--stacked');
+        if (input && value) {
+          input.value = value;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.focus();
+        }
+        return;
+      }
+      if (tries++ < 30) {
+        window.setTimeout(tick, 30);
+      } else {
+        // O modal não abriu (ex.: sem API); desfaz o modo página para não travar o setor
+        pendingSectorRelation = null;
+        restoreSectorFromPage();
+      }
+    };
+    tick();
+  };
+
+  // Transforma o modal do setor em página e abre o modal de criar agente/projeto/usuário por cima
+  const startCreateEntityForSector = (relationType, typedName) => {
+    if (!relationType || !activeEnvironmentCode) return;
+    const name = String(typedName || '').trim();
+    closeEnvironmentRelationPicker();
+    pendingSectorRelation = { type: relationType, name };
+    environmentModal.classList.add('environment-modal--as-page');
+
+    if (relationType === 'users') {
+      shouldAttachNextCreatedUserToEnvironment = true;
+      openCreateUserModalFromLookup?.({ query: name });
+      prefillCreateModalWhenOpen('createUserModal', 'createUserName', name);
+      return;
+    }
+    if (relationType === 'projects') {
+      document.getElementById('agentsCreateProjectBtn')?.click();
+      prefillCreateModalWhenOpen('projectModal', 'projectModalName', name);
+      return;
+    }
+    if (relationType === 'agents') {
+      document.getElementById('openAgentModal')?.click();
+      prefillCreateModalWhenOpen('agentModal', 'agentModalName', name);
+    }
+  };
+
+  // Ao fechar (salvar ou cancelar) o modal de criação, volta o setor de página para modal
+  const sectorPageObserver = new MutationObserver(() => {
+    if (!environmentModal.classList.contains('environment-modal--as-page')) return;
+    const anyOpen = relationCreateModalIds.some((id) => document.getElementById(id)?.classList.contains('open'));
+    if (!anyOpen) {
+      pendingSectorRelation = null;
+      restoreSectorFromPage();
+    }
+  });
+  relationCreateModalIds.forEach((id) => {
+    const modalEl = document.getElementById(id);
+    if (modalEl) sectorPageObserver.observe(modalEl, { attributes: true, attributeFilter: ['class'] });
+  });
+
+  // Projetos e agentes não persistem sem API neste protótipo: vincula o nome digitado ao setor
+  // no front-end e impede o submit padrão (que só mostraria "Recurso indisponível sem API").
+  document.addEventListener('submit', (event) => {
+    if (!pendingSectorRelation || pendingSectorRelation.type === 'users') return;
+    const formId = event.target?.id;
+    const mapping = {
+      projectModalForm: { modalId: 'projectModal', inputId: 'projectModalName' },
+      agentModalForm: { modalId: 'agentModal', inputId: 'agentModalName' },
+    };
+    const config = mapping[formId];
+    if (!config) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    const relationType = pendingSectorRelation.type;
+    const typed = String(document.getElementById(config.inputId)?.value || '').trim() || pendingSectorRelation.name;
+    if (!typed) {
+      document.getElementById(config.inputId)?.focus();
+      return;
+    }
+    const createModal = document.getElementById(config.modalId);
+    if (createModal) {
+      createModal.classList.remove('open', 'modal--stacked');
+      createModal.setAttribute('aria-hidden', 'true');
+    }
+    const added = addItemToActiveEnvironmentRelation(relationType, typed);
+    showAppToast(added ? 'Item criado e vinculado ao setor' : 'Item já está vinculado');
+  }, true);
+
   environmentRelationPickerList?.addEventListener('click', (event) => {
+    const createEntityButton = event.target.closest('[data-relation-create-entity]');
+    if (createEntityButton) {
+      const relationType = createEntityButton.dataset.relationCreateEntity;
+      const typed = String(environmentRelationPickerSearch?.value || '').trim();
+      startCreateEntityForSector(relationType, typed);
+      return;
+    }
+
     const createUserButton = event.target.closest('[data-relation-create-user]');
     if (createUserButton && activeRelationPickerType === 'users') {
-      shouldAttachNextCreatedUserToEnvironment = true;
-      openCreateUserModalFromLookup?.({ query: createUserButton.dataset.relationCreateUser || environmentRelationPickerSearch?.value || '' });
-      closeEnvironmentRelationPicker();
+      startCreateEntityForSector('users', createUserButton.dataset.relationCreateUser || environmentRelationPickerSearch?.value || '');
       return;
     }
 
@@ -10123,6 +10574,9 @@ function buildAgentChatPayloadFromRow(row, fallbackAgentId = '') {
     if (!rowCtxId) {
       rowCtxId = String(row.closest('.agents-context-block')?.dataset.hubContext || '').trim();
     }
+  } else if (agentId === HEALTH_PATIENT_AGENT_PUBLIC_ID) {
+    // Agente público da saúde não está na lista de agentes, mas tem nome próprio.
+    agentName = HEALTH_PATIENT_AGENT_PUBLIC_NAME;
   }
 
   const org = HUB_SCOPE?.[environmentSlug] || null;
@@ -10294,6 +10748,7 @@ function openAgentChatModalFromToggle(button) {
 
   agentChatModal.classList.add('open');
   agentChatModal.setAttribute('aria-hidden', 'false');
+  applyAgentChatThreadForAgent(agentId);
   if (window.lucide) {
     scheduleLucideRefresh();
   }
@@ -14129,6 +14584,40 @@ function exportSchedulesCsv() {
 
 exportSchedulesCsvButton?.addEventListener('click', exportSchedulesCsv);
 
+// Exporta em CSV a lista completa (ranking) das páginas "Ver mais" da Visão geral (Saúde).
+function exportHealthOverviewRanking(tableId, headers, filename) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  const rows = Array.from(table.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])'))
+    .map((row) => Array.from(row.children).slice(0, headers.length).map((cell) => cell.textContent));
+  if (!rows.length) {
+    showAppToast('Nenhum dado para exportar');
+    return;
+  }
+  const csv = [
+    headers.map(escapeCsvCell).join(';'),
+    ...rows.map((row) => row.map(escapeCsvCell).join(';')),
+  ].join('\n');
+  downloadTextFile(filename, `﻿${csv}`, 'text/csv;charset=utf-8');
+  showAppToast('Dados exportados em CSV');
+}
+
+document.getElementById('downloadHealthMnemonicsRankingBtn')?.addEventListener('click', () => {
+  exportHealthOverviewRanking(
+    'healthOverviewMnemonicsTable',
+    ['Posição', 'Mnemônico', 'Ocorrências', 'Participação'],
+    'mnemonicos-leitura-exames.csv',
+  );
+});
+
+document.getElementById('downloadHealthDoctorsRankingBtn')?.addEventListener('click', () => {
+  exportHealthOverviewRanking(
+    'healthOverviewDoctorsRankingTable',
+    ['Posição', 'Médico', 'Consultas com assistente', 'Participação'],
+    'medicos-assistente.csv',
+  );
+});
+
 if (automationTabs.length && automationPanels.length) {
   automationTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
@@ -14948,6 +15437,12 @@ function initHealthAccountabilityWorkflow() {
   const progressBar = document.getElementById('healthAccountabilityProgressBar');
   const processBtn = document.getElementById('processHealthAccountabilityBtn');
   const historyTable = document.getElementById('healthAccountabilityHistoryTable');
+  const historyEmptyEl = document.getElementById('healthAccountabilityHistoryEmpty');
+  const operatorSearchEl = document.getElementById('healthAccountabilityOperatorSearch');
+  const filterBtnEl = document.getElementById('healthAccountabilityFilterBtn');
+  const filterMenuEl = document.getElementById('healthAccountabilityFilterMenu');
+  const getActiveFilterValue = (group) => filterMenuEl
+    ?.querySelector(`.filter-option.active[data-filter="${group}"]`)?.dataset.value || '';
   const pagesTable = document.getElementById('healthAccountabilityPagesTable');
   const documentsTable = document.getElementById('healthAccountabilityDocumentsTable');
   const accountSection = document.getElementById('healthAccountabilityAccountSection');
@@ -14959,6 +15454,9 @@ function initHealthAccountabilityWorkflow() {
   const resultProcessedAtEl = document.querySelector('[data-health-accountability-result-processed-at]');
   const resultPagesEl = document.querySelector('[data-health-accountability-result-pages]');
   const resultDocumentsEl = document.querySelector('[data-health-accountability-result-documents]');
+  const glosaCardEl = document.querySelector('[data-health-accountability-glosa]');
+  const glosaValueEl = document.querySelector('[data-health-accountability-glosa-value]');
+  const glosaTagEl = document.querySelector('[data-health-accountability-glosa-tag]');
   let selectedFile = null;
   let selectedResultIndex = 0;
 
@@ -14978,6 +15476,7 @@ function initHealthAccountabilityWorkflow() {
       operatorId: '48291',
       documentSummary: 'Conta analítica, Descrição cirúrgica, Folha anestésica, Pré-anestésica',
       processedAt: '30/07/2026 • 14:22',
+      glosaChance: 68,
       pages: [
         { page: '1', category: 'Conta analítica', confidence: '96%', summary: 'Conta hospitalar detectada com valores e itens faturados.' },
         { page: '2', category: 'Descrição cirúrgica', confidence: '94%', summary: 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.' },
@@ -15009,6 +15508,7 @@ function initHealthAccountabilityWorkflow() {
       operatorId: 'Ana Silva',
       documentSummary: 'Conta analítica, Endoscopia, Outro exame',
       processedAt: '29/07/2026 • 16:08',
+      glosaChance: 41,
       pages: [
         { page: '1', category: 'Conta analítica', confidence: '93%', summary: 'Conta hospitalar detectada com resumo financeiro.' },
         { page: '2', category: 'Endoscopia', confidence: '87%', summary: 'Resumo da endoscopia com indicação, descrição do exame e conclusão do laudo.' },
@@ -15038,6 +15538,7 @@ function initHealthAccountabilityWorkflow() {
       operatorId: '39107',
       documentSummary: 'Conta analítica, Descrição cirúrgica',
       processedAt: '28/07/2026 • 10:35',
+      glosaChance: 12,
       pages: [
         { page: '1', category: 'Conta analítica', confidence: '95%', summary: 'Conta hospitalar detectada com valores principais.' },
         { page: '2', category: 'Descrição cirúrgica', confidence: '92%', summary: 'Resumo da descrição cirúrgica com procedimento realizado, técnica registrada e achados operatórios principais.' }
@@ -15208,11 +15709,50 @@ function initHealthAccountabilityWorkflow() {
       processBtn.textContent = 'Processar prestação';
     }
   };
+  const getGlosaRisk = (chance) => {
+    const value = Math.max(0, Math.min(100, Number(chance ?? 0)));
+    if (value >= 60) return { tone: 'high', label: 'Alto', value };
+    if (value >= 30) return { tone: 'medium', label: 'Médio', value };
+    return { tone: 'low', label: 'Baixo', value };
+  };
+  const renderGlosaRiskChip = (chance) => {
+    const risk = getGlosaRisk(chance);
+    return `<span class="glosa-chip glosa-chip--${risk.tone}" title="Chance de glosa: ${risk.value}%">${risk.label}</span>`;
+  };
+  const recordMatchesFilters = (record) => {
+    const query = normalizeSearchText(operatorSearchEl?.value || '');
+    if (query) {
+      // Busca "qualquer coisa": combina todos os campos visíveis da linha.
+      const haystack = normalizeSearchText([
+        record.fileName,
+        record.hospital,
+        record.operatorId,
+        record.documentSummary || buildDocumentSummary(record.documents),
+        record.processedAt,
+        getGlosaRisk(record.glosaChance).label,
+      ].filter(Boolean).join(' '));
+      if (!haystack.includes(query)) return false;
+    }
+    const hospital = getActiveFilterValue('hospital');
+    if (hospital && record.hospital !== hospital) return false;
+    const risk = getActiveFilterValue('risk');
+    if (risk && getGlosaRisk(record.glosaChance).tone !== risk) return false;
+    const classification = getActiveFilterValue('classification');
+    if (classification) {
+      const labels = (record.documents || []).map((doc) => doc.document);
+      const summary = record.documentSummary || buildDocumentSummary(record.documents);
+      if (!labels.includes(classification) && !String(summary).includes(classification)) return false;
+    }
+    return true;
+  };
   const renderHistory = () => {
     if (!historyTable) return;
     historyTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
     historyTable.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+    let shown = 0;
     records.forEach((record, index) => {
+      if (!recordMatchesFilters(record)) return;
+      shown += 1;
       const row = document.createElement('div');
       row.className = 'data-row';
       row.dataset.healthAccountabilityHistoryIndex = String(index);
@@ -15222,6 +15762,7 @@ function initHealthAccountabilityWorkflow() {
         <span>${escapeHtmlWes(record.operatorId || '-')}</span>
         <span>${escapeHtmlWes(record.documentSummary || buildDocumentSummary(record.documents))}</span>
         <span>${escapeHtmlWes(record.processedAt)}</span>
+        <span>${renderGlosaRiskChip(record.glosaChance)}</span>
         <span class="row-actions">
           <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
             <span class="material-symbols-rounded" aria-hidden="true">article</span>
@@ -15233,7 +15774,141 @@ function initHealthAccountabilityWorkflow() {
       `;
       historyTable.appendChild(row);
     });
+    if (historyEmptyEl) historyEmptyEl.classList.toggle('is-hidden', shown > 0);
   };
+  const renderFilterGroupOptions = (group, values, allLabel) => {
+    const groupEl = filterMenuEl?.querySelector(`.filter-group[data-filter-group="${group}"]`);
+    if (!groupEl) return;
+    const active = getActiveFilterValue(group);
+    const label = groupEl.querySelector('span');
+    groupEl.querySelectorAll('.filter-option').forEach((opt) => opt.remove());
+    const options = [{ value: '', text: allLabel }, ...values.map((v) => ({ value: v, text: v }))];
+    options.forEach((opt) => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-option';
+      btn.type = 'button';
+      btn.dataset.filter = group;
+      btn.dataset.value = opt.value;
+      btn.textContent = opt.text;
+      if (opt.value === active) btn.classList.add('active');
+      groupEl.appendChild(btn);
+    });
+    // Garante que exista uma opção ativa (padrão: "todos")
+    if (!groupEl.querySelector('.filter-option.active')) {
+      groupEl.querySelector('.filter-option[data-value=""]')?.classList.add('active');
+    }
+    if (label) groupEl.insertBefore(label, groupEl.firstChild);
+  };
+  const populateAccountabilityFilters = () => {
+    const hospitals = [...new Set(records.map((record) => record.hospital).filter(Boolean))]
+      .sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    renderFilterGroupOptions('hospital', hospitals, 'Todos');
+    renderFilterGroupOptions('classification', documentCatalog.map((item) => item.label), 'Todas');
+    if (typeof syncFilterMenuLayout === 'function') syncFilterMenuLayout(filterMenuEl);
+    if (typeof enhanceFilterOptionIcons === 'function') enhanceFilterOptionIcons();
+  };
+  // Mostra no botão de filtros quantos filtros estão ativos (não "todos"); troca o ícone pelo número.
+  const filterCountEl = filterBtnEl?.querySelector('[data-health-accountability-filter-count]');
+  const filterIconEl = filterBtnEl?.querySelector('.filter-btn-icon');
+  const updateFilterBadge = () => {
+    if (!filterBtnEl) return;
+    const activeCount = ['hospital', 'risk', 'classification']
+      .filter((group) => getActiveFilterValue(group)).length;
+    filterBtnEl.classList.toggle('has-active-filters', activeCount > 0);
+    if (filterIconEl) filterIconEl.hidden = activeCount > 0;
+    if (filterCountEl) {
+      filterCountEl.textContent = String(activeCount);
+      filterCountEl.hidden = activeCount === 0;
+    }
+  };
+  operatorSearchEl?.addEventListener('input', renderHistory);
+  if (filterBtnEl && filterMenuEl) {
+    filterBtnEl.addEventListener('click', (event) => {
+      event.stopPropagation();
+      filterMenuEl.classList.toggle('open');
+    });
+    document.addEventListener('click', (event) => {
+      if (!filterMenuEl.contains(event.target) && event.target !== filterBtnEl) {
+        filterMenuEl.classList.remove('open');
+      }
+    });
+    filterMenuEl.addEventListener('click', (event) => {
+      const option = event.target.closest('.filter-option');
+      if (option) {
+        const group = option.dataset.filter;
+        filterMenuEl.querySelectorAll(`.filter-option[data-filter="${group}"]`)
+          .forEach((item) => item.classList.remove('active'));
+        option.classList.add('active');
+        renderHistory();
+        updateFilterBadge();
+      }
+      const clear = event.target.closest('.filter-clear');
+      if (clear) {
+        filterMenuEl.querySelectorAll('.filter-option').forEach((item) => item.classList.remove('active'));
+        filterMenuEl.querySelectorAll('.filter-option[data-value=""]').forEach((item) => item.classList.add('active'));
+        renderHistory();
+        updateFilterBadge();
+      }
+    });
+  }
+  updateFilterBadge();
+  // Explicação da IA: em que critérios de auditoria o agente se baseou e por que chegou à chance de glosa.
+  const aiAuditReasonByDoc = {
+    'Conta analítica': 'itens faturados sem correspondência na descrição do procedimento',
+    'Descrição cirúrgica': 'falta detalhamento da técnica cirúrgica exigido pelo critério',
+    'Folha anestésica': 'faltam horários de início/fim ou assinatura do anestesista',
+    'Pré-anestésica': 'avaliação de risco anestésico incompleta',
+    'Endoscopia': 'laudo sem conclusão objetiva',
+    'Outro exame': 'exame sem laudo anexado'
+  };
+  const renderAiAudit = (result) => {
+    const section = document.getElementById('healthAccountabilityAiAuditSection');
+    const summaryEl = document.getElementById('healthAccountabilityAiAuditSummary');
+    const listEl = document.getElementById('healthAccountabilityAiAuditList');
+    if (!section || !summaryEl || !listEl) return;
+    const chance = Math.max(0, Math.min(100, Number(result.glosaChance ?? 0)));
+    const risk = getGlosaRisk(chance);
+    const docs = getResultDocuments(result);
+    // Quanto maior a chance, mais critérios não atendidos entre os documentos.
+    const findings = docs.map((doc, index) => {
+      let status = 'ok';
+      if (chance >= 55) status = index === 0 ? 'fail' : (index === 1 ? 'warn' : 'ok');
+      else if (chance >= 30) status = index === 0 ? 'warn' : 'ok';
+      const label = doc.document || `Documento ${index + 1}`;
+      const reason = aiAuditReasonByDoc[label] || 'critérios de auditoria configurados';
+      let text;
+      if (status === 'fail') text = `${label}: não atende ao critério — ${reason}. Principal fator da chance de glosa.`;
+      else if (status === 'warn') text = `${label}: atende parcialmente — ${reason}.`;
+      else text = `${label}: todos os critérios de auditoria foram atendidos.`;
+      return { status, text };
+    });
+    summaryEl.textContent = `Com base nos critérios definidos em Ajustes de prestação, o agente avaliou ${docs.length} documento(s) e estimou ${chance}% de chance de glosa (risco ${risk.label.toLowerCase()}). Quanto mais critérios não atendidos, maior a chance.`;
+    const iconByStatus = { fail: 'cancel', warn: 'error', ok: 'check_circle' };
+    listEl.innerHTML = findings.map((finding) => `
+      <li class="health-ai-audit-item is-${finding.status}">
+        <span class="material-symbols-rounded" aria-hidden="true">${iconByStatus[finding.status]}</span>
+        <span>${escapeHtmlWes(finding.text)}</span>
+      </li>
+    `).join('');
+    // Começa colapsado — o usuário expande para ver os detalhes.
+    setAiAuditOpen(false);
+  };
+  // Collapse/expand da Auditoria de IA.
+  const aiAuditToggle = document.getElementById('healthAccountabilityAiAuditToggle');
+  const aiAuditBody = document.getElementById('healthAccountabilityAiAuditBody');
+  const aiAuditSection = document.getElementById('healthAccountabilityAiAuditSection');
+  const setAiAuditOpen = (open) => {
+    if (aiAuditBody) aiAuditBody.hidden = !open;
+    if (aiAuditToggle) aiAuditToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (aiAuditSection) aiAuditSection.classList.toggle('is-open', open);
+  };
+  aiAuditToggle?.addEventListener('click', () => setAiAuditOpen(Boolean(aiAuditBody?.hidden)));
+  aiAuditToggle?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      setAiAuditOpen(Boolean(aiAuditBody?.hidden));
+    }
+  });
   const renderResultPage = () => {
     const result = getCurrentResult();
     if (!result) return;
@@ -15244,6 +15919,17 @@ function initHealthAccountabilityWorkflow() {
     if (resultPagesEl) resultPagesEl.textContent = String(result.pages.length);
     const resultDocuments = getResultDocuments(result);
     if (resultDocumentsEl) resultDocumentsEl.textContent = String(resultDocuments.length);
+
+    if (glosaCardEl && glosaValueEl) {
+      const chance = Math.max(0, Math.min(100, Number(result.glosaChance ?? 0)));
+      const risk = getGlosaRisk(chance);
+      glosaCardEl.dataset.tone = risk.tone;
+      glosaValueEl.textContent = `${chance}%`;
+      if (glosaTagEl) {
+        glosaTagEl.className = `glosa-chip glosa-chip--${risk.tone}`;
+        glosaTagEl.textContent = risk.label;
+      }
+    }
 
     if (pagesTable) {
       pagesTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
@@ -15285,6 +15971,7 @@ function initHealthAccountabilityWorkflow() {
         documentsTable.appendChild(card);
       });
     }
+    renderAiAudit(result);
     if (accountSection) accountSection.hidden = !(result.accountSummary || []).length;
     if (accountTable) {
       accountTable.querySelectorAll('[data-table-empty-state="true"]').forEach((row) => row.remove());
@@ -15355,12 +16042,17 @@ function initHealthAccountabilityWorkflow() {
     const accountSummary = createAccountSummary(file, hospital, hasAccount);
     const needsReview = foundTypes.some((type, index) => type.key === 'outro_exame' || Math.max(72, 96 - (index * 5)) < 80);
     const documentSummary = buildDocumentSummary(documents);
+    const avgConfidence = pages.length
+      ? pages.reduce((sum, page) => sum + (parseInt(page.confidence, 10) || 0), 0) / pages.length
+      : 90;
+    const glosaChance = Math.round(Math.max(5, Math.min(95, (100 - avgConfidence) + (needsReview ? 12 : 0))));
     return {
       fileName: file.name,
       hospital,
       operatorId,
       documentSummary,
       processedAt: now,
+      glosaChance,
       pages,
       documents,
       accountSummary,
@@ -15533,6 +16225,7 @@ function initHealthAccountabilityWorkflow() {
     const result = createMockResult(selectedFile, hospital, operatorId);
     records.unshift(result);
     selectedResultIndex = 0;
+    populateAccountabilityFilters();
     renderHistory();
     renderResultPage();
     closeModal();
@@ -15544,6 +16237,7 @@ function initHealthAccountabilityWorkflow() {
     if (!result) return;
     downloadBlob(buildResultPdfBlob(result), getResultPdfFilename(result));
   });
+  populateAccountabilityFilters();
   renderHistory();
   renderResultPage();
 }
@@ -15585,20 +16279,7 @@ function initHealthExamReadingWorkflow() {
     { code: 'PLAQ', name: 'Plaquetas' },
     { code: 'GLI', name: 'Glicemia' }
   ];
-  const mnemonicNameByCode = {
-    HEM: 'Hemograma completo',
-    HGB: 'Hemoglobina',
-    HTC: 'Hematócrito',
-    LEU: 'Leucócitos',
-    PLAQ: 'Plaquetas',
-    GLI: 'Glicemia',
-    CRE: 'Creatinina',
-    URE: 'Ureia',
-    TGO: 'Transaminase oxalacética',
-    RXTO: 'Raio-X de tórax',
-    OBS: 'Observação clínica',
-    LAU: 'Laudo médico'
-  };
+  const mnemonicNameByCode = healthExamMnemonicBase;
   let selectedFile = null;
   let currentMnemonics = [];
   let latestResult = {
@@ -15960,6 +16641,32 @@ function initHealthExamReadingWorkflow() {
     const copied = await copyTextToClipboard(codes);
     showAppToast(copied ? 'Códigos identificados copiados' : 'Não foi possível copiar');
   });
+
+  // Busca "qualquer coisa" no histórico de leituras.
+  const historySearchInput = document.getElementById('healthExamReadingSearch');
+  const normalizeExamSearch = (value) => String(value || '')
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase();
+  const filterHistoryRows = () => {
+    if (!historyTable) return;
+    const query = normalizeExamSearch(historySearchInput?.value);
+    let shown = 0;
+    historyTable.querySelectorAll('.data-row:not(.header)').forEach((row) => {
+      if (row.dataset.tableEmptyState === 'true') return; // linha de "nenhum registro"
+      // Inclui o texto visível e os códigos guardados no botão de copiar.
+      const codes = row.querySelector('[data-health-exam-copy-history]')?.dataset.healthExamCopyHistory || '';
+      const haystack = normalizeExamSearch(`${row.textContent} ${codes}`);
+      const hidden = Boolean(query) && !haystack.includes(query);
+      row.classList.toggle('is-hidden', hidden);
+      if (!hidden) shown += 1;
+    });
+    // Mostra a linha de vazio quando a busca não retorna resultados.
+    const emptyRow = historyTable.querySelector('[data-table-empty-state="true"]');
+    if (emptyRow) emptyRow.hidden = shown > 0;
+  };
+  historySearchInput?.addEventListener('input', filterHistoryRows);
+
   renderResultsPage();
 }
 
@@ -17547,6 +18254,53 @@ async function copyTextToClipboard(text) {
 const HEALTH_PATIENT_AGENT_PHONE = '+55 85 98888-1048';
 const HEALTH_PATIENT_AGENT_LINK = 'https://wa.me/5585988881048';
 const HEALTH_PATIENT_SHARE_MESSAGE = 'Olá! Use este link para falar com o agente do paciente: https://wa.me/5585988881048';
+// Agente público do paciente — abre a página de chat padrão, no mesmo estilo dos agentes normais.
+const HEALTH_PATIENT_AGENT_PUBLIC_ID = 'agente-do-paciente';
+const HEALTH_PATIENT_AGENT_PUBLIC_NAME = 'Agente do paciente';
+function getHealthPatientAgentPageLink() {
+  return buildStandaloneAgentChatLink(HEALTH_PATIENT_AGENT_PUBLIC_ID);
+}
+// Conversa de exemplo com o conteúdo do fluxo do paciente (autenticação + solicitações).
+const HEALTH_PATIENT_AGENT_CHAT_INTRO = 'Sou o agente de saúde do paciente. Posso tirar dúvidas sobre o seu histórico, receber seus exames ou organizar um encaixe para renovação de receita.';
+const HEALTH_PATIENT_AGENT_CHAT_MESSAGES = [
+  { role: 'agent', time: '09:12', text: 'Olá! Sou o agente de saúde do paciente. Para começar o atendimento com segurança, confirme o seu CPF.' },
+  { role: 'user', time: '09:12', text: 'Meu CPF é 123.456.789-00.' },
+  { role: 'agent', time: '09:13', text: 'Identidade confirmada ✅. Como posso ajudar hoje? Você pode tirar dúvidas sobre o histórico, enviar exames ou pedir um encaixe para renovação de receita.' },
+  { role: 'user', time: '09:13', text: 'Quero um encaixe para renovar a minha receita.' },
+  { role: 'agent', time: '09:14', text: 'Certo! O encaixe apenas agenda um horário — a renovação depende da avaliação do médico. Qual especialidade você precisa?' },
+  { role: 'user', time: '09:14', text: 'Clínica geral.' },
+  { role: 'agent', time: '09:15', text: 'Encontrei horários próximos: Dra. Helena Prado — amanhã 09:40, ou Dr. Rafael Duarte — quinta 14:20. Assim que o médico confirmar, você recebe o aviso por SMS/e-mail.' },
+];
+function buildHealthPatientChatThreadHtml() {
+  return HEALTH_PATIENT_AGENT_CHAT_MESSAGES.map((message) => {
+    const who = message.role === 'user' ? 'Você' : 'Agente';
+    return `
+      <div class="chat-message ${message.role === 'user' ? 'user' : 'agent'}">
+        <div class="chat-meta">
+          <span>${who} • ${message.time}</span>
+          <button class="chat-meta-audio" type="button" aria-label="Ouvir mensagem" title="Ouvir mensagem">
+            <i data-lucide="volume-2"></i>
+          </button>
+        </div>
+        <div class="chat-bubble">${escapeHtmlWes(message.text)}</div>
+      </div>`;
+  }).join('');
+}
+let defaultAgentChatThreadHtml = null;
+// Troca o conteúdo do chat conforme o agente aberto (fluxo do paciente x conversa padrão).
+function applyAgentChatThreadForAgent(agentId) {
+  const thread = agentChatModal?.querySelector('.chat-thread');
+  if (!thread) return;
+  if (defaultAgentChatThreadHtml === null) defaultAgentChatThreadHtml = thread.innerHTML;
+  if (String(agentId || '').trim() === HEALTH_PATIENT_AGENT_PUBLIC_ID) {
+    thread.innerHTML = buildHealthPatientChatThreadHtml();
+    const emptyPrompt = document.getElementById('chatEmptyPrompt');
+    if (emptyPrompt) emptyPrompt.textContent = HEALTH_PATIENT_AGENT_CHAT_INTRO;
+  } else {
+    thread.innerHTML = defaultAgentChatThreadHtml;
+  }
+  if (window.lucide) scheduleLucideRefresh();
+}
 const healthPatientPreviewPatients = [
   { cpf: '12345678900', name: 'Ana Beatriz Lima' },
   { cpf: '98765432100', name: 'Carlos Eduardo Nunes' },
@@ -17942,7 +18696,7 @@ function resetHealthPatientPreview() {
   if (form) form.hidden = false;
   if (input) input.value = '';
   setHealthPatientPreviewOptionsEnabled(false);
-  addHealthPatientPreviewMessage('Olá! Sou o agente da clínica. Envie seu CPF para começarmos.');
+  addHealthPatientPreviewMessage('Olá! Sou o agente de saúde da clínica. Para começar, envie o seu CPF.');
 }
 
 function unlockHealthPatientPreview(cpf) {
@@ -17954,102 +18708,57 @@ function unlockHealthPatientPreview(cpf) {
     return;
   }
   addHealthPatientPreviewMessage(formatHealthPatientPreviewCpf(digits), 'user');
-  addHealthPatientPreviewMessage(`CPF localizado, ${patient.name}. Como posso ajudar hoje? Escolha uma das opções abaixo.`);
+  addHealthPatientPreviewMessage(`Encontrei seu cadastro, ${patient.name}. Por segurança, enviei um código por SMS/e-mail para confirmar sua identidade.`);
+  addHealthPatientPreviewMessage('Identidade confirmada ✅. O que você deseja hoje? Escolha uma das opções abaixo.');
   document.getElementById('healthPatientPreviewCpfForm')?.setAttribute('hidden', '');
   setHealthPatientPreviewOptionsEnabled(true);
 }
 
 function runHealthPatientPreviewFlow(flow) {
-  if (flow === 'renewal') {
-    addHealthPatientPreviewMessage('Quero renovar uma receita.', 'user');
-    addHealthPatientPreviewMessage('Perfeito. Vou mostrar horários disponíveis para uma consulta de avaliação. A receita não é renovada automaticamente.');
-    addHealthPatientPreviewMessage('Horários disponíveis: hoje 11:00, amanhã 09:40 ou sexta 14:40.');
-    addHealthPatientPreviewMessage('Amanhã 09:40', 'user');
-    addHealthPatientPreviewMessage('Solicitação enviada ao médico. Você receberá uma confirmação após o aceite do encaixe.');
-  }
   if (flow === 'questions') {
-    addHealthPatientPreviewMessage('Tenho dúvidas gerais sobre meus exames.', 'user');
-    addHealthPatientPreviewMessage('Pode perguntar. Vou responder com base no seu histórico e orientar quando for necessário falar com o médico.');
-    addHealthPatientPreviewMessage('Exemplo: seus exames recentes estão no histórico, mas sinais de alarme ou piora dos sintomas exigem avaliação médica.');
+    addHealthPatientPreviewMessage('Tenho uma dúvida sobre o meu último exame.', 'user');
+    addHealthPatientPreviewMessage('Consultei o seu histórico: o exame mais recente registrado é um hemograma completo de 24/07/2026, com o laudo do laboratório anexado. Posso te reenviar esse registro, mas a leitura do resultado é feita pelo seu médico.');
+    addHealthPatientPreviewMessage('Importante: sou um agente de assistência. Para diagnóstico, conduta ou qualquer coisa fora do seu histórico, é necessário consultar o seu médico.');
+    addHealthPatientPreviewMessage('A sua dúvida foi resolvida?');
+    addHealthPatientPreviewMessage('Sim, obrigado!', 'user');
+    addHealthPatientPreviewMessage('Que bom! Encerro o atendimento por aqui. Se precisar, é só chamar. 👋');
   }
   if (flow === 'exams') {
-    addHealthPatientPreviewMessage('Quero enviar exames para meu histórico.', 'user');
-    addHealthPatientPreviewMessage('Envie as imagens ou PDFs dos exames por aqui.');
+    addHealthPatientPreviewMessage('Quero enviar exames para o meu histórico.', 'user');
+    addHealthPatientPreviewMessage('Pode enviar o PDF ou a imagem do exame por aqui.');
     addHealthPatientPreviewMessage('exame-laboratorial.pdf', 'user');
-    addHealthPatientPreviewMessage('Recebi o arquivo. Você já enviou todos os exames?');
-    addHealthPatientPreviewMessage('Sim, enviei todos.', 'user');
-    addHealthPatientPreviewMessage('Obrigado. Vou adicionar os exames ao histórico e avisar se houver algo que demande nova orientação.');
+    addHealthPatientPreviewMessage('Recebido! Atualizei o seu histórico médico com este exame.');
+    addHealthPatientPreviewMessage('Confirmo o recebimento ao paciente. Deseja enviar mais algum exame?');
+  }
+  if (flow === 'renewal') {
+    addHealthPatientPreviewMessage('Preciso de um encaixe para renovar a minha receita.', 'user');
+    addHealthPatientPreviewMessage('Certo. O encaixe apenas agenda um horário — quem avalia e decide a renovação é o médico. Qual especialidade você precisa?');
+    addHealthPatientPreviewMessage('Clínica geral', 'user');
+    addHealthPatientPreviewMessage('Encontrei estes médicos e horários próximos: Dra. Helena Prado — amanhã 09:40, ou Dr. Rafael Duarte — quinta 14:20.');
+    addHealthPatientPreviewMessage('Dra. Helena Prado — amanhã 09:40', 'user');
+    addHealthPatientPreviewMessage('Enviei a solicitação para a agenda da Dra. Helena Prado e estou aguardando a confirmação do médico.');
+    addHealthPatientPreviewMessage('Assim que houver resposta, você recebe por SMS/e-mail o aviso de marcação aprovada ou reprovada.');
   }
 }
 
-function renderHealthPatientShareDetail(patient) {
-  const detail = document.getElementById('healthPatientShareDetail');
-  const sendBtn = document.getElementById('healthPatientShareSendBtn');
-  if (!detail || !sendBtn) return;
-  if (!patient) {
-    detail.hidden = true;
-    detail.innerHTML = '';
-    sendBtn.disabled = true;
-    return;
-  }
-  const hasPhone = Boolean(String(patient.phone || '').trim());
-  sendBtn.disabled = !hasPhone;
-  sendBtn.dataset.patientId = patient.id;
-  detail.hidden = false;
-  detail.innerHTML = `
-    <div>
-      <strong>${escapeHtmlWes(patient.name)}</strong>
-      <span>${escapeHtmlWes(formatHealthPatientPhoneLabel(patient.phone))}</span>
-    </div>
-    <div class="health-patient-share-link-row">
-      <span class="health-patient-share-link">${escapeHtmlWes(HEALTH_PATIENT_AGENT_LINK)}</span>
-      <button class="icon-btn health-patient-copy-link-btn" type="button" aria-label="Copiar link do WhatsApp" data-health-patient-modal-copy-link>
-        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
-      </button>
-    </div>
-    <span>${hasPhone
-      ? 'O link será enviado pelo telefone cadastrado do paciente.'
-      : `Paciente sem telefone cadastrado. Mostre o número ${escapeHtmlWes(HEALTH_PATIENT_AGENT_PHONE)} ou copie o link para orientar manualmente.`}</span>
-  `;
-}
-
-function renderHealthPatientShareResults() {
-  const input = document.getElementById('healthPatientShareSearch');
-  const results = document.getElementById('healthPatientShareResults');
-  if (!input || !results) return;
-  const query = normalizeHealthPatientSearch(input.value);
-  const matches = healthPatientSharePatients.filter((patient) =>
-    normalizeHealthPatientSearch(patient.name).includes(query)
-  );
-  if (!matches.length) {
-    results.innerHTML = '<p class="health-patient-share-empty">Nenhum paciente encontrado. Copie o link do agente ou informe o número do atendimento ao paciente.</p>';
-    renderHealthPatientShareDetail(null);
-    return;
-  }
-  results.innerHTML = matches.map((patient) => {
-    const hasPhone = Boolean(String(patient.phone || '').trim());
-    return `
-      <button class="health-patient-share-result" type="button" data-health-patient-id="${escapeHtmlWes(patient.id)}">
-        <span>
-          <strong>${escapeHtmlWes(patient.name)}</strong>
-          <span>${escapeHtmlWes(formatHealthPatientPhoneLabel(patient.phone))}</span>
-        </span>
-        <span class="health-patient-phone-chip${hasPhone ? '' : ' is-missing'}">${hasPhone ? 'Telefone' : 'Sem telefone'}</span>
-      </button>
-    `;
-  }).join('');
+function setHealthPatientShareModalState() {
+  const linkEl = document.getElementById('healthPatientShareLink');
+  const copyBtn = document.getElementById('healthPatientShareCopyBtn');
+  const openBtn = document.getElementById('healthPatientShareOpenBtn');
+  if (!linkEl) return;
+  const link = getHealthPatientAgentPageLink();
+  linkEl.value = link;
+  if (copyBtn) copyBtn.disabled = !link;
+  if (openBtn) openBtn.disabled = !link;
 }
 
 function openHealthPatientShareModal() {
   const modal = document.getElementById('healthPatientShareModal');
-  const input = document.getElementById('healthPatientShareSearch');
-  if (!modal || !input) return;
+  if (!modal) return;
   modal.classList.add('open');
   modal.setAttribute('aria-hidden', 'false');
-  input.value = '';
-  renderHealthPatientShareResults();
-  renderHealthPatientShareDetail(null);
-  window.setTimeout(() => input.focus(), 0);
+  setHealthPatientShareModalState();
+  window.setTimeout(() => document.getElementById('healthPatientShareLink')?.focus(), 0);
 }
 
 function closeHealthPatientShareModal() {
@@ -18070,6 +18779,120 @@ function openHealthPatientPreviewModal() {
 
 function closeHealthPatientPreviewModal() {
   const modal = document.getElementById('healthPatientPreviewModal');
+  if (!modal) return;
+  modal.classList.remove('open');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+const HEALTH_FLOW_ZOOM_MIN = 0.5;
+const HEALTH_FLOW_ZOOM_MAX = 3;
+let healthFlowZoomScale = 1;
+let healthFlowBaseWidth = 0;
+
+function getHealthFlowEls() {
+  return {
+    viewport: document.querySelector('[data-health-flow-viewport]'),
+    canvas: document.querySelector('.health-flow-canvas'),
+  };
+}
+
+function applyHealthFlowZoom() {
+  const { canvas } = getHealthFlowEls();
+  if (canvas && healthFlowBaseWidth) {
+    canvas.style.width = `${healthFlowBaseWidth * healthFlowZoomScale}px`;
+  }
+}
+
+function fitHealthFlow() {
+  const { viewport, canvas } = getHealthFlowEls();
+  if (!viewport || !canvas) return;
+  healthFlowZoomScale = 1;
+  healthFlowBaseWidth = viewport.clientWidth;
+  canvas.style.width = `${healthFlowBaseWidth}px`;
+  viewport.scrollLeft = 0;
+  viewport.scrollTop = 0;
+}
+
+function zoomHealthFlow(multiplier, anchor) {
+  const { viewport } = getHealthFlowEls();
+  if (!viewport || !healthFlowBaseWidth) return;
+  const rect = viewport.getBoundingClientRect();
+  const ax = anchor ? anchor.x : rect.width / 2;
+  const ay = anchor ? anchor.y : rect.height / 2;
+  const contentX = viewport.scrollLeft + ax;
+  const contentY = viewport.scrollTop + ay;
+  const next = Math.min(HEALTH_FLOW_ZOOM_MAX, Math.max(HEALTH_FLOW_ZOOM_MIN, healthFlowZoomScale * multiplier));
+  const ratio = next / healthFlowZoomScale;
+  healthFlowZoomScale = next;
+  applyHealthFlowZoom();
+  viewport.scrollLeft = contentX * ratio - ax;
+  viewport.scrollTop = contentY * ratio - ay;
+}
+
+function setupHealthFlowZoomControls() {
+  const { viewport } = getHealthFlowEls();
+  if (!viewport || viewport.dataset.zoomReady === 'true') return;
+  viewport.dataset.zoomReady = 'true';
+
+  document.querySelectorAll('[data-health-flow-zoom]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.healthFlowZoom;
+      if (action === 'in') zoomHealthFlow(1.25);
+      else if (action === 'out') zoomHealthFlow(0.8);
+      else fitHealthFlow();
+    });
+  });
+
+  let dragging = false;
+  let startX = 0;
+  let startY = 0;
+  let startLeft = 0;
+  let startTop = 0;
+  viewport.addEventListener('pointerdown', (event) => {
+    if (event.target.closest('.health-flow-zoom')) return;
+    dragging = true;
+    startX = event.clientX;
+    startY = event.clientY;
+    startLeft = viewport.scrollLeft;
+    startTop = viewport.scrollTop;
+    viewport.classList.add('is-grabbing');
+    try { viewport.setPointerCapture(event.pointerId); } catch (_) {}
+  });
+  viewport.addEventListener('pointermove', (event) => {
+    if (!dragging) return;
+    viewport.scrollLeft = startLeft - (event.clientX - startX);
+    viewport.scrollTop = startTop - (event.clientY - startY);
+  });
+  const endDrag = () => {
+    dragging = false;
+    viewport.classList.remove('is-grabbing');
+  };
+  viewport.addEventListener('pointerup', endDrag);
+  viewport.addEventListener('pointercancel', endDrag);
+  viewport.addEventListener('pointerleave', endDrag);
+
+  viewport.addEventListener('wheel', (event) => {
+    if (!(event.ctrlKey || event.metaKey)) return;
+    event.preventDefault();
+    const rect = viewport.getBoundingClientRect();
+    zoomHealthFlow(event.deltaY < 0 ? 1.1 : 0.9, { x: event.clientX - rect.left, y: event.clientY - rect.top });
+  }, { passive: false });
+}
+
+function openHealthPatientFlowModal() {
+  const modal = document.getElementById('healthPatientFlowModal');
+  if (!modal) return;
+  modal.classList.add('open');
+  modal.setAttribute('aria-hidden', 'false');
+  setupHealthFlowZoomControls();
+  window.requestAnimationFrame(() => {
+    fitHealthFlow();
+    window.requestAnimationFrame(fitHealthFlow);
+  });
+}
+
+function closeHealthPatientFlowModal() {
+  const modal = document.getElementById('healthPatientFlowModal');
   if (!modal) return;
   modal.classList.remove('open');
   modal.setAttribute('aria-hidden', 'true');
@@ -19067,9 +19890,6 @@ function initHealthPatientShareControls() {
   const previewCpfForm = document.getElementById('healthPatientPreviewCpfForm');
   const previewCpfInput = document.getElementById('healthPatientPreviewCpfInput');
   const previewOptions = document.getElementById('healthPatientPreviewOptions');
-  const input = document.getElementById('healthPatientShareSearch');
-  const results = document.getElementById('healthPatientShareResults');
-  const sendBtn = document.getElementById('healthPatientShareSendBtn');
   document.querySelector('[data-health-patient-copy-link]')?.addEventListener('click', async () => {
     const copied = await copyTextToClipboard(HEALTH_PATIENT_AGENT_LINK);
     showAppToast(copied ? 'Link do WhatsApp copiado' : 'Não foi possível copiar o link');
@@ -19078,6 +19898,14 @@ function initHealthPatientShareControls() {
   document.querySelector('[data-health-patient-preview-open]')?.addEventListener('click', openHealthPatientPreviewModal);
   previewModal?.addEventListener('click', (event) => {
     if (event.target.closest('[data-health-patient-preview-close]')) closeHealthPatientPreviewModal();
+  });
+  const flowModal = document.getElementById('healthPatientFlowModal');
+  document.querySelector('[data-health-flow-open]')?.addEventListener('click', openHealthPatientFlowModal);
+  flowModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-flow-close]')) closeHealthPatientFlowModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && flowModal?.classList.contains('open')) closeHealthPatientFlowModal();
   });
   previewCpfForm?.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -19089,26 +19917,28 @@ function initHealthPatientShareControls() {
     if (!button || button.disabled) return;
     runHealthPatientPreviewFlow(button.dataset.healthPatientFlow);
   });
-  if (!modal || !input || !results || !sendBtn) return;
-  modal.addEventListener('click', async (event) => {
+  if (!modal) return;
+  const copyBtn = document.getElementById('healthPatientShareCopyBtn');
+  const openBtn = document.getElementById('healthPatientShareOpenBtn');
+  const saveBtn = document.getElementById('healthPatientShareSaveBtn');
+  modal.addEventListener('click', (event) => {
     if (event.target.closest('[data-health-patient-share-close]')) closeHealthPatientShareModal();
-    if (event.target.closest('[data-health-patient-modal-copy-link]')) {
-      const copied = await copyTextToClipboard(HEALTH_PATIENT_AGENT_LINK);
-      showAppToast(copied ? 'Link do WhatsApp copiado' : 'Não foi possível copiar o link');
+  });
+  copyBtn?.addEventListener('click', async () => {
+    if (copyBtn.disabled) return;
+    const copied = await copyTextToClipboard(getHealthPatientAgentPageLink());
+    if (copied) {
+      copyBtn.classList.add('is-copied');
+      window.setTimeout(() => copyBtn.classList.remove('is-copied'), 1200);
     }
+    showAppToast(copied ? 'Link copiado' : 'Não foi possível copiar o link');
   });
-  input.addEventListener('input', renderHealthPatientShareResults);
-  results.addEventListener('click', (event) => {
-    const button = event.target.closest('[data-health-patient-id]');
-    if (!button) return;
-    results.querySelectorAll('.health-patient-share-result').forEach((item) => item.classList.remove('is-selected'));
-    button.classList.add('is-selected');
-    renderHealthPatientShareDetail(getHealthPatientById(button.dataset.healthPatientId));
+  openBtn?.addEventListener('click', () => {
+    if (openBtn.disabled) return;
+    window.open(getHealthPatientAgentPageLink(), '_blank', 'noopener');
   });
-  sendBtn.addEventListener('click', () => {
-    const patient = getHealthPatientById(sendBtn.dataset.patientId);
-    if (!patient?.phone) return;
-    showAppToast(`Link enviado para ${patient.name} em ${patient.phone}`);
+  saveBtn?.addEventListener('click', () => {
+    showAppToast('Link do agente do paciente pronto para compartilhar');
     closeHealthPatientShareModal();
   });
   document.addEventListener('keydown', (event) => {
@@ -20730,6 +21560,9 @@ const routeMap = {
   'dashboard/hybrid-flows/new': 'page-hybrid-flows-create',
   'dashboard/hybrid-flows/history': 'page-hybrid-flows-history',
   'dashboard/hybrid-flows/history/details': 'page-hybrid-flows-history-details',
+  'dashboard/health/overview': 'page-health-overview',
+  'dashboard/health/overview/mnemonics': 'page-health-overview-mnemonics',
+  'dashboard/health/overview/doctors': 'page-health-overview-doctors',
   'dashboard/health/whatsapp': 'page-health-whatsapp',
   'dashboard/health/whatsapp/insights': 'page-health-whatsapp-insights',
   'dashboard/health/whatsapp/history': 'page-health-whatsapp-history',
@@ -20752,6 +21585,7 @@ const routeMap = {
   'dashboard/users': 'page-users',
   'dashboard/roles': 'page-roles',
   'dashboard/mcps': 'page-mcps',
+  'dashboard/integrations': 'page-integrations-apis',
   'dashboard/integrations/documentation': 'page-integrations-docs',
   'dashboard/integrations/apis': 'page-integrations-apis',
   'dashboard/health/integrations': 'page-integrations-apis',
@@ -20787,6 +21621,9 @@ const sectionMap = {
   'dashboard/hybrid-flows/new': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history': 'Atendimento dinâmico',
   'dashboard/hybrid-flows/history/details': 'Atendimento dinâmico',
+  'dashboard/health/overview': 'Saúde',
+  'dashboard/health/overview/mnemonics': 'Saúde',
+  'dashboard/health/overview/doctors': 'Saúde',
   'dashboard/health/whatsapp': 'Saúde',
   'dashboard/health/whatsapp/insights': 'Saúde',
   'dashboard/health/whatsapp/history': 'Saúde',
@@ -20805,6 +21642,7 @@ const sectionMap = {
   'dashboard/users': 'Administração',
   'dashboard/roles': 'Administração',
   'dashboard/mcps': 'Administração',
+  'dashboard/integrations': 'Integrações',
   'dashboard/integrations/documentation': 'Integrações',
   'dashboard/integrations/apis': 'Integrações',
   'dashboard/health/integrations': 'Integrações',
@@ -21256,6 +22094,7 @@ const normalizeVisiblePortugueseLabels = () => {
     ['#submenu-administration a[href="#/dashboard/people-management"] .submenu-label', 'Estrutura e Pessoas'],
     ['#submenu-administration a[href="#/dashboard/skills"] .submenu-label', 'Habilidades'],
     ['.nav-trigger[data-menu="health"] .nav-label', 'Sa\u00fade'],
+    ['#submenu-health a[href="#/dashboard/health/overview"] .submenu-label', 'Vis\u00e3o geral'],
     ['#submenu-health a[href="#/dashboard/health/whatsapp"] .submenu-label', 'Agente do paciente'],
     ['#submenu-health a[href="#/dashboard/health/service"] .submenu-label', 'Atendimento'],
     ['#submenu-health a[href="#/dashboard/health/agenda"] .submenu-label', 'Agenda'],
@@ -21290,8 +22129,6 @@ const updateActivePage = () => {
     ? 'dashboard/integrations/apis'
     : routeKey === 'dashboard/health/integrations'
     ? 'dashboard/integrations/apis'
-    : routeKey === 'dashboard/integrations'
-    ? 'dashboard/integrations/documentation'
     : routeKey === 'dashboard/people-management'
     ? getPeopleManagementDefaultRoute()
     : routeKey;
@@ -21338,6 +22175,8 @@ const updateActivePage = () => {
       ? 'dashboard/campaigns'
     : pageRouteKey.startsWith('dashboard/channels/')
       ? 'dashboard/channels'
+    : pageRouteKey.startsWith('dashboard/health/overview/')
+      ? 'dashboard/health/overview'
     : pageRouteKey.startsWith('dashboard/health/whatsapp/')
       ? 'dashboard/health/whatsapp'
     : pageRouteKey.startsWith('dashboard/health/service/')
@@ -21359,6 +22198,7 @@ const updateActivePage = () => {
       'dashboard/voice-messaging/new',
       'dashboard/campaigns',
       'dashboard/hybrid-flows',
+      'dashboard/health/overview',
       'dashboard/health/whatsapp',
       'dashboard/health/service',
       'dashboard/health/agenda',
@@ -21440,13 +22280,400 @@ const updateActivePage = () => {
   document.body.classList.toggle('route-vm-monitoring', routeKey === 'dashboard/vm-monitoring');
   document.body.classList.toggle('route-channels', routeKey === 'dashboard/channels' || routeKey.startsWith('dashboard/channels/'));
   document.body.classList.toggle('route-profile', routeKey === 'dashboard/profile');
+  const healthIntegrationsBack = document.querySelector('[data-health-integrations-back]');
+  if (healthIntegrationsBack) {
+    healthIntegrationsBack.hidden = routeKey !== 'dashboard/health/integrations';
+  }
   syncVoiceMessagingInsightsChart(routeKey);
+  syncHealthOverviewCharts(routeKey);
   if (typeof window.ensureAgentsAutoRefresh === 'function') {
     window.ensureAgentsAutoRefresh();
   }
 };
 
 window.refreshHubScopeFromApi = refreshHubScopeFromApi;
+
+function setupHealthHospitals() {
+  const modal = document.getElementById('healthHospitalsModal');
+  const listEl = document.getElementById('healthHospitalsList');
+  const emptyEl = document.getElementById('healthHospitalsEmpty');
+  const addForm = document.getElementById('healthHospitalsAddForm');
+  const addInput = document.getElementById('healthHospitalsInput');
+  if (!modal || !listEl || !addForm || !addInput) return;
+
+  const hospitals = ['HMoinhos', 'Hospital São Lucas', 'Hospital Santa Clara'];
+
+  const escapeHospital = (value) => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  const renderSelects = () => {
+    document.querySelectorAll('[data-health-hospital-select]').forEach((select) => {
+      const current = select.value;
+      const placeholder = select.querySelector('option[value=""]');
+      const placeholderHtml = placeholder ? placeholder.outerHTML : '<option value="">Selecione o hospital</option>';
+      select.innerHTML = placeholderHtml + hospitals
+        .map((name) => `<option value="${escapeHospital(name)}">${escapeHospital(name)}</option>`)
+        .join('');
+      if (current && hospitals.includes(current)) select.value = current;
+    });
+  };
+
+  const renderList = () => {
+    listEl.innerHTML = hospitals
+      .map((name, index) => `
+        <li class="health-hospitals-item">
+          <span>${escapeHospital(name)}</span>
+          <button class="icon-btn action-icon danger" type="button" aria-label="Remover ${escapeHospital(name)}" data-health-hospital-remove="${index}">
+            <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+          </button>
+        </li>
+      `)
+      .join('');
+    if (emptyEl) emptyEl.classList.toggle('is-hidden', hospitals.length > 0);
+    renderSelects();
+  };
+
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    activateTab('hospitals');
+    window.setTimeout(() => addInput.focus(), 0);
+  };
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  document.getElementById('openHealthAccountabilitySettings')?.addEventListener('click', openModal);
+
+  modal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeModal();
+    const removeBtn = event.target.closest('[data-health-hospital-remove]');
+    if (removeBtn) {
+      const index = Number(removeBtn.dataset.healthHospitalRemove);
+      if (!Number.isNaN(index)) {
+        hospitals.splice(index, 1);
+        renderList();
+      }
+    }
+  });
+  modal.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeModal();
+  });
+
+  addForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = addInput.value.trim();
+    if (!name) return;
+    if (hospitals.some((item) => item.toLowerCase() === name.toLowerCase())) {
+      if (typeof showAppToast === 'function') showAppToast('Esse hospital já está na lista');
+      addInput.value = '';
+      return;
+    }
+    hospitals.push(name);
+    addInput.value = '';
+    renderList();
+    if (typeof showAppToast === 'function') showAppToast('Hospital adicionado');
+  });
+
+  // ----- Abas do modal de ajustes de prestação (padrão .tabs .tab do projeto) -----
+  const tabs = Array.from(modal.querySelectorAll('[data-prest-tab]'));
+  const panels = Array.from(modal.querySelectorAll('.prest-tab-panel'));
+  const activateTab = (key) => {
+    tabs.forEach((tab) => {
+      const active = tab.dataset.prestTab === key;
+      tab.classList.toggle('active', active);
+      tab.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+    panels.forEach((panel) => {
+      const active = panel.dataset.prestPanel === key;
+      panel.classList.toggle('is-active', active);
+      panel.hidden = !active;
+    });
+  };
+  tabs.forEach((tab) => tab.addEventListener('click', () => activateTab(tab.dataset.prestTab)));
+
+  // ----- Aba "Tipos de documento" -----
+  const docTypesForm = document.getElementById('healthDocTypesAddForm');
+  const docTypesInput = document.getElementById('healthDocTypesInput');
+  const docTypesList = document.getElementById('healthDocTypesList');
+  const docTypesEmpty = document.getElementById('healthDocTypesEmpty');
+  const docTypes = ['Conta analítica', 'Descrição cirúrgica', 'Folha anestésica', 'Pré-anestésica', 'Endoscopia', 'Outro exame'];
+  const renderDocTypes = () => {
+    if (!docTypesList) return;
+    docTypesList.innerHTML = docTypes
+      .map((name, index) => `
+        <li class="health-hospitals-item">
+          <span>${escapeHospital(name)}</span>
+          <button class="icon-btn action-icon danger" type="button" aria-label="Remover ${escapeHospital(name)}" data-health-doctype-remove="${index}">
+            <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+          </button>
+        </li>
+      `)
+      .join('');
+    if (docTypesEmpty) docTypesEmpty.classList.toggle('is-hidden', docTypes.length > 0);
+  };
+  docTypesForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = (docTypesInput?.value || '').trim();
+    if (!name) return;
+    if (docTypes.some((item) => item.toLowerCase() === name.toLowerCase())) {
+      if (typeof showAppToast === 'function') showAppToast('Esse tipo de documento já está na lista');
+      docTypesInput.value = '';
+      return;
+    }
+    docTypes.push(name);
+    docTypesInput.value = '';
+    renderDocTypes();
+    renderRuleScopeOptions();
+    if (typeof showAppToast === 'function') showAppToast('Tipo de documento adicionado');
+  });
+  docTypesList?.addEventListener('click', (event) => {
+    const removeBtn = event.target.closest('[data-health-doctype-remove]');
+    if (!removeBtn) return;
+    const index = Number(removeBtn.dataset.healthDoctypeRemove);
+    if (!Number.isNaN(index)) {
+      docTypes.splice(index, 1);
+      renderDocTypes();
+      renderRuleScopeOptions();
+    }
+  });
+
+  // ----- Aba "Regras / critérios de auditoria" -----
+  const rulesForm = document.getElementById('healthRulesAddForm');
+  const ruleScopeSelect = document.getElementById('healthRuleScopeSelect');
+  const ruleTextInput = document.getElementById('healthRuleTextInput');
+  const rulesList = document.getElementById('healthRulesList');
+  const rulesEmpty = document.getElementById('healthRulesEmpty');
+  const GENERAL_RULE = '__general__';
+  const rules = [
+    { scope: 'Conta analítica', text: 'Deve conter valores e itens faturados discriminados.' },
+    { scope: GENERAL_RULE, text: 'Todo documento precisa estar legível, datado e assinado.' },
+  ];
+  const ruleScopeLabel = (scope) => (scope === GENERAL_RULE ? 'Todos os documentos' : scope);
+  // Mantém o select alinhado com os tipos de documento cadastrados.
+  const renderRuleScopeOptions = () => {
+    if (!ruleScopeSelect) return;
+    const current = ruleScopeSelect.value;
+    ruleScopeSelect.innerHTML = `<option value="${GENERAL_RULE}">Regra geral (todos os documentos)</option>`
+      + docTypes.map((name) => `<option value="${escapeHospital(name)}">${escapeHospital(name)}</option>`).join('');
+    if (current && (current === GENERAL_RULE || docTypes.includes(current))) ruleScopeSelect.value = current;
+  };
+  const renderRules = () => {
+    if (!rulesList) return;
+    rulesList.innerHTML = rules
+      .map((rule, index) => {
+        const isGeneral = rule.scope === GENERAL_RULE;
+        return `
+        <li class="health-hospitals-item health-rule-item">
+          <span class="health-rule-copy">
+            <span class="health-rule-text">${escapeHospital(rule.text)}</span>
+            <span class="health-rule-assoc${isGeneral ? ' is-general' : ''}">Associado a: <strong>${escapeHospital(ruleScopeLabel(rule.scope))}</strong></span>
+          </span>
+          <button class="icon-btn action-icon danger" type="button" aria-label="Remover regra" data-health-rule-remove="${index}">
+            <span class="material-symbols-rounded" aria-hidden="true">delete</span>
+          </button>
+        </li>`;
+      })
+      .join('');
+    if (rulesEmpty) rulesEmpty.classList.toggle('is-hidden', rules.length > 0);
+  };
+  rulesForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const scope = ruleScopeSelect?.value || GENERAL_RULE;
+    const text = (ruleTextInput?.value || '').trim();
+    if (!text) {
+      if (typeof showAppToast === 'function') showAppToast('Descreva a regra antes de adicionar');
+      return;
+    }
+    rules.push({ scope, text });
+    ruleTextInput.value = '';
+    renderRules();
+    if (typeof showAppToast === 'function') showAppToast('Regra adicionada');
+  });
+  rulesList?.addEventListener('click', (event) => {
+    const removeBtn = event.target.closest('[data-health-rule-remove]');
+    if (!removeBtn) return;
+    const index = Number(removeBtn.dataset.healthRuleRemove);
+    if (!Number.isNaN(index)) {
+      rules.splice(index, 1);
+      renderRules();
+    }
+  });
+
+  renderList();
+  renderDocTypes();
+  renderRuleScopeOptions();
+  renderRules();
+}
+
+setupHealthHospitals();
+
+function setupHealthMnemonics() {
+  const modal = document.getElementById('healthMnemonicsModal');
+  const openBtn = document.getElementById('openHealthExamReadingSettings');
+  const table = document.getElementById('healthMnemonicsTable');
+  const countEl = document.getElementById('healthMnemonicsCount');
+  const dropzone = document.getElementById('healthMnemonicsDropzone');
+  const fileInput = document.getElementById('healthMnemonicsCsvInput');
+  const feedbackEl = document.getElementById('healthMnemonicsFeedback');
+  const templateBtn = document.getElementById('downloadHealthMnemonicsTemplate');
+  if (!modal || !openBtn || !table || !fileInput) return;
+
+  const escapeMn = (value) => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+
+  const setFeedback = (message = '', type = 'info') => {
+    if (!feedbackEl) return;
+    feedbackEl.hidden = !message;
+    feedbackEl.textContent = message;
+    feedbackEl.dataset.type = type;
+  };
+
+  const MAX_VISIBLE_SYNONYMS = 2;
+  const renderSynonymsCell = (code) => {
+    const synonyms = (healthExamMnemonicSynonyms[code] || []).filter(Boolean);
+    if (!synonyms.length) return '<span class="health-mnemonics-synonyms"><span class="health-mnemonics-syn-empty">—</span></span>';
+    const visible = synonyms.slice(0, MAX_VISIBLE_SYNONYMS);
+    const hidden = synonyms.length - visible.length;
+    const chips = visible.map((syn) => `<span class="health-mnemonics-syn-chip">${escapeMn(syn)}</span>`).join('');
+    // "+X" mostra todos os sinônimos no title ao passar o mouse.
+    const more = hidden > 0
+      ? `<span class="health-mnemonics-syn-more" title="${escapeMn(synonyms.join(', '))}">+${hidden}</span>`
+      : '';
+    return `<span class="health-mnemonics-synonyms" title="${escapeMn(synonyms.join(', '))}">${chips}${more}</span>`;
+  };
+  const renderTable = () => {
+    const entries = Object.entries(healthExamMnemonicBase)
+      .sort((a, b) => a[0].localeCompare(b[0], 'pt-BR'));
+    table.querySelectorAll('.data-row:not(.header)').forEach((row) => row.remove());
+    entries.forEach(([code, name]) => {
+      const row = document.createElement('div');
+      row.className = 'data-row';
+      row.innerHTML = `<span><strong>${escapeMn(code)}</strong></span><span>${escapeMn(name)}</span>${renderSynonymsCell(code)}`;
+      table.appendChild(row);
+    });
+    if (countEl) countEl.textContent = `${entries.length} mnemônico${entries.length === 1 ? '' : 's'} na base`;
+  };
+
+  const parseCsv = (text) => {
+    const lines = String(text || '').split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+    let added = 0;
+    let updated = 0;
+    const clean = (value) => String(value || '').trim().replace(/^"|"$/g, '');
+    lines.forEach((line, index) => {
+      // Delimitador de colunas: vírgula por padrão (sinônimos usam ; internamente).
+      const delimiter = line.includes(',') ? ',' : ';';
+      const cols = line.split(delimiter);
+      const code = clean(cols[0]);
+      const name = clean(cols[1]);
+      if (!code || !name) return;
+      const normalized = code.toLowerCase();
+      // Ignora linha de cabeçalho como "codigo,nome,sinonimos".
+      if (index === 0 && ['codigo', 'código', 'code', 'mnemonico', 'mnemônico'].includes(normalized)) return;
+      // 3ª coluna = sinônimos separados por ; ou | (1 ou vários).
+      const synonyms = clean(cols.slice(2).join(delimiter))
+        .split(/[;|]/)
+        .map((syn) => syn.trim())
+        .filter(Boolean);
+      if (Object.prototype.hasOwnProperty.call(healthExamMnemonicBase, code)) updated += 1;
+      else added += 1;
+      healthExamMnemonicBase[code] = name;
+      healthExamMnemonicSynonyms[code] = synonyms;
+    });
+    return { added, updated };
+  };
+
+  const importFile = (file) => {
+    if (!file) return;
+    const isCsv = /\.csv$/i.test(file.name) || file.type === 'text/csv';
+    if (!isCsv) {
+      setFeedback('Envie um arquivo .csv com uma linha por mnemônico (código, nome).', 'error');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const { added, updated } = parseCsv(reader.result);
+      renderTable();
+      if (added || updated) {
+        setFeedback(`Base atualizada: ${added} adicionado(s), ${updated} atualizado(s).`, 'success');
+        if (typeof showAppToast === 'function') showAppToast('Base de mnemônicos atualizada');
+      } else {
+        setFeedback('Nenhum mnemônico válido encontrado. Use o formato: código,nome', 'error');
+      }
+    };
+    reader.onerror = () => setFeedback('Não foi possível ler o arquivo.', 'error');
+    reader.readAsText(file, 'utf-8');
+  };
+
+  const openModal = () => {
+    setFeedback('');
+    renderTable();
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+  };
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+  };
+
+  openBtn.addEventListener('click', openModal);
+  modal.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeModal();
+  });
+  modal.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeModal();
+  });
+
+  dropzone?.addEventListener('click', () => fileInput.click());
+  dropzone?.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      fileInput.click();
+    }
+  });
+  ['dragover', 'dragenter'].forEach((type) => dropzone?.addEventListener(type, (event) => {
+    event.preventDefault();
+    dropzone.classList.add('is-dragover');
+  }));
+  ['dragleave', 'drop'].forEach((type) => dropzone?.addEventListener(type, (event) => {
+    event.preventDefault();
+    dropzone.classList.remove('is-dragover');
+  }));
+  dropzone?.addEventListener('drop', (event) => {
+    const file = event.dataTransfer?.files?.[0];
+    importFile(file);
+  });
+  fileInput.addEventListener('change', () => {
+    importFile(fileInput.files?.[0]);
+    fileInput.value = '';
+  });
+
+  templateBtn?.addEventListener('click', () => {
+    const csv = 'codigo,nome,sinonimos\nHB,Hemoglobina,Hb;Hgb;Hemoglobina sérica\nGLI,Glicemia,Glicose;Glicemia de jejum;GJ\nCOL,Colesterol total,Colesterol;CT\nTSH,Hormonio tireoestimulante,TSH ultrassensível;Tireotropina';
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'modelo-mnemonicos.csv';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  });
+
+  renderTable();
+}
+
+setupHealthMnemonics();
 
 updateActivePage();
 window.updateActivePage = updateActivePage;
@@ -21736,7 +22963,7 @@ document.addEventListener('click', (event) => {
       extendedProps: { meta: 'Confirmada | Primeira avaliação' },
     },
     {
-      title: 'Retorno | Luciana Martins',
+      title: 'Encaixe | Luciana Martins',
       start: '2026-07-16T08:20:00',
       end: '2026-07-16T08:50:00',
       classNames: ['health-fc-event--return'],
@@ -21750,7 +22977,7 @@ document.addEventListener('click', (event) => {
       extendedProps: { meta: 'Confirmada | Dor lombar recorrente' },
     },
     {
-      title: 'Retorno | Paulo Reis',
+      title: 'Encaixe | Paulo Reis',
       start: '2026-07-14T10:10:00',
       end: '2026-07-14T10:40:00',
       classNames: ['health-fc-event--return'],
@@ -21785,7 +23012,7 @@ document.addEventListener('click', (event) => {
       extendedProps: { meta: 'Online | Pós-exame' },
     },
     {
-      title: 'Retorno | Fernanda Reis',
+      title: 'Encaixe | Fernanda Reis',
       start: '2026-07-17T16:10:00',
       end: '2026-07-17T16:40:00',
       classNames: ['health-fc-event--return'],
@@ -21796,6 +23023,7 @@ document.addEventListener('click', (event) => {
   const healthAgendaEventPalette = {
     'health-fc-event--consult': { color: '#016ff4', bg: '#eef6ff' },
     'health-fc-event--return': { color: '#0f766e', bg: '#ecfdf5' },
+    'health-fc-event--break': { color: '#64748b', bg: '#eef1f6' },
   };
 
   const healthAgendaRenewalQueue = [
@@ -21831,20 +23059,15 @@ document.addEventListener('click', (event) => {
     },
   ];
 
-  const getAgendaWeekdays = () => {
-    const dayMap = {
-      sunday: 0,
-      monday: 1,
-      tuesday: 2,
-      wednesday: 3,
-      thursday: 4,
-      friday: 5,
-      saturday: 6,
-    };
-    return Array.from(form.querySelectorAll('input[name="doctor_weekdays"]:checked'))
-      .map((input) => dayMap[input.value])
-      .filter((day) => Number.isInteger(day));
-  };
+  const AGENDA_WEEKDAY_DEFS = [
+    { value: 'monday', idx: 1, label: 'Segunda' },
+    { value: 'tuesday', idx: 2, label: 'Terça' },
+    { value: 'wednesday', idx: 3, label: 'Quarta' },
+    { value: 'thursday', idx: 4, label: 'Quinta' },
+    { value: 'friday', idx: 5, label: 'Sexta' },
+    { value: 'saturday', idx: 6, label: 'Sábado' },
+    { value: 'sunday', idx: 0, label: 'Domingo' },
+  ];
 
   const formatAgendaSlotDuration = (minutes) => {
     const safeMinutes = Number.isFinite(minutes) && minutes > 0 ? minutes : 30;
@@ -21882,33 +23105,136 @@ document.addEventListener('click', (event) => {
     return `${day}/${month}/${year} às ${hours}:${minutes}`;
   };
 
+  const isValidTime = (value) => /^\d{2}:\d{2}$/.test(String(value || ''));
+
+  // Lê os intervalos (um ou vários) informados na lista.
+  const getAgendaBreaks = () => {
+    const rows = form.querySelectorAll('#healthAgendaBreakList .health-agenda-break-row');
+    return Array.from(rows)
+      .map((row) => ({
+        start: row.querySelector('[data-break-start]')?.value || '',
+        end: row.querySelector('[data-break-end]')?.value || '',
+      }))
+      .filter((item) => isValidTime(item.start) && isValidTime(item.end) && item.end > item.start);
+  };
+
+  // Lê os intervalos informados dentro do cartão de um dia específico (modo por dia).
+  const getPerDayBreaks = (dayValue) => {
+    const rows = form.querySelectorAll(`#healthAgendaPerDayList [data-perday-row="${dayValue}"] .health-agenda-break-row`);
+    return Array.from(rows)
+      .map((row) => ({
+        start: row.querySelector('[data-break-start]')?.value || '',
+        end: row.querySelector('[data-break-end]')?.value || '',
+      }))
+      .filter((item) => isValidTime(item.start) && isValidTime(item.end) && item.end > item.start);
+  };
+
+  // Resolve horário e intervalos de cada dia selecionado, respeitando o modo "por dia".
+  const getAgendaDaySchedules = (globalStart, globalEnd, perDayEnabled, globalBreaks) => {
+    return AGENDA_WEEKDAY_DEFS
+      .filter((def) => form.querySelector(`input[name="doctor_weekdays"][value="${def.value}"]`)?.checked)
+      .map((def) => {
+        let start = globalStart;
+        let end = globalEnd;
+        let breaks = globalBreaks;
+        if (perDayEnabled) {
+          const row = form.querySelector(`#healthAgendaPerDayList [data-perday-row="${def.value}"]`);
+          const rowStart = row?.querySelector('[data-perday-start]')?.value;
+          const rowEnd = row?.querySelector('[data-perday-end]')?.value;
+          if (isValidTime(rowStart)) start = rowStart;
+          if (isValidTime(rowEnd)) end = rowEnd;
+          breaks = getPerDayBreaks(def.value); // cada dia define seus próprios intervalos
+        }
+        return { value: def.value, idx: def.idx, label: def.label, start, end, breaks };
+      })
+      .filter((day) => isValidTime(day.start) && isValidTime(day.end) && day.end > day.start);
+  };
+
+  // Remove os intervalos de uma faixa de horário, devolvendo os blocos de trabalho restantes.
+  const subtractBreaksFromRange = (start, end, breaks) => {
+    const clamped = breaks
+      .map((b) => ({ start: b.start > start ? b.start : start, end: b.end < end ? b.end : end }))
+      .filter((b) => b.start < b.end)
+      .sort((a, b) => (a.start < b.start ? -1 : 1));
+    const segments = [];
+    let cursor = start;
+    clamped.forEach((b) => {
+      if (b.start > cursor) segments.push({ start: cursor, end: b.start });
+      if (b.end > cursor) cursor = b.end;
+    });
+    if (cursor < end) segments.push({ start: cursor, end });
+    return segments;
+  };
+
   const getAgendaSettings = () => {
-    const startTime = form.querySelector('#healthAgendaStartTime')?.value || '08:00';
-    const endTime = form.querySelector('#healthAgendaEndTime')?.value || '17:00';
+    const globalStart = form.querySelector('#healthAgendaStartTime')?.value || '08:00';
+    const globalEnd = form.querySelector('#healthAgendaEndTime')?.value || '17:00';
     const duration = form.querySelector('#healthAgendaSlotDuration')?.value || '30';
     const durationNumber = clampAgendaAppointmentMinutes(Number.parseInt(duration, 10));
     const formattedDuration = formatAgendaSlotDuration(durationNumber);
+    const perDayEnabled = Boolean(form.querySelector('#healthAgendaPerDayEnabled')?.checked);
+    // Fora do modo por dia, os intervalos globais valem para todos os dias.
+    const breakEnabled = Boolean(form.querySelector('#healthAgendaBreakEnabled')?.checked);
+    const globalBreaks = !perDayEnabled && breakEnabled ? getAgendaBreaks() : [];
+    const days = getAgendaDaySchedules(globalStart, globalEnd, perDayEnabled, globalBreaks);
+    const starts = days.map((day) => day.start);
+    const ends = days.map((day) => day.end);
     return {
-      daysOfWeek: getAgendaWeekdays(),
-      startTime,
-      endTime,
+      days,
+      perDayEnabled,
       durationMinutes: durationNumber,
       appointmentDuration: formattedDuration,
       slotDuration: formattedDuration,
+      // Janela visível abrange o menor início e o maior fim entre os dias.
+      slotMinTime: starts.length ? starts.reduce((a, b) => (a < b ? a : b)) : globalStart,
+      slotMaxTime: ends.length ? ends.reduce((a, b) => (a > b ? a : b)) : globalEnd,
     };
   };
 
   const applyAgendaSettingsToCalendar = () => {
     if (!healthAgendaCalendar) return;
     const settings = getAgendaSettings();
-    healthAgendaCalendar.setOption('slotMinTime', `${settings.startTime}:00`);
-    healthAgendaCalendar.setOption('slotMaxTime', `${settings.endTime}:00`);
+    healthAgendaCalendar.setOption('slotMinTime', `${settings.slotMinTime}:00`);
+    healthAgendaCalendar.setOption('slotMaxTime', `${settings.slotMaxTime}:00`);
     healthAgendaCalendar.setOption('slotDuration', settings.slotDuration);
     healthAgendaCalendar.setOption('snapDuration', settings.appointmentDuration);
-    healthAgendaCalendar.setOption('businessHours', {
-      daysOfWeek: settings.daysOfWeek,
-      startTime: settings.startTime,
-      endTime: settings.endTime,
+    // Monta o expediente por dia, descontando os intervalos daquele dia.
+    const businessHours = [];
+    settings.days.forEach((day) => {
+      subtractBreaksFromRange(day.start, day.end, day.breaks).forEach((segment) => {
+        businessHours.push({ daysOfWeek: [day.idx], startTime: segment.start, endTime: segment.end });
+      });
+    });
+    healthAgendaCalendar.setOption('businessHours', businessHours.length ? businessHours : false);
+    applyAgendaBreakEvents(settings);
+  };
+
+  const applyAgendaBreakEvents = (settings) => {
+    if (!healthAgendaCalendar) return;
+    healthAgendaCalendar.getEvents().forEach((event) => {
+      if (event.groupId === 'health-agenda-break') event.remove();
+    });
+    // Agrupa intervalos idênticos entre dias para gerar um evento recorrente por faixa.
+    const specs = {};
+    settings.days.forEach((day) => {
+      day.breaks.forEach((brk) => {
+        if (brk.start < day.start || brk.end > day.end) return;
+        const key = `${brk.start}-${brk.end}`;
+        if (!specs[key]) specs[key] = { start: brk.start, end: brk.end, days: [] };
+        if (!specs[key].days.includes(day.idx)) specs[key].days.push(day.idx);
+      });
+    });
+    Object.values(specs).forEach((spec) => {
+      healthAgendaCalendar.addEvent({
+        groupId: 'health-agenda-break',
+        daysOfWeek: spec.days,
+        startTime: spec.start,
+        endTime: spec.end,
+        title: 'Intervalo',
+        editable: false,
+        classNames: ['health-fc-event--break'],
+        extendedProps: { meta: 'Intervalo | Sem atendimento' },
+      });
     });
   };
 
@@ -21993,9 +23319,12 @@ document.addEventListener('click', (event) => {
 
   const applyAgendaEventPalette = (arg) => {
     const eventText = `${arg.event.title || ''} ${arg.event.extendedProps?.meta || ''}`.toLowerCase();
-    const inferredClassName = eventText.includes('retorno')
-      ? 'health-fc-event--return'
-      : 'health-fc-event--consult';
+    let inferredClassName = 'health-fc-event--consult';
+    if (arg.event.groupId === 'health-agenda-break' || eventText.includes('pausa') || eventText.includes('intervalo')) {
+      inferredClassName = 'health-fc-event--break';
+    } else if (eventText.includes('encaixe')) {
+      inferredClassName = 'health-fc-event--return';
+    }
     const className = (arg.event.classNames || []).find((name) => healthAgendaEventPalette[name]) || inferredClassName;
     const palette = healthAgendaEventPalette[className] || healthAgendaEventPalette['health-fc-event--consult'];
     arg.el.style.setProperty('--event-color', palette.color);
@@ -22166,6 +23495,145 @@ document.addEventListener('click', (event) => {
     }
   });
 
+  // ----- Intervalos (um ou vários) -----
+  const breakToggle = form.querySelector('#healthAgendaBreakEnabled');
+  const breakFields = form.querySelector('#healthAgendaBreakFields');
+  const breakHint = form.querySelector('#healthAgendaBreakHint');
+  const breakList = form.querySelector('#healthAgendaBreakList');
+  const breakAddBtn = form.querySelector('#healthAgendaBreakAdd');
+  const syncBreakFieldsState = () => {
+    const enabled = Boolean(breakToggle?.checked);
+    // Colapsa os campos quando desativado (já ficam desabilitados de qualquer forma).
+    if (breakFields) breakFields.hidden = !enabled;
+    breakFields?.querySelectorAll('input, button').forEach((el) => { el.disabled = !enabled; });
+    if (breakHint) {
+      breakHint.textContent = enabled
+        ? 'Esses horários ficam bloqueados na agenda e não recebem encaixes.'
+        : 'Intervalos desativados — o médico atende durante todo o expediente.';
+    }
+  };
+  const createBreakRow = (start = '12:00', end = '13:00') => {
+    const row = document.createElement('div');
+    row.className = 'health-agenda-break-row';
+    row.innerHTML = `
+      <div>
+        <label class="modal-label">Início</label>
+        <input class="modal-input" data-break-start type="time" value="${start}" />
+      </div>
+      <div>
+        <label class="modal-label">Fim</label>
+        <input class="modal-input" data-break-end type="time" value="${end}" />
+      </div>
+      <button class="icon-btn health-agenda-break-remove" type="button" data-break-remove aria-label="Remover intervalo">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>`;
+    return row;
+  };
+  breakToggle?.addEventListener('change', syncBreakFieldsState);
+  breakAddBtn?.addEventListener('click', () => {
+    breakList?.appendChild(createBreakRow());
+  });
+  breakList?.addEventListener('click', (event) => {
+    if (!event.target.closest('[data-break-remove]')) return;
+    event.target.closest('.health-agenda-break-row')?.remove();
+  });
+  syncBreakFieldsState();
+
+  // ----- Horário diferente por dia (com intervalos próprios de cada dia) -----
+  const perDayToggle = form.querySelector('#healthAgendaPerDayEnabled');
+  const perDayList = form.querySelector('#healthAgendaPerDayList');
+  const breakSection = form.querySelector('#healthAgendaBreakSection');
+  const globalStartEl = form.querySelector('#healthAgendaStartTime');
+  const globalEndEl = form.querySelector('#healthAgendaEndTime');
+  const perDayData = {}; // memoriza horários e intervalos já definidos por dia na sessão
+  const breakRowHTML = (start, end) => `
+    <div class="health-agenda-break-row">
+      <div>
+        <label class="modal-label">Início</label>
+        <input class="modal-input" data-break-start type="time" value="${start}" />
+      </div>
+      <div>
+        <label class="modal-label">Fim</label>
+        <input class="modal-input" data-break-end type="time" value="${end}" />
+      </div>
+      <button class="icon-btn health-agenda-break-remove" type="button" data-break-remove aria-label="Remover intervalo">
+        <span class="material-symbols-rounded" aria-hidden="true">close</span>
+      </button>
+    </div>`;
+  const capturePerDayData = () => {
+    perDayList.querySelectorAll('[data-perday-row]').forEach((card) => {
+      const value = card.dataset.perdayRow;
+      perDayData[value] = {
+        start: card.querySelector('[data-perday-start]')?.value || '08:00',
+        end: card.querySelector('[data-perday-end]')?.value || '17:00',
+        breaks: Array.from(card.querySelectorAll('.health-agenda-break-row')).map((row) => ({
+          start: row.querySelector('[data-break-start]')?.value || '',
+          end: row.querySelector('[data-break-end]')?.value || '',
+        })),
+      };
+    });
+  };
+  const renderPerDayRows = () => {
+    if (!perDayList) return;
+    const enabled = Boolean(perDayToggle?.checked);
+    perDayList.hidden = !enabled;
+    if (breakSection) breakSection.hidden = enabled; // no modo por dia, cada dia tem seus intervalos
+    if (!enabled) return;
+    const defaultStart = globalStartEl?.value || '08:00';
+    const defaultEnd = globalEndEl?.value || '17:00';
+    capturePerDayData(); // preserva valores atuais antes de recriar os cartões
+    const selected = AGENDA_WEEKDAY_DEFS.filter((def) =>
+      form.querySelector(`input[name="doctor_weekdays"][value="${def.value}"]`)?.checked
+    );
+    if (!selected.length) {
+      perDayList.innerHTML = '<p class="modal-field-hint">Selecione ao menos um dia de atendimento acima.</p>';
+      return;
+    }
+    perDayList.innerHTML = selected.map((def) => {
+      const data = perDayData[def.value] || { start: defaultStart, end: defaultEnd, breaks: [{ start: '12:00', end: '13:00' }] };
+      const breaksHtml = (data.breaks || []).map((b) => breakRowHTML(b.start || '12:00', b.end || '13:00')).join('');
+      return `
+        <div class="health-agenda-perday-card" data-perday-row="${def.value}">
+          <div class="health-agenda-perday-head">
+            <span class="health-agenda-perday-day">${def.label}</span>
+            <div class="health-agenda-perday-hours">
+              <div>
+                <label class="modal-label">Início</label>
+                <input class="modal-input" data-perday-start type="time" value="${data.start}" />
+              </div>
+              <div>
+                <label class="modal-label">Fim</label>
+                <input class="modal-input" data-perday-end type="time" value="${data.end}" />
+              </div>
+            </div>
+          </div>
+          <div class="health-agenda-perday-breaks">
+            <span class="health-agenda-perday-breaks-label">Intervalos</span>
+            <div class="health-agenda-break-list" data-perday-break-list>${breaksHtml}</div>
+            <button class="btn outline health-agenda-break-add" type="button" data-perday-break-add>
+              <span class="material-symbols-rounded" aria-hidden="true">add</span>
+              Adicionar intervalo
+            </button>
+          </div>
+        </div>`;
+    }).join('');
+  };
+  perDayList?.addEventListener('click', (event) => {
+    const addBtn = event.target.closest('[data-perday-break-add]');
+    if (addBtn) {
+      const list = addBtn.closest('.health-agenda-perday-breaks')?.querySelector('[data-perday-break-list]');
+      list?.insertAdjacentHTML('beforeend', breakRowHTML('12:00', '13:00'));
+      return;
+    }
+    if (event.target.closest('[data-break-remove]')) {
+      event.target.closest('.health-agenda-break-row')?.remove();
+    }
+  });
+  perDayToggle?.addEventListener('change', renderPerDayRows);
+  form.querySelectorAll('input[name="doctor_weekdays"]').forEach((input) => {
+    input.addEventListener('change', renderPerDayRows);
+  });
+
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     applyAgendaSettingsToCalendar();
@@ -22195,5 +23663,238 @@ document.addEventListener('click', (event) => {
   window.addEventListener('resize', () => healthAgendaCalendar?.updateSize());
   calendarEl?.addEventListener('click', () => {
     window.setTimeout(applyAgendaToolbarPalette, 0);
+  });
+})();
+
+(function initHealthCustomIntegrationModal() {
+  const modal = document.getElementById('healthCustomIntegrationModal');
+  const openBtn = document.querySelector('[data-health-custom-integration-open]');
+  const form = document.getElementById('healthCustomIntegrationForm');
+  if (!modal || !openBtn) return;
+
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    window.setTimeout(() => modal.querySelector('#healthCustomIntegrationChannel')?.focus(), 0);
+  };
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    openBtn.focus();
+  };
+
+  openBtn.addEventListener('click', openModal);
+  modal.addEventListener('click', async (event) => {
+    if (event.target.closest('[data-health-custom-integration-close]')) {
+      closeModal();
+      return;
+    }
+    if (event.target.closest('[data-health-custom-integration-copy]')) {
+      const key = document.getElementById('healthCustomIntegrationKey')?.textContent || '';
+      const copied = await copyTextToClipboard(key);
+      if (typeof showAppToast === 'function') {
+        showAppToast(copied ? 'Chave de API copiada' : 'Não foi possível copiar a chave');
+      }
+    }
+  });
+  modal.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeModal();
+  });
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    closeModal();
+    if (typeof showAppToast === 'function') {
+      showAppToast('Integração personalizada ativada');
+    }
+  });
+})();
+
+// Modal "Exportar dados" da Visão geral (Saúde): Excel, CSV, PDF, JSON (dados brutos) e conexão via API.
+(function initHealthOverviewExportModal() {
+  const modal = document.getElementById('healthOverviewExportModal');
+  const openBtn = document.querySelector('[data-health-overview-export-open]');
+  if (!modal || !openBtn) return;
+
+  const deburr = (value) => String(value ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const htmlEscape = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // Monta um único conjunto consolidado a partir do que já está renderizado na Visão geral.
+  const buildDataset = () => {
+    const overview = document.getElementById('page-health-overview');
+    const indicadores = Array.from(overview?.querySelectorAll('.health-overview-stats .stat-card') || [])
+      .map((card) => ({
+        indicador: card.querySelector('.stat-label')?.textContent.trim() || '',
+        valor: card.querySelector('.stat-value')?.textContent.trim() || '',
+        detalhe: card.querySelector('.stat-sub')?.textContent.trim() || '',
+      }));
+    const riscoGlosa = Array.from(overview?.querySelectorAll('.health-overview-glosa-stats > div') || [])
+      .map((item) => ({
+        nivel: item.querySelector('span')?.textContent.trim() || '',
+        documentos: item.querySelector('strong')?.textContent.trim() || '',
+      }));
+    const readRanking = (tableId) => {
+      const table = document.getElementById(tableId);
+      return Array.from(table?.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])') || [])
+        .map((row) => Array.from(row.children).map((cell) => cell.textContent.trim()));
+    };
+    const medicos = readRanking('healthOverviewDoctorsRankingTable')
+      .map(([posicao, medico, consultas, participacao]) => ({ posicao, medico, consultas, participacao }));
+    const mnemonicos = readRanking('healthOverviewMnemonicsTable')
+      .map(([posicao, mnemonico, ocorrencias, participacao]) => ({ posicao, mnemonico, ocorrencias, participacao }));
+    return {
+      secao: 'Saúde — Visão geral',
+      gerado_em: new Date().toLocaleString('pt-BR'),
+      indicadores,
+      risco_glosa: riscoGlosa,
+      medicos_assistente: medicos,
+      mnemonicos_exames: mnemonicos,
+    };
+  };
+
+  const csvRow = (cells) => cells.map(escapeCsvCell).join(';');
+  const buildCsv = (data) => {
+    const lines = [];
+    lines.push(csvRow([data.secao]));
+    lines.push(csvRow(['Gerado em', data.gerado_em]));
+    lines.push('');
+    lines.push(csvRow(['Indicadores']));
+    lines.push(csvRow(['Indicador', 'Valor', 'Detalhe']));
+    data.indicadores.forEach((i) => lines.push(csvRow([i.indicador, i.valor, i.detalhe])));
+    lines.push('');
+    lines.push(csvRow(['Risco de glosa (documentos)']));
+    lines.push(csvRow(['Nível', 'Documentos']));
+    data.risco_glosa.forEach((r) => lines.push(csvRow([r.nivel, r.documentos])));
+    lines.push('');
+    lines.push(csvRow(['Médicos usando o assistente']));
+    lines.push(csvRow(['Posição', 'Médico', 'Consultas com assistente', 'Participação']));
+    data.medicos_assistente.forEach((m) => lines.push(csvRow([m.posicao, m.medico, m.consultas, m.participacao])));
+    lines.push('');
+    lines.push(csvRow(['Mnemônicos — leitura de exames']));
+    lines.push(csvRow(['Posição', 'Mnemônico', 'Ocorrências', 'Participação']));
+    data.mnemonicos_exames.forEach((m) => lines.push(csvRow([m.posicao, m.mnemonico, m.ocorrencias, m.participacao])));
+    return lines.join('\n');
+  };
+
+  const htmlTable = (title, headers, rows) => {
+    const head = headers.map((h) => `<th>${htmlEscape(h)}</th>`).join('');
+    const body = rows.map((r) => `<tr>${r.map((c) => `<td>${htmlEscape(c)}</td>`).join('')}</tr>`).join('');
+    return `<h3>${htmlEscape(title)}</h3><table border="1" cellspacing="0" cellpadding="4"><tr>${head}</tr>${body}</table><br>`;
+  };
+  const buildExcel = (data) => {
+    const sections = [
+      htmlTable('Indicadores', ['Indicador', 'Valor', 'Detalhe'], data.indicadores.map((i) => [i.indicador, i.valor, i.detalhe])),
+      htmlTable('Risco de glosa (documentos)', ['Nível', 'Documentos'], data.risco_glosa.map((r) => [r.nivel, r.documentos])),
+      htmlTable('Médicos usando o assistente', ['Posição', 'Médico', 'Consultas com assistente', 'Participação'], data.medicos_assistente.map((m) => [m.posicao, m.medico, m.consultas, m.participacao])),
+      htmlTable('Mnemônicos — leitura de exames', ['Posição', 'Mnemônico', 'Ocorrências', 'Participação'], data.mnemonicos_exames.map((m) => [m.posicao, m.mnemonico, m.ocorrencias, m.participacao])),
+    ].join('');
+    return `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8"></head><body><h2>${htmlEscape(data.secao)}</h2><p>Gerado em ${htmlEscape(data.gerado_em)}</p>${sections}</body></html>`;
+  };
+
+  const escapePdfText = (value) => deburr(value)
+    .replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  const buildPdf = (data) => {
+    const lines = [
+      'Secao Saude - Visao geral',
+      `Gerado em: ${data.gerado_em}`,
+      '',
+      'Indicadores:',
+      ...data.indicadores.map((i) => `  ${i.indicador}: ${i.valor} (${i.detalhe})`),
+      '',
+      'Risco de glosa (documentos):',
+      ...data.risco_glosa.map((r) => `  ${r.nivel}: ${r.documentos}`),
+      '',
+      'Medicos usando o assistente:',
+      ...data.medicos_assistente.map((m) => `  ${m.posicao}. ${m.medico} - ${m.consultas} consultas (${m.participacao})`),
+      '',
+      'Mnemonicos - leitura de exames:',
+      ...data.mnemonicos_exames.map((m) => `  ${m.posicao}. ${m.mnemonico} - ${m.ocorrencias} ocorrencias (${m.participacao})`),
+    ];
+    const contentLines = lines.slice(0, 52).map((line, index) => {
+      const y = 760 - (index * 14);
+      return `72 ${y} Td (${escapePdfText(line)}) Tj`;
+    });
+    const content = ['BT', '/F1 9 Tf', ...contentLines, 'ET'].join('\n');
+    const objects = [
+      '1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj',
+      '2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj',
+      '3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>\nendobj',
+      `4 0 obj\n<< /Length ${content.length} >>\nstream\n${content}\nendstream\nendobj`,
+      '5 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj',
+    ];
+    let pdf = '%PDF-1.4\n';
+    const offsets = [0];
+    objects.forEach((object) => { offsets.push(pdf.length); pdf += `${object}\n`; });
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n`;
+    pdf += '0000000000 65535 f \n';
+    offsets.slice(1).forEach((offset) => { pdf += `${String(offset).padStart(10, '0')} 00000 n \n`; });
+    pdf += `trailer\n<< /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xrefOffset}\n%%EOF`;
+    return pdf;
+  };
+
+  const exporters = {
+    excel: () => downloadTextFile('saude-visao-geral.xls', buildExcel(buildDataset()), 'application/vnd.ms-excel'),
+    csv: () => downloadTextFile('saude-visao-geral.csv', `﻿${buildCsv(buildDataset())}`, 'text/csv;charset=utf-8'),
+    pdf: () => downloadTextFile('saude-visao-geral.pdf', buildPdf(buildDataset()), 'application/pdf'),
+    json: () => downloadTextFile('saude-visao-geral.json', JSON.stringify(buildDataset(), null, 2), 'application/json'),
+  };
+  const formatLabels = { excel: 'Excel', csv: 'CSV', pdf: 'PDF', json: 'JSON (dados brutos)' };
+
+  const openModal = () => {
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    window.setTimeout(() => modal.querySelector('.health-overview-export-format')?.focus(), 0);
+  };
+  const closeModal = () => {
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    openBtn.focus();
+  };
+
+  openBtn.addEventListener('click', openModal);
+  modal.addEventListener('click', async (event) => {
+    if (event.target.closest('[data-health-overview-export-close]')) {
+      closeModal();
+      return;
+    }
+    const formatBtn = event.target.closest('[data-health-overview-export-format]');
+    if (formatBtn) {
+      const format = formatBtn.dataset.healthOverviewExportFormat;
+      try {
+        exporters[format]?.();
+        if (typeof showAppToast === 'function') showAppToast(`Dados exportados em ${formatLabels[format] || format}`);
+        closeModal();
+      } catch (error) {
+        if (typeof showAppToast === 'function') showAppToast('Não foi possível exportar os dados');
+      }
+      return;
+    }
+    const advancedToggle = event.target.closest('[data-health-overview-advanced-toggle]');
+    if (advancedToggle) {
+      const body = document.getElementById('healthOverviewExportAdvanced');
+      const willOpen = advancedToggle.getAttribute('aria-expanded') !== 'true';
+      advancedToggle.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+      if (body) body.hidden = !willOpen;
+      return;
+    }
+    const copyBtn = event.target.closest('[data-health-overview-export-copy]');
+    if (copyBtn) {
+      const value = document.getElementById(copyBtn.dataset.healthOverviewExportCopy)?.textContent || '';
+      const copied = await copyTextToClipboard(value);
+      if (typeof showAppToast === 'function') {
+        showAppToast(copied ? 'Copiado para a área de transferência' : 'Não foi possível copiar');
+      }
+    }
+  });
+  modal.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeModal();
+  });
+  // Ao reabrir o modal, "Opções avançadas" volta recolhido.
+  openBtn.addEventListener('click', () => {
+    const toggle = modal.querySelector('[data-health-overview-advanced-toggle]');
+    const body = document.getElementById('healthOverviewExportAdvanced');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+    if (body) body.hidden = true;
   });
 })();

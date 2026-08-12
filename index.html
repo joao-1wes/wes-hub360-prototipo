@@ -3,10 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Protótipo em desenvolvimento: evita servir HTML em cache (causava telas desatualizadas) -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <title>WES HUB 360 - Painel (Estático)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/skeleton.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/themes/classic/theme.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260731-health-exam-summary-gap-tight" />
+    <link rel="stylesheet" href="./styles.css?v=20260807-ui-tweaks7" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
@@ -193,25 +197,9 @@
                   <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
                 </label>
                 <label class="public-modal-field" for="companyAdminEmail">
-                  <span class="public-modal-field-label--required">Responsável</span>
-                  <input id="companyAdminEmail" name="company_admin_email" type="text" autocomplete="name" required />
+                  <span class="public-modal-field-label--required">Email do responsável</span>
+                  <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
                 </label>
-              </div>
-            </section>
-            <section class="create-company-sectors-panel" id="createCompanySectorsPanel">
-              <div class="company-users-section-head">
-                <h3 class="users-modal-section-title">Setores da empresa</h3>
-                <span class="chip">Opcional</span>
-              </div>
-              <label class="public-modal-field" for="companyInitialSectors">
-                <span>Setores</span>
-                <textarea id="companyInitialSectors" name="company_initial_sectors" rows="3" placeholder="Operações, Financeiro, Atendimento"></textarea>
-              </label>
-              <div class="company-sectors-actions">
-                <button type="button" class="btn outline" id="createCompanyViewSectorsButton">
-                  <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
-                  Visualizar setores
-                </button>
               </div>
             </section>
             <fieldset class="organization-sections-picker" id="organizationSectionsPicker" hidden>
@@ -458,6 +446,9 @@
             </div>
           </div>
 
+          <a class="nav-item" href="#/dashboard/integrations" data-route="dashboard/integrations"><span class="material-symbols-rounded">integration_instructions</span><span class="nav-label">Integrações</span></a>
+
+          <!-- Integrações agora é página única (antes era submenu com Documentação e API's)
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="integrations" type="button">
               <span class="material-symbols-rounded">integration_instructions</span>
@@ -469,6 +460,8 @@
               <a class="submenu-item" href="#/dashboard/integrations/apis"><span class="submenu-label">API's</span></a>
             </div>
           </div>
+          -->
+
 
           <div class="nav-group">
             <button class="nav-item nav-trigger" data-menu="health" type="button">
@@ -477,6 +470,7 @@
               <span class="nav-caret">▾</span>
             </button>
             <div class="submenu" id="submenu-health">
+              <a class="submenu-item" href="#/dashboard/health/overview"><span class="submenu-label">Visão geral</span></a>
               <a class="submenu-item" href="#/dashboard/health/whatsapp"><span class="submenu-label">Agente do paciente</span></a>
               <a class="submenu-item" href="#/dashboard/health/service"><span class="submenu-label">Atendimento</span></a>
               <a class="submenu-item" href="#/dashboard/health/agenda"><span class="submenu-label">Agenda</span></a>
@@ -874,6 +868,7 @@
                     </span>
                   </div>
                   <nav class="dashboard-navigation-submenu" aria-label="Saúde">
+                    <a href="#/dashboard/health/overview">Visão geral <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
                     <a href="#/dashboard/health/whatsapp">Agente do paciente <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
                     <a href="#/dashboard/health/service">Atendimento <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
                     <a href="#/dashboard/health/agenda">Agenda <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span></a>
@@ -1214,7 +1209,7 @@
                     <span>Automação</span>
                     <span>Descrição</span>
                     <span>Última execução</span>
-                    <span>Linguagem</span>
+                    <span>Pacote</span>
                     <span>Prioridade</span>
                     <span>Status</span>
                     <span>Ações</span>
@@ -6569,59 +6564,239 @@
             </div>
           </div>
 
-          <div class="page" id="page-integrations-apis" data-title="API's">
-            <div class="section health-page health-integrations-page mcps-integrations-section">
+          <div class="page" id="page-integrations-apis" data-title="Integrações">
+            <div class="section health-page">
+              <div class="health-patient-detail-top" data-health-integrations-back hidden>
+                <a class="telegram-back-link" href="#/dashboard/health/whatsapp">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Agente do paciente</span>
+                </a>
+              </div>
+
               <div class="page-header">
                 <div>
-                  <h2>API's</h2>
+                  <h2>Integrações</h2>
                   <p class="page-subtitle">Configure conectores operacionais, canais e APIs externas usados pelos agentes.</p>
                 </div>
               </div>
 
-              <div class="health-page health-integrations-page">
-                  <div class="health-integrations-grid">
-                    <article class="health-integration-card health-integration-card--wide">
-                      <div>
-                        <h3>Conexão com plano de saúde</h3>
-                        <p>Conector para integrar carteirinha, elegibilidade, autorizações, histórico assistencial e dados operacionais das operadoras atendidas.</p>
-                        <div class="health-provider-chips" aria-label="Planos de saúde previstos">
-                          <span>Unimed</span>
-                          <span>Hapvida</span>
-                          <span>NotreDame</span>
-                          <span>Amil</span>
-                          <span>Bradesco Saúde</span>
-                          <span>SulAmérica</span>
-                          <span>Porto Saúde</span>
-                          <span>Planos regionais</span>
-                        </div>
-                        <button class="btn primary health-integration-action" type="button">
-                          <span class="material-symbols-rounded">link</span>
-                          Configurar plano
-                        </button>
-                      </div>
-                    </article>
-                    <article class="health-integration-card">
-                      <div>
-                        <h3>WhatsApp Business API</h3>
-                        <p>Aciona o chat do paciente, envia confirmações, mensagens transacionais e orientações antes ou depois da consulta.</p>
-                        <button class="btn primary health-integration-action" type="button">
-                          <span class="material-symbols-rounded">edit</span>
-                          Editar conexão
-                        </button>
-                      </div>
-                    </article>
-                    <article class="health-integration-card">
-                      <div>
-                        <h3>Integração com agenda</h3>
-                        <p>Sincroniza confirmação, remarcação e cancelamento de atendimentos com a agenda local da clínica.</p>
-                        <button class="btn primary health-integration-action" type="button">
-                          <span class="material-symbols-rounded">link</span>
-                          Conectar agenda
-                        </button>
-                      </div>
-                    </article>
+              <div class="health-integrations-cards">
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Conexão com plano de saúde</h3>
+                    </div>
                   </div>
+                  <p class="health-patient-panel-note">Conector para integrar carteirinha, elegibilidade, autorizações, histórico assistencial e dados operacionais das operadoras atendidas.</p>
+                  <div class="health-provider-chips" aria-label="Planos de saúde previstos">
+                    <span>Unimed</span>
+                    <span>Hapvida</span>
+                    <span>NotreDame</span>
+                    <span>Amil</span>
+                    <span>Bradesco Saúde</span>
+                    <span>SulAmérica</span>
+                    <span>Porto Saúde</span>
+                    <span>Planos regionais</span>
+                  </div>
+                  <div class="health-patient-panel-footer">
+                    <button class="btn primary" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">link</span>
+                      Configurar plano
+                    </button>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">WhatsApp Business API</h3>
+                    </div>
+                  </div>
+                  <p class="health-patient-panel-note">Aciona o chat do paciente, envia confirmações, mensagens transacionais e orientações antes ou depois da consulta.</p>
+                  <div class="health-patient-panel-footer">
+                    <button class="btn primary" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                      Editar conexão
+                    </button>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Integração com agenda</h3>
+                    </div>
+                  </div>
+                  <p class="health-patient-panel-note">Sincroniza confirmação, remarcação e cancelamento de atendimentos com a agenda local da clínica.</p>
+                  <div class="health-patient-panel-footer">
+                    <button class="btn primary" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">link</span>
+                      Conectar agenda
+                    </button>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Integração personalizada</h3>
+                    </div>
+                  </div>
+                  <p class="health-patient-panel-note">Conecte o agente ao seu próprio sistema — chat do site, aplicativo ou plataforma interna — via API, Webhook ou widget incorporável.</p>
+                  <div class="health-provider-chips" aria-label="Canais personalizados suportados">
+                    <span>Chat no site</span>
+                    <span>Aplicativo próprio</span>
+                    <span>API / REST</span>
+                    <span>Webhook</span>
+                    <span>Widget embutido</span>
+                  </div>
+                  <div class="health-patient-panel-footer">
+                    <button class="btn primary" type="button" data-health-custom-integration-open aria-haspopup="dialog" aria-controls="healthCustomIntegrationModal">
+                      <span class="material-symbols-rounded" aria-hidden="true">integration_instructions</span>
+                      Configurar integração
+                    </button>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="healthOverviewExportModal" aria-hidden="true">
+            <div class="modal-backdrop" data-health-overview-export-close></div>
+            <div class="modal-dialog health-overview-export-dialog" role="dialog" aria-modal="true" aria-labelledby="healthOverviewExportTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="healthOverviewExportTitle">Exportar dados</h3>
+                  <p class="modal-subtitle">Escolha o formato para baixar o panorama consolidado da Seção Saúde — ou conecte-se pela API.</p>
                 </div>
+                <button class="icon-btn" aria-label="Fechar" data-health-overview-export-close type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+              </div>
+              <div class="modal-body health-overview-export-body">
+                <section class="health-overview-export-section">
+                  <span class="modal-label">Formato do arquivo</span>
+                  <div class="health-overview-export-formats" role="group" aria-label="Formato do arquivo">
+                    <button class="health-overview-export-format" type="button" data-health-overview-export-format="excel">
+                      <span class="material-symbols-rounded" aria-hidden="true">table_view</span>
+                      <span class="health-overview-export-format-name">Excel</span>
+                      <span class="health-overview-export-format-desc">Planilha .xls para abrir no Excel</span>
+                    </button>
+                    <button class="health-overview-export-format" type="button" data-health-overview-export-format="csv">
+                      <span class="material-symbols-rounded" aria-hidden="true">grid_on</span>
+                      <span class="health-overview-export-format-name">CSV</span>
+                      <span class="health-overview-export-format-desc">Arquivo .csv separado por ponto e vírgula</span>
+                    </button>
+                    <button class="health-overview-export-format" type="button" data-health-overview-export-format="pdf">
+                      <span class="material-symbols-rounded" aria-hidden="true">picture_as_pdf</span>
+                      <span class="health-overview-export-format-name">PDF</span>
+                      <span class="health-overview-export-format-desc">Relatório .pdf para leitura e impressão</span>
+                    </button>
+                    <button class="health-overview-export-format" type="button" data-health-overview-export-format="json">
+                      <span class="material-symbols-rounded" aria-hidden="true">data_object</span>
+                      <span class="health-overview-export-format-name">Dados brutos (JSON)</span>
+                      <span class="health-overview-export-format-desc">.json com todos os dados — ideal para integração</span>
+                    </button>
+                  </div>
+                  <p class="modal-field-hint">Todos os formatos exportam o mesmo conteúdo: indicadores, risco de glosa, médicos e mnemônicos.</p>
+                </section>
+
+                <section class="health-overview-export-section health-overview-export-advanced">
+                  <button class="health-overview-export-advanced-toggle" type="button" data-health-overview-advanced-toggle aria-expanded="false" aria-controls="healthOverviewExportAdvanced">
+                    <span class="health-overview-export-advanced-title">
+                      <span class="material-symbols-rounded" aria-hidden="true">tune</span>Opções avançadas
+                    </span>
+                    <span class="material-symbols-rounded health-overview-export-advanced-chevron" aria-hidden="true">expand_more</span>
+                  </button>
+                  <div class="health-overview-export-advanced-body" id="healthOverviewExportAdvanced" hidden>
+                    <span class="modal-label">Conectar via API</span>
+                    <p class="modal-field-hint">Prefere visualizar os dados em outro sistema, sem baixar arquivo? Consuma a API de leitura com o endpoint e a sua chave abaixo.</p>
+                    <div class="health-custom-integration-key">
+                      <code id="healthOverviewApiEndpoint">https://api.weshub360.com/v1/health/overview</code>
+                      <button class="icon-btn" type="button" data-health-overview-export-copy="healthOverviewApiEndpoint" aria-label="Copiar endpoint da API">
+                        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                      </button>
+                    </div>
+                    <div class="health-custom-integration-key">
+                      <code id="healthOverviewApiKey">wes_live_sk_9f3c1a7b42e8</code>
+                      <button class="icon-btn" type="button" data-health-overview-export-copy="healthOverviewApiKey" aria-label="Copiar chave de API">
+                        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                      </button>
+                    </div>
+                    <pre class="health-custom-integration-snippet"><code>curl https://api.weshub360.com/v1/health/overview \
+  -H "Authorization: Bearer wes_live_sk_9f3c1a7b42e8"</code></pre>
+                  </div>
+                </section>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" type="button" data-health-overview-export-close>Fechar</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="healthCustomIntegrationModal" aria-hidden="true">
+            <div class="modal-backdrop" data-health-custom-integration-close></div>
+            <div class="modal-dialog health-custom-integration-dialog" role="dialog" aria-modal="true" aria-labelledby="healthCustomIntegrationTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="healthCustomIntegrationTitle">Integração personalizada</h3>
+                  <p class="modal-subtitle">Conecte o agente ao seu sistema próprio — chat, aplicativo ou plataforma interna.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-health-custom-integration-close type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+              </div>
+              <form id="healthCustomIntegrationForm">
+                <div class="modal-body health-custom-integration-body">
+                  <section class="health-custom-integration-section">
+                    <label class="modal-label" for="healthCustomIntegrationChannel">Tipo de canal</label>
+                    <select class="modal-input" id="healthCustomIntegrationChannel" name="channel_type">
+                      <option value="web-chat" selected>Chat no site</option>
+                      <option value="mobile-app">Aplicativo próprio</option>
+                      <option value="rest-api">API REST</option>
+                      <option value="webhook">Webhook</option>
+                      <option value="embed-widget">Widget incorporável</option>
+                    </select>
+                    <p class="modal-field-hint">Escolha como o seu sistema vai conversar com o agente da saúde.</p>
+                  </section>
+
+                  <section class="health-custom-integration-section">
+                    <label class="modal-label" for="healthCustomIntegrationName">Nome da integração</label>
+                    <input class="modal-input" id="healthCustomIntegrationName" name="integration_name" type="text" placeholder="Ex.: Chat do portal do paciente" />
+                  </section>
+
+                  <section class="health-custom-integration-section">
+                    <label class="modal-label" for="healthCustomIntegrationEndpoint">Endpoint / URL de retorno</label>
+                    <input class="modal-input" id="healthCustomIntegrationEndpoint" name="endpoint_url" type="url" placeholder="https://seu-sistema.com/api/agente" />
+                    <p class="modal-field-hint">Para onde o agente envia as mensagens e recebe as respostas do seu sistema.</p>
+                  </section>
+
+                  <section class="health-custom-integration-section">
+                    <span class="modal-label">Chave de API</span>
+                    <div class="health-custom-integration-key">
+                      <code id="healthCustomIntegrationKey">wes_live_sk_9f3c1a7b42e8</code>
+                      <button class="icon-btn" type="button" data-health-custom-integration-copy aria-label="Copiar chave de API">
+                        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                      </button>
+                    </div>
+                    <p class="modal-field-hint">Use esta chave para autenticar as chamadas do seu sistema ao agente.</p>
+                  </section>
+
+                  <section class="health-custom-integration-section">
+                    <span class="modal-label">Exemplo de incorporação</span>
+                    <pre class="health-custom-integration-snippet"><code>&lt;script src="https://cdn.weshub360.com/agent.js"
+  data-agent="saude-paciente"
+  data-key="wes_live_sk_9f3c1a7b42e8"&gt;&lt;/script&gt;</code></pre>
+                  </section>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn outline" data-health-custom-integration-close type="button">Cancelar</button>
+                  <button class="btn primary" type="submit">
+                    <span class="material-symbols-rounded" aria-hidden="true">bolt</span>
+                    Ativar integração
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
 
@@ -7099,7 +7274,12 @@
             <div class="modal-dialog environment-dialog" role="dialog" aria-modal="true" aria-labelledby="environmentModalTitle">
               <div class="modal-header">
                 <div>
-                  <h3 id="environmentModalTitle">Visualizar e editar setor</h3>
+                  <div class="company-modal-title-row">
+                    <h3 id="environmentModalTitle">Visualizar e editar setor</h3>
+                    <button type="button" class="icon-btn action-icon company-modal-edit-icon" id="environmentModalEditButton" aria-label="Editar setor" title="Editar setor">
+                      <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                    </button>
+                  </div>
                   <p class="modal-subtitle" id="environmentModalSubtitle">Consulte e ajuste projetos, agentes e usuários vinculados.</p>
                 </div>
                 <button type="button" class="icon-btn" aria-label="Fechar" data-modal-close>
@@ -7196,10 +7376,8 @@
                 </section>
               </form>
               <div class="modal-footer">
-                <button type="button" class="btn outline" data-modal-close>Fechar</button>
-                <button type="button" class="btn outline environment-edit-only" id="environmentModalCancelEditButton" hidden>Cancelar edição</button>
-                <button type="button" class="btn primary" id="environmentModalEditButton">Editar</button>
-                <button type="submit" form="environmentModalForm" class="btn primary environment-edit-only" id="environmentModalSubmit" hidden>Salvar alterações</button>
+                <button type="button" class="btn outline environment-edit-only" id="environmentModalCancelEditButton" hidden>Cancelar</button>
+                <button type="submit" form="environmentModalForm" class="btn primary environment-edit-only" id="environmentModalSubmit" hidden>Salvar</button>
               </div>
             </div>
           </div>
@@ -7787,21 +7965,21 @@
                 <section class="users-modal-section">
                   <div class="company-users-section-head">
                     <h4 class="users-modal-section-title">Empresas da organização</h4>
-                    <span class="chip organization-details-count" id="organizationDetailsCompaniesChip">0</span>
+                    <span class="chip section-count-badge" id="organizationDetailsCompaniesChip">0</span>
                   </div>
                   <div class="company-users-list organization-company-list" id="organizationDetailsCompaniesList"></div>
                 </section>
                 <section class="users-modal-section">
                   <div class="company-users-section-head">
                     <h4 class="users-modal-section-title">Setores da organização</h4>
-                    <span class="chip organization-details-count" id="organizationDetailsSectorsChip">0</span>
+                    <span class="chip section-count-badge" id="organizationDetailsSectorsChip">0</span>
                   </div>
                   <div class="company-users-list organization-sector-list" id="organizationDetailsSectorsList"></div>
                 </section>
                 <section class="users-modal-section users-modal-section--last">
                   <div class="company-users-section-head">
                     <h4 class="users-modal-section-title">Usuários da organização</h4>
-                    <span class="chip organization-details-count" id="organizationDetailsUsersChip">0</span>
+                    <span class="chip section-count-badge" id="organizationDetailsUsersChip">0</span>
                   </div>
                   <div class="company-users-list organization-user-list" id="organizationDetailsUsersList"></div>
                 </section>
@@ -8007,8 +8185,17 @@
                 </section>
                 <section class="users-modal-section">
                   <div class="company-users-section-head">
-                    <h4 class="users-modal-section-title">Setores da empresa</h4>
-                    <span class="chip" id="companySectorsCount">0 setores</span>
+                    <div class="users-modal-section-title-group">
+                      <h4 class="users-modal-section-title">Setores da empresa</h4>
+                      <span
+                        class="doc-analysis-info material-symbols-rounded"
+                        tabindex="0"
+                        role="img"
+                        aria-label="Informação sobre edição de setores"
+                        data-tooltip="Aqui você apenas consulta os setores vinculados a esta empresa. Para editar ou remover um setor, vá até a aba Setores e clique em editar."
+                      >info</span>
+                    </div>
+                    <span class="chip section-count-badge" id="companySectorsCount">0</span>
                   </div>
                   <div class="company-users-list company-sectors-list" id="companySectorsList"></div>
                 </section>
@@ -8030,13 +8217,12 @@
                 <section class="users-modal-section users-modal-section--last">
                   <div class="company-users-section-head">
                     <h4 class="users-modal-section-title">Usuários da empresa</h4>
-                    <span class="chip" id="companyUsersCount">0 usuários</span>
+                    <span class="chip section-count-badge" id="companyUsersCount">0</span>
                   </div>
                   <div class="company-users-list" id="companyUsersList"></div>
                 </section>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn outline" data-modal-close id="companyUsersCloseButton">Fechar</button>
                 <button type="button" class="btn outline company-users-edit-only" id="companyUsersCancelEditButton" hidden>Cancelar edição</button>
                 <button type="button" class="btn primary company-users-edit-only" id="companyUsersSaveButton" hidden>Salvar alterações</button>
               </div>
@@ -8718,6 +8904,234 @@
             </div>
           </div>
 
+          <div class="page" id="page-health-overview" data-title="Visão geral">
+            <div class="section health-page health-overview-page">
+              <div class="page-header health-overview-header">
+                <div>
+                  <h2>Visão geral — Seção Saúde</h2>
+                  <p class="page-subtitle">Panorama consolidado do atendimento em saúde: pacientes, assistente médico, prestação de contas e leitura de exames.</p>
+                </div>
+                <button class="btn primary" id="healthOverviewExportBtn" data-health-overview-export-open type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">ios_share</span>Exportar dados
+                </button>
+              </div>
+
+              <div class="stats-cards health-overview-stats" aria-label="Indicadores gerais de saúde">
+                <article class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">forum</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">142</div>
+                    <div class="stat-label">Atendimentos por WhatsApp</div>
+                    <div class="stat-sub">+18% nos últimos 7 dias</div>
+                  </div>
+                </article>
+                <article class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">stethoscope</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Consultas com assistente médico</div>
+                    <div class="stat-sub">6 médicos ativos</div>
+                  </div>
+                </article>
+                <article class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">receipt_long</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">320</div>
+                    <div class="stat-label">Documentos analisados</div>
+                    <div class="stat-sub">58 com possível glosa (18%)</div>
+                  </div>
+                </article>
+                <article class="stat-card">
+                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">biotech</span></div>
+                  <div class="stat-body">
+                    <div class="stat-value">214</div>
+                    <div class="stat-label">Exames lidos</div>
+                    <div class="stat-sub">1.560 mnemônicos extraídos</div>
+                  </div>
+                </article>
+              </div>
+
+              <div class="health-overview-charts">
+                <article class="health-patient-panel health-overview-panel">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">O que acontece no WhatsApp</h3>
+                      <span class="health-overview-panel-sub">Distribuição dos 142 atendimentos por tipo de solicitação</span>
+                    </div>
+                    <span class="health-patient-period-chip">142 total</span>
+                  </div>
+                  <div class="health-overview-chart-wrap health-overview-chart-wrap--pie">
+                    <canvas id="healthOverviewWhatsappChart" role="img" aria-label="Gráfico de pizza da distribuição de atendimentos no WhatsApp"></canvas>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-overview-panel">
+                  <div class="health-patient-panel-head">
+                    <div class="health-overview-panel-headline">
+                      <div class="health-overview-panel-headline-row">
+                        <h3 class="health-patient-panel-title">Médicos usando o assistente</h3>
+                        <span class="health-patient-period-chip health-patient-period-chip--orange">6 médicos</span>
+                      </div>
+                      <span class="health-overview-panel-sub">Consultas apoiadas pelo assistente médico por profissional</span>
+                    </div>
+                    <div class="health-patient-panel-actions">
+                      <a class="health-patient-more-link" href="#/dashboard/health/overview/doctors">Ver mais</a>
+                    </div>
+                  </div>
+                  <div class="health-overview-chart-wrap health-overview-chart-wrap--bar">
+                    <canvas id="healthOverviewDoctorsChart" role="img" aria-label="Gráfico de barras dos médicos que usam o assistente"></canvas>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-overview-panel">
+                  <div class="health-patient-panel-head">
+                    <div class="health-overview-panel-headline">
+                      <div class="health-overview-panel-headline-row">
+                        <h3 class="health-patient-panel-title">Leitura de exames — mnemônicos</h3>
+                        <span class="health-patient-period-chip">214 exames</span>
+                      </div>
+                      <span class="health-overview-panel-sub">Mnemônicos mais identificados na extração automática</span>
+                    </div>
+                    <div class="health-patient-panel-actions">
+                      <a class="health-patient-more-link" href="#/dashboard/health/overview/mnemonics">Ver mais</a>
+                    </div>
+                  </div>
+                  <div class="health-overview-chart-wrap health-overview-chart-wrap--bar">
+                    <canvas id="healthOverviewExamsChart" role="img" aria-label="Gráfico de barras dos mnemônicos mais identificados"></canvas>
+                  </div>
+                  <div class="health-overview-least">
+                    <span class="health-overview-least-title">Menos identificados</span>
+                    <div class="health-overview-chip-row">
+                      <span class="health-overview-mnemonic-chip">T4 livre (T4L) · 14</span>
+                      <span class="health-overview-mnemonic-chip">Hemoglobina glicada (HbA1c) · 22</span>
+                      <span class="health-overview-mnemonic-chip">Proteína C reativa (PCR) · 28</span>
+                      <span class="health-overview-mnemonic-chip">Ferritina (FERR) · 39</span>
+                      <span class="health-overview-mnemonic-chip">Vitamina D (VITD) · 47</span>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="health-patient-panel health-overview-panel">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Prestação de contas</h3>
+                      <span class="health-overview-panel-sub">Documentos analisados classificados por risco de glosa</span>
+                    </div>
+                    <span class="health-patient-period-chip">320 documentos</span>
+                  </div>
+                  <div class="health-overview-chart-wrap health-overview-chart-wrap--pie">
+                    <canvas id="healthOverviewAccountabilityChart" role="img" aria-label="Gráfico de rosca de documentos classificados por risco de glosa (alto, médio e baixo)"></canvas>
+                  </div>
+                  <div class="health-overview-glosa-stats">
+                    <div><strong class="is-danger">58</strong><span>Risco alto</span></div>
+                    <div><strong class="is-warning">79</strong><span>Risco médio</span></div>
+                    <div><strong class="is-success">183</strong><span>Risco baixo</span></div>
+                  </div>
+                </article>
+              </div>
+
+              <article class="health-patient-panel health-overview-insights">
+                <div class="health-patient-panel-head">
+                  <div>
+                    <h3 class="health-patient-panel-title">Insights de IA</h3>
+                  </div>
+                  <div class="health-patient-panel-actions">
+                    <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/insights">Ver mais</a>
+                  </div>
+                </div>
+                <div class="health-patient-detail-grid">
+                  <article class="health-patient-detail-card">
+                    <span class="health-patient-kicker">Mais frequente</span>
+                    <strong>Dúvidas sobre exames</strong>
+                    <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
+                    <span class="health-patient-tag">412 menções</span>
+                  </article>
+                  <article class="health-patient-detail-card">
+                    <span class="health-patient-kicker">Crescimento</span>
+                    <strong>Solicitação de consulta</strong>
+                    <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
+                    <span class="health-patient-tag">+18%</span>
+                  </article>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-overview-mnemonics" data-title="Mnemônicos — leitura de exames">
+            <div class="section health-page health-patient-detail-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/overview">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Visão geral</span>
+                </a>
+              </div>
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Mnemônicos — leitura de exames</h2>
+                  <p class="page-subtitle">Lista completa dos mnemônicos identificados na extração automática, em ordem decrescente — do mais lido ao menos lido.</p>
+                </div>
+                <button class="btn outline" id="downloadHealthMnemonicsRankingBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
+                </button>
+              </div>
+
+              <div class="data-table health-overview-ranking-table" id="healthOverviewMnemonicsTable" data-table-empty-state-disabled="true">
+                <div class="data-row header">
+                  <span>Posição</span>
+                  <span>Mnemônico</span>
+                  <span>Ocorrências</span>
+                  <span>Participação</span>
+                </div>
+                <div class="data-row"><span>1</span><span>Hemoglobina (HB)</span><span>412</span><span>20,0%</span></div>
+                <div class="data-row"><span>2</span><span>Glicemia (GLI)</span><span>388</span><span>18,8%</span></div>
+                <div class="data-row"><span>3</span><span>Colesterol (COL)</span><span>351</span><span>17,0%</span></div>
+                <div class="data-row"><span>4</span><span>TSH (tireoide)</span><span>298</span><span>14,5%</span></div>
+                <div class="data-row"><span>5</span><span>Creatinina (CREA)</span><span>254</span><span>12,3%</span></div>
+                <div class="data-row"><span>6</span><span>Ureia (URE)</span><span>208</span><span>10,1%</span></div>
+                <div class="data-row"><span>7</span><span>Vitamina D (VITD)</span><span>47</span><span>2,3%</span></div>
+                <div class="data-row"><span>8</span><span>Ferritina (FERR)</span><span>39</span><span>1,9%</span></div>
+                <div class="data-row"><span>9</span><span>Proteína C reativa (PCR)</span><span>28</span><span>1,4%</span></div>
+                <div class="data-row"><span>10</span><span>Hemoglobina glicada (HbA1c)</span><span>22</span><span>1,1%</span></div>
+                <div class="data-row"><span>11</span><span>T4 livre (T4L)</span><span>14</span><span>0,7%</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-overview-doctors" data-title="Médicos usando o assistente">
+            <div class="section health-page health-patient-detail-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/overview">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Visão geral</span>
+                </a>
+              </div>
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Médicos usando o assistente</h2>
+                  <p class="page-subtitle">Lista completa dos profissionais por consultas apoiadas pelo assistente médico, em ordem decrescente — do que mais usa ao que menos usa.</p>
+                </div>
+                <button class="btn outline" id="downloadHealthDoctorsRankingBtn" type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
+                </button>
+              </div>
+
+              <div class="data-table health-overview-ranking-table" id="healthOverviewDoctorsRankingTable" data-table-empty-state-disabled="true">
+                <div class="data-row header">
+                  <span>Posição</span>
+                  <span>Médico</span>
+                  <span>Consultas com assistente</span>
+                  <span>Participação</span>
+                </div>
+                <div class="data-row"><span>1</span><span>Dra. Helena Prado</span><span>28</span><span>31,5%</span></div>
+                <div class="data-row"><span>2</span><span>Dr. Rafael Duarte</span><span>21</span><span>23,6%</span></div>
+                <div class="data-row"><span>3</span><span>Dra. Camila Nunes</span><span>16</span><span>18,0%</span></div>
+                <div class="data-row"><span>4</span><span>Dr. Marcos Vinícius</span><span>12</span><span>13,5%</span></div>
+                <div class="data-row"><span>5</span><span>Dra. Luciana Martins</span><span>8</span><span>9,0%</span></div>
+                <div class="data-row"><span>6</span><span>Dr. Paulo Reis</span><span>4</span><span>4,5%</span></div>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-health-whatsapp" data-title="Agente do paciente">
             <div class="section health-page health-patient-agent-page">
               <div class="page-header health-patient-agent-header">
@@ -8725,156 +9139,90 @@
                   <h2>Agente do paciente</h2>
                   <p class="page-subtitle">Acompanhe atendimentos automatizados, solicitações clínicas e encaminhamentos do canal de pacientes.</p>
                 </div>
-                <div class="page-actions">
-                  <button class="btn outline health-patient-preview-icon-btn" type="button" aria-label="Ver prévia da conversa" data-health-patient-preview-open>
-                    <span class="material-symbols-rounded" aria-hidden="true">chat</span>
-                  </button>
-                  <a class="btn primary" href="#/dashboard/integrations/apis">
-                    <span class="material-symbols-rounded" aria-hidden="true">code</span>
-                    Realizar integração
-                  </a>
-                </div>
-	              </div>
+              </div>
 
-	              <div class="stats-cards health-patient-status-cards" aria-label="Indicadores do agente do paciente">
-	                <article class="stat-card">
-	                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">forum</span></div>
-	                  <div class="stat-body">
-	                    <div class="stat-value">142</div>
-	                    <div class="stat-label">Atendimentos via WhatsApp</div>
-	                    <div class="stat-sub">+18% nos últimos 7 dias</div>
-	                  </div>
-	                </article>
-	                <article class="stat-card">
-	                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">event_available</span></div>
-	                  <div class="stat-body">
-	                    <div class="stat-value">37</div>
-	                    <div class="stat-label">Consultas solicitadas</div>
-	                    <div class="stat-sub">12 aguardando confirmação</div>
-	                  </div>
-	                </article>
-	                <article class="stat-card">
-	                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">clinical_notes</span></div>
-	                  <div class="stat-body">
-	                    <div class="stat-value">19</div>
-	                    <div class="stat-label">Exames enviados</div>
-	                    <div class="stat-sub">PDFs e imagens anexados</div>
-	                  </div>
-	                </article>
-	              </div>
-
-              <div class="health-patient-agent-grid">
-                <article class="health-patient-panel health-patient-panel--wide">
-	                  <div class="health-patient-panel-head">
-		                    <div>
-		                      <h3 class="health-patient-panel-title">Insights das conversas</h3>
-		                    </div>
-                    <div class="health-patient-panel-actions">
-                      <span class="health-patient-period-chip health-patient-period-chip--orange">Últimos 7 dias</span>
-                      <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/insights">Ver mais</a>
+              <div class="health-patient-card-grid">
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Fluxo do atendimento</h3>
                     </div>
                   </div>
-	                  <div class="health-patient-insight-list">
-	                    <div class="health-patient-insight-item">
-	                      <div>
-	                        <strong>Dúvidas sobre exames</strong>
-	                        <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
-	                      </div>
-	                      <span class="health-patient-tag">Mais frequente</span>
-	                    </div>
-		                    <div class="health-patient-insight-item">
-		                      <div>
-		                        <strong>Solicitação de consulta</strong>
-		                        <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
-		                      </div>
-		                      <span class="health-patient-tag">+18%</span>
-		                    </div>
-	                  </div>
+                  <p class="health-patient-panel-note">Veja como o agente conduz cada solicitação no WhatsApp, da autenticação do paciente até a resolução ou o encaixe com o médico.</p>
+                  <div class="health-patient-panel-footer">
+                    <button class="btn primary" type="button" aria-haspopup="dialog" aria-controls="healthPatientFlowModal" data-health-flow-open>
+                      <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
+                      Ver fluxo
+                    </button>
+                  </div>
                 </article>
 
-                <article class="health-patient-panel health-patient-panel--events">
-	                  <div class="health-patient-panel-head">
-		                    <div>
-		                      <h3 class="health-patient-panel-title">Histórico de interações</h3>
-		                    </div>
-                    <div class="health-patient-panel-actions">
-                      <span class="health-patient-period-chip">Tempo real</span>
-                      <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/history">Ver mais</a>
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Integração</h3>
                     </div>
                   </div>
-                  <div class="health-patient-events-list">
-                    <div class="health-patient-event-item">
-                      <time>10:48</time>
-                      <div>
-                        <strong>Solicitou consulta</strong>
-                        <span>Ana Beatriz Lima</span>
-                        <p>Escolheu amanhã 09:40 para avaliação de renovação.</p>
-                      </div>
-                    </div>
-                    <div class="health-patient-event-item">
-                      <time>10:32</time>
-                      <div>
-                        <strong>Pediu renovação</strong>
-                        <span>Carlos Eduardo Nunes</span>
-                        <p>Agente sinalizou necessidade de revisão médica.</p>
-                      </div>
-                    </div>
-                    <div class="health-patient-event-item">
-                      <time>09:58</time>
-                      <div>
-                        <strong>Enviou exames</strong>
-                        <span>Marina Costa Rocha</span>
-                        <p>Arquivo exame-laboratorial.pdf recebido no histórico.</p>
-                      </div>
-                    </div>
-                    <div class="health-patient-event-item">
-                      <time>09:41</time>
-                      <div>
-                        <strong>Atendimento humano</strong>
-                        <span>Luciana Martins</span>
-                        <p>Fluxo automatizado interrompido e solicitação encaminhada.</p>
-                      </div>
-                    </div>
+                  <p class="health-patient-panel-note">Conecte o agente do paciente aos canais e às APIs para colocar o atendimento automatizado em produção.</p>
+                  <div class="health-patient-panel-footer">
+                    <a class="btn primary" href="#/dashboard/health/integrations">
+                      <span class="material-symbols-rounded" aria-hidden="true">code</span>
+                      Realizar integração
+                    </a>
                   </div>
                 </article>
 
                 <article class="health-patient-panel health-patient-panel--share">
                   <div class="health-patient-panel-head">
-	                    <div>
-	                      <h3 class="health-patient-panel-title">Compartilhar agente</h3>
-	                    </div>
-	                  </div>
-	                  <div class="health-patient-contact-card">
-	                    <span>Número do agente</span>
-	                    <strong>+55 85 98888-1048</strong>
-	                    <div class="health-patient-contact-actions">
-	                      <button class="btn outline health-patient-copy-link-btn" type="button" data-health-patient-copy-link>
-	                        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
-	                        Copiar link
-	                      </button>
-	                      <button class="btn primary health-patient-share-btn" type="button" data-health-patient-share-open>
-	                        <span class="material-symbols-rounded" aria-hidden="true">ios_share</span>
-	                        Compartilhar
-	                      </button>
-	                    </div>
-	                  </div>
-                  <p class="health-patient-panel-note">Use este cartão em campanhas, lembretes de consulta e comunicações para direcionar pacientes ao atendimento automatizado.</p>
+                    <div>
+                      <h3 class="health-patient-panel-title">Compartilhar agente</h3>
+                    </div>
+                  </div>
+                  <div class="health-patient-contact-card">
+                    <span>Número do agente</span>
+                    <strong>+55 85 98888-1048</strong>
+                    <div class="health-patient-contact-actions">
+                      <button class="btn outline health-patient-copy-link-btn" type="button" data-health-patient-copy-link>
+                        <span class="material-symbols-rounded" aria-hidden="true">content_copy</span>
+                        Copiar link
+                      </button>
+                      <button class="btn primary health-patient-share-btn" type="button" data-health-patient-share-open>
+                        <span class="material-symbols-rounded" aria-hidden="true">ios_share</span>
+                        Compartilhar
+                      </button>
+                    </div>
+                  </div>
                 </article>
-	              </div>
-	            </div>
-	          </div>
+
+                <article class="health-patient-panel health-patient-panel--action">
+                  <div class="health-patient-panel-head">
+                    <div>
+                      <h3 class="health-patient-panel-title">Simulação no WhatsApp</h3>
+                    </div>
+                  </div>
+                  <p class="health-patient-panel-note">Abra uma prévia interativa da conversa do paciente para testar as respostas do agente antes de divulgar.</p>
+                  <div class="health-patient-panel-footer">
+                    <button class="btn primary" type="button" data-health-patient-preview-open>
+                      <span class="material-symbols-rounded" aria-hidden="true">chat</span>
+                      Abrir simulação
+                    </button>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
 
           <div class="page" id="page-health-whatsapp-insights" data-title="Insights do agente do paciente">
             <div class="section health-page health-patient-detail-page">
               <div class="health-patient-detail-top">
-                <a class="telegram-back-link" href="#/dashboard/health/whatsapp">
+                <a class="telegram-back-link" href="#/dashboard/health/overview">
                   <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
-                  <span class="telegram-back-link-text">Voltar para Agente do paciente</span>
+                  <span class="telegram-back-link-text">Voltar para Visão geral</span>
                 </a>
               </div>
               <div class="page-header health-integrations-header">
                 <div>
-                  <h2>Insights das conversas</h2>
+                  <h2>Insights de IA</h2>
                   <p class="page-subtitle">Acompanhe sinais recorrentes, variações de demanda e motivos de atendimento do canal de pacientes.</p>
                 </div>
                 <span class="health-patient-period-chip health-patient-period-chip--orange">Últimos 7 dias</span>
@@ -9279,7 +9627,7 @@
                   </div>
                   <div class="health-agenda-legend" aria-label="Legenda da agenda">
                     <span><i class="is-consult"></i>Consulta</span>
-                    <span><i class="is-return"></i>Retorno</span>
+                    <span><i class="is-return"></i>Encaixe</span>
                   </div>
                 </div>
                 <div class="health-agenda-calendar" id="healthAgendaCalendar" aria-label="Calendário da agenda médica"></div>
@@ -9332,7 +9680,7 @@
                       </div>
                       <div class="health-agenda-slot">
                         <div class="health-agenda-event is-return is-wide">
-                          <strong>Retorno | Luciana Martins</strong>
+                          <strong>Encaixe | Luciana Martins</strong>
                           <span>8:20 - 8:50</span>
                         </div>
                       </div>
@@ -9362,7 +9710,7 @@
                       <div class="health-agenda-slot"></div>
                       <div class="health-agenda-slot">
                         <div class="health-agenda-event is-return">
-                          <strong>Retorno | Paulo Reis</strong>
+                          <strong>Encaixe | Paulo Reis</strong>
                           <span>10:10 - 10:40</span>
                         </div>
                       </div>
@@ -9456,7 +9804,7 @@
                       </div>
                       <div class="health-agenda-slot">
                         <div class="health-agenda-event is-return is-wide">
-                          <strong>Retorno | Fernanda Reis</strong>
+                          <strong>Encaixe | Fernanda Reis</strong>
                           <span>16:10 - 16:40</span>
                         </div>
                       </div>
@@ -9488,9 +9836,47 @@
                   <p class="page-subtitle">Consulte prestações processadas e inicie uma nova análise documental a partir de um PDF hospitalar.</p>
                 </div>
                 <div class="page-actions">
+                  <button class="icon-btn health-agenda-settings-btn" id="openHealthAccountabilitySettings" type="button" aria-label="Ajustes de prestação" aria-haspopup="dialog" aria-controls="healthHospitalsModal">
+                    <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+                  </button>
                   <button class="btn primary" id="openHealthAccountabilityModal" type="button">
                     Iniciar prestação
                   </button>
+                </div>
+              </div>
+
+              <div class="filters-grid health-accountability-filters">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                    <input type="search" id="healthAccountabilityOperatorSearch" placeholder="Buscar por arquivo, hospital, operador, classificação..." aria-label="Buscar em prestações de contas" autocomplete="off" />
+                  </div>
+                </div>
+                <div class="form-field">
+                  <button class="btn filter-btn" id="healthAccountabilityFilterBtn" type="button">
+                    <span class="material-symbols-rounded filter-btn-icon" aria-hidden="true">filter_list</span>
+                    <span class="filter-btn-count" data-health-accountability-filter-count hidden>0</span>Filtros
+                  </button>
+                  <div class="menu" id="healthAccountabilityFilterMenu">
+                    <div class="filter-footer">
+                      <button class="filter-clear" type="button">Limpar filtros</button>
+                    </div>
+                    <div class="filter-group" data-filter-group="hospital">
+                      <span>Hospital</span>
+                      <button class="filter-option active" data-filter="hospital" data-value="">Todos</button>
+                    </div>
+                    <div class="filter-group" data-filter-group="risk">
+                      <span>Risco de glosa</span>
+                      <button class="filter-option active" data-filter="risk" data-value="">Todos</button>
+                      <button class="filter-option" data-filter="risk" data-value="high">Alto</button>
+                      <button class="filter-option" data-filter="risk" data-value="medium">Médio</button>
+                      <button class="filter-option" data-filter="risk" data-value="low">Baixo</button>
+                    </div>
+                    <div class="filter-group" data-filter-group="classification">
+                      <span>Classificação</span>
+                      <button class="filter-option active" data-filter="classification" data-value="">Todas</button>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -9501,6 +9887,7 @@
                   <span>Operador</span>
                   <span>Classificação</span>
                   <span>Processado em</span>
+                  <span>Risco de glosa</span>
                   <span>Ações</span>
                 </div>
                 <div class="data-row" data-health-accountability-history-index="0">
@@ -9509,6 +9896,7 @@
                   <span>48291</span>
                   <span>Conta analítica, Descrição cirúrgica, Folha anestésica, Pré-anestésica</span>
                   <span>30/07/2026 • 14:22</span>
+                  <span><span class="glosa-chip glosa-chip--high" title="Chance de glosa: 68%">Alto</span></span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
                       <span class="material-symbols-rounded" aria-hidden="true">article</span>
@@ -9524,6 +9912,7 @@
                   <span>Ana Silva</span>
                   <span>Conta analítica, Endoscopia, Outro exame</span>
                   <span>29/07/2026 • 16:08</span>
+                  <span><span class="glosa-chip glosa-chip--medium" title="Chance de glosa: 41%">Médio</span></span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
                       <span class="material-symbols-rounded" aria-hidden="true">article</span>
@@ -9539,6 +9928,7 @@
                   <span>39107</span>
                   <span>Conta analítica, Descrição cirúrgica</span>
                   <span>28/07/2026 • 10:35</span>
+                  <span><span class="glosa-chip glosa-chip--low" title="Chance de glosa: 12%">Baixo</span></span>
                   <span class="row-actions">
                     <button class="icon-btn action-icon" type="button" aria-label="Abrir resultado" data-health-accountability-open-result>
                       <span class="material-symbols-rounded" aria-hidden="true">article</span>
@@ -9549,6 +9939,7 @@
                   </span>
                 </div>
               </div>
+              <p class="health-exam-results-empty is-hidden" id="healthAccountabilityHistoryEmpty">Nenhuma prestação encontrada para os filtros selecionados.</p>
             </div>
           </div>
 
@@ -9600,6 +9991,28 @@
                     <span>Processado em:</span>
                     <strong data-health-accountability-result-processed-at>30/07/2026 • 14:22</strong>
                   </div>
+                </div>
+                <aside class="health-accountability-glosa" data-health-accountability-glosa data-tone="high" aria-label="Chance de glosa">
+                  <span class="health-accountability-glosa-kicker">Chance de glosa</span>
+                  <strong class="health-accountability-glosa-value" data-health-accountability-glosa-value>68%</strong>
+                  <span class="health-accountability-glosa-risk">Risco: <span class="glosa-chip glosa-chip--high" data-health-accountability-glosa-tag>Alto</span></span>
+                </aside>
+              </div>
+
+              <div class="health-accountability-result-section health-ai-audit" id="healthAccountabilityAiAuditSection">
+                <div class="health-ai-audit-head" id="healthAccountabilityAiAuditToggle" role="button" tabindex="0" aria-expanded="false" aria-controls="healthAccountabilityAiAuditBody">
+                  <span class="health-ai-audit-icon" aria-hidden="true">
+                    <span class="material-symbols-rounded">auto_awesome</span>
+                  </span>
+                  <div class="health-ai-audit-titles">
+                    <h3>Auditoria de IA</h3>
+                    <p class="page-subtitle">Com base em quê e por quais motivos o agente chegou a esta chance de glosa, segundo os critérios definidos em Ajustes de prestação.</p>
+                  </div>
+                  <span class="material-symbols-rounded health-ai-audit-caret" aria-hidden="true">expand_more</span>
+                </div>
+                <div class="health-ai-audit-body" id="healthAccountabilityAiAuditBody" hidden>
+                  <p class="health-ai-audit-summary" id="healthAccountabilityAiAuditSummary"></p>
+                  <ul class="health-ai-audit-list" id="healthAccountabilityAiAuditList"></ul>
                 </div>
               </div>
 
@@ -9669,8 +10082,11 @@
 
                 <div class="modal-row">
                   <div>
-                    <label class="modal-label modal-label--required" for="healthAccountabilityHospitalInput">Nome do hospital</label>
-                    <input class="modal-input" id="healthAccountabilityHospitalInput" type="text" placeholder="Ex.: HMoinhos" />
+                    <label class="modal-label modal-label--required" for="healthAccountabilityHospitalInput">Hospital</label>
+                    <select class="modal-input" id="healthAccountabilityHospitalInput" data-health-hospital-select>
+                      <option value="">Selecione o hospital</option>
+                    </select>
+                    <p class="modal-field-hint">Gerencie a lista de hospitais no botão de ajustes (⚙) da página.</p>
                   </div>
                   <div>
                     <label class="modal-label modal-label--required" for="healthAccountabilityOperatorInput">Identificação do operador</label>
@@ -9699,6 +10115,123 @@
             </div>
           </div>
 
+          <div class="modal" id="healthHospitalsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog health-hospitals-dialog" role="dialog" aria-modal="true" aria-labelledby="healthHospitalsTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="healthHospitalsTitle">Ajustes de prestação</h3>
+                  <p class="modal-subtitle">Gerencie a base de hospitais, os tipos de documento e os critérios usados na auditoria das prestações.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+              </div>
+
+              <div class="modal-body">
+                <div class="tabs tabs-underline prest-tabs" role="tablist" aria-label="Ajustes de prestação">
+                  <button class="tab active" type="button" role="tab" aria-selected="true" data-prest-tab="hospitals">Base de hospitais</button>
+                  <button class="tab" type="button" role="tab" aria-selected="false" data-prest-tab="doctypes">Tipos de documento</button>
+                  <button class="tab" type="button" role="tab" aria-selected="false" data-prest-tab="rules">Regras / critérios de auditoria</button>
+                </div>
+
+                <div class="prest-tab-panel is-active" data-prest-panel="hospitals">
+                  <p class="modal-field-hint">Cadastre os hospitais usados nas prestações de contas e na leitura de exames. A lista aparece como opção ao iniciar cada processo.</p>
+                  <form class="health-hospitals-add" id="healthHospitalsAddForm">
+                    <input class="modal-input" id="healthHospitalsInput" type="text" placeholder="Nome do hospital (ex.: HMoinhos)" autocomplete="off" aria-label="Nome do hospital" />
+                    <button class="btn primary" type="submit">
+                      <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                      Adicionar
+                    </button>
+                  </form>
+                  <ul class="health-hospitals-list" id="healthHospitalsList" aria-label="Hospitais cadastrados"></ul>
+                  <p class="health-hospitals-empty is-hidden" id="healthHospitalsEmpty">Nenhum hospital cadastrado ainda. Adicione o primeiro acima.</p>
+                </div>
+
+                <div class="prest-tab-panel" data-prest-panel="doctypes" hidden>
+                  <p class="modal-field-hint">Defina os tipos de documento que o agente pode classificar em cada prestação (ex.: conta analítica, folha anestésica).</p>
+                  <form class="health-hospitals-add" id="healthDocTypesAddForm">
+                    <input class="modal-input" id="healthDocTypesInput" type="text" placeholder="Nome do tipo de documento (ex.: Conta analítica)" autocomplete="off" aria-label="Nome do tipo de documento" />
+                    <button class="btn primary" type="submit">
+                      <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                      Adicionar
+                    </button>
+                  </form>
+                  <ul class="health-hospitals-list" id="healthDocTypesList" aria-label="Tipos de documento cadastrados"></ul>
+                  <p class="health-hospitals-empty is-hidden" id="healthDocTypesEmpty">Nenhum tipo de documento cadastrado ainda. Adicione o primeiro acima.</p>
+                </div>
+
+                <div class="prest-tab-panel" data-prest-panel="rules" hidden>
+                  <p class="modal-field-hint">Cadastre as regras que o agente aplica para avaliar cada documento e estimar a chance de glosa. Ligue cada regra a um tipo de documento ou marque como regra geral (vale para todos).</p>
+                  <form class="health-rule-add" id="healthRulesAddForm">
+                    <select class="modal-input" id="healthRuleScopeSelect" aria-label="Documento da regra">
+                      <option value="__general__">Regra geral (todos os documentos)</option>
+                    </select>
+                    <input class="modal-input" id="healthRuleTextInput" type="text" placeholder="Descreva a regra (ex.: precisa conter assinatura e horários)" autocomplete="off" aria-label="Texto da regra" />
+                    <button class="btn primary" type="submit">
+                      <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                      Adicionar
+                    </button>
+                  </form>
+                  <ul class="health-hospitals-list health-rules-list" id="healthRulesList" aria-label="Regras cadastradas"></ul>
+                  <p class="health-hospitals-empty is-hidden" id="healthRulesEmpty">Nenhuma regra cadastrada ainda. Documentos sem regra são apenas classificados.</p>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn primary" type="button" data-modal-close>Concluir</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="healthMnemonicsModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog health-hospitals-dialog" role="dialog" aria-modal="true" aria-labelledby="healthMnemonicsTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="healthMnemonicsTitle">Base de mnemônicos</h3>
+                  <p class="modal-subtitle">Importe um CSV (código, nome, sinônimos) para abastecer a base usada na leitura de exames. Cada mnemônico tem um nome padrão e pode ter vários sinônimos, usados para reconhecer o exame nos arquivos.</p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+              </div>
+
+              <div class="modal-body">
+                <input id="healthMnemonicsCsvInput" type="file" accept=".csv,text/csv" hidden />
+                <div class="health-exam-reading-upload health-mnemonics-upload" id="healthMnemonicsDropzone" role="button" tabindex="0" aria-label="Importar CSV de mnemônicos">
+                  <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                  <div>
+                    <strong>Importar CSV (código, nome, sinônimos)</strong>
+                    <p id="healthMnemonicsFileName">Arraste o arquivo ou clique para selecionar. Uma linha por mnemônico, com sinônimos separados por <code>;</code>: <code>HB,Hemoglobina,Hb;Hgb</code></p>
+                  </div>
+                </div>
+
+                <div class="health-mnemonics-toolbar">
+                  <button class="btn outline" type="button" id="downloadHealthMnemonicsTemplate">
+                    <span class="material-symbols-rounded" aria-hidden="true">download</span>
+                    Baixar modelo CSV
+                  </button>
+                  <span class="health-mnemonics-count" id="healthMnemonicsCount"></span>
+                </div>
+
+                <p class="health-exam-reading-feedback" id="healthMnemonicsFeedback" hidden></p>
+
+                <div class="data-table health-mnemonics-table" id="healthMnemonicsTable">
+                  <div class="data-row header">
+                    <span>Código</span>
+                    <span>Nome</span>
+                    <span>Sinônimos</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="modal-footer">
+                <button class="btn primary" type="button" data-modal-close>Concluir</button>
+              </div>
+            </div>
+          </div>
+
           <div class="page" id="page-health-exam-reading" data-title="Leitura de exames">
             <div class="section health-page health-exam-reading-page">
               <div class="page-header">
@@ -9707,9 +10240,21 @@
                   <p class="page-subtitle">Envie um arquivo para identificar os códigos de exames presentes no documento.</p>
                 </div>
                 <div class="page-actions">
+                  <button class="icon-btn health-agenda-settings-btn" id="openHealthExamReadingSettings" type="button" aria-label="Base de mnemônicos" aria-haspopup="dialog" aria-controls="healthMnemonicsModal">
+                    <span class="material-symbols-rounded" aria-hidden="true">tune</span>
+                  </button>
                   <button class="btn primary" id="openHealthExamReadingModal" type="button">
                     Iniciar leitura
                   </button>
+                </div>
+              </div>
+
+              <div class="filters-grid health-exam-reading-filters">
+                <div class="form-field">
+                  <div class="search-field">
+                    <span class="material-symbols-rounded" aria-hidden="true">search</span>
+                    <input type="search" id="healthExamReadingSearch" placeholder="Buscar por arquivo, operador, data, códigos..." aria-label="Buscar em leitura de exames" autocomplete="off" />
+                  </div>
                 </div>
               </div>
 
@@ -9939,7 +10484,7 @@
                       <span class="material-symbols-rounded" aria-hidden="true">schedule</span>
                       <div>
                         <h4>Horários de atendimento</h4>
-                        <p>Defina o intervalo padrão exibido para este médico.</p>
+                        <p>Defina o horário exibido para este médico. Ative a opção abaixo para um horário diferente em cada dia.</p>
                       </div>
                     </div>
                     <div class="modal-row">
@@ -9961,6 +10506,50 @@
                         </select>
                       </div>
                     </div>
+                    <div class="switch-row health-agenda-perday-switch">
+                      <span>Definir horário diferente por dia</span>
+                      <label class="switch">
+                        <input type="checkbox" id="healthAgendaPerDayEnabled" />
+                        <span class="switch-track"></span>
+                      </label>
+                    </div>
+                    <div class="health-agenda-perday-list" id="healthAgendaPerDayList" hidden></div>
+                  </section>
+
+                  <section class="health-agenda-settings-section" id="healthAgendaBreakSection">
+                    <div class="health-agenda-settings-section-head">
+                      <span class="material-symbols-rounded" aria-hidden="true">free_breakfast</span>
+                      <div>
+                        <h4>Intervalo</h4>
+                        <p>O médico não atende durante estes períodos (almoço, esticar as pernas ou um afazer rápido). Adicione quantos intervalos precisar.</p>
+                      </div>
+                      <label class="switch health-agenda-break-switch">
+                        <input type="checkbox" id="healthAgendaBreakEnabled" name="break_enabled" checked />
+                        <span class="switch-track"></span>
+                      </label>
+                    </div>
+                    <div id="healthAgendaBreakFields">
+                      <div class="health-agenda-break-list" id="healthAgendaBreakList">
+                        <div class="health-agenda-break-row">
+                          <div>
+                            <label class="modal-label">Início</label>
+                            <input class="modal-input" data-break-start type="time" value="12:00" />
+                          </div>
+                          <div>
+                            <label class="modal-label">Fim</label>
+                            <input class="modal-input" data-break-end type="time" value="13:00" />
+                          </div>
+                          <button class="icon-btn health-agenda-break-remove" type="button" data-break-remove aria-label="Remover intervalo">
+                            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                          </button>
+                        </div>
+                      </div>
+                      <button class="btn outline health-agenda-break-add" type="button" id="healthAgendaBreakAdd">
+                        <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                        Adicionar intervalo
+                      </button>
+                    </div>
+                    <p class="modal-field-hint" id="healthAgendaBreakHint">Esses horários ficam bloqueados na agenda e não recebem encaixes.</p>
                   </section>
 
                   <section class="health-agenda-settings-section">
@@ -10440,31 +11029,34 @@
 
 	        <div class="modal" id="healthPatientShareModal" aria-hidden="true">
 	          <div class="modal-backdrop" data-health-patient-share-close></div>
-	          <div class="modal-dialog health-patient-share-dialog" role="dialog" aria-modal="true" aria-labelledby="healthPatientShareTitle">
+	          <div class="modal-dialog agent-share-dialog" role="dialog" aria-modal="true" aria-labelledby="healthPatientShareTitle">
 	            <div class="modal-header">
 	              <div>
 	                <h3 id="healthPatientShareTitle">Compartilhar agente do paciente</h3>
-	                <p class="modal-subtitle">Busque o paciente para enviar o link pelo telefone cadastrado.</p>
+	                <p class="modal-subtitle">Copie o link do agente ou abra o atendimento em outra página.</p>
 	              </div>
 	              <button type="button" class="icon-btn" aria-label="Fechar" data-health-patient-share-close>
 	                <span class="material-symbols-rounded" aria-hidden="true">close</span>
 	              </button>
 	            </div>
-	            <div class="modal-body health-patient-share-body">
-	              <label class="modal-label" for="healthPatientShareSearch">Paciente</label>
-	              <div class="health-patient-share-search">
-	                <span class="material-symbols-rounded" aria-hidden="true">search</span>
-	                <input class="modal-input" id="healthPatientShareSearch" type="search" autocomplete="off" placeholder="Digite o nome do paciente" />
+	            <div class="modal-body agent-share-body">
+	              <div class="agent-share-link-card">
+	                <label class="modal-label" for="healthPatientShareLink">Link para compartilhar</label>
+	                <div class="modal-input-action-wrap modal-input-action-wrap--double">
+	                  <input class="modal-input modal-input--with-action" id="healthPatientShareLink" type="text" readonly />
+	                  <button class="icon-btn modal-input-action modal-input-action--copy" id="healthPatientShareCopyBtn" type="button" aria-label="Copiar link">
+	                    <span class="material-symbols-rounded">content_copy</span>
+	                  </button>
+	                  <button class="icon-btn modal-input-action modal-input-action--open" id="healthPatientShareOpenBtn" type="button" aria-label="Abrir link em nova aba">
+	                    <span class="material-symbols-rounded">open_in_new</span>
+	                  </button>
+	                </div>
+	                <p class="modal-field-hint">Copie o link ou abra o atendimento em outra página.</p>
 	              </div>
-	              <div class="health-patient-share-results" id="healthPatientShareResults" aria-live="polite"></div>
-	              <div class="health-patient-share-detail" id="healthPatientShareDetail" hidden></div>
 	            </div>
-	            <div class="modal-footer health-patient-share-footer">
-	              <button type="button" class="btn outline" data-health-patient-share-close>Fechar</button>
-	              <button type="button" class="btn primary" id="healthPatientShareSendBtn" disabled>
-	                <span class="material-symbols-rounded" aria-hidden="true">send</span>
-	                Enviar link
-	              </button>
+	            <div class="modal-footer">
+	              <button type="button" class="btn outline" data-health-patient-share-close>Cancelar</button>
+	              <button type="button" class="btn primary" id="healthPatientShareSaveBtn">Salvar</button>
 	            </div>
 	          </div>
 	        </div>
@@ -10496,17 +11088,17 @@
 	                  </button>
 	                </form>
 	                <div class="health-patient-wa-options" id="healthPatientPreviewOptions">
-	                  <button type="button" data-health-patient-flow="renewal" disabled>
-	                    <span class="material-symbols-rounded" aria-hidden="true">calendar_add_on</span>
-	                    Renovação de receita
-	                  </button>
 	                  <button type="button" data-health-patient-flow="questions" disabled>
 	                    <span class="material-symbols-rounded" aria-hidden="true">help</span>
-	                    Dúvidas gerais
+	                    Dúvidas sobre o histórico
 	                  </button>
 	                  <button type="button" data-health-patient-flow="exams" disabled>
 	                    <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
 	                    Enviar exames
+	                  </button>
+	                  <button type="button" data-health-patient-flow="renewal" disabled>
+	                    <span class="material-symbols-rounded" aria-hidden="true">calendar_add_on</span>
+	                    Encaixe para renovação
 	                  </button>
 	                </div>
 	              </section>
@@ -10514,7 +11106,190 @@
 	          </div>
 	        </div>
 
-	        <div id="directChatDrawer" class="direct-chat-drawer" aria-hidden="true">
+	        <div class="modal" id="healthPatientFlowModal" aria-hidden="true">
+          <div class="modal-backdrop" data-health-flow-close></div>
+          <div class="modal-dialog health-flow-dialog" role="dialog" aria-modal="true" aria-label="Fluxo do usuário no WhatsApp">
+            <div class="modal-header health-flow-head">
+              <div class="health-flow-title">
+                <h3>Fluxo do usuário no WhatsApp</h3>
+                <p>Da autenticação do paciente às três solicitações — dúvidas sobre o histórico, envio de exames e encaixe para renovação. O encaixe apenas agenda um horário: a marcação depende da confirmação do médico.</p>
+              </div>
+              <button type="button" class="icon-btn" aria-label="Fechar fluxo" data-health-flow-close>
+                <span class="material-symbols-rounded" aria-hidden="true">close</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <div class="health-flow-legend" aria-hidden="true">
+                <span><i class="lg-start"></i>Início</span>
+                <span><i class="lg-proc"></i>Ação do agente</span>
+                <span><i class="lg-dec"></i>Decisão</span>
+                <span><i class="lg-end"></i>Fim</span>
+              </div>
+              <div class="health-flow-viewport-wrap">
+              <div class="health-flow-scroll" data-health-flow-viewport>
+                <svg class="health-flow-canvas" viewBox="0 0 1380 1605" role="img" aria-label="Diagrama do fluxo do usuário no WhatsApp do Agente do paciente">
+                  <defs>
+                    <marker id="flowArrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                      <path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"></path>
+                    </marker>
+                  </defs>
+
+                  <!-- Conexões: autenticação -->
+                  <path class="flow-edge" d="M650,79 L650,130" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,196 L650,261" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,334 L650,373" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M772,446 L814,446" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,519 L650,571" marker-end="url(#flowArrow)"></path>
+                  <!-- Conexões: escolha das opções -->
+                  <path class="flow-edge" d="M524,647 L200,647 L200,776" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,722 L650,779" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M776,647 L1130,647 L1130,776" marker-end="url(#flowArrow)"></path>
+                  <!-- Conexões: exames -->
+                  <path class="flow-edge" d="M200,852 L200,920" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M200,996 L200,1064" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M200,1140 L200,1199" marker-end="url(#flowArrow)"></path>
+                  <!-- Conexões: dúvidas -->
+                  <path class="flow-edge" d="M650,850 L650,876" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,1012 L650,1053" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M530,944 L495,944" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,1128 L650,1159" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M405,978 L405,1227 L528,1227" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M650,1296 L650,1352" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M772,1227 L800,1227" marker-end="url(#flowArrow)"></path>
+                  <!-- Conexões: renovação -->
+                  <path class="flow-edge" d="M1130,852 L1130,920" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M1130,996 L1130,1064" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M1130,1140 L1130,1213" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M1130,1289 L1130,1324" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M1130,1461 L1130,1484 L1010,1484 L1010,1501" marker-end="url(#flowArrow)"></path>
+                  <path class="flow-edge" d="M1130,1461 L1130,1484 L1252,1484 L1252,1501" marker-end="url(#flowArrow)"></path>
+
+                  <!-- Rótulos das conexões -->
+                  <text class="flow-elabel" text-anchor="middle" x="352" y="632">Exames</text>
+                  <text class="flow-elabel" text-anchor="start" x="666" y="753">Dúvidas</text>
+                  <text class="flow-elabel" text-anchor="middle" x="935" y="632">Renovação</text>
+                  <text class="flow-elabel" text-anchor="start" x="782" y="432">Não</text>
+                  <text class="flow-elabel" text-anchor="start" x="666" y="550">Sim</text>
+                  <text class="flow-elabel" text-anchor="start" x="666" y="1036">Sim</text>
+                  <text class="flow-elabel" text-anchor="end" x="504" y="930">Não</text>
+                  <text class="flow-elabel" text-anchor="start" x="666" y="1329">Sim</text>
+                  <text class="flow-elabel" text-anchor="start" x="778" y="1213">Não</text>
+                  <text class="flow-elabel" text-anchor="middle" x="1052" y="1477">Sim</text>
+                  <text class="flow-elabel" text-anchor="middle" x="1210" y="1477">Não</text>
+
+                  <!-- Nós: autenticação -->
+                  <rect class="flow-box is-start" x="543" y="25" width="214" height="46" rx="23"></rect>
+                  <text class="flow-t is-strong" text-anchor="middle" dominant-baseline="middle" x="650" y="48">Paciente inicia no WhatsApp</text>
+
+                  <rect class="flow-box is-spine" x="530" y="130" width="240" height="56" rx="16"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="158">Agente solicita o CPF</text>
+
+                  <rect class="flow-box is-spine" x="508" y="261" width="284" height="62" rx="16"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="282">Confirma identidade por</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="306">código (SMS/e-mail)</text>
+
+                  <polygon class="flow-diamond" points="650,373 772,446 650,519 528,446"></polygon>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="438">Autenticação</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="458">confirmada?</text>
+
+                  <rect class="flow-box is-end" x="814" y="418" width="196" height="48" rx="24"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="912" y="442">Encerra por segurança</text>
+
+                  <polygon class="flow-diamond" points="650,571 776,647 650,722 524,647"></polygon>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="639">O que o paciente</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="659">deseja?</text>
+
+                  <!-- Nós: exames -->
+                  <rect class="flow-box is-exam" x="92" y="776" width="216" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="798">Paciente envia exame</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="820">(PDF ou imagem)</text>
+
+                  <rect class="flow-box is-exam" x="92" y="920" width="216" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="942">Agente atualiza o</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="964">histórico médico</text>
+
+                  <rect class="flow-box is-exam" x="92" y="1064" width="216" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="1086">Confirma o recebimento</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="1108">ao paciente</text>
+
+                  <rect class="flow-box is-end" x="112" y="1199" width="176" height="48" rx="24"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="200" y="1223">Concluído</text>
+
+                  <!-- Nós: dúvidas -->
+                  <rect class="flow-box is-doubt" x="535" y="779" width="230" height="60" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="809">Paciente faz uma dúvida</text>
+
+                  <polygon class="flow-diamond" points="650,876 770,944 650,1012 530,944"></polygon>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="936">É sobre o</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="956">histórico médico?</text>
+
+                  <rect class="flow-box is-doubt" x="315" y="910" width="180" height="58" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="405" y="931">Orienta procurar</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="405" y="953">o médico</text>
+
+                  <rect class="flow-box is-doubt" x="530" y="1053" width="240" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="1075">Responde dentro do</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="1097">escopo do histórico</text>
+
+                  <polygon class="flow-diamond" points="650,1159 772,1227 650,1296 528,1227"></polygon>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="1219">Dúvida</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="1239">resolvida?</text>
+
+                  <rect class="flow-box is-end" x="550" y="1352" width="200" height="48" rx="24"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="650" y="1376">Encerra o chat</text>
+
+                  <rect class="flow-box is-doubt" x="800" y="1189" width="200" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="900" y="1211">Aviso: consultar o</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="900" y="1233">médico (nova opção)</text>
+
+                  <!-- Nós: renovação -->
+                  <rect class="flow-box is-renew" x="1014" y="776" width="232" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="798">Paciente escolhe a</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="820">especialidade</text>
+
+                  <rect class="flow-box is-renew" x="1014" y="920" width="232" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="942">Busca médicos e</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="964">horários próximos</text>
+
+                  <rect class="flow-box is-renew" x="1014" y="1064" width="232" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="1086">Paciente escolhe</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="1108">o horário</text>
+
+                  <rect class="flow-box is-renew" x="1012" y="1213" width="236" height="64" rx="14"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="1235">Notifica a agenda e</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="1259">aguarda confirmação</text>
+
+                  <polygon class="flow-diamond" points="1130,1324 1248,1392 1130,1461 1012,1392"></polygon>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="1384">Médico</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1130" y="1404">aprovou?</text>
+
+                  <rect class="flow-box is-end" x="908" y="1501" width="204" height="56" rx="16"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1010" y="1519">SMS/e-mail:</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1010" y="1541">marcação aprovada</text>
+
+                  <rect class="flow-box is-end" x="1150" y="1501" width="204" height="56" rx="16"></rect>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1252" y="1519">SMS/e-mail:</text>
+                  <text class="flow-t" text-anchor="middle" dominant-baseline="middle" x="1252" y="1541">marcação reprovada</text>
+                </svg>
+              </div>
+              <div class="health-flow-zoom" role="group" aria-label="Controles de zoom do fluxo">
+                <button type="button" data-health-flow-zoom="out" aria-label="Diminuir zoom">
+                  <span class="material-symbols-rounded" aria-hidden="true">remove</span>
+                </button>
+                <button type="button" data-health-flow-zoom="reset" aria-label="Ajustar à tela">
+                  <span class="material-symbols-rounded" aria-hidden="true">fit_screen</span>
+                </button>
+                <button type="button" data-health-flow-zoom="in" aria-label="Aumentar zoom">
+                  <span class="material-symbols-rounded" aria-hidden="true">add</span>
+                </button>
+              </div>
+              </div>
+              <p class="health-flow-hint">Arraste para navegar • use os botões, a roda do mouse com Ctrl ou pinça para dar zoom.</p>
+            </div>
+          </div>
+        </div>
+
+        <div id="directChatDrawer" class="direct-chat-drawer" aria-hidden="true">
           <div class="direct-chat-backdrop" data-direct-chat-close tabindex="-1" aria-hidden="true"></div>
           <aside
             class="direct-chat-panel"
@@ -10613,6 +11388,6 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/locales/pt-br/global.js"></script>
     <script src="./assets/chart.umd.min.js"></script>
     <script src="./auth.js?v=20260701-hybrid-flow-voice-page"></script>
-    <script src="./app.js?v=20260731-health-exam-report-menu"></script>
+    <script src="./app.js?v=20260807-ui-tweaks7"></script>
   </body>
 </html>

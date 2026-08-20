@@ -640,9 +640,19 @@ const automationCreateCodeApproveBtn = document.getElementById('automationCreate
 const automationCreateCodeRejectBtn = document.getElementById('automationCreateCodeRejectBtn');
 const automationCreateCodeRejectedState = document.getElementById('automationCreateCodeRejectedState');
 const automationCodeHistoryToggle = document.getElementById('automationCodeHistoryToggle');
-const automationCodeHistoryPanel = document.getElementById('automationCodeHistoryPanel');
+const automationCodeHistoryModal = document.getElementById('automationCodeHistoryModal');
 const automationCodeHistoryList = document.getElementById('automationCodeHistoryList');
 const automationCodeHistoryEmpty = document.getElementById('automationCodeHistoryEmpty');
+const automationCodeEditActions = document.getElementById('automationCodeEditActions');
+const automationCodeEditToggle = document.getElementById('automationCodeEditToggle');
+const automationCodeEditModal = document.getElementById('automationCodeEditModal');
+const automationCodeEditError = document.getElementById('automationCodeEditError');
+const automationCodeEditChat = document.getElementById('automationCodeEditChat');
+const automationCodeEditPromptInput = document.getElementById('automationCodeEditPromptInput');
+const automationCodeEditPromptSend = document.getElementById('automationCodeEditPromptSend');
+const automationCodeEditUploadBtn = document.getElementById('automationCodeEditUploadBtn');
+const automationCodeEditUploadInput = document.getElementById('automationCodeEditUploadInput');
+const automationCodeEditHint = document.getElementById('automationCodeEditHint');
 const automationAiEditPrompt = document.getElementById('automationAiEditPrompt');
 const automationAiEditInput = document.getElementById('automationAiEditInput');
 const automationAiEditSend = document.getElementById('automationAiEditSend');
@@ -1458,9 +1468,9 @@ let projectEnvironmentOverrides = readProjectEnvironmentOverrides();
 let projectPromptOverrides = readProjectPromptOverrides();
 const periodFilterBtn = document.getElementById('periodFilterBtn');
 const periodFilterMenu = document.getElementById('periodFilterMenu');
-const periodOptions = document.querySelectorAll('.period-option');
-const rangeFields = document.querySelectorAll('.period-field.range-only');
-const singleField = document.querySelector('.period-field.single-only');
+const periodOptions = document.querySelectorAll('#periodFilterMenu .audit-period-option');
+const rangeFields = document.querySelectorAll('#periodFilterMenu .audit-range-only');
+const singleField = document.querySelector('#periodFilterMenu .audit-single-only');
 const addToggles = document.querySelectorAll('.add-toggle');
 const dismissibleInfoBanners = document.querySelectorAll('.info-banner.dismissible');
 const settingsSaveBtn = document.getElementById('settingsSaveBtn');
@@ -2510,6 +2520,14 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
   if (!voiceMessagingInsightsChartCanvas || !window.Chart) return;
   if (voiceMessagingInsightsChart) return;
 
+  // Paleta sensível ao tema (claro/escuro)
+  const isDarkTheme = document.body.classList.contains('theme-dark');
+  const vmTickColor = isDarkTheme ? '#b8bcc4' : '#64748b';
+  const vmStrongColor = isDarkTheme ? '#d3d7dd' : '#475569';
+  const vmGridColor = isDarkTheme ? 'rgba(148, 163, 184, 0.14)' : 'rgba(214, 224, 237, 0.9)';
+  const vmTooltipBg = isDarkTheme ? '#2e3033' : '#0f172a';
+  const vmRefusedColor = isDarkTheme ? 'rgba(56, 188, 255, 0.24)' : '#dbeafe';
+
   voiceMessagingInsightsChart = new window.Chart(voiceMessagingInsightsChartCanvas, {
     type: 'bar',
     data: {
@@ -2536,7 +2554,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
         {
           label: 'Recusadas',
           data: [0, 0],
-          backgroundColor: '#dbeafe',
+          backgroundColor: vmRefusedColor,
           borderRadius: getVoiceMessagingInsightsBarRadius,
           borderSkipped: false,
           stack: 'calls',
@@ -2573,7 +2591,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
             pointStyle: 'rectRounded',
             boxWidth: 12,
             boxHeight: 12,
-            color: '#475569',
+            color: vmStrongColor,
             font: {
               family: 'inherit',
               size: 13,
@@ -2583,7 +2601,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
           },
         },
         tooltip: {
-          backgroundColor: '#0f172a',
+          backgroundColor: vmTooltipBg,
           titleColor: '#f8fafc',
           bodyColor: '#e2e8f0',
           padding: 12,
@@ -2616,7 +2634,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
             display: false,
           },
           ticks: {
-            color: '#475569',
+            color: vmStrongColor,
             font: {
               family: 'inherit',
               size: 13,
@@ -2626,7 +2644,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
           title: {
             display: true,
             text: 'Horário do disparo',
-            color: '#64748b',
+            color: vmTickColor,
             font: {
               family: 'inherit',
               size: 12,
@@ -2642,7 +2660,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
           ticks: {
             stepSize: 1,
             precision: 0,
-            color: '#64748b',
+            color: vmTickColor,
             font: {
               family: 'inherit',
               size: 12,
@@ -2650,7 +2668,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
             },
           },
           grid: {
-            color: 'rgba(214, 224, 237, 0.9)',
+            color: vmGridColor,
             drawBorder: false,
           },
           border: {
@@ -2659,7 +2677,7 @@ function syncVoiceMessagingInsightsChart(routeKey = '') {
           title: {
             display: true,
             text: 'Quantidade de chamadas',
-            color: '#64748b',
+            color: vmTickColor,
             font: {
               family: 'inherit',
               size: 12,
@@ -2706,59 +2724,92 @@ function syncHealthOverviewCharts(routeKey = '') {
     return;
   }
 
-  const axisTick = { family: 'inherit', size: 12, weight: '600' };
-  const gridColor = 'rgba(214, 224, 237, 0.9)';
+  // Paleta sensível ao tema (claro/escuro).
+  const isDarkTheme = document.body.classList.contains('theme-dark');
+  const axisTick = { family: 'inherit', size: 10, weight: '600' };
+  const gridColor = isDarkTheme ? 'rgba(148, 163, 184, 0.14)' : 'rgba(214, 224, 237, 0.9)';
+  const tickColor = isDarkTheme ? '#94a3b8' : '#64748b';
+  const tickStrongColor = isDarkTheme ? '#cbd5e1' : '#334155';
+  const legendColor = isDarkTheme ? '#cbd5e1' : '#475569';
+  const donutBorderColor = isDarkTheme ? '#121212' : '#ffffff';
   const tooltipStyle = {
-    backgroundColor: '#0f172a',
+    backgroundColor: isDarkTheme ? '#2e3033' : '#0f172a',
     titleColor: '#f8fafc',
     bodyColor: '#e2e8f0',
     padding: 12,
   };
+  // Gradiente horizontal para as barras (recalculado quando o gráfico ganha área).
+  const makeBarGradient = (from, to) => (context) => {
+    const { ctx, chartArea } = context.chart;
+    if (!chartArea) return from;
+    const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+    gradient.addColorStop(0, from);
+    gradient.addColorStop(1, to);
+    return gradient;
+  };
 
   const whatsappCanvas = document.getElementById('healthOverviewWhatsappChart');
   if (whatsappCanvas) {
+    const whatsappLine = isDarkTheme ? '#3b82f6' : '#2563eb';
     healthOverviewWhatsappChart = new window.Chart(whatsappCanvas, {
-      type: 'doughnut',
+      type: 'line',
       data: {
-        labels: ['Envio de exames', 'Dúvidas', 'Encaixe para renovação'],
+        // Últimos 7 dias (11 a 17/08/2026), perfil de dia da semana: fim de semana fraco, segunda cheia. Soma = 142.
+        labels: ['11', '12', '13', '14', '15', '16', '17'],
         datasets: [
           {
-            data: [58, 49, 35],
-            backgroundColor: ['#016ff4', '#22c55e', '#f59e0b'],
-            borderColor: '#ffffff',
+            label: 'Atendimentos',
+            data: [24, 22, 21, 20, 12, 10, 33],
+            fill: true,
+            borderColor: whatsappLine,
+            backgroundColor: (context) => {
+              const { ctx, chartArea } = context.chart;
+              if (!chartArea) return 'rgba(37, 99, 235, 0.16)';
+              const gradient = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              gradient.addColorStop(0, isDarkTheme ? 'rgba(59, 130, 246, 0.32)' : 'rgba(37, 99, 235, 0.22)');
+              gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+              return gradient;
+            },
             borderWidth: 2,
-            hoverOffset: 6,
+            tension: 0.4,
+            pointRadius: 2.5,
+            pointHoverRadius: 4,
+            pointBackgroundColor: whatsappLine,
+            pointBorderColor: donutBorderColor,
+            pointBorderWidth: 1,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '56%',
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              pointStyle: 'circle',
-              boxWidth: 10,
-              boxHeight: 10,
-              color: '#475569',
-              font: { family: 'inherit', size: 12, weight: '600' },
-              padding: 14,
-            },
-          },
+          legend: { display: false },
           tooltip: {
             ...tooltipStyle,
             callbacks: {
+              title(items) {
+                return `${items[0].label} de ago. de 2026`;
+              },
               label(context) {
-                const dataset = context.dataset.data || [];
-                const total = dataset.reduce((sum, value) => sum + Number(value || 0), 0);
-                const value = Number(context.parsed || 0);
-                const pct = total ? Math.round((value / total) * 100) : 0;
-                return ` ${context.label}: ${value} (${pct}%)`;
+                const value = Number(context.parsed.y || 0);
+                const suffix = value === 1 ? 'atendimento' : 'atendimentos';
+                return ` ${value} ${suffix}`;
               },
             },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false, drawBorder: false },
+            border: { display: false },
+            ticks: { color: tickColor, font: { family: 'inherit', size: 10, weight: '500' } },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: gridColor, drawBorder: false },
+            border: { display: false },
+            ticks: { color: tickColor, precision: 0, font: { family: 'inherit', size: 10, weight: '500' } },
           },
         },
       },
@@ -2782,11 +2833,11 @@ function syncHealthOverviewCharts(routeKey = '') {
           {
             label: 'Consultas com assistente',
             data: [28, 21, 16, 12, 8, 4],
-            backgroundColor: '#0b82f9',
-            hoverBackgroundColor: '#016ff4',
-            borderRadius: 6,
+            backgroundColor: makeBarGradient(isDarkTheme ? '#3b82f6' : '#2563eb', isDarkTheme ? '#22d3ee' : '#06b6d4'),
+            hoverBackgroundColor: makeBarGradient(isDarkTheme ? '#60a5fa' : '#1d4ed8', isDarkTheme ? '#67e8f9' : '#0891b2'),
+            borderRadius: 8,
             borderSkipped: false,
-            maxBarThickness: 22,
+            maxBarThickness: 20,
           },
         ],
       },
@@ -2813,12 +2864,12 @@ function syncHealthOverviewCharts(routeKey = '') {
             beginAtZero: true,
             grid: { color: gridColor, drawBorder: false },
             border: { display: false },
-            ticks: { color: '#64748b', precision: 0, font: { family: 'inherit', size: 12, weight: '500' } },
+            ticks: { color: tickColor, precision: 0, font: { family: 'inherit', size: 10, weight: '500' } },
           },
           y: {
             grid: { display: false, drawBorder: false },
             border: { display: false },
-            ticks: { color: '#334155', font: axisTick },
+            ticks: { color: tickStrongColor, font: axisTick },
           },
         },
       },
@@ -2834,17 +2885,17 @@ function syncHealthOverviewCharts(routeKey = '') {
         datasets: [
           {
             data: [58, 79, 183],
-            backgroundColor: ['#ef4444', '#f59e0b', '#22c55e'],
-            borderColor: '#ffffff',
-            borderWidth: 2,
-            hoverOffset: 6,
+            backgroundColor: isDarkTheme ? ['#f87171', '#fbbf24', '#4ade80'] : ['#ef4444', '#f59e0b', '#22c55e'],
+            borderColor: donutBorderColor,
+            borderWidth: 3,
+            hoverOffset: 8,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '56%',
+        cutout: '68%',
         // Ao clicar em um segmento, leva para a Prestação de contas já filtrada pelo risco.
         onClick(event, elements) {
           if (!elements || !elements.length) return;
@@ -2863,18 +2914,7 @@ function syncHealthOverviewCharts(routeKey = '') {
           if (target) target.style.cursor = elements && elements.length ? 'pointer' : 'default';
         },
         plugins: {
-          legend: {
-            position: 'bottom',
-            labels: {
-              usePointStyle: true,
-              pointStyle: 'circle',
-              boxWidth: 10,
-              boxHeight: 10,
-              color: '#475569',
-              font: { family: 'inherit', size: 12, weight: '600' },
-              padding: 14,
-            },
-          },
+          legend: { display: false },
           tooltip: {
             ...tooltipStyle,
             callbacks: {
@@ -2886,58 +2926,6 @@ function syncHealthOverviewCharts(routeKey = '') {
                 return ` ${context.label}: ${value} documentos (${pct}%)`;
               },
             },
-          },
-        },
-      },
-    });
-  }
-
-  const examsCanvas = document.getElementById('healthOverviewExamsChart');
-  if (examsCanvas) {
-    healthOverviewExamsChart = new window.Chart(examsCanvas, {
-      type: 'bar',
-      data: {
-        labels: ['Hemoglobina (HB)', 'Glicemia (GLI)', 'Colesterol (COL)', 'TSH (tireoide)', 'Creatinina (CREA)', 'Ureia (URE)'],
-        datasets: [
-          {
-            label: 'Ocorrências identificadas',
-            data: [412, 388, 351, 298, 254, 208],
-            backgroundColor: '#16a34a',
-            hoverBackgroundColor: '#15803d',
-            borderRadius: 6,
-            borderSkipped: false,
-            maxBarThickness: 22,
-          },
-        ],
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        layout: { padding: { right: 12 } },
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            ...tooltipStyle,
-            callbacks: {
-              label(context) {
-                const value = Number(context.parsed.x || 0);
-                return ` ${value} ocorrências`;
-              },
-            },
-          },
-        },
-        scales: {
-          x: {
-            beginAtZero: true,
-            grid: { color: gridColor, drawBorder: false },
-            border: { display: false },
-            ticks: { color: '#64748b', precision: 0, font: { family: 'inherit', size: 12, weight: '500' } },
-          },
-          y: {
-            grid: { display: false, drawBorder: false },
-            border: { display: false },
-            ticks: { color: '#334155', font: axisTick },
           },
         },
       },
@@ -9839,7 +9827,8 @@ if (auditPeriodBtn && auditPeriodMenu) {
     auditPeriodMenu.classList.toggle('open');
   });
 
-  document.addEventListener('click', () => {
+  document.addEventListener('click', (event) => {
+    if (auditPeriodMenu.contains(event.target) || auditPeriodBtn.contains(event.target)) return;
     auditPeriodMenu.classList.remove('open');
   });
 
@@ -12434,6 +12423,8 @@ if (automationStatusSwitches.length) {
     };
   }
 
+  let automationCodeEditMessages = [];
+
   function getAutomationCreateControls() {
     if (!hasAutomationCreateForm) return null;
     return {
@@ -12469,9 +12460,18 @@ if (automationStatusSwitches.length) {
       uploadZipTitle: automationUploadZipTitle,
       uploadZipList: automationUploadZipList,
       historyToggle: automationCodeHistoryToggle,
-      historyPanel: automationCodeHistoryPanel,
+      historyModal: automationCodeHistoryModal,
       historyList: automationCodeHistoryList,
       historyEmpty: automationCodeHistoryEmpty,
+      codeEditToggle: automationCodeEditToggle,
+      codeEditModal: automationCodeEditModal,
+      codeEditError: automationCodeEditError,
+      codeEditChat: automationCodeEditChat,
+      codeEditPromptInput: automationCodeEditPromptInput,
+      codeEditPromptSend: automationCodeEditPromptSend,
+      codeEditUploadBtn: automationCodeEditUploadBtn,
+      codeEditUploadInput: automationCodeEditUploadInput,
+      codeEditHint: automationCodeEditHint,
       aiPrompt: automationAiEditPrompt,
       aiInput: automationAiEditInput,
       aiSend: automationAiEditSend,
@@ -12913,6 +12913,7 @@ if (automationStatusSwitches.length) {
     if (paramsObject.source === 'file') return 'Upload';
     if (paramsObject.source === 'mock_ai') return 'IA';
     if (paramsObject.source === 'saved_code') return 'Salvo';
+    if (paramsObject.source === 'manual_edit') return 'Manual';
     return 'Criação';
   }
 
@@ -12989,6 +12990,349 @@ if (automationStatusSwitches.length) {
         </article>
       `).join('')
       : '';
+  }
+
+  function setAutomationCodeEditError(controls, message) {
+    if (!controls?.codeEditError) return;
+    controls.codeEditError.textContent = message;
+    controls.codeEditError.hidden = !message;
+  }
+
+  function setAutomationCodeEditHint(message = '', state = '') {
+    if (!automationCodeEditHint) return;
+    automationCodeEditHint.textContent = message || 'Peça a mudança para a IA ou envie um arquivo .cs, .java, .py ou .zip. A nova versão só é aplicada depois da sua aprovação.';
+    automationCodeEditHint.classList.toggle('is-error', state === 'error');
+    automationCodeEditHint.classList.toggle('is-success', state === 'success');
+  }
+
+  function formatAutomationCodeEditTime(value = '') {
+    const date = value ? new Date(value) : new Date();
+    if (Number.isNaN(date.getTime())) return '';
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function appendAutomationCodeEditMessage(message = {}) {
+    const entry = {
+      id: `msg-${Date.now().toString(36)}-${automationCodeEditMessages.length + 1}`,
+      role: 'agent',
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+      ...message,
+    };
+    automationCodeEditMessages.push(entry);
+    renderAutomationCodeEditChat();
+    return entry;
+  }
+
+  function getAutomationCodeEditMessage(messageId) {
+    return automationCodeEditMessages.find((item) => item.id === messageId) || null;
+  }
+
+  function hasPendingAutomationCodeEditProposal() {
+    return automationCodeEditMessages.some((item) => item.kind === 'proposal' && item.status === 'pending');
+  }
+
+  function renderAutomationCodeEditProposal(message) {
+    const statusLabel = message.status === 'approved'
+      ? 'Aprovado'
+      : message.status === 'rejected'
+        ? 'Reprovado'
+        : 'Aguardando aprovação';
+    const actions = message.status === 'pending'
+      ? `
+        <div class="automation-code-edit-proposal-actions">
+          <button class="btn outline automation-code-edit-reject" type="button" data-code-edit-reject="${escapeHtmlWes(message.id)}">
+            <span class="material-symbols-rounded" aria-hidden="true">close</span>
+            Reprovar
+          </button>
+          <button class="btn primary automation-code-edit-approve" type="button" data-code-edit-approve="${escapeHtmlWes(message.id)}">
+            <span class="material-symbols-rounded" aria-hidden="true">check</span>
+            Aprovar
+          </button>
+        </div>`
+      : '';
+    return `
+      <div class="automation-code-edit-proposal" data-status="${escapeHtmlWes(message.status)}">
+        <div class="automation-code-edit-proposal-head">
+          <strong>${escapeHtmlWes(message.proposalTitle || 'Nova versão do código')}</strong>
+          <span class="automation-code-edit-proposal-badge">${escapeHtmlWes(statusLabel)}</span>
+        </div>
+        <pre class="automation-code-edit-proposal-code"><code>${escapeHtmlWes(message.code || '')}</code></pre>
+        ${actions}
+      </div>`;
+  }
+
+  function renderAutomationCodeEditChat() {
+    if (!automationCodeEditChat) return;
+    const isEmpty = !automationCodeEditMessages.length;
+    automationCodeEditChat.classList.toggle('is-empty', isEmpty);
+    if (isEmpty) {
+      automationCodeEditChat.innerHTML = `
+        <div class="chat-empty">
+          <div class="chat-empty-card">
+            <div class="chat-empty-title">Comece por aqui</div>
+            <div class="chat-empty-text">Posso alterar o código desta automação. Descreva a mudança que você precisa ou envie um arquivo .cs, .java, .py ou .zip com a nova versão.</div>
+            <div class="chat-empty-hint">Nada é aplicado sem a sua aprovação.</div>
+          </div>
+        </div>`;
+      return;
+    }
+    automationCodeEditChat.innerHTML = automationCodeEditMessages.map((message) => {
+      const isUser = message.role === 'user';
+      const author = isUser ? 'Você' : 'Agente de código';
+      const time = formatAutomationCodeEditTime(message.createdAt);
+      const proposal = message.kind === 'proposal' ? renderAutomationCodeEditProposal(message) : '';
+      return `
+        <article class="automation-code-edit-message automation-code-edit-message--${isUser ? 'user' : 'agent'}">
+          <span class="automation-code-edit-meta">${escapeHtmlWes(author)}${time ? ` · ${escapeHtmlWes(time)}` : ''}</span>
+          <div class="automation-code-edit-bubble">
+            ${message.text ? `<p>${escapeHtmlWes(message.text)}</p>` : ''}
+            ${proposal}
+          </div>
+        </article>`;
+    }).join('');
+    automationCodeEditChat.scrollTop = automationCodeEditChat.scrollHeight;
+  }
+
+  function syncAutomationCodeEditComposer() {
+    const controls = getAutomationCreateControls();
+    const hasPending = hasPendingAutomationCodeEditProposal();
+    if (controls?.codeEditPromptInput) controls.codeEditPromptInput.disabled = hasPending;
+    if (controls?.codeEditUploadBtn) controls.codeEditUploadBtn.disabled = hasPending;
+    if (controls?.codeEditPromptSend) {
+      controls.codeEditPromptSend.disabled = hasPending
+        || !String(controls.codeEditPromptInput?.value || '').trim();
+    }
+  }
+
+  function openAutomationCodeHistoryModal() {
+    const controls = getAutomationCreateControls();
+    if (!controls?.historyModal) return;
+    renderAutomationCodeHistory(controls);
+    controls.historyModal.classList.add('open');
+    controls.historyModal.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeAutomationCodeHistoryModal() {
+    if (!automationCodeHistoryModal) return;
+    automationCodeHistoryModal.classList.remove('open');
+    automationCodeHistoryModal.setAttribute('aria-hidden', 'true');
+  }
+
+  function openAutomationCodeEditModal() {
+    const controls = getAutomationCreateControls();
+    if (!controls?.codeEditModal) return;
+    automationCodeEditMessages = [];
+    if (controls.codeEditPromptInput) controls.codeEditPromptInput.value = '';
+    if (controls.codeEditUploadInput) controls.codeEditUploadInput.value = '';
+    setAutomationCodeEditError(controls, '');
+    setAutomationCodeEditHint('');
+    renderAutomationCodeEditChat();
+    syncAutomationCodeEditComposer();
+    controls.codeEditModal.classList.add('open');
+    controls.codeEditModal.setAttribute('aria-hidden', 'false');
+    scheduleLucideRefresh();
+    window.setTimeout(() => controls.codeEditPromptInput?.focus(), 0);
+  }
+
+  function closeAutomationCodeEditModal() {
+    if (!automationCodeEditModal) return;
+    automationCodeEditModal.classList.remove('open');
+    automationCodeEditModal.setAttribute('aria-hidden', 'true');
+  }
+
+  function buildAutomationCodeEditDraftParams(controls, overrides = {}) {
+    let draftParams = {};
+    try {
+      draftParams = JSON.parse(controls.form.dataset.generatedDraft || '{}');
+    } catch {
+      draftParams = {};
+    }
+    return {
+      ...draftParams,
+      language: controls.language?.value || draftParams.language || 'csharp',
+      scheduled: Boolean(controls.scheduled?.checked),
+      previous_code: String(controls.form.dataset.generatedCode || controls.codeContent?.textContent || ''),
+      ...overrides,
+    };
+  }
+
+  function requestAutomationCodeEditFromPrompt(promptText = '') {
+    const controls = getAutomationCreateControls();
+    if (!controls?.form) return;
+    const request = String(promptText || '').trim();
+    if (!request) return;
+    if (hasPendingAutomationCodeEditProposal()) {
+      setAutomationCodeEditError(controls, 'Aprove ou reprove a versão pendente antes de pedir outra mudança.');
+      return;
+    }
+
+    setAutomationCodeEditError(controls, '');
+    appendAutomationCodeEditMessage({ role: 'user', text: request });
+    if (controls.codeEditPromptInput) controls.codeEditPromptInput.value = '';
+
+    const description = buildAutomationMockAiDescription(request, controls);
+    const draftParams = buildAutomationCodeEditDraftParams(controls, {
+      source: 'mock_ai',
+      mocked: true,
+      mock_description: true,
+      change_request: true,
+      ai_prompt: request,
+      description,
+    });
+    const generatedCode = buildAutomationGeneratedCode(controls, draftParams);
+
+    appendAutomationCodeEditMessage({
+      role: 'agent',
+      kind: 'proposal',
+      proposalSource: 'ia',
+      proposalTitle: 'Nova versão gerada com IA',
+      text: description,
+      code: generatedCode,
+      description,
+      prompt: request,
+      status: 'pending',
+    });
+    setAutomationCodeEditHint('Revise a versão proposta e aprove para aplicar no código da automação.');
+    syncAutomationCodeEditComposer();
+  }
+
+  async function requestAutomationCodeEditFromUpload(file) {
+    const controls = getAutomationCreateControls();
+    if (!controls?.form || !file) return;
+    if (hasPendingAutomationCodeEditProposal()) {
+      setAutomationCodeEditError(controls, 'Aprove ou reprove a versão pendente antes de enviar outro arquivo.');
+      return;
+    }
+
+    const isZipUpload = isAutomationZipUpload(file);
+    const isSourceUpload = isAutomationSourceCodeUpload(file);
+    if (!isZipUpload && !isSourceUpload) {
+      const message = 'Envie um arquivo .cs, .java, .py ou .zip com código C#, Java ou Python.';
+      setAutomationCodeEditError(controls, message);
+      setAutomationCodeEditHint(message, 'error');
+      return;
+    }
+
+    setAutomationCodeEditError(controls, '');
+    appendAutomationCodeEditMessage({ role: 'user', text: `Enviei o arquivo ${file.name}.` });
+
+    const zipEntryNames = isZipUpload ? await readAutomationZipEntryNames(file).catch(() => []) : [];
+    const detectedLanguage = isZipUpload
+      ? detectAutomationCodeFileLanguageFromNames(zipEntryNames)
+      : await detectAutomationUploadLanguage(file);
+    if (isZipUpload && !detectedLanguage) {
+      const message = 'O ZIP precisa conter pelo menos um arquivo de código .cs, .java ou .py.';
+      setAutomationCodeEditError(controls, message);
+      setAutomationCodeEditHint(message, 'error');
+      appendAutomationCodeEditMessage({ role: 'agent', text: message });
+      syncAutomationCodeEditComposer();
+      return;
+    }
+
+    const uploadedCode = isZipUpload
+      ? buildAutomationZipPreviewCode(file, zipEntryNames)
+      : await readAutomationUploadedSourceCode(file);
+    if (!String(uploadedCode || '').trim()) {
+      const message = 'Não foi possível ler o código deste arquivo. Tente outro arquivo.';
+      setAutomationCodeEditError(controls, message);
+      setAutomationCodeEditHint(message, 'error');
+      appendAutomationCodeEditMessage({ role: 'agent', text: message });
+      syncAutomationCodeEditComposer();
+      return;
+    }
+
+    const languageLabel = detectedLanguage
+      ? `Linguagem detectada: ${getAutomationLanguageLabel(detectedLanguage)}.`
+      : 'Não foi possível detectar a linguagem automaticamente.';
+    appendAutomationCodeEditMessage({
+      role: 'agent',
+      kind: 'proposal',
+      proposalSource: 'upload',
+      proposalTitle: isZipUpload ? `Pacote ${file.name}` : `Arquivo ${file.name}`,
+      text: `Recebi ${file.name}. ${languageLabel} Revise e aprove para usar esta versão.`,
+      code: uploadedCode,
+      description: `Código enviado pelo arquivo ${file.name}.`,
+      fileName: file.name,
+      fileType: file.type || 'desconhecido',
+      isZip: isZipUpload,
+      zipEntryNames,
+      language: detectedLanguage || controls.language?.value || 'csharp',
+      status: 'pending',
+    });
+    setAutomationCodeEditHint('Revise o código enviado e aprove para aplicar na automação.');
+    syncAutomationCodeEditComposer();
+  }
+
+  function approveAutomationCodeEditProposal(messageId) {
+    const controls = getAutomationCreateControls();
+    const message = getAutomationCodeEditMessage(messageId);
+    if (!controls?.form || !message || message.status !== 'pending') return;
+
+    const isUpload = message.proposalSource === 'upload';
+    if (isUpload && message.language && controls.language && controls.language.value !== message.language) {
+      controls.language.value = message.language;
+      syncAutomationCreateSelectLabels(controls);
+    }
+    if (!isUpload && controls.description && message.description) {
+      controls.description.value = message.description;
+    }
+
+    const extraParams = isUpload
+      ? {
+        source: 'file',
+        mocked: false,
+        change_request: false,
+        reference_file: message.fileName || '',
+        reference_file_type: message.fileType || 'desconhecido',
+        zip_entries: message.isZip ? (message.zipEntryNames || []) : [],
+        language: message.language || controls.language?.value || 'csharp',
+        description: controls.description?.value || '',
+      }
+      : {
+        source: 'mock_ai',
+        mocked: true,
+        mock_description: true,
+        change_request: true,
+        ai_prompt: message.prompt || '',
+        description: message.description || '',
+      };
+
+    updateAutomationGeneratedDraftCode(controls, message.code, {
+      ...extraParams,
+      appendHistory: true,
+      historyTitle: isUpload ? 'Código enviado por upload' : 'Alteração aprovada com IA',
+      historySource: isUpload ? 'Upload' : 'IA',
+      historyDescription: message.description || controls.description?.value || '',
+    });
+    setAutomationCodePreviewState(controls, 'approved', message.code);
+    setAutomationFormError(controls, '');
+
+    message.status = 'approved';
+    renderAutomationCodeEditChat();
+    appendAutomationCodeEditMessage({
+      role: 'agent',
+      text: 'Versão aprovada e aplicada no código da automação. Ela também foi registrada no histórico de versões.',
+    });
+    setAutomationCodeEditHint('Versão aplicada. Peça outra mudança ou feche o editor.', 'success');
+    syncAutomationCodeEditComposer();
+    showAppToast('Código aprovado');
+  }
+
+  function rejectAutomationCodeEditProposal(messageId) {
+    const message = getAutomationCodeEditMessage(messageId);
+    if (!message || message.status !== 'pending') return;
+    message.status = 'rejected';
+    renderAutomationCodeEditChat();
+    appendAutomationCodeEditMessage({
+      role: 'agent',
+      text: 'Versão reprovada e descartada. O código atual da automação continua o mesmo. Descreva com mais detalhes o que precisa mudar ou envie outro arquivo.',
+    });
+    setAutomationCodeEditHint('Versão descartada. Peça uma nova mudança ou envie outro arquivo.');
+    syncAutomationCodeEditComposer();
+    showAppToast('Versão reprovada');
+    const controls = getAutomationCreateControls();
+    window.setTimeout(() => controls?.codeEditPromptInput?.focus(), 0);
   }
 
   function updateAutomationGeneratedDraftCode(controls, code, extraParams = {}) {
@@ -13104,8 +13448,8 @@ if (automationStatusSwitches.length) {
     delete controls.form.dataset.codeApproval;
     delete controls.form.dataset.generatedCode;
     clearAutomationUploadSelectedState(controls);
-    if (controls.historyPanel) controls.historyPanel.hidden = true;
-    if (controls.historyToggle) controls.historyToggle.setAttribute('aria-expanded', 'false');
+    closeAutomationCodeHistoryModal();
+    closeAutomationCodeEditModal();
     if (controls.historyList) controls.historyList.innerHTML = '';
     if (controls.historyEmpty) controls.historyEmpty.hidden = true;
     setAutomationCodePreviewState(controls, '', '');
@@ -13121,6 +13465,7 @@ if (automationStatusSwitches.length) {
     if (!controls?.aiPrompt) return;
     controls.aiPrompt.hidden = false;
     if (controls.aiSend) controls.aiSend.disabled = !String(controls.aiInput?.value || '').trim();
+    scheduleLucideRefresh();
     window.setTimeout(() => controls.aiInput?.focus(), 0);
   }
 
@@ -13570,6 +13915,9 @@ if (automationStatusSwitches.length) {
         ${isEdit ? 'Fazer upload de novo código' : 'Fazer upload do código'}
       `;
     }
+    if (automationCodeEditActions) automationCodeEditActions.hidden = isEdit;
+    if (automationCreateUploadHint) automationCreateUploadHint.hidden = isEdit;
+    if (isEdit) closeAutomationAiEditPrompt();
     document.getElementById('page-automations-create')?.setAttribute('data-title', isEdit ? 'Editar automação' : 'Criar automação');
   }
 
@@ -13645,6 +13993,32 @@ if (automationStatusSwitches.length) {
     openAutomationCreatePage();
   });
 
+  function openScheduleEditPage(scheduleRow) {
+    const controls = getAutomationCreateControls();
+    if (!controls || !scheduleRow) return;
+    const automationRow = findAutomationRowById(scheduleRow.dataset.scheduleAutomationId);
+    openAutomationCreatePage(automationRow, { focus: false });
+
+    if (controls.scheduled) controls.scheduled.checked = true;
+    const scheduleTime = String(scheduleRow.dataset.scheduleTime || '').trim();
+    const scheduleFrequency = String(scheduleRow.dataset.scheduleFrequency || '').trim();
+    if (controls.scheduleTime && scheduleTime) controls.scheduleTime.value = scheduleTime;
+    if (controls.scheduleFrequency && scheduleFrequency) controls.scheduleFrequency.value = scheduleFrequency;
+    syncAutomationSchedulePanel(controls);
+
+    window.setTimeout(() => {
+      controls.schedulePanel?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      controls.scheduleTime?.focus();
+    }, 0);
+  }
+
+  schedulesTable?.addEventListener('click', (event) => {
+    const editButton = event.target.closest('.schedule-edit-trigger');
+    if (!editButton) return;
+    const scheduleRow = editButton.closest('.data-row');
+    openScheduleEditPage(scheduleRow);
+  });
+
   resetAutomationForm(getAutomationCreateControls());
   setAutomationCreatePageMode(null);
   syncAutomationCreateRouteState();
@@ -13672,12 +14046,63 @@ if (automationStatusSwitches.length) {
   });
 
   automationCodeHistoryToggle?.addEventListener('click', () => {
+    openAutomationCodeHistoryModal();
+  });
+
+  automationCodeHistoryModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeAutomationCodeHistoryModal();
+  });
+
+  automationCodeEditToggle?.addEventListener('click', () => {
+    openAutomationCodeEditModal();
+  });
+
+  automationCodeEditModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-modal-close]')) closeAutomationCodeEditModal();
+  });
+
+  automationCodeEditChat?.addEventListener('click', (event) => {
+    const approveBtn = event.target.closest('[data-code-edit-approve]');
+    if (approveBtn) {
+      approveAutomationCodeEditProposal(approveBtn.dataset.codeEditApprove);
+      return;
+    }
+    const rejectBtn = event.target.closest('[data-code-edit-reject]');
+    if (rejectBtn) rejectAutomationCodeEditProposal(rejectBtn.dataset.codeEditReject);
+  });
+
+  automationCodeEditPromptInput?.addEventListener('input', () => {
     const controls = getAutomationCreateControls();
-    if (!controls?.historyPanel) return;
-    const shouldOpen = controls.historyPanel.hidden;
-    controls.historyPanel.hidden = !shouldOpen;
-    controls.historyToggle?.setAttribute('aria-expanded', String(shouldOpen));
-    if (shouldOpen) renderAutomationCodeHistory(controls);
+    if (controls?.codeEditError && !controls.codeEditError.hidden) {
+      setAutomationCodeEditError(controls, '');
+    }
+    syncAutomationCodeEditComposer();
+  });
+
+  automationCodeEditPromptInput?.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' || event.shiftKey) return;
+    event.preventDefault();
+    requestAutomationCodeEditFromPrompt(automationCodeEditPromptInput.value);
+  });
+
+  automationCodeEditPromptSend?.addEventListener('click', () => {
+    requestAutomationCodeEditFromPrompt(automationCodeEditPromptInput?.value);
+  });
+
+  automationCodeEditUploadBtn?.addEventListener('click', () => {
+    automationCodeEditUploadInput?.click();
+  });
+
+  automationCodeEditUploadInput?.addEventListener('change', async () => {
+    const file = automationCodeEditUploadInput.files?.[0];
+    automationCodeEditUploadInput.value = '';
+    if (file) await requestAutomationCodeEditFromUpload(file);
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    if (automationCodeEditModal?.classList.contains('open')) closeAutomationCodeEditModal();
+    if (automationCodeHistoryModal?.classList.contains('open')) closeAutomationCodeHistoryModal();
   });
 
   automationAiEditInput?.addEventListener('input', () => {
@@ -13962,8 +14387,25 @@ if (periodFilterBtn && periodFilterMenu) {
     periodFilterMenu.classList.toggle('open');
   });
 
-  document.addEventListener('click', () => {
+  document.addEventListener('click', (event) => {
+    if (periodFilterMenu.contains(event.target) || periodFilterBtn.contains(event.target)) return;
     periodFilterMenu.classList.remove('open');
+  });
+
+  document.getElementById('executionsApplyPeriodBtn')?.addEventListener('click', () => {
+    periodFilterMenu.classList.remove('open');
+  });
+
+  periodFilterMenu.querySelector('.filter-clear')?.addEventListener('click', () => {
+    periodFilterMenu.querySelectorAll('input[type="date"]').forEach((input) => {
+      input.value = '';
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    periodOptions.forEach((item) => item.classList.remove('active'));
+    const defaultOption = Array.from(periodOptions).find((item) => item.dataset.mode === 'range');
+    defaultOption?.classList.add('active');
+    rangeFields.forEach((field) => field.classList.remove('is-hidden'));
+    singleField?.classList.add('is-hidden');
   });
 }
 
@@ -14585,38 +15027,27 @@ function exportSchedulesCsv() {
 exportSchedulesCsvButton?.addEventListener('click', exportSchedulesCsv);
 
 // Exporta em CSV a lista completa (ranking) das páginas "Ver mais" da Visão geral (Saúde).
-function exportHealthOverviewRanking(tableId, headers, filename) {
+// `metaLines` recebe pares [rótulo, valor] que identificam o período consultado.
+function exportHealthOverviewRanking(tableId, headers, filename, metaLines = []) {
   const table = document.getElementById(tableId);
   if (!table) return;
   const rows = Array.from(table.querySelectorAll('.data-row:not(.header):not([data-table-empty-state="true"])'))
-    .map((row) => Array.from(row.children).slice(0, headers.length).map((cell) => cell.textContent));
+    .map((row) => Array.from(row.children).slice(0, headers.length)
+      // Células com ícone informam o texto limpo em data-csv-value.
+      .map((cell) => String(cell.dataset.csvValue ?? cell.textContent).trim()));
   if (!rows.length) {
     showAppToast('Nenhum dado para exportar');
     return;
   }
   const csv = [
+    ...metaLines.map((line) => line.map(escapeCsvCell).join(';')),
+    ...(metaLines.length ? [''] : []),
     headers.map(escapeCsvCell).join(';'),
     ...rows.map((row) => row.map(escapeCsvCell).join(';')),
   ].join('\n');
   downloadTextFile(filename, `﻿${csv}`, 'text/csv;charset=utf-8');
   showAppToast('Dados exportados em CSV');
 }
-
-document.getElementById('downloadHealthMnemonicsRankingBtn')?.addEventListener('click', () => {
-  exportHealthOverviewRanking(
-    'healthOverviewMnemonicsTable',
-    ['Posição', 'Mnemônico', 'Ocorrências', 'Participação'],
-    'mnemonicos-leitura-exames.csv',
-  );
-});
-
-document.getElementById('downloadHealthDoctorsRankingBtn')?.addEventListener('click', () => {
-  exportHealthOverviewRanking(
-    'healthOverviewDoctorsRankingTable',
-    ['Posição', 'Médico', 'Consultas com assistente', 'Participação'],
-    'medicos-assistente.csv',
-  );
-});
 
 if (automationTabs.length && automationPanels.length) {
   automationTabs.forEach((tab) => {
@@ -17841,7 +18272,8 @@ if (agentHistoryPeriodBtn && agentHistoryPeriodMenu) {
     agentHistoryPeriodMenu.classList.toggle('open');
   });
 
-  document.addEventListener('click', () => {
+  document.addEventListener('click', (event) => {
+    if (agentHistoryPeriodMenu.contains(event.target) || agentHistoryPeriodBtn.contains(event.target)) return;
     agentHistoryPeriodMenu.classList.remove('open');
   });
 
@@ -18369,14 +18801,14 @@ const healthServiceExamRecords = {
     result: 'HbA1c 6,1%, LDL 142 mg/dL, triglicerídeos 178 mg/dL e creatinina preservada.',
     report: 'Controle glicêmico limítrofe e dislipidemia leve. Função renal preservada. Recomenda-se correlacionar com sintomas atuais, hábitos alimentares e medicações em uso.',
     rows: [
-      { marker: 'Hemoglobina glicada', result: '6,1%', reference: 'Meta usual: < 5,7%', status: 'Atenção', tone: 'warning' },
-      { marker: 'Glicemia de jejum', result: '112 mg/dL', reference: '70 a 99 mg/dL', status: 'Atenção', tone: 'warning' },
-      { marker: 'Colesterol total', result: '224 mg/dL', reference: '< 190 mg/dL', status: 'Elevado', tone: 'danger' },
-      { marker: 'LDL', result: '142 mg/dL', reference: 'Meta depende do risco', status: 'Elevado', tone: 'danger' },
-      { marker: 'HDL', result: '48 mg/dL', reference: '> 40 mg/dL', status: 'Adequado', tone: 'success' },
-      { marker: 'Triglicerídeos', result: '178 mg/dL', reference: '< 150 mg/dL', status: 'Atenção', tone: 'warning' },
-      { marker: 'Creatinina', result: '0,9 mg/dL', reference: '0,6 a 1,2 mg/dL', status: 'Adequado', tone: 'success' },
-      { marker: 'TFG estimada', result: '92 mL/min/1,73m²', reference: '> 60 mL/min/1,73m²', status: 'Adequado', tone: 'success' },
+      { marker: 'Hemoglobina glicada', result: '6,1%', reference: 'Meta usual: < 5,7%', status: 'Atenção' },
+      { marker: 'Glicemia de jejum', result: '112 mg/dL', reference: '70 a 99 mg/dL', status: 'Atenção' },
+      { marker: 'Colesterol total', result: '224 mg/dL', reference: '< 190 mg/dL', status: 'Elevado' },
+      { marker: 'LDL', result: '142 mg/dL', reference: 'Meta depende do risco', status: 'Elevado' },
+      { marker: 'HDL', result: '48 mg/dL', reference: '> 40 mg/dL', status: 'Adequado' },
+      { marker: 'Triglicerídeos', result: '178 mg/dL', reference: '< 150 mg/dL', status: 'Atenção' },
+      { marker: 'Creatinina', result: '0,9 mg/dL', reference: '0,6 a 1,2 mg/dL', status: 'Adequado' },
+      { marker: 'TFG estimada', result: '92 mL/min/1,73m²', reference: '> 60 mL/min/1,73m²', status: 'Adequado' },
     ],
     reportItems: [
       'Hemoglobina glicada: 6,1%.',
@@ -18399,10 +18831,10 @@ const healthServiceExamRecords = {
     result: 'Hemoglobina, leucócitos e plaquetas dentro dos intervalos de referência.',
     report: 'Sem sinais laboratoriais relevantes no hemograma. Não há evidência de anemia, leucocitose ou plaquetopenia no registro analisado.',
     rows: [
-      { marker: 'Hemoglobina', result: '13,4 g/dL', reference: '12,0 a 16,0 g/dL', status: 'Adequado', tone: 'success' },
-      { marker: 'Leucócitos', result: '6.800/mm³', reference: '4.000 a 10.000/mm³', status: 'Adequado', tone: 'success' },
-      { marker: 'Plaquetas', result: '248.000/mm³', reference: '150.000 a 450.000/mm³', status: 'Adequado', tone: 'success' },
-      { marker: 'Hematócrito', result: '40%', reference: '36 a 46%', status: 'Adequado', tone: 'success' },
+      { marker: 'Hemoglobina', result: '13,4 g/dL', reference: '12,0 a 16,0 g/dL', status: 'Adequado' },
+      { marker: 'Leucócitos', result: '6.800/mm³', reference: '4.000 a 10.000/mm³', status: 'Adequado' },
+      { marker: 'Plaquetas', result: '248.000/mm³', reference: '150.000 a 450.000/mm³', status: 'Adequado' },
+      { marker: 'Hematócrito', result: '40%', reference: '36 a 46%', status: 'Adequado' },
     ],
     reportItems: [
       'Hemoglobina dentro da faixa de referência.',
@@ -18420,10 +18852,10 @@ const healthServiceExamRecords = {
     result: 'Sem alterações agudas. Fígado, vias biliares, rins e baço sem achados obstrutivos relevantes.',
     report: 'Exame de imagem sem achados agudos. Manter acompanhamento clínico conforme rotina e revisar se houver dor persistente, febre ou alteração laboratorial associada.',
     rows: [
-      { marker: 'Fígado', result: 'Contornos preservados', reference: 'Sem lesão focal descrita', status: 'Adequado', tone: 'success' },
-      { marker: 'Vias biliares', result: 'Sem dilatação', reference: 'Calibre habitual', status: 'Adequado', tone: 'success' },
-      { marker: 'Rins', result: 'Sem hidronefrose', reference: 'Sem obstrução aparente', status: 'Adequado', tone: 'success' },
-      { marker: 'Achados agudos', result: 'Ausentes', reference: 'Sem sinais de urgência', status: 'Adequado', tone: 'success' },
+      { marker: 'Fígado', result: 'Contornos preservados', reference: 'Sem lesão focal descrita', status: 'Adequado' },
+      { marker: 'Vias biliares', result: 'Sem dilatação', reference: 'Calibre habitual', status: 'Adequado' },
+      { marker: 'Rins', result: 'Sem hidronefrose', reference: 'Sem obstrução aparente', status: 'Adequado' },
+      { marker: 'Achados agudos', result: 'Ausentes', reference: 'Sem sinais de urgência', status: 'Adequado' },
     ],
     reportItems: [
       'Exame de imagem sem achados agudos.',
@@ -18645,6 +19077,7 @@ let healthServiceExamPdfUrl = '';
 let healthServiceExamImageUrl = '';
 let healthServiceEndRecognition = null;
 let healthServiceEndDictationActive = false;
+let healthServiceEndDictationBaseText = '';
 
 function normalizeHealthPatientSearch(value) {
   return String(value || '')
@@ -18974,17 +19407,13 @@ function renderHealthServiceAttendanceTable() {
     const row = document.createElement('div');
     row.className = 'data-row';
     row.dataset.healthServiceAttendanceIndex = String(index);
-    row.dataset.healthServiceSearch = record.patientName || '';
+    row.dataset.healthServiceSearch = record.plan || '';
     row.dataset.healthServiceOccurredAt = record.occurredAt || '';
     row.innerHTML = `
-      <span>${escapeHtmlWes(record.patientName || '-')}</span>
       <span>${escapeHtmlWes(record.plan || '-')}</span>
       <span>${escapeHtmlWes(formatHealthServiceAttendanceDateTime(record.occurredAt))}</span>
       <span class="row-actions">
-        <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do auxiliar médico de ${escapeHtmlWes(record.patientName || 'paciente')}" data-health-service-open-chat-history>
-          <span class="material-symbols-rounded" aria-hidden="true">history</span>
-        </button>
-        <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do paciente ${escapeHtmlWes(record.patientName || '')}" data-health-service-open-patient-history>
+        <button class="icon-btn action-icon" type="button" aria-label="Ver histórico do paciente" data-health-service-open-patient-history>
           <span class="material-symbols-rounded" aria-hidden="true">assignment_ind</span>
         </button>
       </span>
@@ -19082,12 +19511,14 @@ function setHealthServiceEndDictationStatus(message, tone = '') {
 function syncHealthServiceEndDictationButton(isActive = healthServiceEndDictationActive) {
   const button = document.getElementById('healthServiceEndDictationBtn');
   const label = button?.querySelector('[data-health-service-end-dictation-label]');
+  const icon = button?.querySelector('.material-symbols-rounded');
   if (!button) return;
   const isSupported = Boolean(getHealthServiceSpeechRecognition());
   button.disabled = !isSupported;
   button.classList.toggle('is-active', Boolean(isActive));
   button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   if (label) label.textContent = isActive ? 'Parar ditado' : 'Ditar';
+  if (icon) icon.textContent = isActive ? 'stop_circle' : 'mic';
   if (!isSupported) {
     button.title = 'Ditado não disponível neste navegador';
     setHealthServiceEndDictationStatus('Ditado não disponível neste navegador. Você ainda pode digitar a descrição.', 'warning');
@@ -19096,12 +19527,12 @@ function syncHealthServiceEndDictationButton(isActive = healthServiceEndDictatio
   }
 }
 
-function appendHealthServiceEndTranscript(transcript) {
+function applyHealthServiceEndTranscript(transcript) {
   const textarea = document.getElementById('healthServiceEndDescription');
-  const text = String(transcript || '').trim();
-  if (!textarea || !text) return;
-  const current = textarea.value.trim();
-  textarea.value = current ? `${current} ${text}` : text;
+  if (!textarea) return;
+  const spoken = String(transcript || '').replace(/\s+/g, ' ').trim();
+  const base = healthServiceEndDictationBaseText;
+  textarea.value = [base, spoken].filter(Boolean).join(' ');
   textarea.dispatchEvent(new Event('input', { bubbles: true }));
 }
 
@@ -19133,26 +19564,16 @@ function startHealthServiceEndDictation() {
   healthServiceEndRecognition.interimResults = true;
   healthServiceEndRecognition.onstart = () => {
     healthServiceEndDictationActive = true;
+    healthServiceEndDictationBaseText = textarea.value.trim();
     syncHealthServiceEndDictationButton(true);
     setHealthServiceEndDictationStatus('Ouvindo... fale o resumo do atendimento.', 'active');
   };
   healthServiceEndRecognition.onresult = (event) => {
-    let finalTranscript = '';
-    let interimTranscript = '';
-    for (let index = event.resultIndex; index < event.results.length; index += 1) {
-      const transcript = event.results[index]?.[0]?.transcript || '';
-      if (event.results[index].isFinal) {
-        finalTranscript += transcript;
-      } else {
-        interimTranscript += transcript;
-      }
+    let spokenTranscript = '';
+    for (let index = 0; index < event.results.length; index += 1) {
+      spokenTranscript += event.results[index]?.[0]?.transcript || '';
     }
-    appendHealthServiceEndTranscript(finalTranscript);
-    if (interimTranscript.trim()) {
-      setHealthServiceEndDictationStatus(`Transcrevendo: ${interimTranscript.trim()}`, 'active');
-    } else if (finalTranscript.trim()) {
-      setHealthServiceEndDictationStatus('Transcrição adicionada à descrição.', 'success');
-    }
+    applyHealthServiceEndTranscript(spokenTranscript);
   };
   healthServiceEndRecognition.onerror = (event) => {
     const error = String(event.error || '');
@@ -19861,11 +20282,6 @@ function initHealthServiceControls() {
     button.addEventListener('click', () => openHealthServiceExamModal(button.dataset.healthServiceExamId));
   });
   attendanceTable?.addEventListener('click', (event) => {
-    const chatButton = event.target.closest('[data-health-service-open-chat-history]');
-    if (chatButton && attendanceTable.contains(chatButton)) {
-      window.location.hash = '#/dashboard/health/whatsapp/history';
-      return;
-    }
     const patientButton = event.target.closest('[data-health-service-open-patient-history]');
     if (!patientButton || !attendanceTable.contains(patientButton)) return;
     const row = patientButton.closest('[data-health-service-attendance-index]');
@@ -21563,9 +21979,10 @@ const routeMap = {
   'dashboard/health/overview': 'page-health-overview',
   'dashboard/health/overview/mnemonics': 'page-health-overview-mnemonics',
   'dashboard/health/overview/doctors': 'page-health-overview-doctors',
+  'dashboard/health/overview/whatsapp': 'page-health-overview-whatsapp',
+  'dashboard/health/overview/accountability': 'page-health-overview-accountability',
   'dashboard/health/whatsapp': 'page-health-whatsapp',
   'dashboard/health/whatsapp/insights': 'page-health-whatsapp-insights',
-  'dashboard/health/whatsapp/history': 'page-health-whatsapp-history',
   'dashboard/health/service': 'page-health-service',
   'dashboard/health/service/patient': 'page-health-service-patient',
   'dashboard/health/agenda': 'page-health-agenda',
@@ -21624,9 +22041,10 @@ const sectionMap = {
   'dashboard/health/overview': 'Saúde',
   'dashboard/health/overview/mnemonics': 'Saúde',
   'dashboard/health/overview/doctors': 'Saúde',
+  'dashboard/health/overview/whatsapp': 'Saúde',
+  'dashboard/health/overview/accountability': 'Saúde',
   'dashboard/health/whatsapp': 'Saúde',
   'dashboard/health/whatsapp/insights': 'Saúde',
-  'dashboard/health/whatsapp/history': 'Saúde',
   'dashboard/health/service': 'Saúde',
   'dashboard/health/agenda': 'Saúde',
   'dashboard/health/accountability': 'Saúde',
@@ -22163,7 +22581,11 @@ const updateActivePage = () => {
   window.setTimeout(() => forceRouteScrollTop(pageRouteKey), 50);
   window.setTimeout(() => forceRouteScrollTop(pageRouteKey), 250);
 
-  const navRouteKey = peopleManagementRouteKeys.has(pageRouteKey)
+  // Integrações não tem item de menu: quando aberta pela Saúde, o menu
+  // destaca "Agente do paciente", que é de onde a seção é acessada.
+  const navRouteKey = routeKey === 'dashboard/health/integrations'
+    ? 'dashboard/health/whatsapp'
+    : peopleManagementRouteKeys.has(pageRouteKey)
     ? 'dashboard/people-management'
     : pageRouteKey.startsWith('dashboard/agents/project/')
     ? 'dashboard/agents'
@@ -22286,6 +22708,9 @@ const updateActivePage = () => {
   }
   syncVoiceMessagingInsightsChart(routeKey);
   syncHealthOverviewCharts(routeKey);
+  if (typeof window.syncHealthHistoryPages === 'function') {
+    window.syncHealthHistoryPages(routeKey);
+  }
   if (typeof window.ensureAgentsAutoRefresh === 'function') {
     window.ensureAgentsAutoRefresh();
   }
@@ -23897,4 +24322,1355 @@ document.addEventListener('click', (event) => {
     if (toggle) toggle.setAttribute('aria-expanded', 'false');
     if (body) body.hidden = true;
   });
+})();
+
+// Histórico das páginas "Ver mais" da Visão geral (Saúde).
+// O protótipo não tem API: as séries por período são derivadas dos valores do período
+// atual com pesos fixos, para que os números fiquem estáveis entre recarregamentos.
+// Cada página passa a permitir consultar também o passado (meses anteriores e janelas
+// de 30/90 dias), além do período corrente.
+(function initHealthHistoryPages() {
+  const CURRENT_PERIOD_ID = '7d';
+
+  // seed 0 = período atual: reproduz exatamente os números exibidos na Visão geral.
+  const PERIODS = [
+    { id: '7d', kind: 'range', label: 'Últimos 7 dias', chip: '7 dias', range: '11/08/2026 a 17/08/2026', weight: 1, seed: 0, prevWeight: 0.86, prevSeed: 11, prevLabel: '7 dias anteriores' },
+    { id: '2026-08', kind: 'month', label: 'Agosto/2026 (parcial)', short: 'Ago/2026', range: '01/08/2026 a 17/08/2026', weight: 2.4, seed: 4, prevWeight: 2.2, prevSeed: 15, prevLabel: 'mesmo período de julho' },
+    { id: '2026-07', kind: 'month', label: 'Julho/2026', short: 'Jul/2026', range: '01/07/2026 a 31/07/2026', weight: 4.3, seed: 5, prevWeight: 3.9, prevSeed: 6, prevLabel: 'junho/2026' },
+    { id: '2026-06', kind: 'month', label: 'Junho/2026', short: 'Jun/2026', range: '01/06/2026 a 30/06/2026', weight: 3.9, seed: 6, prevWeight: 2.9, prevSeed: 7, prevLabel: 'maio/2026' },
+    { id: '2026-05', kind: 'month', label: 'Maio/2026', short: 'Mai/2026', range: '01/05/2026 a 31/05/2026', weight: 2.9, seed: 7, prevWeight: 3.1, prevSeed: 8, prevLabel: 'abril/2026' },
+    { id: '2026-04', kind: 'month', label: 'Abril/2026', short: 'Abr/2026', range: '01/04/2026 a 30/04/2026', weight: 3.1, seed: 8, prevWeight: 2.7, prevSeed: 9, prevLabel: 'março/2026' },
+    { id: '2026-03', kind: 'month', label: 'Março/2026', short: 'Mar/2026', range: '01/03/2026 a 31/03/2026', weight: 2.7, seed: 9, prevWeight: 2.5, prevSeed: 20, prevLabel: 'fevereiro/2026' },
+  ];
+
+  // Meses em ordem cronológica (do mais antigo ao mais recente) para o histórico.
+  const MONTH_PERIODS = PERIODS.filter((period) => period.kind === 'month').slice().reverse();
+  const periodById = (id) => PERIODS.find((period) => period.id === id) || PERIODS[0];
+
+  // Variação determinística por item/período: mantém o ranking vivo (posições mudam
+  // de um mês para o outro) sem usar números aleatórios, que quebrariam a comparação.
+  const DRIFT = [1, 1.14, 0.9, 1.06, 0.85, 1.19, 0.94, 1.09, 0.91, 1.16, 0.88, 1.03];
+  const driftAt = (itemIndex, seed) => (seed === 0 ? 1 : DRIFT[((itemIndex * 5) + (seed * 7)) % DRIFT.length]);
+  const valueAt = (item, itemIndex, weight, seed) => (weight
+    ? Math.max(1, Math.round(item.base * weight * driftAt(itemIndex, seed)))
+    : 0);
+
+  const DATASETS = {
+    doctors: {
+      tableId: 'healthOverviewDoctorsRankingTable',
+      historyTableId: 'healthOverviewDoctorsHistoryTable',
+      icon: 'stethoscope',
+      entityHeader: 'Médico',
+      valueHeader: 'Consultas com assistente',
+      unit: 'consultas',
+      totalLabel: 'Consultas com assistente',
+      leaderLabel: 'Médico que mais usou',
+      filePrefix: 'medicos-assistente',
+      csvTitle: 'Médicos usando o assistente',
+      compareTitle: 'médicos',
+      items: [
+        { label: 'Dra. Helena Prado', base: 28 },
+        { label: 'Dr. Rafael Duarte', base: 21 },
+        { label: 'Dra. Camila Nunes', base: 16 },
+        { label: 'Dr. Marcos Vinícius', base: 12 },
+        { label: 'Dra. Luciana Martins', base: 8 },
+        { label: 'Dr. Paulo Reis', base: 4 },
+      ],
+    },
+    mnemonics: {
+      tableId: 'healthOverviewMnemonicsTable',
+      historyTableId: 'healthOverviewMnemonicsHistoryTable',
+      icon: 'biotech',
+      entityHeader: 'Mnemônico',
+      valueHeader: 'Ocorrências',
+      unit: 'ocorrências',
+      totalLabel: 'Mnemônicos extraídos',
+      leaderLabel: 'Mais identificado',
+      filePrefix: 'mnemonicos-leitura-exames',
+      csvTitle: 'Mnemônicos — leitura de exames',
+      compareTitle: 'mnemônicos',
+      items: [
+        { label: 'Hemoglobina (HB)', base: 412 },
+        { label: 'Glicemia (GLI)', base: 388 },
+        { label: 'Colesterol (COL)', base: 351 },
+        { label: 'TSH (tireoide)', base: 298 },
+        { label: 'Creatinina (CREA)', base: 254 },
+        { label: 'Ureia (URE)', base: 208 },
+        { label: 'Vitamina D (VITD)', base: 47 },
+        { label: 'Ferritina (FERR)', base: 39 },
+        { label: 'Proteína C reativa (PCR)', base: 28 },
+        { label: 'Hemoglobina glicada (HbA1c)', base: 22 },
+        { label: 'T4 livre (T4L)', base: 14 },
+      ],
+    },
+    whatsapp: {
+      tableId: 'healthOverviewWhatsappRankingTable',
+      historyTableId: 'healthOverviewWhatsappHistoryTable',
+      icon: 'forum',
+      entityHeader: 'Tipo de solicitação',
+      valueHeader: 'Atendimentos',
+      unit: 'atendimentos',
+      totalLabel: 'Atendimentos no WhatsApp',
+      leaderLabel: 'Solicitação mais comum',
+      filePrefix: 'whatsapp-tipos-de-solicitacao',
+      csvTitle: 'O que acontece no WhatsApp',
+      compareTitle: 'tipos de solicitação',
+      items: [
+        { label: 'Envio de exames', base: 58 },
+        { label: 'Dúvidas', base: 49 },
+        { label: 'Encaixe para renovação', base: 35 },
+      ],
+    },
+    accountability: {
+      tableId: 'healthOverviewAccountabilityRankingTable',
+      historyTableId: 'healthOverviewAccountabilityHistoryTable',
+      icon: 'receipt_long',
+      entityHeader: 'Classificação',
+      valueHeader: 'Documentos',
+      unit: 'documentos',
+      totalLabel: 'Documentos analisados',
+      leaderLabel: 'Classificação predominante',
+      filePrefix: 'prestacao-de-contas-risco-glosa',
+      csvTitle: 'Prestação de contas — risco de glosa',
+      compareTitle: 'classificações de risco',
+      // Risco tem ordem própria (alto → baixo): manter a leitura clínica em vez de ranquear.
+      ranked: false,
+      // `chip` usa o mesmo componente de risco da página de Prestação de contas.
+      items: [
+        { label: 'Risco alto', base: 58, chip: { tone: 'high', label: 'Alto' } },
+        { label: 'Risco médio', base: 79, chip: { tone: 'medium', label: 'Médio' } },
+        { label: 'Risco baixo', base: 183, chip: { tone: 'low', label: 'Baixo' } },
+      ],
+    },
+  };
+
+  const ROUTES = {
+    'dashboard/health/overview/doctors': 'doctors',
+    'dashboard/health/overview/mnemonics': 'mnemonics',
+    'dashboard/health/overview/whatsapp': 'whatsapp',
+    'dashboard/health/overview/accountability': 'accountability',
+  };
+
+  const formatInt = (value) => Number(value || 0).toLocaleString('pt-BR');
+  const formatPercent = (value) => `${(Math.round(value * 10) / 10).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}%`;
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+
+  const deltaOf = (current, previous) => {
+    if (!previous) return null;
+    return ((current - previous) / previous) * 100;
+  };
+  const deltaText = (delta) => {
+    if (delta === null) return '—';
+    if (Math.abs(delta) < 0.05) return 'estável';
+    return `${delta > 0 ? '+' : '−'}${formatPercent(Math.abs(delta))}`;
+  };
+  const deltaClass = (delta) => {
+    if (delta === null) return 'is-neutral';
+    if (Math.abs(delta) < 0.05) return 'is-flat';
+    return delta > 0 ? 'is-up' : 'is-down';
+  };
+  const deltaIcon = (delta) => {
+    if (delta === null) return 'remove';
+    if (Math.abs(delta) < 0.05) return 'trending_flat';
+    return delta > 0 ? 'trending_up' : 'trending_down';
+  };
+  // Variação usa o chip padrão do projeto (.chip success/danger/neutral).
+  const deltaChipClass = (delta) => {
+    if (delta === null || Math.abs(delta) < 0.05) return 'neutral';
+    return delta > 0 ? 'success' : 'danger';
+  };
+  const deltaCell = (delta) => `<span class="chip ${deltaChipClass(delta)}">${escapeHtml(deltaText(delta))}</span>`;
+
+  // Monta a série de um período: valor atual, valor do período anterior e participação.
+  const buildSeries = (dataset, periodId) => {
+    const period = periodById(periodId);
+    const rows = dataset.items.map((item, index) => {
+      const value = valueAt(item, index, period.weight, period.seed);
+      const previous = valueAt(item, index, period.prevWeight, period.prevSeed);
+      return { ...item, value, previous, delta: deltaOf(value, previous) };
+    });
+    const total = rows.reduce((sum, row) => sum + row.value, 0);
+    const previousTotal = rows.reduce((sum, row) => sum + row.previous, 0);
+    const ordered = dataset.ranked === false ? rows : rows.slice().sort((a, b) => b.value - a.value);
+    ordered.forEach((row, index) => {
+      row.position = index + 1;
+      row.share = total ? (row.value / total) * 100 : 0;
+    });
+    const leader = rows.slice().sort((a, b) => b.value - a.value)[0] || null;
+    return { period, rows: ordered, total, previousTotal, totalDelta: deltaOf(total, previousTotal), leader };
+  };
+
+  const renderRanking = (block, dataset, series, scope) => {
+    const table = block.querySelector(`[data-health-history-ranking="${scope}"]`);
+    if (!table) return;
+    const ranked = dataset.ranked !== false;
+    table.classList.toggle('health-overview-ranking-table--norank', !ranked);
+    const extras = dataset.extraColumns || [];
+    const headers = [
+      ...(ranked ? ['Posição'] : []),
+      dataset.entityHeader,
+      dataset.valueHeader,
+      '% do total',
+      ...extras.map((column) => column.header),
+    ];
+    const headerRow = `<div class="data-row header">${headers.map((header) => `<span>${escapeHtml(header)}</span>`).join('')}</div>`;
+    const bodyRows = series.rows.map((row) => {
+      const cells = [
+        ...(ranked ? [`<span>${row.position}</span>`] : []),
+        // No CSV vai o rótulo completo ("Risco alto"), não só o texto do chip.
+        (row.chip
+          ? `<span data-csv-value="${escapeHtml(row.label)}"><span class="glosa-chip glosa-chip--${row.chip.tone}">${escapeHtml(row.chip.label)}</span></span>`
+          : `<span>${escapeHtml(row.label)}</span>`),
+        `<span>${formatInt(row.value)}</span>`,
+        `<span>${formatPercent(row.share)}</span>`,
+        ...extras.map((column) => `<span>${escapeHtml(row[column.key] || '')}</span>`),
+      ];
+      return `<div class="data-row">${cells.join('')}</div>`;
+    }).join('');
+    table.innerHTML = `${headerRow}${bodyRows}`;
+  };
+
+  // Indicadores do período nos stat-cards padrão do projeto (como na Visão geral).
+  const renderStats = (block, dataset, series, scope) => {
+    const stats = block.querySelector(`[data-health-history-stats="${scope}"]`);
+    if (!stats) return;
+    const leaderShare = series.total && series.leader ? (series.leader.value / series.total) * 100 : 0;
+    const cards = [
+      {
+        icon: dataset.icon,
+        value: formatInt(series.total),
+        label: dataset.totalLabel,
+        sub: `${series.period.label} · ${series.period.range}`,
+      },
+      {
+        icon: deltaIcon(series.totalDelta),
+        value: deltaText(series.totalDelta),
+        valueTone: deltaClass(series.totalDelta),
+        label: `Variação vs. ${series.period.prevLabel || 'período anterior'}`,
+        sub: series.period.prevWeight
+          ? `${formatInt(series.previousTotal)} ${dataset.unit} no período anterior`
+          : 'Sem período anterior para comparar',
+      },
+      {
+        icon: 'workspace_premium',
+        value: series.leader ? formatInt(series.leader.value) : '—',
+        label: series.leader ? series.leader.label : dataset.leaderLabel,
+        sub: series.leader
+          ? `${dataset.leaderLabel} · ${formatPercent(leaderShare)} do total`
+          : '',
+      },
+    ];
+    stats.innerHTML = cards.map((card) => `
+      <article class="stat-card">
+        <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">${card.icon}</span></div>
+        <div class="stat-body">
+          <div class="stat-value${card.valueTone ? ` ${card.valueTone}` : ''}">${escapeHtml(card.value)}</div>
+          <div class="stat-label">${escapeHtml(card.label)}</div>
+          <div class="stat-sub">${escapeHtml(card.sub)}</div>
+        </div>
+      </article>
+    `).join('');
+  };
+
+  // ----- Histórico em janelas de calendário (semana / mês / ano), estilo página de status -----
+  // O total de cada mês (o mesmo do ranking) é distribuído entre os dias com um perfil de
+  // dias da semana, então qualquer janela — semana, mês ou ano — fecha com esses números.
+  const MONTH_DAY_COUNTS = {
+    '2026-03': 31, '2026-04': 30, '2026-05': 31, '2026-06': 30, '2026-07': 31, '2026-08': 17,
+  };
+  // Domingo a sábado: clínica cheia no início da semana e fraca no fim de semana.
+  const WEEKDAY_FACTOR = [0.2, 1.25, 1.2, 1.15, 1.1, 1, 0.35];
+  const HISTORY_MIN = new Date(2026, 2, 1);
+  const HISTORY_MAX = new Date(2026, 7, 17);
+
+  const pad2 = (value) => String(value).padStart(2, '0');
+  const isoDay = (date) => `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`;
+  const addDays = (date, amount) => {
+    const next = new Date(date);
+    next.setDate(next.getDate() + amount);
+    return next;
+  };
+  const startOfWeek = (date) => addDays(date, -((date.getDay() + 6) % 7)); // semana começa na segunda
+  const dayFull = (date) => date.toLocaleDateString('pt-BR');
+  const monthLabel = (date) => date.toLocaleDateString('pt-BR', { month: 'short', year: 'numeric' });
+  const monthOnly = (date) => date.toLocaleDateString('pt-BR', { month: 'short' });
+
+  // itemIndex null = todos os itens somados.
+  const monthTotalFor = (dataset, period, itemIndex) => (itemIndex === null
+    ? dataset.items.reduce((sum, item, index) => sum + valueAt(item, index, period.weight, period.seed), 0)
+    : valueAt(dataset.items[itemIndex], itemIndex, period.weight, period.seed));
+
+  const buildDailySeries = (dataset, itemIndex) => {
+    const days = [];
+    MONTH_PERIODS.forEach((period) => {
+      const [year, month] = period.id.split('-').map(Number);
+      const total = monthTotalFor(dataset, period, itemIndex);
+      const count = MONTH_DAY_COUNTS[period.id] || 30;
+      const seed = itemIndex === null ? 0 : itemIndex;
+      const weights = [];
+      for (let day = 1; day <= count; day += 1) {
+        const date = new Date(year, month - 1, day);
+        const drift = DRIFT[((seed * 3) + (day * 5) + period.seed) % DRIFT.length];
+        weights.push(WEEKDAY_FACTOR[date.getDay()] * drift);
+      }
+      const weightSum = weights.reduce((sum, weight) => sum + weight, 0) || 1;
+      // Arredondamento cumulativo: a soma dos dias fecha exatamente com o mês.
+      let rawSoFar = 0;
+      let intSoFar = 0;
+      weights.forEach((weight, index) => {
+        rawSoFar += (total * weight) / weightSum;
+        const target = Math.round(rawSoFar);
+        days.push({ date: new Date(year, month - 1, index + 1), value: Math.max(0, target - intSoFar) });
+        intSoFar = target;
+      });
+    });
+    return days;
+  };
+
+  const dailyCache = new Map();
+  const dailyMapFor = (key, dataset, itemIndex) => {
+    const cacheId = `${key}:${itemIndex === null ? 'all' : itemIndex}`;
+    if (!dailyCache.has(cacheId)) {
+      const map = new Map();
+      if (itemIndex === null) {
+        // Soma item por item, dia a dia: qualquer janela fecha com o total do ranking.
+        dataset.items.forEach((_, index) => {
+          dailyMapFor(key, dataset, index).forEach((value, day) => {
+            map.set(day, (map.get(day) || 0) + value);
+          });
+        });
+      } else {
+        buildDailySeries(dataset, itemIndex).forEach((day) => map.set(isoDay(day.date), day.value));
+      }
+      dailyCache.set(cacheId, map);
+    }
+    return dailyCache.get(cacheId);
+  };
+  const sumWindow = (map, start, end) => {
+    let total = 0;
+    for (let cursor = new Date(start); cursor <= end; cursor = addDays(cursor, 1)) {
+      total += map.get(isoDay(cursor)) || 0;
+    }
+    return total;
+  };
+
+  // Janelas disponíveis por granularidade, em ordem cronológica.
+  const windowsCache = new Map();
+  const windowsFor = (grain) => {
+    if (windowsCache.has(grain)) return windowsCache.get(grain);
+    const list = [];
+    if (grain === 'week') {
+      for (let cursor = startOfWeek(HISTORY_MIN); cursor <= HISTORY_MAX; cursor = addDays(cursor, 7)) {
+        list.push({ grain, start: new Date(cursor), end: addDays(cursor, 6) });
+      }
+    } else if (grain === 'year') {
+      list.push({ grain, start: new Date(2026, 0, 1), end: new Date(2026, 11, 31) });
+    } else {
+      for (let month = HISTORY_MIN.getMonth(); month <= HISTORY_MAX.getMonth(); month += 1) {
+        list.push({ grain: 'month', start: new Date(2026, month, 1), end: new Date(2026, month + 1, 0) });
+      }
+    }
+    windowsCache.set(grain, list);
+    return list;
+  };
+
+  const windowLabel = (win) => {
+    if (!win) return '—';
+    if (win.grain === 'year') return String(win.start.getFullYear());
+    if (win.grain === 'month') return monthLabel(win.start);
+    const sameMonth = win.start.getMonth() === win.end.getMonth();
+    return sameMonth
+      ? `${pad2(win.start.getDate())} – ${pad2(win.end.getDate())} de ${monthLabel(win.start)}`
+      : `${pad2(win.start.getDate())} de ${monthOnly(win.start)} – ${pad2(win.end.getDate())} de ${monthLabel(win.end)}`;
+  };
+  const windowRange = (win) => (win ? `${dayFull(win.start)} a ${dayFull(win.end)}` : '');
+  const GRAIN_NOUN = { week: 'semana', month: 'mês', year: 'ano' };
+
+  // Série de uma janela: valor por item, comparação com a janela anterior e participação.
+  const buildWindowSeries = (key, dataset, win, previousWindow) => {
+    const rows = dataset.items.map((item, index) => {
+      const map = dailyMapFor(key, dataset, index);
+      const value = sumWindow(map, win.start, win.end);
+      const previous = previousWindow ? sumWindow(map, previousWindow.start, previousWindow.end) : 0;
+      return { ...item, value, previous, delta: deltaOf(value, previous) };
+    });
+    const total = rows.reduce((sum, row) => sum + row.value, 0);
+    const previousTotal = rows.reduce((sum, row) => sum + row.previous, 0);
+    const ordered = dataset.ranked === false ? rows : rows.slice().sort((a, b) => b.value - a.value);
+    ordered.forEach((row, index) => {
+      row.position = index + 1;
+      row.share = total ? (row.value / total) * 100 : 0;
+    });
+    const leader = rows.slice().sort((a, b) => b.value - a.value)[0] || null;
+    return { window: win, previousWindow, rows: ordered, total, previousTotal, totalDelta: deltaOf(total, previousTotal), leader };
+  };
+
+  // Estado por página: granularidade, índice da janela e (em médicos) item filtrado.
+  const historyState = new Map();
+  const getHistoryState = (key) => {
+    if (!historyState.has(key)) {
+      const windows = windowsFor('month');
+      // `date` é a data de referência: preserva o ponto no tempo ao trocar de granularidade.
+      historyState.set(key, { grain: 'month', index: windows.length - 1, items: new Set(), date: new Date(HISTORY_MAX) });
+    }
+    return historyState.get(key);
+  };
+  const currentWindows = (key) => windowsFor(getHistoryState(key).grain);
+
+  const charts = new Map();
+  const destroyChart = (key) => {
+    charts.get(key)?.destroy();
+    charts.delete(key);
+  };
+
+  const activeTab = new Map();
+
+  // Linha-resumo do cenário atual: total e validade da análise.
+  const renderHeadline = (block, dataset, series) => {
+    const headline = block.querySelector('[data-health-history-headline]');
+    if (!headline) return;
+    const period = periodById(CURRENT_PERIOD_ID);
+    const today = String(period.range || '').split(' a ')[1] || period.range;
+    headline.innerHTML = `
+      <strong class="health-history-headline-total">Total: ${escapeHtml(formatInt(series.total))} ${escapeHtml(dataset.unit)}</strong>
+      <span class="health-patient-period-chip health-patient-period-chip--orange">
+        Análise válida para hoje, ${escapeHtml(today)}
+      </span>
+    `;
+  };
+
+  // Aba "Cenário atual": só o retrato do período corrente, sem filtro.
+  const renderCurrent = (block, dataset) => {
+    const series = buildSeries(dataset, CURRENT_PERIOD_ID);
+    renderStats(block, dataset, series, 'current');
+    renderHeadline(block, dataset, series);
+    renderRanking(block, dataset, series, 'current');
+  };
+
+  // ----- Escolha do período: menu de filtro com Mês e as semanas daquele mês -----
+  const pickerMonth = new Map();
+  const monthKeyOf = (date) => new Date(date.getFullYear(), date.getMonth(), 1);
+  const inRange = (date) => date >= HISTORY_MIN && date <= HISTORY_MAX;
+
+  // Índice da janela (na granularidade atual) que contém a data.
+  const windowIndexFor = (grain, date) => windowsFor(grain)
+    .findIndex((win) => date >= win.start && date <= win.end);
+
+  const monthWindows = () => windowsFor('month').map((win, index) => ({ win, index }));
+  const weekWindowsIn = (monthDate) => {
+    const first = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+    const last = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+    return windowsFor('week')
+      .map((win, index) => ({ win, index }))
+      .filter(({ win }) => win.end >= first && win.start <= last);
+  };
+  const weekOptionLabel = (win) => (win.start.getMonth() === win.end.getMonth()
+    ? `${pad2(win.start.getDate())} – ${pad2(win.end.getDate())} de ${monthOnly(win.start)}`
+    : `${pad2(win.start.getDate())} de ${monthOnly(win.start)} – ${pad2(win.end.getDate())} de ${monthOnly(win.end)}`);
+
+  const buildPeriodPicker = (block) => {
+    const nav = block.querySelector('.health-history-nav');
+    if (!nav || nav.querySelector('[data-health-history-picker]')) return;
+    nav.insertAdjacentHTML('beforeend', `
+      <div class="menu filter-menu filter-menu--standard health-history-picker-menu" data-health-history-picker>
+        <div class="filter-group" data-health-history-picker-group="month">
+          <span>Mês</span>
+        </div>
+        <div class="filter-group" data-health-history-picker-group="week">
+          <span>Semana</span>
+        </div>
+      </div>
+    `);
+  };
+
+  const closePeriodPickers = () => {
+    document.querySelectorAll('[data-health-history-picker]').forEach((menu) => menu.classList.remove('open'));
+    document.querySelectorAll('[data-health-history-picker-toggle]').forEach((button) => {
+      button.setAttribute('aria-expanded', 'false');
+    });
+  };
+
+  const renderPeriodPicker = (block, key, win) => {
+    const menu = block.querySelector('[data-health-history-picker]');
+    const toggle = block.querySelector('[data-health-history-picker-toggle]');
+    if (!menu) return;
+    const view = getHistoryState(key);
+    const isYear = view.grain === 'year';
+    // No Ano existe uma única janela: não há o que escolher.
+    if (toggle) toggle.disabled = isYear;
+    if (isYear) {
+      menu.classList.remove('open');
+      return;
+    }
+
+    const showWeeks = view.grain === 'week';
+    const reference = pickerMonth.get(key) || monthKeyOf(win.start < HISTORY_MIN ? HISTORY_MIN : win.start);
+    pickerMonth.set(key, reference);
+
+    const monthGroup = menu.querySelector('[data-health-history-picker-group="month"]');
+    const weekGroup = menu.querySelector('[data-health-history-picker-group="week"]');
+    if (monthGroup) {
+      const activeMonth = showWeeks ? reference : win.start;
+      monthGroup.innerHTML = '<span>Mês</span>'
+        + monthWindows().map(({ win: monthWin, index }) => {
+          const isActive = monthWin.start.getMonth() === activeMonth.getMonth();
+          return `<button class="filter-option${isActive ? ' active' : ''}" type="button"`
+            + ` data-health-history-pick-month="${index}"`
+            + ` data-value="${index}">${escapeHtml(monthLabel(monthWin.start))}</button>`;
+        }).join('');
+    }
+    if (weekGroup) {
+      weekGroup.hidden = !showWeeks;
+      if (showWeeks) {
+        weekGroup.innerHTML = '<span>Semana</span>'
+          + weekWindowsIn(reference).map(({ win: weekWin, index }) => {
+            const isActive = index === view.index;
+            return `<button class="filter-option${isActive ? ' active' : ''}" type="button"`
+              + ` data-health-history-pick-week="${index}"`
+              + ` data-value="${index}">${escapeHtml(weekOptionLabel(weekWin))}</button>`;
+          }).join('');
+      }
+    }
+    menu.classList.toggle('filter-menu--groups-2', showWeeks);
+    menu.classList.toggle('filter-menu--groups-1', !showWeeks);
+    if (typeof enhanceFilterOptionIcons === 'function') enhanceFilterOptionIcons();
+  };
+
+  // Aba "Histórico": mesma tabela do cenário atual, na janela que o usuário escolher.
+  const renderHistory = (block, dataset, key) => {
+    if (!block.querySelector('[data-health-history-panel="history"]')) return;
+    const view = getHistoryState(key);
+    const windows = currentWindows(key);
+    view.index = Math.min(Math.max(view.index, 0), windows.length - 1);
+    const win = windows[view.index];
+    const series = buildWindowSeries(key, dataset, win, windows[view.index - 1] || null);
+
+    block.querySelectorAll('[data-health-history-grain]').forEach((tab) => {
+      tab.classList.toggle('active', tab.dataset.healthHistoryGrain === view.grain);
+    });
+    const navLabel = block.querySelector('[data-health-history-nav-label]');
+    if (navLabel) navLabel.textContent = windowLabel(win);
+    const prevBtn = block.querySelector('[data-health-history-nav="prev"]');
+    const nextBtn = block.querySelector('[data-health-history-nav="next"]');
+    if (prevBtn) prevBtn.disabled = view.index <= 0;
+    if (nextBtn) nextBtn.disabled = view.index >= windows.length - 1;
+    const periodChip = block.querySelector('[data-health-history-period-chip]');
+    if (periodChip) periodChip.textContent = windowLabel(win);
+
+    // Filtro de itens: mantém a posição e o % do total calculados sobre o ranking cheio.
+    const filtered = view.items && view.items.size
+      ? { ...series, rows: series.rows.filter((row) => view.items.has(row.label)) }
+      : series;
+    renderRanking(block, dataset, filtered, 'history');
+    renderPeriodPicker(block, key, win);
+  };
+
+  const render = (key) => {
+    const block = document.querySelector(`[data-health-history="${key}"]`);
+    const dataset = DATASETS[key];
+    if (!block || !dataset) return;
+    renderCurrent(block, dataset);
+    renderHistory(block, dataset, key);
+  };
+
+  const setGrain = (key, grain) => {
+    if (!GRAIN_NOUN[grain]) return;
+    const view = getHistoryState(key);
+    if (view.grain === grain) return;
+    // Mantém a data de referência ao trocar de granularidade.
+    const reference = view.date || HISTORY_MAX;
+    view.grain = grain;
+    const windows = windowsFor(grain);
+    const match = windowIndexFor(grain, reference < HISTORY_MIN ? HISTORY_MIN : reference);
+    view.index = match >= 0 ? match : windows.length - 1;
+    const anchor = windows[view.index].start < HISTORY_MIN ? HISTORY_MIN : windows[view.index].start;
+    pickerMonth.set(key, monthKeyOf(grain === 'year' ? HISTORY_MAX : anchor));
+    render(key);
+  };
+
+  const moveWindow = (key, step) => {
+    const view = getHistoryState(key);
+    const windows = currentWindows(key);
+    const next = view.index + step;
+    if (next < 0 || next > windows.length - 1) return;
+    view.index = next;
+    const anchor = windows[next].start < HISTORY_MIN ? HISTORY_MIN : windows[next].start;
+    view.date = windows[next].grain === 'year' ? new Date(HISTORY_MAX) : anchor;
+    pickerMonth.set(key, monthKeyOf(view.date));
+    render(key);
+  };
+
+  // Seleciona uma janela pelo índice (opções do menu de período).
+  const goToWindow = (key, index) => {
+    const view = getHistoryState(key);
+    const windows = currentWindows(key);
+    if (!windows[index]) return;
+    view.index = index;
+    const anchor = windows[index].start < HISTORY_MIN ? HISTORY_MIN : windows[index].start;
+    view.date = anchor;
+    pickerMonth.set(key, monthKeyOf(anchor));
+    render(key);
+  };
+
+  const toggleHistoryItem = (key, label) => {
+    const { items } = getHistoryState(key);
+    if (items.has(label)) items.delete(label);
+    else items.add(label);
+    render(key);
+  };
+
+  const clearHistoryItems = (key) => {
+    getHistoryState(key).items.clear();
+    render(key);
+  };
+
+  const setTab = (key, tab) => {
+    const block = document.querySelector(`[data-health-history="${key}"]`);
+    if (!block) return;
+    const target = tab === 'history' ? 'history' : 'current';
+    activeTab.set(key, target);
+    block.querySelectorAll('[data-health-history-tab]').forEach((button) => {
+      const isActive = button.dataset.healthHistoryTab === target;
+      button.classList.toggle('active', isActive);
+      button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+    });
+    block.querySelectorAll('[data-health-history-panel]').forEach((panel) => {
+      panel.classList.toggle('active', panel.dataset.healthHistoryPanel === target);
+    });
+    if (target === 'history') render(key);
+  };
+
+  const exportRanking = (key) => {
+    const dataset = DATASETS[key];
+    if (!dataset) return;
+    const isHistory = activeTab.get(key) === 'history';
+    const view = getHistoryState(key);
+    const win = currentWindows(key)[view.index];
+    const ranked = dataset.ranked !== false;
+    const headers = [
+      ...(ranked ? ['Posição'] : []),
+      dataset.entityHeader,
+      dataset.valueHeader,
+      '% do total',
+      ...(dataset.extraColumns || []).map((column) => column.header),
+    ];
+    const label = isHistory ? windowLabel(win) : periodById(CURRENT_PERIOD_ID).label;
+    const range = isHistory ? windowRange(win) : periodById(CURRENT_PERIOD_ID).range;
+    const slug = label.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^\w]+/g, '-').replace(/^-|-$/g, '').toLowerCase();
+    exportHealthOverviewRanking(
+      isHistory ? dataset.historyTableId : dataset.tableId,
+      headers,
+      `${dataset.filePrefix}-${slug}.csv`,
+      [
+        [dataset.csvTitle],
+        ['Aba', isHistory ? 'Histórico' : 'Cenário atual'],
+        ['Período', label],
+        ['Intervalo', range],
+      ],
+    );
+  };
+
+  const setupBlock = (block, key) => {
+    buildPeriodPicker(block);
+    const picker = block.querySelector('[data-health-history-picker]');
+    const pickerToggle = block.querySelector('[data-health-history-picker-toggle]');
+
+    // O clique fica no próprio menu: parar a propagação aqui é o que evita que o
+    // listener global (que fecha os menus) atue antes da escolha.
+    picker?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const monthOption = event.target.closest('[data-health-history-pick-month]');
+      if (monthOption) {
+        const index = Number(monthOption.dataset.healthHistoryPickMonth);
+        const monthWin = windowsFor('month')[index];
+        if (!monthWin) return;
+        if (getHistoryState(key).grain === 'week') {
+          // Em Semana, escolher o mês só abre as semanas dele.
+          pickerMonth.set(key, monthKeyOf(monthWin.start));
+          renderPeriodPicker(block, key, currentWindows(key)[getHistoryState(key).index]);
+          return;
+        }
+        goToWindow(key, index);
+        closePeriodPickers();
+        return;
+      }
+      const weekOption = event.target.closest('[data-health-history-pick-week]');
+      if (weekOption) {
+        goToWindow(key, Number(weekOption.dataset.healthHistoryPickWeek));
+        closePeriodPickers();
+      }
+    });
+    pickerToggle?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const willOpen = !picker?.classList.contains('open');
+      closePeriodPickers();
+      if (willOpen) {
+        picker?.classList.add('open');
+        pickerToggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+    document.addEventListener('click', closePeriodPickers);
+    block.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closePeriodPickers();
+    });
+
+    block.addEventListener('click', (event) => {
+      if (event.target.closest('[data-health-history-picker]')
+        || event.target.closest('[data-health-history-picker-toggle]')) return;
+      const tabBtn = event.target.closest('[data-health-history-tab]');
+      if (tabBtn) {
+        setTab(key, tabBtn.dataset.healthHistoryTab);
+        return;
+      }
+      const grainBtn = event.target.closest('[data-health-history-grain]');
+      if (grainBtn) {
+        setGrain(key, grainBtn.dataset.healthHistoryGrain);
+        return;
+      }
+      const navBtn = event.target.closest('[data-health-history-nav]');
+      if (navBtn) {
+        moveWindow(key, navBtn.dataset.healthHistoryNav === 'prev' ? -1 : 1);
+        return;
+      }
+      const exportBtn = event.target.closest('[data-health-history-export]');
+      if (exportBtn) exportRanking(key);
+    });
+    // O botão "Baixar dados" fica no cabeçalho da página, fora do bloco.
+    const page = block.closest('.page');
+    page?.querySelectorAll('[data-health-history-export]').forEach((button) => {
+      if (block.contains(button)) return;
+      button.addEventListener('click', () => exportRanking(key));
+    });
+    activeTab.set(key, 'current');
+    render(key);
+  };
+
+  // Filtro de médicos da aba Histórico: seleção múltipla, no padrão de filtros do projeto.
+  const setupDoctorFilter = () => {
+    const block = document.querySelector('[data-health-history="doctors"]');
+    const dataset = DATASETS.doctors;
+    if (!block || !dataset) return;
+    const menu = block.querySelector('[data-health-doctor-filter-menu]');
+    const filterBtn = block.querySelector('[data-health-doctor-filter-btn]');
+    const group = menu?.querySelector('[data-health-doctor-filter-group]');
+    const label = block.querySelector('[data-health-doctor-filter-label]');
+
+    const syncFilter = () => {
+      const { items } = getHistoryState('doctors');
+      if (label) {
+        label.textContent = items.size ? `Filtros · ${items.size}` : 'Filtros';
+      }
+      filterBtn?.classList.toggle('is-active', items.size > 0);
+      menu?.querySelectorAll('[data-health-doctor-option]').forEach((option) => {
+        const item = dataset.items[Number(option.dataset.healthDoctorOption)];
+        option.classList.toggle('active', Boolean(item) && items.has(item.label));
+      });
+    };
+
+    if (group) {
+      group.insertAdjacentHTML('beforeend', dataset.items.map((item, index) => (
+        `<button class="filter-option" type="button" data-health-doctor-option="${index}"`
+        + ` data-value="${index}">${escapeHtml(item.label)}</button>`
+      )).join(''));
+    }
+    if (menu) {
+      if (typeof syncFilterMenuLayout === 'function') syncFilterMenuLayout(menu);
+      if (typeof enhanceFilterOptionIcons === 'function') enhanceFilterOptionIcons();
+      // Seleção múltipla: o menu fica aberto enquanto o usuário marca os médicos.
+      menu.addEventListener('click', (event) => {
+        event.stopPropagation();
+        const option = event.target.closest('[data-health-doctor-option]');
+        if (option) {
+          const item = dataset.items[Number(option.dataset.healthDoctorOption)];
+          if (item) toggleHistoryItem('doctors', item.label);
+          syncFilter();
+          return;
+        }
+        if (event.target.closest('[data-health-doctor-filter-clear]')) {
+          clearHistoryItems('doctors');
+          syncFilter();
+        }
+      });
+      document.addEventListener('click', () => menu.classList.remove('open'));
+    }
+    filterBtn?.addEventListener('click', (event) => {
+      event.stopPropagation();
+      menu?.classList.toggle('open');
+    });
+    syncFilter();
+  };
+
+  Object.keys(DATASETS).forEach((key) => {
+    const block = document.querySelector(`[data-health-history="${key}"]`);
+    if (block) setupBlock(block, key);
+  });
+  setupDoctorFilter();
+
+  window.syncHealthHistoryPages = (routeKey = '') => {
+    const activeKey = ROUTES[routeKey];
+    if (!activeKey) return;
+    const block = document.querySelector(`[data-health-history="${activeKey}"]`);
+    const dataset = DATASETS[activeKey];
+    if (!block || !dataset) return;
+    renderCurrent(block, dataset);
+    if (activeTab.get(activeKey) === 'history') renderHistory(block, dataset, activeKey);
+  };
+
+  // ----- Insights de IA: leituras sobre os dados da Visão geral -----
+  // Cada insight aponta atenção ou melhoria e nasce dos mesmos números das outras
+  // páginas, então nunca contradiz a Visão geral.
+  const EXAMS_READ = 214; // exames lidos no card da Visão geral
+
+  const insightTones = {
+    atencao: { chip: 'danger', label: 'Atenção' },
+    revisar: { chip: 'warning', label: 'Revisar' },
+    oportunidade: { chip: 'neutral', label: 'Oportunidade' },
+    destaque: { chip: 'success', label: 'Destaque' },
+  };
+
+  const buildAiInsights = () => {
+    // Os insights usam o período corrente (o mesmo do "Cenário atual").
+    const current = (key) => buildSeries(DATASETS[key], CURRENT_PERIOD_ID);
+
+    const doctors = current('doctors');
+    const whatsapp = current('whatsapp');
+    const accountability = current('accountability');
+    const mnemonics = current('mnemonics');
+
+    const pct = (value, total) => (total ? (value / total) * 100 : 0);
+    const byLabel = (series, label) => series.rows.find((row) => row.label === label);
+
+    const highRisk = byLabel(accountability, 'Risco alto');
+    const mediumRisk = byLabel(accountability, 'Risco médio');
+    const riskToReview = (highRisk?.value || 0) + (mediumRisk?.value || 0);
+
+    const topDoctors = doctors.rows.slice(0, 2);
+    const topTwo = topDoctors.reduce((sum, row) => sum + row.value, 0);
+    const lastDoctor = doctors.rows[doctors.rows.length - 1];
+
+    const topRequest = whatsapp.rows[0];
+
+    const rareMnemonics = mnemonics.rows.slice(-3);
+    const rareTotal = rareMnemonics.reduce((sum, row) => sum + row.value, 0);
+
+    const perExam = mnemonics.total / (EXAMS_READ || 1);
+
+    return [
+      {
+        tone: 'atencao',
+        title: `${formatPercent(pct(highRisk?.value || 0, accountability.total))} dos documentos com risco alto de glosa`,
+        text: `${formatInt(highRisk?.value || 0)} dos ${formatInt(accountability.total)} documentos analisados ficaram com risco alto e outros `
+          + `${formatInt(mediumRisk?.value || 0)} com risco médio — ${formatPercent(pct(riskToReview, accountability.total))} do total precisa de conferência antes do envio.`,
+        action: `Priorizar a revisão dos ${formatInt(highRisk?.value || 0)} documentos de risco alto.`,
+        source: 'Prestação de contas',
+        href: '#/dashboard/health/overview/accountability',
+      },
+      {
+        tone: 'atencao',
+        title: 'Uso do assistente médico concentrado em dois profissionais',
+        text: `${topDoctors.map((row) => `${row.label} (${formatInt(row.value)})`).join(' e ')} respondem por `
+          + `${formatPercent(pct(topTwo, doctors.total))} das ${formatInt(doctors.total)} consultas apoiadas, enquanto `
+          + `${lastDoctor?.label} registrou ${formatInt(lastDoctor?.value || 0)} (${formatPercent(lastDoctor?.share || 0)}).`,
+        action: 'Acompanhar os profissionais com menor adoção e entender o que trava o uso.',
+        source: 'Médicos usando o assistente',
+        href: '#/dashboard/health/overview/doctors',
+      },
+      {
+        tone: 'oportunidade',
+        title: `${formatPercent(topRequest?.share || 0)} dos atendimentos são ${String(topRequest?.label || '').toLowerCase()}`,
+        text: `${formatInt(topRequest?.value || 0)} dos ${formatInt(whatsapp.total)} atendimentos do WhatsApp caem nesse motivo — o maior volume do canal.`,
+        action: 'Automatizar a confirmação de recebimento e as orientações de preparo para reduzir idas e vindas.',
+        source: 'O que acontece no WhatsApp',
+        href: '#/dashboard/health/overview/whatsapp',
+      },
+      {
+        tone: 'revisar',
+        title: 'Três mnemônicos com identificação muito baixa',
+        text: `${rareMnemonics.map((row) => `${row.label} (${formatInt(row.value)})`).join(', ')} somam `
+          + `${formatPercent(pct(rareTotal, mnemonics.total))} das ${formatInt(mnemonics.total)} ocorrências, muito abaixo dos demais marcadores.`,
+        action: 'Revisar o dicionário de extração para esses exames antes de assumir queda real.',
+        source: 'Mnemônicos — leitura de exames',
+        href: '#/dashboard/health/overview/mnemonics',
+      },
+      {
+        tone: 'destaque',
+        title: `Leitura de exames rendendo ${perExam.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })} mnemônicos por exame`,
+        text: `${formatInt(EXAMS_READ)} exames lidos geraram ${formatInt(mnemonics.total)} mnemônicos extraídos no período.`,
+        action: 'Manter o volume e usar a base para sugerir exames de acompanhamento.',
+        source: 'Mnemônicos — leitura de exames',
+        href: '#/dashboard/health/overview/mnemonics',
+      },
+    ];
+  };
+
+  const renderAiInsights = () => {
+    const container = document.querySelector('[data-health-ai-insights]');
+    if (!container) return;
+    container.innerHTML = buildAiInsights().map((insight) => {
+      const tone = insightTones[insight.tone] || insightTones.oportunidade;
+      return `
+        <article class="health-patient-detail-card health-insight-card">
+          <div class="health-insight-head">
+            <span class="chip ${tone.chip}">${escapeHtml(tone.label)}</span>
+            <a class="health-patient-more-link" href="${insight.href}"
+              aria-label="Ver mais em ${escapeHtml(insight.source)}">Ver mais</a>
+          </div>
+          <strong>${escapeHtml(insight.title)}</strong>
+          <p>${escapeHtml(insight.text)}</p>
+          <p class="health-insight-action">
+            <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
+            ${escapeHtml(insight.action)}
+          </p>
+        </article>
+      `;
+    }).join('');
+  };
+
+  renderAiInsights();
+
+  // ----- Modal "Comparar": itens da página lado a lado, com base no histórico -----
+  const COMPARE_COLORS = ['#016ff4', '#22c55e', '#f59e0b', '#a855f7', '#ef4444', '#0ea5e9', '#14b8a6', '#f472b6'];
+  const compareState = { key: null, selected: new Set() };
+
+  const compareModal = document.getElementById('healthCompareModal');
+
+  const buildCompareRows = (dataset) => dataset.items.map((item, index) => {
+    const months = MONTH_PERIODS.map((period) => ({
+      label: period.short,
+      value: monthTotalFor(dataset, period, index),
+    }));
+    const total = months.reduce((sum, month) => sum + month.value, 0);
+    const best = months.slice().sort((a, b) => b.value - a.value)[0];
+    return { index, label: item.label, months, total, average: total / (months.length || 1), best };
+  });
+
+  const renderCompare = () => {
+    if (!compareModal || !compareState.key) return;
+    const dataset = DATASETS[compareState.key];
+    if (!dataset) return;
+    const rows = buildCompareRows(dataset);
+    const picked = rows.filter((row) => compareState.selected.has(row.index));
+
+    const picker = compareModal.querySelector('[data-health-compare-picker]');
+    if (picker && picker.dataset.rendered !== compareState.key) {
+      picker.dataset.rendered = compareState.key;
+      picker.innerHTML = rows.map((row) => `
+        <label class="health-compare-check">
+          <input type="checkbox" value="${row.index}"${compareState.selected.has(row.index) ? ' checked' : ''} />
+          <span>${escapeHtml(row.label)}</span>
+        </label>
+      `).join('');
+    } else if (picker) {
+      picker.querySelectorAll('input[type="checkbox"]').forEach((input) => {
+        input.checked = compareState.selected.has(Number(input.value));
+      });
+    }
+
+    // Sem nenhum item marcado, o lugar do gráfico recebe o aviso ao usuário.
+    const emptyState = compareModal.querySelector('[data-health-compare-empty]');
+    const chartWrap = compareModal.querySelector('[data-health-compare-chart-wrap]');
+    const table = compareModal.querySelector('[data-health-compare-table]');
+    if (!picked.length) {
+      destroyChart('compare');
+      if (emptyState) emptyState.hidden = false;
+      if (chartWrap) chartWrap.hidden = true;
+      if (table) table.hidden = true;
+      return;
+    }
+    if (emptyState) emptyState.hidden = true;
+    if (chartWrap) chartWrap.hidden = false;
+    if (table) table.hidden = false;
+
+    if (table) {
+      const headerRow = `<div class="data-row header"><span>${escapeHtml(dataset.entityHeader)}</span>`
+        + `<span>Total (6 meses)</span><span>Média por mês</span><span>Mês mais forte</span></div>`;
+      const bodyRows = picked.map((row, order) => `<div class="data-row">`
+          + `<span><span class="health-compare-swatch" style="background:${COMPARE_COLORS[order % COMPARE_COLORS.length]}" aria-hidden="true"></span>`
+          + `${escapeHtml(row.label)}</span>`
+          + `<span>${formatInt(row.total)}</span>`
+          + `<span>${row.average.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 })}</span>`
+          + `<span>${escapeHtml(row.best ? `${row.best.label} · ${formatInt(row.best.value)}` : '—')}</span>`
+          + '</div>').join('');
+      table.innerHTML = `${headerRow}${bodyRows}`;
+    }
+
+    const canvas = compareModal.querySelector('[data-health-compare-chart]');
+    if (!canvas || !window.Chart) return;
+    const labels = MONTH_PERIODS.map((period) => period.short);
+    const datasets = picked.map((row, order) => ({
+      label: row.label,
+      data: row.months.map((month) => month.value),
+      backgroundColor: COMPARE_COLORS[order % COMPARE_COLORS.length],
+      borderRadius: 6,
+      borderSkipped: false,
+      maxBarThickness: 26,
+    }));
+    const existing = charts.get('compare');
+    if (existing) {
+      existing.data.labels = labels;
+      existing.data.datasets = datasets;
+      existing.update();
+      return;
+    }
+    const wrap = canvas.closest('.health-overview-chart-wrap');
+    if (!wrap || wrap.clientHeight === 0) return;
+    charts.set('compare', new window.Chart(canvas, {
+      type: 'bar',
+      data: { labels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              usePointStyle: true,
+              pointStyle: 'circle',
+              boxWidth: 10,
+              boxHeight: 10,
+              color: '#475569',
+              font: { family: 'inherit', size: 12, weight: '600' },
+              padding: 14,
+            },
+          },
+          tooltip: {
+            backgroundColor: '#0f172a',
+            titleColor: '#f8fafc',
+            bodyColor: '#e2e8f0',
+            padding: 12,
+            callbacks: {
+              label(context) {
+                return ` ${context.dataset.label}: ${formatInt(context.parsed.y)} ${dataset.unit}`;
+              },
+            },
+          },
+        },
+        scales: {
+          x: {
+            grid: { display: false, drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#475569', font: { family: 'inherit', size: 12, weight: '600' } },
+          },
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(214, 224, 237, 0.9)', drawBorder: false },
+            border: { display: false },
+            ticks: { color: '#475569', precision: 0, font: { family: 'inherit', size: 12, weight: '600' } },
+          },
+        },
+      },
+    }));
+  };
+
+  const openCompare = (key) => {
+    const dataset = DATASETS[key];
+    if (!compareModal || !dataset) return;
+    if (compareState.key !== key) {
+      compareState.key = key;
+      // Abre comparando os três primeiros itens (ou todos, se houver menos).
+      compareState.selected = new Set(dataset.items.slice(0, 3).map((_, index) => index));
+      const picker = compareModal.querySelector('[data-health-compare-picker]');
+      if (picker) picker.dataset.rendered = '';
+    }
+    destroyChart('compare');
+    const title = compareModal.querySelector('#healthCompareTitle');
+    if (title) title.textContent = `Comparar — ${dataset.compareTitle || dataset.csvTitle}`;
+    const subtitle = compareModal.querySelector('[data-health-compare-subtitle]');
+    if (subtitle) {
+      subtitle.textContent = `Marque os itens para comparar a evolução mês a mês `
+        + `(${MONTH_PERIODS[0].short} a ${MONTH_PERIODS[MONTH_PERIODS.length - 1].short}).`;
+    }
+    const pickerLabel = compareModal.querySelector('[data-health-compare-label]');
+    if (pickerLabel) pickerLabel.textContent = dataset.entityHeader;
+
+    compareModal.classList.add('open');
+    compareModal.setAttribute('aria-hidden', 'false');
+    renderCompare();
+    // O canvas só tem altura depois de o modal abrir.
+    window.requestAnimationFrame(renderCompare);
+  };
+
+  const closeCompare = () => {
+    if (!compareModal) return;
+    compareModal.classList.remove('open');
+    compareModal.setAttribute('aria-hidden', 'true');
+    // Recria o gráfico na próxima abertura, já com o modal na altura final.
+    destroyChart('compare');
+  };
+
+  document.querySelectorAll('[data-health-compare-open]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const page = button.closest('.page');
+      const block = page?.querySelector('[data-health-history]');
+      const key = block?.dataset.healthHistory;
+      if (key) openCompare(key);
+    });
+  });
+
+  compareModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-health-compare-close]')) closeCompare();
+  });
+  compareModal?.addEventListener('change', (event) => {
+    const input = event.target.closest('input[type="checkbox"]');
+    if (!input) return;
+    const index = Number(input.value);
+    if (input.checked) compareState.selected.add(index);
+    else compareState.selected.delete(index);
+    renderCompare();
+  });
+  compareModal?.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeCompare();
+  });
+})();
+
+// Calendário interno dos filtros de período: substitui o seletor nativo do
+// navegador/sistema, que muda de aparência e comportamento a cada dispositivo.
+(() => {
+  const WEEKDAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
+  const PLACEHOLDER = 'dd/mm/aaaa';
+  const pad = (value) => String(value).padStart(2, '0');
+  const toIso = (year, month, day) => `${year}-${pad(month + 1)}-${pad(day)}`;
+
+  const parseIso = (value) => {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value || '').trim());
+    if (!match) return null;
+    return { year: Number(match[1]), month: Number(match[2]) - 1, day: Number(match[3]) };
+  };
+
+  const formatMonthTitle = (year, month) => {
+    const label = new Date(year, month, 1).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+    return label.charAt(0).toUpperCase() + label.slice(1);
+  };
+
+  const fields = [];
+  const closeAllCalendars = (except = null) => {
+    fields.forEach((field) => {
+      if (field !== except) field.close();
+    });
+  };
+
+  function setupDateField(input) {
+    if (!input || input.dataset.hubDateField === 'true') return;
+    input.dataset.hubDateField = 'true';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'hub-date-field';
+    input.parentNode.insertBefore(wrap, input);
+    wrap.appendChild(input);
+    input.classList.add('hub-date-native');
+
+    const trigger = document.createElement('button');
+    trigger.type = 'button';
+    trigger.className = 'hub-date-trigger';
+    trigger.setAttribute('aria-haspopup', 'dialog');
+    trigger.setAttribute('aria-expanded', 'false');
+
+    const valueEl = document.createElement('span');
+    valueEl.className = 'hub-date-value';
+    const iconEl = document.createElement('span');
+    iconEl.className = 'material-symbols-rounded';
+    iconEl.setAttribute('aria-hidden', 'true');
+    iconEl.textContent = 'calendar_month';
+    trigger.append(valueEl, iconEl);
+    wrap.appendChild(trigger);
+
+    const popup = document.createElement('div');
+    popup.className = 'hub-calendar';
+    popup.setAttribute('role', 'dialog');
+    popup.hidden = true;
+    wrap.appendChild(popup);
+
+    const fieldLabel = input.closest('.audit-period-field')?.querySelector('label')?.textContent?.trim();
+    if (fieldLabel) trigger.setAttribute('aria-label', `${fieldLabel}: escolher data`);
+
+    let view = null;
+
+    const syncLabel = () => {
+      const parts = parseIso(input.value);
+      valueEl.textContent = parts ? `${pad(parts.day)}/${pad(parts.month + 1)}/${parts.year}` : PLACEHOLDER;
+      valueEl.classList.toggle('is-placeholder', !parts);
+    };
+
+    const render = () => {
+      const today = new Date();
+      const selected = parseIso(input.value);
+      if (!view) {
+        view = selected
+          ? { year: selected.year, month: selected.month }
+          : { year: today.getFullYear(), month: today.getMonth() };
+      }
+
+      const first = new Date(view.year, view.month, 1);
+      const start = new Date(view.year, view.month, 1 - first.getDay());
+      const todayIso = toIso(today.getFullYear(), today.getMonth(), today.getDate());
+      const selectedIso = selected ? toIso(selected.year, selected.month, selected.day) : '';
+
+      let days = '';
+      for (let index = 0; index < 42; index += 1) {
+        const date = new Date(start.getFullYear(), start.getMonth(), start.getDate() + index);
+        const iso = toIso(date.getFullYear(), date.getMonth(), date.getDate());
+        const classes = ['hub-calendar-day'];
+        if (date.getMonth() !== view.month) classes.push('is-outside');
+        if (iso === todayIso) classes.push('is-today');
+        if (iso === selectedIso) classes.push('is-selected');
+        days += `<button type="button" class="${classes.join(' ')}" data-date="${iso}">${date.getDate()}</button>`;
+      }
+
+      popup.innerHTML = `
+        <div class="hub-calendar-head">
+          <strong>${formatMonthTitle(view.year, view.month)}</strong>
+          <div class="hub-calendar-nav">
+            <button type="button" class="hub-calendar-nav-btn" data-calendar-step="-1" aria-label="Mês anterior">
+              <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+            </button>
+            <button type="button" class="hub-calendar-nav-btn" data-calendar-step="1" aria-label="Próximo mês">
+              <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+            </button>
+          </div>
+        </div>
+        <div class="hub-calendar-weekdays">${WEEKDAYS.map((day) => `<span>${day}</span>`).join('')}</div>
+        <div class="hub-calendar-grid">${days}</div>
+        <div class="hub-calendar-foot">
+          <button type="button" class="hub-calendar-link" data-calendar-clear>Limpar</button>
+          <button type="button" class="hub-calendar-link" data-calendar-today>Hoje</button>
+        </div>
+      `;
+    };
+
+    const commit = (iso) => {
+      input.value = iso;
+      syncLabel();
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+
+    const field = {
+      close() {
+        if (popup.hidden) return;
+        popup.hidden = true;
+        trigger.setAttribute('aria-expanded', 'false');
+      },
+      open() {
+        closeAllCalendars(field);
+        const selected = parseIso(input.value);
+        if (selected) view = { year: selected.year, month: selected.month };
+        render();
+        popup.hidden = false;
+        trigger.setAttribute('aria-expanded', 'true');
+        window.setTimeout(() => popup.scrollIntoView({ block: 'nearest' }), 0);
+      },
+      sync: syncLabel,
+    };
+    fields.push(field);
+
+    trigger.addEventListener('click', () => {
+      if (popup.hidden) field.open();
+      else field.close();
+    });
+
+    popup.addEventListener('click', (event) => {
+      const step = event.target.closest('[data-calendar-step]');
+      if (step) {
+        const delta = Number(step.dataset.calendarStep);
+        view = { year: view.year, month: view.month + delta };
+        render();
+        return;
+      }
+
+      const day = event.target.closest('[data-date]');
+      if (day) {
+        commit(day.dataset.date);
+        field.close();
+        return;
+      }
+
+      if (event.target.closest('[data-calendar-clear]')) {
+        commit('');
+        field.close();
+        return;
+      }
+
+      if (event.target.closest('[data-calendar-today]')) {
+        const today = new Date();
+        commit(toIso(today.getFullYear(), today.getMonth(), today.getDate()));
+        field.close();
+      }
+    });
+
+    input.addEventListener('change', syncLabel);
+    syncLabel();
+  }
+
+  document.querySelectorAll('.audit-period-menu input[type="date"]').forEach(setupDateField);
+
+  // "Limpar filtros" e a troca de modo alteram o valor sem disparar change.
+  document.querySelectorAll('.audit-period-menu').forEach((menu) => {
+    menu.addEventListener('click', (event) => {
+      if (!event.target.closest('.hub-date-field')) closeAllCalendars();
+      window.setTimeout(() => fields.forEach((field) => field.sync()), 0);
+    });
+  });
+
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('.hub-date-field')) return;
+    closeAllCalendars();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeAllCalendars();
+  });
+})();
+
+
+// ==== Alternador de tema (claro/escuro) ====
+// O tema escuro é aplicado via body.theme-dark e vale para o app
+// inteiro (tokens em styles.css). Todos os alternadores da página
+// (cabeçalho e tela de login) ficam sincronizados entre si.
+(function setupThemeSwitcher() {
+  const switchers = Array.from(document.querySelectorAll('.theme-switcher'))
+    .map((el) => {
+      const options = el.querySelectorAll('.theme-option');
+      return options.length >= 2 ? { light: options[0], dark: options[1] } : null;
+    })
+    .filter(Boolean);
+  if (!switchers.length) return;
+  const THEME_STORAGE_KEY = 'wesHubTheme';
+
+  function applyTheme(theme) {
+    const isDark = theme === 'dark';
+    document.body.classList.toggle('theme-dark', isDark);
+    switchers.forEach(({ light, dark }) => {
+      light.classList.toggle('is-active', !isDark);
+      dark.classList.toggle('is-active', isDark);
+      light.setAttribute('aria-pressed', String(!isDark));
+      dark.setAttribute('aria-pressed', String(isDark));
+    });
+    try {
+      window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (error) {
+      /* armazenamento indisponível: o tema vale só para a sessão */
+    }
+    // Recria os gráficos visíveis com a paleta do tema ativo.
+    if (document.getElementById('page-health-overview')?.classList.contains('is-active')) {
+      destroyHealthOverviewCharts();
+      syncHealthOverviewCharts('dashboard/health/overview');
+    }
+    if (voiceMessagingInsightsChart) {
+      destroyVoiceMessagingInsightsChart();
+      syncVoiceMessagingInsightsChart('dashboard/voice-messaging/insights');
+    }
+  }
+
+  switchers.forEach(({ light, dark }) => {
+    light.addEventListener('click', () => applyTheme('light'));
+    dark.addEventListener('click', () => applyTheme('dark'));
+  });
+
+  let savedTheme = null;
+  try {
+    savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  } catch (error) {
+    savedTheme = null;
+  }
+  if (savedTheme === 'dark') applyTheme('dark');
 })();

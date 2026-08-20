@@ -10,11 +10,18 @@ protótipo WES Hub360.
 > uma API configurada; sem ela, a UI cai nos mocks.
 
 **Arquivos-fonte** (raiz do repositório)
-- [index.html](index.html) — markup de todas as páginas e modais.
-- [app.js](app.js) — lógica, dados mock, roteamento (~23,6k linhas).
+- [index.html](index.html) — markup de todas as páginas e modais (~11,5k linhas).
+- [app.js](app.js) — lógica, dados mock, roteamento (~25k linhas).
 - [agents-environment-ui.js](agents-environment-ui.js) — camada de setores/ambientes dos Agentes.
 - [auth.js](auth.js) — login e sessão (mock).
-- [styles.css](styles.css) — estilos.
+- [styles.css](styles.css) — estilos (~24,5k linhas).
+
+**Outros documentos do repositório**
+- [SECAO_SAUDE.md](SECAO_SAUDE.md) — a Seção Saúde inteira, subseção por subseção.
+- [VISAO_GERAL_SAUDE.md](VISAO_GERAL_SAUDE.md) — a subseção Visão geral em detalhe:
+  página por página, o que cada botão faz e de onde vêm os números.
+- [PADROES_DE_TELAS.md](PADROES_DE_TELAS.md) — padrões de tela do projeto.
+- [RELATORIO_ANALISE_UX_UI.md](RELATORIO_ANALISE_UX_UI.md) — análise de UX/UI.
 
 ---
 
@@ -51,8 +58,10 @@ topo, acessíveis pelo menu lateral, são:
 | **Administração** | `#/dashboard/audit` | Auditoria, conexões (MCP), estrutura e pessoas, habilidades. |
 
 ### Roteamento
-- `routeMap` ([app.js:21479](app.js)) mapeia cada hash → id de página; `sectionMap` ([app.js:21536](app.js)) mapeia hash → título de seção.
-- `updateActivePage()` ([app.js:22053](app.js)) é o router central, chamado por `auth.js` a cada `hashchange`; aplica o controle de acesso antes de ativar a página.
+- `routeMap` ([app.js:21547](app.js)) mapeia cada hash → id de página; `sectionMap` ([app.js:21607](app.js)) mapeia hash → título de seção.
+- `updateActivePage()` ([app.js:22127](app.js)) é o router central, chamado por `auth.js` a cada `hashchange`; aplica o controle de acesso antes de ativar a página.
+- Rotas filhas de uma seção mantêm o item do menu do pai ativo (regra de `navRouteKey`),
+  por exemplo `dashboard/health/overview/*` → **Visão geral**.
 
 ---
 
@@ -318,47 +327,86 @@ Só a **Integração personalizada** tem ação: modal `healthCustomIntegrationM
 ## 8. Saúde
 
 **Menu:** "Saúde" (`data-menu="health"`, submenu [index.html:466](index.html)).
-Rotas `#/dashboard/health/*` → `sectionMap` "Saúde" ([app.js:21554](app.js)). Módulo
-vertical com 6 subseções. No formulário de criação de organização, as subseções são
+Rotas `#/dashboard/health/*` → `sectionMap` "Saúde" ([app.js:21607](app.js)). Módulo
+vertical com 6 subseções (a Visão geral abre 5 páginas de detalhe, ver §8.1). No formulário de criação de organização, as subseções são
 checkboxes `organization_subsections` ([index.html:312](index.html)).
 
 ### 8.1 Visão geral
-**Rota:** `/health/overview` · **Página:** `page-health-overview` ([index.html:8834](index.html)).
-Painel consolidado: 4 stat-cards (142 atendimentos WhatsApp; 89 consultas; 320
-documentos; 214 exames) e 4 gráficos (Chart.js). Lógica `syncHealthOverviewCharts()`
-([app.js:2691](app.js)). Datasets: WhatsApp `[58,49,35]`, Médicos `[28,21,16,12,8,4]`,
-Prestação `[262,58]`, Exames `[412,388,351,298,254,208]`.
+**Rota:** `/health/overview` · **Página:** `page-health-overview` ([index.html:8951](index.html)).
+Detalhamento completo desta subseção: [VISAO_GERAL_SAUDE.md](VISAO_GERAL_SAUDE.md).
+
+Painel consolidado com 4 stat-cards (142 atendimentos WhatsApp; 89 consultas; 320
+documentos; 214 exames), 4 gráficos (Chart.js) e o painel de Insights de IA. Lógica dos
+gráficos em `syncHealthOverviewCharts()` ([app.js:2691](app.js)); datasets: WhatsApp
+`[58,49,35]`, Médicos `[28,21,16,12,8,4]`, Risco de glosa `[58,79,183]`, Exames
+`[412,388,351,298,254,208]`.
+
+**Exportar dados** (`#healthOverviewExportBtn`) abre `healthOverviewExportModal`
+([app.js:23718](app.js)): monta um pacote a partir do que está renderizado e gera
+`saude-visao-geral` em **Excel / CSV / PDF / JSON**, com "Opções avançadas" trazendo
+endpoint e chave de API fictícios para copiar.
+
+**Cada painel tem "Ver mais"**, abrindo uma página de detalhe:
+
+| Painel | Rota | Página |
+|---|---|---|
+| O que acontece no WhatsApp | `/health/overview/whatsapp` | `page-health-overview-whatsapp` |
+| Médicos usando o assistente | `/health/overview/doctors` | `page-health-overview-doctors` |
+| Leitura de exames — mnemônicos | `/health/overview/mnemonics` | `page-health-overview-mnemonics` |
+| Prestação de contas | `/health/overview/accountability` | `page-health-overview-accountability` |
+| Insights de IA | `/health/whatsapp/insights` | `page-health-whatsapp-insights` |
+
+As quatro primeiras seguem o mesmo desenho, em `initHealthHistoryPages()`
+([app.js:23912](app.js)):
+- abas **Cenário atual** (retrato do período corrente: linha-resumo + tabela) e
+  **Histórico** (janela de calendário navegável);
+- no Histórico, granularidade **Semana / Mês / Ano**, navegação `‹ período ›` com menu de
+  escolha (mês e as semanas do mês) e, em Médicos, o botão **Filtros** com seleção
+  múltipla de profissionais;
+- **Comparar** abre `healthCompareModal` (barras agrupadas mês a mês + tabela de totais);
+  **Baixar dados** exporta em CSV a tabela da aba ativa;
+- os números saem de valores base por item, distribuídos por mês e por dia com pesos
+  fixos, então qualquer janela fecha com os mesmos totais da Visão geral.
+
+A página de **Insights de IA** tem outro papel: lê os dados das quatro páginas acima e
+devolve leituras (Atenção / Revisar / Oportunidade / Destaque), cada uma com os números
+que a sustentam, a ação sugerida e "Ver mais" para a página de origem
+(`buildAiInsights()`, [app.js](app.js)). Não tem abas, histórico, Comparar nem Baixar
+dados.
 
 ### 8.2 Agente do paciente
-**Rota:** `/health/whatsapp` · **Páginas:** `page-health-whatsapp` (+ insights, history)
-([index.html:8976](index.html)).
+**Rota:** `/health/whatsapp` · **Página:** `page-health-whatsapp`
+([index.html:9360](index.html)).
 Agente automatizado de WhatsApp: autenticação por CPF, dúvidas sobre histórico, envio
-de exames, encaixe para renovação. Painéis: fluxo, integração, compartilhar
-(**+55 85 98888-1048**), simulação. **Simulação** (`healthPatientPreviewModal`):
+de exames, encaixe para renovação. A página tem dois cards — **Integração** (leva a
+`/health/integrations`) e **Compartilhar agente** (**+55 85 98888-1048**, com copiar
+link e compartilhar) — e dois `.icon-btn` no canto superior direito do cabeçalho:
+`account_tree` abre o **fluxo do atendimento** e `chat` abre a **simulação no WhatsApp**.
+**Simulação** (`healthPatientPreviewModal`):
 `unlockHealthPatientPreview(cpf)` ([app.js:18634](app.js), CPF de teste `12345678900`)
 e `runHealthPatientPreviewFlow(flow)` ([app.js:18649](app.js), fluxos questions/exams/
 renewal). Integrações reaproveitam `page-integrations-apis` (ver §7).
 
 ### 8.3 Atendimento
 **Rota:** `/health/service` · **Páginas:** `page-health-service`, `page-health-service-patient`
-([index.html:9179](index.html)).
+([index.html:9437](index.html)).
 Inicia atendimento por CPF; a tela de **histórico médico** reúne resumo clínico,
 exames recentes (Laboratoriais/Imagem), **auxiliar de IA** restrito ao histórico e
 uma **linha do tempo clínica** interativa (8 tipos de evento, filtros por ano/tipo,
-zoom). Lógica `initHealthServiceControls()` ([app.js:19628](app.js)); mocks
+zoom). Lógica `initHealthServiceControls()` ([app.js:19701](app.js)); mocks
 `healthServicePatientRecords`/`AttendanceRecords`/`ExamRecords`/`TimelineEvents`
 ([app.js:18248](app.js)+).
 
 ### 8.4 Agenda
-**Rota:** `/health/agenda` · **Página:** `page-health-agenda` ([index.html:9437](index.html)).
+**Rota:** `/health/agenda` · **Página:** `page-health-agenda` ([index.html:9694](index.html)).
 Agenda operacional do médico: card **"Encaixes para renovação"** (fila
 `healthAgendaRenewalQueue` [app.js:22955](app.js), 5 itens, mostra 3) + board semanal
 (HTML estático) com ajustes (dias, horários, planos).
 
 ### 8.5 Prestação de contas
 **Rota:** `/health/accountability` · **Páginas:** `page-health-accountability` (+ results)
-([index.html:9672](index.html)) · **Lógica:** `initHealthAccountabilityWorkflow()`
-([app.js:15370](app.js)–16175).
+([index.html:9929](index.html)) · **Lógica:** `initHealthAccountabilityWorkflow()`
+([app.js:15437](app.js)+).
 Auditoria de contas hospitalares. Upload de PDF → classifica páginas por tipo de
 documento (`documentCatalog` [app.js:15412](app.js), 6 tipos) → resume → consolida a
 conta → estima a **chance de glosa**. Faixas: **≥60 Alto · ≥30 Médio · <30 Baixo**
@@ -369,8 +417,8 @@ Download de PDF montado à mão (`buildResultPdfBlob` [app.js:16005](app.js)).
 
 ### 8.6 Leitura de exames
 **Rota:** `/health/exam-reading` · **Páginas:** `page-health-exam-reading` (+ results)
-([index.html:10075](index.html)) · **Lógica:** `initHealthExamReadingWorkflow()`
-([app.js:16177](app.js)–16603).
+([index.html:10333](index.html)) · **Lógica:** `initHealthExamReadingWorkflow()`
+([app.js:16261](app.js)+).
 Extrai códigos/mnemônicos de exames de um arquivo (PDF/PNG/JPG). Upload → converte
 para base64 (`readFileAsDataUrl`, **conteúdo ignorado**) → sempre retorna
 `mockMnemonics` ([app.js:16206](app.js): HEM, HGB, HTC, LEU, PLAQ, GLI). Busca, cópia
@@ -437,7 +485,9 @@ Tabela + modal (nome, descrição, upload, status). Lógica: bloco
   `mcpsCustomConnections`), fluxos híbridos (`hybridFlowsCreated`), operações de voz
   (`voiceMessagingCreated`), última base de API e flags de UI.
 - **Somente DOM/memória** (perde ao recarregar) — a maioria dos registros criados:
-  agentes, campanhas, canais, prestações de contas, leituras de exame, habilidades.
+  agentes, campanhas, canais, prestações de contas, leituras de exame, habilidades. Também
+  o estado das páginas de detalhe da Visão geral (aba ativa, granularidade, janela do
+  histórico e médicos filtrados), guardado em `historyState`.
 
 ### O que é simulado
 - **Login** não valida credenciais; qualquer acesso cria o usuário demo.
@@ -447,10 +497,34 @@ Tabela + modal (nome, descrição, upload, status). Lógica: bloco
 - **Processos/BPMN** são apenas placeholders "em desenvolvimento".
 - **Leitura de exames** converte o arquivo para base64 de verdade, mas ignora o
   conteúdo e sempre retorna os mesmos 6 mnemônicos.
-- **PDFs de download** (prestação e leitura) são gerados no client montando a
-  estrutura PDF na mão, sem biblioteca.
+- **PDFs de download** (prestação, leitura e exportação da Visão geral) são gerados no
+  client montando a estrutura PDF na mão, sem biblioteca.
+- **Histórico da Visão geral** não vem de banco: os valores de cada mês e de cada dia são
+  derivados dos números do período corrente com pesos fixos e um *drift* determinístico
+  (`initHealthHistoryPages`, [app.js:23912](app.js)). Por isso são estáveis entre
+  recarregamentos e fecham com os totais mostrados na Visão geral. A base coberta é
+  **01/03/2026 a 17/08/2026**, e "hoje", no protótipo, é **17/08/2026**.
+- **Insights de IA** não chama modelo nenhum: as leituras são regras calculadas sobre
+  esses mesmos dados (`buildAiInsights()`).
 
 ### Detalhes que podem confundir
 - Na UI, **"Setores" = `environment`** no código.
 - `#/dashboard/audit` e `#/dashboard/agent-history` apontam para a **mesma** página; `page-audit` é legada e absorvida como aba.
 - A página de "Integrações" (`page-integrations-apis`) serve três rotas, incluindo `#/dashboard/health/integrations`.
+- A página **Insights de IA** fica na rota `#/dashboard/health/whatsapp/insights` (herança
+  do Agente do paciente), mas hoje pertence à **Visão geral**: é lá que ela é acessada e
+  são os dados de lá que ela analisa.
+- Em "Prestação de contas" há duas coisas com nome parecido: a subseção
+  (`/health/accountability`, o fluxo de auditoria de contas) e a página de detalhe da
+  Visão geral (`/health/overview/accountability`, a distribuição por risco de glosa).
+
+---
+
+## 11. Onde continuar a leitura
+
+| Documento | Para quê |
+|---|---|
+| [SECAO_SAUDE.md](SECAO_SAUDE.md) | a Seção Saúde inteira, subseção por subseção |
+| [VISAO_GERAL_SAUDE.md](VISAO_GERAL_SAUDE.md) | a Visão geral em detalhe: cada página, cada botão e a origem dos números |
+| [PADROES_DE_TELAS.md](PADROES_DE_TELAS.md) | padrões de tela e componentes |
+| [RELATORIO_ANALISE_UX_UI.md](RELATORIO_ANALISE_UX_UI.md) | análise de UX/UI do protótipo |

@@ -237,8 +237,6 @@
     const createCompanySubmitButton = createCompanyForm?.querySelector('button[type="submit"]');
     const orgChoices = document.querySelectorAll('[data-org-choice]');
     let createCompanyContext = 'company';
-    let createCompanyMode = 'create';
-    let activeOrganizationEditRow = null;
     loginForm?.addEventListener('submit', (event) => {
       event.preventDefault();
       window.location.hash = '#/select-organization';
@@ -264,26 +262,19 @@
       createCompanyModal.classList.remove('public-modal--organization');
       createCompanyModal.setAttribute('aria-hidden', 'true');
       document.body.classList.remove('public-modal-open');
-      activeOrganizationEditRow = null;
-      createCompanyMode = 'create';
     };
 
     const syncCreateCompanyModalCopy = () => {
       const isOrganization = createCompanyContext === 'organization';
-      const isEditingOrganization = isOrganization && createCompanyMode === 'edit';
       if (createCompanyModalTitle) {
-        createCompanyModalTitle.textContent = isEditingOrganization
-          ? 'Editar organização'
-          : (isOrganization ? 'Criar organização' : 'Criar empresa');
+        createCompanyModalTitle.textContent = isOrganization ? 'Criar organização' : 'Criar empresa';
       }
       createCompanyModal?.classList.toggle('public-modal--organization', isOrganization);
       if (organizationSectionsPicker) organizationSectionsPicker.hidden = !isOrganization;
       if (createCompanySectorsPanel) createCompanySectorsPanel.hidden = isOrganization;
       const subtitle = createCompanyModal?.querySelector('.public-modal-header p');
       if (subtitle) {
-        subtitle.textContent = isEditingOrganization
-          ? 'Atualize os dados e seções disponíveis para esta organização.'
-          : (isOrganization ? 'Informe os dados iniciais da organização.' : 'Informe os dados iniciais da empresa.');
+        subtitle.textContent = isOrganization ? 'Informe os dados iniciais da organização.' : 'Informe os dados iniciais da empresa.';
       }
       if (companyNameLabel) companyNameLabel.textContent = isOrganization ? 'Nome da organização' : 'Nome da empresa';
       if (companyAdminEmailLabel) companyAdminEmailLabel.textContent = isOrganization ? 'E-mail do ADM da organização' : 'Email do responsável';
@@ -291,9 +282,9 @@
         companyAdminEmail.type = 'email';
         companyAdminEmail.autocomplete = 'email';
       }
-      if (createCompanySubmitButton) createCompanySubmitButton.textContent = isEditingOrganization ? 'Salvar alterações' : 'Salvar';
+      if (createCompanySubmitButton) createCompanySubmitButton.textContent = 'Salvar';
       if (createCompanyAdminUserLink) {
-        createCompanyAdminUserLink.hidden = !isOrganization || isEditingOrganization;
+        createCompanyAdminUserLink.hidden = !isOrganization;
         createCompanyAdminUserLink.textContent = isOrganization
           ? 'Não criou o ADM da organização ainda?'
           : 'Não criou o responsável ainda?';
@@ -303,8 +294,6 @@
     const showCreateCompanyModal = (event) => {
       if (!createCompanyModal) return;
       createCompanyContext = event?.currentTarget?.dataset?.createContext || 'company';
-      createCompanyMode = 'create';
-      activeOrganizationEditRow = null;
       createCompanyForm?.reset();
       syncCreateCompanyModalCopy();
       if (createCompanyModal.parentElement !== document.body) {
@@ -317,35 +306,8 @@
       window.setTimeout(() => companyName?.focus(), 50);
     };
 
-    const showEditOrganizationModal = (row) => {
-      if (!createCompanyModal || !row) return;
-      createCompanyContext = 'organization';
-      createCompanyMode = 'edit';
-      activeOrganizationEditRow = row;
-      syncCreateCompanyModalCopy();
-      if (companyName) companyName.value = row.dataset.organizationName || row.querySelector('strong')?.textContent?.trim() || '';
-      const adminEmail = row.dataset.organizationAdmin || row.children[1]?.textContent?.trim() || '';
-      const companyAdminEmail = document.getElementById('companyAdminEmail');
-      if (companyAdminEmail) companyAdminEmail.value = adminEmail;
-      if (createCompanyModal.parentElement !== document.body) {
-        document.body.appendChild(createCompanyModal);
-      }
-      createCompanyModal.classList.toggle('public-modal--app', Boolean(appShell && !appShell.hidden));
-      createCompanyModal.classList.add('is-open');
-      createCompanyModal.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('public-modal-open');
-      window.setTimeout(() => companyName?.focus(), 50);
-    };
-
     openCreateCompanyModalButtons.forEach((button) => {
       button.addEventListener('click', showCreateCompanyModal);
-    });
-    document.addEventListener('click', (event) => {
-      const editButton = event.target.closest('[data-organization-edit]');
-      if (!editButton) return;
-      const row = editButton.closest('[data-organization-row]');
-      if (!row) return;
-      showEditOrganizationModal(row);
     });
     document.querySelectorAll('[data-create-company-close]').forEach((button) => {
       button.addEventListener('click', closeCreateCompanyModal);
@@ -393,21 +355,6 @@
     });
     createCompanyForm?.addEventListener('submit', (event) => {
       event.preventDefault();
-      if (createCompanyContext === 'organization' && createCompanyMode === 'edit' && activeOrganizationEditRow) {
-        const nextName = String(companyName?.value || '').trim();
-        const nextAdmin = String(companyAdminEmail?.value || '').trim();
-        if (nextName) {
-          activeOrganizationEditRow.dataset.organizationName = nextName;
-          const nameEl = activeOrganizationEditRow.querySelector('strong');
-          if (nameEl) nameEl.textContent = nextName;
-        }
-        if (nextAdmin) {
-          activeOrganizationEditRow.dataset.organizationAdmin = nextAdmin;
-          if (activeOrganizationEditRow.children[1]) activeOrganizationEditRow.children[1].textContent = nextAdmin;
-        }
-        closeCreateCompanyModal();
-        return;
-      }
       createCompanyForm.reset();
       closeCreateCompanyModal();
       window.location.hash = createCompanyContext === 'organization' ? '#/select-organization' : '#/dashboard/companies';

@@ -82,6 +82,10 @@ Mapeamento rota → id de página em [app.js:21495](app.js); títulos em
 | Rota (hash) | Página (id) |
 |-------------|-------------|
 | `dashboard/health/overview` | `page-health-overview` |
+| `dashboard/health/overview/doctors` | `page-health-overview-doctors` |
+| `dashboard/health/overview/mnemonics` | `page-health-overview-mnemonics` |
+| `dashboard/health/overview/whatsapp` | `page-health-overview-whatsapp` |
+| `dashboard/health/overview/accountability` | `page-health-overview-accountability` |
 | `dashboard/health/whatsapp` | `page-health-whatsapp` |
 | `dashboard/health/whatsapp/insights` | `page-health-whatsapp-insights` |
 | `dashboard/health/whatsapp/history` | `page-health-whatsapp-history` |
@@ -112,6 +116,8 @@ saúde com KPIs, gráficos e insights de IA.
   4. `biotech` — **214** Exames lidos · "1.560 mnemônicos extraídos"
 - **4 gráficos** (`<canvas>`, [index.html:8878](index.html)): WhatsApp, Médicos, Leitura de exames, Prestação de contas.
 - **Painel "Insights de IA"** ([index.html:8947](index.html)) com link "Ver mais" → `#/dashboard/health/whatsapp/insights`.
+- **Todos os quatro painéis têm "Ver mais"**, cada um abrindo uma página de detalhe
+  com consulta de períodos passados (ver 4.1).
 
 ### Lógica JS — `syncHealthOverviewCharts(routeKey)` ([app.js:2691](app.js))
 - Só cria os gráficos na rota `dashboard/health/overview`; fora dela chama
@@ -128,6 +134,75 @@ saúde com KPIs, gráficos e insights de IA.
 
 ---
 
+## 4.1 Páginas "Ver mais" com histórico
+
+> Documentação detalhada da subseção, página por página e botão por botão:
+> [VISAO_GERAL_SAUDE.md](VISAO_GERAL_SAUDE.md).
+
+Cada painel da Visão geral abre uma página de detalhe que mostra **o período atual e
+também o passado**, para consulta:
+
+| Página | Bloco (`data-health-history`) | Tabela (id) |
+|--------|-------------------------------|-------------|
+| Médicos usando o assistente | `doctors` | `healthOverviewDoctorsRankingTable` |
+| Mnemônicos — leitura de exames | `mnemonics` | `healthOverviewMnemonicsTable` |
+| O que acontece no WhatsApp | `whatsapp` | `healthOverviewWhatsappRankingTable` |
+| Prestação de contas — risco de glosa | `accountability` | `healthOverviewAccountabilityRankingTable` |
+
+> A página **Insights de IA** (`#/dashboard/health/whatsapp/insights`) tem outro papel:
+> ela **lê os dados das quatro páginas acima** e devolve leituras — pontos de atenção e
+> oportunidades de melhoria. Não tem abas, histórico, "Comparar" nem "Baixar dados".
+> Cada insight é um `.health-patient-detail-card` com chip de tipo (Atenção / Revisar /
+> Oportunidade / Destaque) e o link **"Ver mais"** no canto superior direito, seguidos do
+> texto com os números e da ação sugerida. O link leva à página de origem e carrega o
+> nome dela no `aria-label`. Os valores vêm de `buildAiInsights()` ([app.js](app.js)), calculados
+> a partir dos mesmos datasets — nunca contradizem a Visão geral.
+
+### Estrutura: duas abas (iguais nas quatro páginas)
+Cada página usa `.tabs.tabs-underline` + `.tab-panel` (padrão do projeto):
+
+**Aba "Cenário atual"** — retrato do período corrente (últimos 7 dias), sem filtro:
+- **Linha-resumo** colada na tabela (8px): `Total: 142 atendimentos` em
+  `--md-label-large`/700 e, à direita, o chip `Análise válida para hoje, 17/08/2026`.
+- `.stats-cards` + `.stat-card`: total, variação vs. os 7 dias anteriores e líder.
+- Tabela do ranking (`.data-table`) com a coluna de variação em `.chip`
+  (`success`/`danger`/`neutral`). Mantém os ids originais
+  (`healthOverviewDoctorsRankingTable`, `healthOverviewMnemonicsTable`, …), que o modal
+  "Exportar dados" da Visão geral continua lendo.
+
+**Aba "Histórico"** — a mesma tabela do cenário atual, na janela que o usuário escolher.
+Abre no mês mais recente (ago. de 2026) e não tem cards nem gráficos:
+- **Granularidade**: `.tabs`/`.tab` com **Semana / Mês / Ano**. Ao trocar, sempre vai
+  para a janela mais recente daquela granularidade.
+- **Navegador** `‹ ago. de 2026 ›`: as setas (`.icon-btn` circulares, azul primário)
+  andam janela por janela e ficam `disabled` nos limites da base (01/03/2026 a
+  17/08/2026).
+- **Escolha do período**: clicar no rótulo abre o `.menu.filter-menu` padrão do projeto.
+  Em **Mês**, um grupo "Mês" (mar. a ago. de 2026) — escolher fecha o menu. Em
+  **Semana**, dois grupos: "Mês" só troca a lista, e "Semana" traz as semanas daquele
+  mês ("01 – 07 de jun.", "29 de jun. – 05 de jul.") — escolher fecha o menu. Em
+  **Ano** o gatilho fica `disabled`, porque só existe uma janela.
+- Trocar a granularidade preserva a data de referência: de "04 – 10 de mai." para Mês
+  abre "mai. de 2026", não o mês mais recente.
+- **Tabela do ranking** da janela (tabelas `…HistoryTable`), com as mesmas colunas do
+  cenário atual: posição, item, valor e **% do total**. Em Prestação de contas a
+  coluna Classificação usa o chip de risco da própria seção (`.glosa-chip--high/medium/low`,
+  o mesmo da tabela de Prestação de contas); no CSV vai o rótulo completo ("Risco alto"). Janelas incompletas (o mês e a
+  semana correntes, o ano de 2026) somam apenas os dias com dado — nada é extrapolado.
+- Na página de médicos, a barra tem o botão **Filtros** (`filter_list`) com o grupo
+  "Médicos" em **seleção múltipla**: marcar/desmarcar mantém o menu aberto, o rótulo
+  mostra a contagem ("Filtros · 2") e a tabela passa a listar só os médicos marcados,
+  preservando a posição e o % do total do ranking cheio. "Limpar filtros" volta a
+  mostrar todos.
+- **"Baixar dados"** exporta a tabela da aba ativa em CSV, com aba, período e intervalo
+  no cabeçalho do arquivo.
+
+Consistência dos números: o total de cada mês (o mesmo do ranking) é distribuído entre
+os dias com um perfil de dia da semana e arredondamento cumulativo. Por isso qualquer
+janela — semana, mês ou ano — fecha com os mesmos totais.
+
+---
+
 ## 5. Subseção: Agente do paciente
 
 **Rota:** `#/dashboard/health/whatsapp` · **Páginas:** `page-health-whatsapp`,
@@ -140,11 +215,12 @@ renovação de receita. Permite testar via simulação, integrar aos canais e
 compartilhar o número.
 
 ### Elementos de UI
-- **Página principal** — grid de 4 painéis:
-  - *Fluxo do atendimento* → "Ver fluxo" abre modal `healthPatientFlowModal` (diagrama com pan/zoom).
+- **Ações do cabeçalho** — `.page-actions` com dois `.icon-btn` no canto superior direito:
+  - `account_tree` → abre o modal `healthPatientFlowModal` (fluxo do atendimento, com pan/zoom).
+  - `chat` → abre o modal `healthPatientPreviewModal` (simulação no WhatsApp).
+- **Página principal** — grid de 2 painéis:
   - *Integração* → "Realizar integração" → `#/dashboard/health/integrations`.
   - *Compartilhar agente* → número **+55 85 98888-1048**, "Copiar link" e "Compartilhar".
-  - *Simulação no WhatsApp* → "Abrir simulação" (modal `healthPatientPreviewModal`).
 - **Insights** — 2 cards de detalhe + tabela "Auditoria dos sinais".
 - **Histórico** — tabela "Histórico de interações" (5 linhas estáticas com chips de status).
 

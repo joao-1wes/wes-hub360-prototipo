@@ -10,7 +10,7 @@
     <title>WES HUB 360 - Painel (Estático)</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/skeleton.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/themes/classic/theme.css" />
-    <link rel="stylesheet" href="./styles.css?v=20260807-ui-tweaks7" />
+    <link rel="stylesheet" href="./styles.css?v=20260819-dark-mode9" />
     <link rel="icon" type="image/svg+xml" href="./assets/favicon.svg" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0" />
   </head>
@@ -196,10 +196,15 @@
                   <span class="public-modal-field-label--required">Nome da empresa</span>
                   <input id="companyName" name="company_name" type="text" autocomplete="organization" required />
                 </label>
-                <label class="public-modal-field" for="companyAdminEmail">
-                  <span class="public-modal-field-label--required">Email do responsável</span>
-                  <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
-                </label>
+                <div class="create-company-admin-field">
+                  <label class="public-modal-field" for="companyAdminEmail">
+                    <span class="public-modal-field-label--required">Email do responsável</span>
+                    <input id="companyAdminEmail" name="company_admin_email" type="email" autocomplete="email" required />
+                  </label>
+                  <button class="auth-link public-modal-admin-link" id="createCompanyAdminUserLink" type="button">
+                    Não criou o responsável ainda?
+                  </button>
+                </div>
               </div>
             </section>
             <fieldset class="organization-sections-picker" id="organizationSectionsPicker" hidden>
@@ -376,9 +381,6 @@
                 </div>
               </div>
             </fieldset>
-            <button class="auth-link public-modal-admin-link" id="createCompanyAdminUserLink" type="button">
-              Não criou o responsável ainda?
-            </button>
             <div class="public-modal-footer">
               <button class="btn outline" type="button" data-create-company-close>Cancelar</button>
               <button class="btn primary" type="submit">Salvar</button>
@@ -446,7 +448,8 @@
             </div>
           </div>
 
-          <a class="nav-item" href="#/dashboard/integrations" data-route="dashboard/integrations"><span class="material-symbols-rounded">integration_instructions</span><span class="nav-label">Integrações</span></a>
+          <!-- Integrações saiu do menu: a seção é acessada pelo Agente do paciente
+               (Saúde), via "Realizar integração" → #/dashboard/health/integrations. -->
 
           <!-- Integrações agora é página única (antes era submenu com Documentação e API's)
           <div class="nav-group">
@@ -730,72 +733,52 @@
               </div>
               <div class="insights-grid" id="insightsGrid">
                 <div class="insight-card">
-                  <div class="insight-header">
-                    <div class="insight-title">Capacidade de processamento pode ser insuficiente</div>
-                    <span class="insight-tag">Atenção</span>
+                  <div class="insight-head">
+                    <span class="chip danger">Atenção</span>
+                    <a class="insight-more-link" href="#/dashboard/schedules" aria-label="Ver mais em Agendamentos">Ver mais</a>
                   </div>
-                  <div class="insight-desc">Você tem 6 agendamentos ativos. Considere distribuir para evitar picos de carga.</div>
-                  <ul class="insight-list">
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                  </ul>
-                  <div class="insight-actions">
-                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
-                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
-                  </div>
+                  <strong class="insight-title">Capacidade de processamento pode ser insuficiente</strong>
+                  <p class="insight-desc">Você tem 6 agendamentos ativos concorrendo pelos mesmos executores, o que aumenta o risco de picos de carga.</p>
+                  <p class="insight-action">
+                    <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
+                    Distribuir os agendamentos ao longo do dia e priorizar os jobs críticos.
+                  </p>
                 </div>
                 <div class="insight-card">
-                  <div class="insight-header">
-                    <div class="insight-title">Execuções com falhas recorrentes</div>
-                    <span class="insight-tag">Atenção</span>
+                  <div class="insight-head">
+                    <span class="chip danger">Atenção</span>
+                    <a class="insight-more-link" href="#/dashboard/automations" aria-label="Ver mais em Automações">Ver mais</a>
                   </div>
-                  <div class="insight-desc">Há aumento no tempo de execução em tarefas críticas.</div>
-                  <ul class="insight-list">
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                  </ul>
-                  <div class="insight-actions">
-                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
-                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
-                  </div>
+                  <strong class="insight-title">Execuções com falhas recorrentes</strong>
+                  <p class="insight-desc">Há aumento no tempo de execução em tarefas críticas e as falhas se repetem nas mesmas automações.</p>
+                  <p class="insight-action">
+                    <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
+                    Revisar os logs das automações que mais falharam antes da próxima janela.
+                  </p>
                 </div>
                 <div class="insight-card">
-                  <div class="insight-header">
-                    <div class="insight-title">Executor com baixa disponibilidade</div>
-                    <span class="insight-tag">Atenção</span>
+                  <div class="insight-head">
+                    <span class="chip warning">Revisar</span>
+                    <a class="insight-more-link" href="#/dashboard/executors" aria-label="Ver mais em Executores">Ver mais</a>
                   </div>
-                  <div class="insight-desc">Executor-02 está offline há mais de 30 minutos.</div>
-                  <ul class="insight-list">
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                  </ul>
-                  <div class="insight-actions">
-                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
-                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
-                  </div>
+                  <strong class="insight-title">Executor com baixa disponibilidade</strong>
+                  <p class="insight-desc">O Executor-02 está offline há mais de 30 minutos e as filas atribuídas a ele seguem acumulando.</p>
+                  <p class="insight-action">
+                    <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
+                    Verificar a conexão do executor e redistribuir as filas enquanto ele não volta.
+                  </p>
                 </div>
                 <div class="insight-card">
-                  <div class="insight-header">
-                    <div class="insight-title">Sugestão de otimização</div>
-                    <span class="insight-tag">Atenção</span>
+                  <div class="insight-head">
+                    <span class="chip neutral">Oportunidade</span>
+                    <a class="insight-more-link" href="#/dashboard/schedules" aria-label="Ver mais em Agendamentos">Ver mais</a>
                   </div>
-                  <div class="insight-desc">Agrupe execuções em horários de menor carga.</div>
-                  <ul class="insight-list">
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                    <li>Priorizar jobs críticos</li>
-                  </ul>
-                  <div class="insight-actions">
-                    <button class="btn primary small"><span class="material-symbols-rounded">chat</span>Conversar</button>
-                    <button class="btn danger small"><span class="material-symbols-rounded">close</span>Dispensar</button>
-                  </div>
+                  <strong class="insight-title">Sugestão de otimização</strong>
+                  <p class="insight-desc">Boa parte das execuções está concentrada no mesmo intervalo, enquanto os horários de menor carga ficam ociosos.</p>
+                  <p class="insight-action">
+                    <span class="material-symbols-rounded" aria-hidden="true">lightbulb</span>
+                    Agrupar execuções em horários de menor carga para reduzir a concorrência.
+                  </p>
                 </div>
               </div>
             </div>
@@ -1306,31 +1289,34 @@
               <div class="tab-panel" data-panel="executions">
                 <div class="filters-grid">
                   <div class="form-field">
-                    <label>Período</label>
-                    <button class="btn outline period-btn" id="periodFilterBtn">
-                      <span class="material-symbols-rounded">calendar_month</span>Filtrar período
+                    <button class="btn filter-btn" id="periodFilterBtn" type="button">
+                      <span class="material-symbols-rounded" aria-hidden="true">date_range</span>
+                      <span>Período</span>
                     </button>
-                    <div class="menu period-menu" id="periodFilterMenu">
-                      <div class="period-toggle">
-                        <button class="period-option active" data-mode="range">Entre períodos</button>
-                        <button class="period-option" data-mode="single">Data específica</button>
+                    <div class="menu audit-period-menu" id="periodFilterMenu">
+                      <div class="filter-footer">
+                        <button class="filter-clear" type="button">Limpar filtros</button>
                       </div>
-                      <div class="period-fields">
-                        <div class="period-field range-only">
-                          <label>Início</label>
-                          <input type="date" />
+                      <div class="audit-period-toggle">
+                        <button class="audit-period-option active" type="button" data-mode="range">Período</button>
+                        <button class="audit-period-option" type="button" data-mode="single">Data específica</button>
+                      </div>
+                      <div class="audit-period-fields">
+                        <div class="audit-period-field audit-range-only">
+                          <label for="executionsStartDate">Início</label>
+                          <input id="executionsStartDate" type="date" />
                         </div>
-                        <div class="period-field range-only">
-                          <label>Fim</label>
-                          <input type="date" />
+                        <div class="audit-period-field audit-range-only">
+                          <label for="executionsEndDate">Fim</label>
+                          <input id="executionsEndDate" type="date" />
                         </div>
-                        <div class="period-field single-only is-hidden">
-                          <label>Data</label>
-                          <input type="date" />
+                        <div class="audit-period-field audit-single-only is-hidden">
+                          <label for="executionsSingleDate">Data</label>
+                          <input id="executionsSingleDate" type="date" />
                         </div>
                       </div>
-                      <div class="period-footer">
-                        <button class="btn filter-btn">Filtrar período</button>
+                      <div class="period-footer audit-period-footer">
+                        <button class="btn filter-btn" id="executionsApplyPeriodBtn" type="button">Aplicar período</button>
                       </div>
                     </div>
                   </div>
@@ -1438,7 +1424,12 @@
                     <span>Próxima execução</span>
                     <span>Ações</span>
                   </div>
-                  <div class="data-row">
+                  <div
+                    class="data-row"
+                    data-schedule-automation-id="relatorio-diario"
+                    data-schedule-time="09:00"
+                    data-schedule-frequency="daily"
+                  >
                     <span>Relatório diário</span>
                     <span>reports-v2.1</span>
                     <span>Todos os dias às 09:00</span>
@@ -1448,7 +1439,7 @@
                       <button class="icon-btn action-icon" aria-label="Pausar">
                         <span class="material-symbols-rounded">pause</span>
                       </button>
-                      <button class="icon-btn action-icon" aria-label="Editar">
+                      <button class="icon-btn action-icon schedule-edit-trigger" aria-label="Editar">
                         <span class="material-symbols-rounded">edit</span>
                       </button>
                       <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -1467,7 +1458,12 @@
                       </div>
                     </span>
                   </div>
-                  <div class="data-row">
+                  <div
+                    class="data-row"
+                    data-schedule-automation-id="monitoramento-filas"
+                    data-schedule-time="08:00"
+                    data-schedule-frequency="business_days"
+                  >
                     <span>Monitorar filas</span>
                     <span>queues-v1.4</span>
                     <span>A cada 30 minutos</span>
@@ -1477,7 +1473,7 @@
                       <button class="icon-btn action-icon" aria-label="Ativar">
                         <span class="material-symbols-rounded">play_arrow</span>
                       </button>
-                      <button class="icon-btn action-icon" aria-label="Editar">
+                      <button class="icon-btn action-icon schedule-edit-trigger" aria-label="Editar">
                         <span class="material-symbols-rounded">edit</span>
                       </button>
                       <button class="icon-btn action-icon danger" aria-label="Excluir">
@@ -1864,7 +1860,7 @@
 
                   <div class="automation-create-description-grid">
                     <div class="form-field">
-                      <label class="modal-label" for="automationCreateDescription">Descrição ou pedido de mudança</label>
+                      <label class="modal-label" for="automationCreateDescription">Descrição</label>
                       <textarea
                         class="modal-textarea"
                         id="automationCreateDescription"
@@ -1883,21 +1879,17 @@
                           </div>
                           <div class="automation-code-preview-head-actions">
                             <span class="automation-code-preview-badge" id="automationCreateCodeBadge">Pendente</span>
-                            <button class="btn outline automation-code-history-toggle" id="automationCodeHistoryToggle" type="button" aria-expanded="false" aria-controls="automationCodeHistoryPanel">
-                              <span class="material-symbols-rounded" aria-hidden="true">history</span>
-                              Ver históricos de código
-                            </button>
+                            <div class="automation-code-head-actions">
+                              <button class="icon-btn action-icon automation-code-head-action" id="automationCodeEditToggle" type="button" aria-label="Editar código" aria-haspopup="dialog">
+                                <span class="material-symbols-rounded" aria-hidden="true">edit</span>
+                              </button>
+                              <button class="icon-btn action-icon automation-code-head-action" id="automationCodeHistoryToggle" type="button" aria-label="Ver históricos de código" aria-haspopup="dialog">
+                                <span class="material-symbols-rounded" aria-hidden="true">history</span>
+                              </button>
+                            </div>
                           </div>
                         </div>
                         <pre class="automation-code-preview-block"><code id="automationCreateCodeContent"></code></pre>
-                        <div class="automation-code-history-panel" id="automationCodeHistoryPanel" hidden>
-                          <div class="automation-code-history-head">
-                            <h5>Histórico de versões</h5>
-                            <p>Todas as versões de código geradas ou enviadas para esta automação.</p>
-                          </div>
-                          <div class="automation-code-history-list" id="automationCodeHistoryList"></div>
-                          <p class="automation-code-history-empty" id="automationCodeHistoryEmpty" hidden>Nenhuma versão registrada ainda.</p>
-                        </div>
                         <div class="automation-code-rejected-state" id="automationCreateCodeRejectedState" hidden>
                           <i data-lucide="refresh-cw" aria-hidden="true"></i>
                           <p>Revise a descrição ou peça uma mudança com mais detalhes sobre entrada, regras de negócio e saída esperada. Depois use a IA para criar uma nova versão mais próxima do que você precisa.</p>
@@ -1913,7 +1905,7 @@
                           </button>
                         </div>
                       </div>
-                      <div class="automation-code-edit-actions">
+                      <div class="automation-code-edit-actions" id="automationCodeEditActions">
                         <button class="btn primary automation-create-generate-btn" id="automationCreateGenerateBtn" type="button">
                           <span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>
                           Gerar código com IA
@@ -1959,8 +1951,8 @@
                             autocomplete="off"
                             placeholder="Peça a mudança que a IA deve aplicar no código"
                           />
-                          <button class="automation-ai-send" id="automationAiEditSend" type="button" aria-label="Enviar pedido para IA" disabled>
-                            <span class="material-symbols-rounded" aria-hidden="true">arrow_upward</span>
+                          <button class="automation-ai-send icon-only has-tooltip" id="automationAiEditSend" type="button" aria-label="Enviar" data-tooltip="Enviar" disabled>
+                            <i data-lucide="send"></i>
                           </button>
                         </div>
                       </div>
@@ -3845,6 +3837,62 @@
               </div>
             </div>
           </div>
+          <div class="modal" id="automationCodeEditModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog automation-code-edit-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="automationCodeEditModalTitle">
+              <div class="modal-header">
+                <h3 id="automationCodeEditModalTitle">Editar código</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body automation-code-edit-modal-body">
+                <p id="automationCodeEditError" class="modal-form-error" role="alert" hidden></p>
+                <div class="automation-code-edit-chat" id="automationCodeEditChat" aria-live="polite"></div>
+                <div class="automation-code-edit-composer">
+                  <div class="automation-ai-input-shell automation-code-edit-input-shell">
+                    <button class="automation-code-edit-upload-btn has-tooltip" id="automationCodeEditUploadBtn" type="button" aria-label="Fazer upload do código" data-tooltip="Fazer upload do código">
+                      <span class="material-symbols-rounded" aria-hidden="true">upload_file</span>
+                    </button>
+                    <input
+                      id="automationCodeEditPromptInput"
+                      class="automation-ai-input"
+                      type="text"
+                      maxlength="1000"
+                      autocomplete="off"
+                      placeholder="Peça a mudança que a IA deve aplicar no código"
+                    />
+                    <button class="automation-ai-send icon-only has-tooltip" id="automationCodeEditPromptSend" type="button" aria-label="Enviar" data-tooltip="Enviar" disabled>
+                      <i data-lucide="send"></i>
+                    </button>
+                  </div>
+                  <input id="automationCodeEditUploadInput" type="file" accept=".cs,.java,.py,.zip,application/zip,application/x-zip-compressed,text/plain" hidden />
+                </div>
+                <p class="modal-field-hint" id="automationCodeEditHint">Peça a mudança para a IA ou envie um arquivo .cs, .java, .py ou .zip. A nova versão só é aplicada depois da sua aprovação.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="automationCodeHistoryModal" aria-hidden="true">
+            <div class="modal-backdrop" data-modal-close></div>
+            <div class="modal-dialog automation-code-history-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="automationCodeHistoryModalTitle">
+              <div class="modal-header">
+                <h3 id="automationCodeHistoryModalTitle">Histórico de versões</h3>
+                <button class="icon-btn" aria-label="Fechar" data-modal-close type="button">
+                  <span class="material-symbols-rounded">close</span>
+                </button>
+              </div>
+              <div class="modal-body automation-code-history-modal-body">
+                <p class="modal-field-hint">Todas as versões de código geradas ou enviadas para esta automação.</p>
+                <div class="automation-code-history-list" id="automationCodeHistoryList"></div>
+                <p class="automation-code-history-empty" id="automationCodeHistoryEmpty" hidden>Nenhuma versão registrada ainda.</p>
+              </div>
+              <div class="modal-footer">
+                <button class="btn outline" data-modal-close type="button">Fechar</button>
+              </div>
+            </div>
+          </div>
+
           <div class="modal" id="automationModal" aria-hidden="true">
             <div class="modal-backdrop" data-modal-close></div>
             <div class="modal-dialog automation-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="automationModalTitle">
@@ -6480,6 +6528,12 @@
                   <h2>Conexões</h2>
                   <p class="page-subtitle">Conecte MCPs e fontes de dados para ampliar as capacidades dos agentes.</p>
                 </div>
+                <div class="page-actions mcps-mcp-actions">
+                  <button class="btn primary" id="openMcpCreateModalBtn" type="button">
+                    <span class="material-symbols-rounded">add</span>
+                    Adicionar nova conexão
+                  </button>
+                </div>
               </div>
 
               <div class="mcps-connections-panel" id="mcpsMcpPanel">
@@ -6496,12 +6550,6 @@
                     </button>
                     <button class="mcps-view-toggle-btn" id="mcpsListViewBtn" type="button" aria-pressed="false" title="Visualização em lista">
                       <span class="material-symbols-rounded">view_list</span>
-                    </button>
-                  </div>
-                  <div class="page-actions mcps-mcp-actions">
-                    <button class="btn primary" id="openMcpCreateModalBtn" type="button">
-                      <span class="material-symbols-rounded">add</span>
-                      Adicionar nova conexão
                     </button>
                   </div>
                 </div>
@@ -6657,6 +6705,38 @@
                     </button>
                   </div>
                 </article>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal" id="healthCompareModal" aria-hidden="true">
+            <div class="modal-backdrop" data-health-compare-close></div>
+            <div class="modal-dialog health-compare-dialog" role="dialog" aria-modal="true" aria-labelledby="healthCompareTitle">
+              <div class="modal-header">
+                <div>
+                  <h3 id="healthCompareTitle">Comparar</h3>
+                  <p class="modal-subtitle" data-health-compare-subtitle></p>
+                </div>
+                <button class="icon-btn" aria-label="Fechar" data-health-compare-close type="button">
+                  <span class="material-symbols-rounded" aria-hidden="true">close</span>
+                </button>
+              </div>
+              <div class="modal-body health-compare-body">
+                <section class="health-compare-section">
+                  <span class="modal-label" data-health-compare-label>Itens</span>
+                  <div class="health-compare-picker" data-health-compare-picker></div>
+                </section>
+                <div class="health-compare-empty" data-health-compare-empty hidden>
+                  <div class="table-empty-content">
+                    <span class="material-symbols-rounded" aria-hidden="true">bar_chart</span>
+                    <strong>Nenhum item selecionado</strong>
+                    <small>Marque ao menos um item acima para montar a comparação.</small>
+                  </div>
+                </div>
+                <div class="health-overview-chart-wrap health-overview-chart-wrap--bar health-compare-chart" data-health-compare-chart-wrap>
+                  <canvas data-health-compare-chart role="img" aria-label="Gráfico de barras comparando os itens mês a mês"></canvas>
+                </div>
+                <div class="data-table health-compare-table" data-health-compare-table data-table-empty-state-disabled="true"></div>
               </div>
             </div>
           </div>
@@ -8917,60 +8997,101 @@
               </div>
 
               <div class="stats-cards health-overview-stats" aria-label="Indicadores gerais de saúde">
-                <article class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">forum</span></div>
-                  <div class="stat-body">
+                <article class="stat-card health-overview-stat is-blue">
+                  <div class="health-overview-stat-top">
+                    <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">forum</span></div>
                     <div class="stat-value">142</div>
-                    <div class="stat-label">Atendimentos por WhatsApp</div>
-                    <div class="stat-sub">+18% nos últimos 7 dias</div>
                   </div>
+                  <div class="stat-label">Atendimentos por WhatsApp</div>
+                  <div class="stat-sub">+18% nos últimos 7 dias</div>
                 </article>
-                <article class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">stethoscope</span></div>
-                  <div class="stat-body">
+                <article class="stat-card health-overview-stat is-violet">
+                  <div class="health-overview-stat-top">
+                    <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">stethoscope</span></div>
                     <div class="stat-value">89</div>
-                    <div class="stat-label">Consultas com assistente médico</div>
-                    <div class="stat-sub">6 médicos ativos</div>
                   </div>
+                  <div class="stat-label">Consultas com assistente médico</div>
+                  <div class="stat-sub">6 médicos ativos</div>
                 </article>
-                <article class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">receipt_long</span></div>
-                  <div class="stat-body">
+                <article class="stat-card health-overview-stat is-rose">
+                  <div class="health-overview-stat-top">
+                    <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">receipt_long</span></div>
                     <div class="stat-value">320</div>
-                    <div class="stat-label">Documentos analisados</div>
-                    <div class="stat-sub">58 com possível glosa (18%)</div>
                   </div>
+                  <div class="stat-label">Documentos analisados</div>
+                  <div class="stat-sub">58 com possível glosa (18%)</div>
                 </article>
-                <article class="stat-card">
-                  <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">biotech</span></div>
-                  <div class="stat-body">
+                <article class="stat-card health-overview-stat is-teal">
+                  <div class="health-overview-stat-top">
+                    <div class="stat-icon"><span class="material-symbols-rounded" aria-hidden="true">biotech</span></div>
                     <div class="stat-value">214</div>
-                    <div class="stat-label">Exames lidos</div>
-                    <div class="stat-sub">1.560 mnemônicos extraídos</div>
                   </div>
+                  <div class="stat-label">Exames lidos</div>
+                  <div class="stat-sub">1.560 mnemônicos extraídos</div>
                 </article>
               </div>
 
-              <div class="health-overview-charts">
-                <article class="health-patient-panel health-overview-panel">
-                  <div class="health-patient-panel-head">
-                    <div>
-                      <h3 class="health-patient-panel-title">O que acontece no WhatsApp</h3>
-                      <span class="health-overview-panel-sub">Distribuição dos 142 atendimentos por tipo de solicitação</span>
-                    </div>
-                    <span class="health-patient-period-chip">142 total</span>
+              <article class="health-patient-panel health-overview-insights">
+                <div class="health-patient-panel-head">
+                  <div class="health-overview-panel-headline">
+                    <h3 class="health-patient-panel-title health-overview-insights-title"><span class="material-symbols-rounded" aria-hidden="true">auto_awesome</span>Insights de IA</h3>
+                    <span class="health-overview-panel-sub">Leituras automáticas dos quatro produtos de saúde</span>
                   </div>
-                  <div class="health-overview-chart-wrap health-overview-chart-wrap--pie">
-                    <canvas id="healthOverviewWhatsappChart" role="img" aria-label="Gráfico de pizza da distribuição de atendimentos no WhatsApp"></canvas>
+                  <div class="health-patient-panel-actions">
+                    <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/insights">Ver mais</a>
+                  </div>
+                </div>
+                <div class="health-patient-detail-grid">
+                  <article class="health-patient-detail-card">
+                    <div class="health-overview-insight-row"><span class="health-patient-kicker">Mais frequente</span><span class="health-patient-tag">412 menções</span></div>
+                    <strong>Dúvidas sobre exames</strong>
+                    <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
+                  </article>
+                  <article class="health-patient-detail-card">
+                    <div class="health-overview-insight-row"><span class="health-patient-kicker">Crescimento</span><span class="health-patient-tag">+18%</span></div>
+                    <strong>Solicitação de consulta</strong>
+                    <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
+                  </article>
+                  <article class="health-patient-detail-card">
+                    <div class="health-overview-insight-row"><span class="health-patient-kicker health-patient-kicker--danger">Atenção</span><span class="health-patient-tag is-danger">58 documentos</span></div>
+                    <strong>Risco alto de glosa</strong>
+                    <p>58 dos 320 documentos analisados (18%) precisam de revisão prioritária.</p>
+                  </article>
+                </div>
+              </article>
+
+              <div class="health-overview-charts">
+                <article class="health-patient-panel health-overview-panel health-overview-panel--blue">
+                  <div class="health-patient-panel-head">
+                    <div class="health-overview-panel-headline">
+                      <div class="health-overview-panel-headline-row">
+                        <h3 class="health-patient-panel-title">O que acontece no WhatsApp</h3>
+                        <span class="health-patient-period-chip">142 total</span>
+                        <span class="health-overview-period-chip" title="Últimos 7 dias — 11 a 17 de agosto de 2026">11–17 ago. 2026</span>
+                      </div>
+                      <span class="health-overview-panel-sub">Atendimentos por dia nos últimos 7 dias</span>
+                    </div>
+                    <div class="health-patient-panel-actions">
+                      <a class="health-patient-more-link" href="#/dashboard/health/overview/whatsapp">Ver mais</a>
+                    </div>
+                  </div>
+                  <div class="health-overview-chart-wrap health-overview-chart-wrap--area">
+                    <canvas id="healthOverviewWhatsappChart" role="img" aria-label="Gráfico de área dos atendimentos por dia no WhatsApp nos últimos 7 dias"></canvas>
+                  </div>
+                  <div class="health-overview-glosa-stats health-overview-glosa-stats--whatsapp">
+                    <div><strong class="is-exams">58</strong><span>Envio de exames</span></div>
+                    <div><strong class="is-doubts">49</strong><span>Dúvidas</span></div>
+                    <div><strong class="is-fit" title="Encaixe para renovação">35</strong><span>Encaixe</span></div>
                   </div>
                 </article>
 
-                <article class="health-patient-panel health-overview-panel">
+                <article class="health-patient-panel health-overview-panel health-overview-panel--violet">
                   <div class="health-patient-panel-head">
                     <div class="health-overview-panel-headline">
                       <div class="health-overview-panel-headline-row">
                         <h3 class="health-patient-panel-title">Médicos usando o assistente</h3>
                         <span class="health-patient-period-chip health-patient-period-chip--orange">6 médicos</span>
+                        <span class="health-overview-period-chip" title="Últimos 7 dias — 11 a 17 de agosto de 2026">11–17 ago. 2026</span>
                       </div>
                       <span class="health-overview-panel-sub">Consultas apoiadas pelo assistente médico por profissional</span>
                     </div>
@@ -8983,12 +9104,13 @@
                   </div>
                 </article>
 
-                <article class="health-patient-panel health-overview-panel">
+                <article class="health-patient-panel health-overview-panel health-overview-panel--teal">
                   <div class="health-patient-panel-head">
                     <div class="health-overview-panel-headline">
                       <div class="health-overview-panel-headline-row">
-                        <h3 class="health-patient-panel-title">Leitura de exames — mnemônicos</h3>
+                        <h3 class="health-patient-panel-title">Leitura de exames</h3>
                         <span class="health-patient-period-chip">214 exames</span>
+                        <span class="health-overview-period-chip" title="Últimos 7 dias — 11 a 17 de agosto de 2026">11–17 ago. 2026</span>
                       </div>
                       <span class="health-overview-panel-sub">Mnemônicos mais identificados na extração automática</span>
                     </div>
@@ -8997,30 +9119,50 @@
                     </div>
                   </div>
                   <div class="health-overview-chart-wrap health-overview-chart-wrap--bar">
-                    <canvas id="healthOverviewExamsChart" role="img" aria-label="Gráfico de barras dos mnemônicos mais identificados"></canvas>
+                    <div class="health-overview-treemap" role="img" aria-label="Mapa proporcional dos mnemônicos mais identificados: quanto maior o bloco, mais ocorrências">
+                      <div class="health-overview-treemap-col" style="flex-basis: 37.15%">
+                        <div class="health-overview-treemap-cell is-c1" style="flex-basis: 58.03%" title="Hemoglobina (HB) — 412 ocorrências"><span>HB</span><strong>412</strong></div>
+                        <div class="health-overview-treemap-cell is-c4" style="flex-basis: 41.97%" title="TSH (tireoide) — 298 ocorrências"><span>TSH</span><strong>298</strong></div>
+                      </div>
+                      <div class="health-overview-treemap-col" style="flex-basis: 33.59%">
+                        <div class="health-overview-treemap-cell is-c2" style="flex-basis: 60.44%" title="Glicemia (GLI) — 388 ocorrências"><span>GLI</span><strong>388</strong></div>
+                        <div class="health-overview-treemap-cell is-c5" style="flex-basis: 39.56%" title="Creatinina (CREA) — 254 ocorrências"><span>CREA</span><strong>254</strong></div>
+                      </div>
+                      <div class="health-overview-treemap-col" style="flex-basis: 29.25%">
+                        <div class="health-overview-treemap-cell is-c3" style="flex-basis: 62.79%" title="Colesterol (COL) — 351 ocorrências"><span>COL</span><strong>351</strong></div>
+                        <div class="health-overview-treemap-cell is-c6" style="flex-basis: 37.21%" title="Ureia (URE) — 208 ocorrências"><span>URE</span><strong>208</strong></div>
+                      </div>
+                    </div>
                   </div>
                   <div class="health-overview-least">
                     <span class="health-overview-least-title">Menos identificados</span>
                     <div class="health-overview-chip-row">
-                      <span class="health-overview-mnemonic-chip">T4 livre (T4L) · 14</span>
-                      <span class="health-overview-mnemonic-chip">Hemoglobina glicada (HbA1c) · 22</span>
-                      <span class="health-overview-mnemonic-chip">Proteína C reativa (PCR) · 28</span>
-                      <span class="health-overview-mnemonic-chip">Ferritina (FERR) · 39</span>
-                      <span class="health-overview-mnemonic-chip">Vitamina D (VITD) · 47</span>
+                      <span class="health-overview-mnemonic-chip" title="T4 livre">T4L · 14</span>
+                      <span class="health-overview-mnemonic-chip" title="Hemoglobina glicada">HbA1c · 22</span>
+                      <span class="health-overview-mnemonic-chip" title="Proteína C reativa">PCR · 28</span>
+                      <span class="health-overview-mnemonic-chip" title="Ferritina">FERR · 39</span>
+                      <span class="health-overview-mnemonic-chip" title="Vitamina D">VITD · 47</span>
                     </div>
                   </div>
                 </article>
 
-                <article class="health-patient-panel health-overview-panel">
+                <article class="health-patient-panel health-overview-panel health-overview-panel--rose">
                   <div class="health-patient-panel-head">
-                    <div>
-                      <h3 class="health-patient-panel-title">Prestação de contas</h3>
+                    <div class="health-overview-panel-headline">
+                      <div class="health-overview-panel-headline-row">
+                        <h3 class="health-patient-panel-title">Prestação de contas</h3>
+                        <span class="health-patient-period-chip">320 documentos</span>
+                        <span class="health-overview-period-chip" title="Últimos 7 dias — 11 a 17 de agosto de 2026">11–17 ago. 2026</span>
+                      </div>
                       <span class="health-overview-panel-sub">Documentos analisados classificados por risco de glosa</span>
                     </div>
-                    <span class="health-patient-period-chip">320 documentos</span>
+                    <div class="health-patient-panel-actions">
+                      <a class="health-patient-more-link" href="#/dashboard/health/overview/accountability">Ver mais</a>
+                    </div>
                   </div>
                   <div class="health-overview-chart-wrap health-overview-chart-wrap--pie">
                     <canvas id="healthOverviewAccountabilityChart" role="img" aria-label="Gráfico de rosca de documentos classificados por risco de glosa (alto, médio e baixo)"></canvas>
+                    <div class="health-overview-donut-center" aria-hidden="true"><strong>320</strong><span>documentos</span></div>
                   </div>
                   <div class="health-overview-glosa-stats">
                     <div><strong class="is-danger">58</strong><span>Risco alto</span></div>
@@ -9030,30 +9172,6 @@
                 </article>
               </div>
 
-              <article class="health-patient-panel health-overview-insights">
-                <div class="health-patient-panel-head">
-                  <div>
-                    <h3 class="health-patient-panel-title">Insights de IA</h3>
-                  </div>
-                  <div class="health-patient-panel-actions">
-                    <a class="health-patient-more-link" href="#/dashboard/health/whatsapp/insights">Ver mais</a>
-                  </div>
-                </div>
-                <div class="health-patient-detail-grid">
-                  <article class="health-patient-detail-card">
-                    <span class="health-patient-kicker">Mais frequente</span>
-                    <strong>Dúvidas sobre exames</strong>
-                    <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
-                    <span class="health-patient-tag">412 menções</span>
-                  </article>
-                  <article class="health-patient-detail-card">
-                    <span class="health-patient-kicker">Crescimento</span>
-                    <strong>Solicitação de consulta</strong>
-                    <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
-                    <span class="health-patient-tag">+18%</span>
-                  </article>
-                </div>
-              </article>
             </div>
           </div>
 
@@ -9068,31 +9186,49 @@
               <div class="page-header health-integrations-header">
                 <div>
                   <h2>Mnemônicos — leitura de exames</h2>
-                  <p class="page-subtitle">Lista completa dos mnemônicos identificados na extração automática, em ordem decrescente — do mais lido ao menos lido.</p>
+                  <p class="page-subtitle">Lista completa dos mnemônicos identificados na extração automática, em ordem decrescente. Use as abas para ver o cenário atual ou o histórico.</p>
                 </div>
-                <button class="btn outline" id="downloadHealthMnemonicsRankingBtn" type="button">
-                  <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
-                </button>
+                <div class="page-actions">
+                  <button class="btn outline" type="button" data-health-compare-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span>Comparar
+                  </button>
+                  <button class="btn primary" id="downloadHealthMnemonicsRankingBtn" type="button" data-health-history-export>
+                    <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
+                  </button>
+                </div>
               </div>
 
-              <div class="data-table health-overview-ranking-table" id="healthOverviewMnemonicsTable" data-table-empty-state-disabled="true">
-                <div class="data-row header">
-                  <span>Posição</span>
-                  <span>Mnemônico</span>
-                  <span>Ocorrências</span>
-                  <span>Participação</span>
+              <div class="health-history-block" data-health-history="mnemonics">
+                <div class="tabs tabs-underline health-history-tabs" role="tablist" aria-label="Cenário atual e histórico">
+                  <button class="tab active" type="button" role="tab" aria-selected="true" data-health-history-tab="current">Cenário atual</button>
+                  <button class="tab" type="button" role="tab" aria-selected="false" data-health-history-tab="history">Histórico</button>
                 </div>
-                <div class="data-row"><span>1</span><span>Hemoglobina (HB)</span><span>412</span><span>20,0%</span></div>
-                <div class="data-row"><span>2</span><span>Glicemia (GLI)</span><span>388</span><span>18,8%</span></div>
-                <div class="data-row"><span>3</span><span>Colesterol (COL)</span><span>351</span><span>17,0%</span></div>
-                <div class="data-row"><span>4</span><span>TSH (tireoide)</span><span>298</span><span>14,5%</span></div>
-                <div class="data-row"><span>5</span><span>Creatinina (CREA)</span><span>254</span><span>12,3%</span></div>
-                <div class="data-row"><span>6</span><span>Ureia (URE)</span><span>208</span><span>10,1%</span></div>
-                <div class="data-row"><span>7</span><span>Vitamina D (VITD)</span><span>47</span><span>2,3%</span></div>
-                <div class="data-row"><span>8</span><span>Ferritina (FERR)</span><span>39</span><span>1,9%</span></div>
-                <div class="data-row"><span>9</span><span>Proteína C reativa (PCR)</span><span>28</span><span>1,4%</span></div>
-                <div class="data-row"><span>10</span><span>Hemoglobina glicada (HbA1c)</span><span>22</span><span>1,1%</span></div>
-                <div class="data-row"><span>11</span><span>T4 livre (T4L)</span><span>14</span><span>0,7%</span></div>
+
+                <div class="tab-panel active health-history-tab-panel" data-health-history-panel="current">
+                  <div class="health-history-headline" data-health-history-headline></div>
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewMnemonicsTable" data-health-history-ranking="current" data-table-empty-state-disabled="true"></div>
+                </div>
+
+                <div class="tab-panel health-history-tab-panel" data-health-history-panel="history">
+                  <div class="health-history-toolbar">
+                    <div class="tabs tabs-underline health-history-grain-tabs" role="group" aria-label="Agrupar o histórico por">
+                      <button class="tab" type="button" data-health-history-grain="week">Semana</button>
+                      <button class="tab active" type="button" data-health-history-grain="month">Mês</button>
+                      <button class="tab" type="button" data-health-history-grain="year">Ano</button>
+                    </div>
+                    <div class="health-history-nav">
+                      <button class="icon-btn" type="button" data-health-history-nav="prev" aria-label="Período anterior" title="Período anterior">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+                      </button>
+                      <button class="health-history-nav-label" type="button" data-health-history-nav-label data-health-history-picker-toggle aria-haspopup="true" aria-expanded="false" title="Escolher o período" aria-live="polite"></button>
+                      <button class="icon-btn" type="button" data-health-history-nav="next" aria-label="Período seguinte" title="Período seguinte">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewMnemonicsHistoryTable" data-health-history-ranking="history" data-table-empty-state-disabled="true"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -9108,26 +9244,179 @@
               <div class="page-header health-integrations-header">
                 <div>
                   <h2>Médicos usando o assistente</h2>
-                  <p class="page-subtitle">Lista completa dos profissionais por consultas apoiadas pelo assistente médico, em ordem decrescente — do que mais usa ao que menos usa.</p>
+                  <p class="page-subtitle">Lista completa dos profissionais por consultas apoiadas pelo assistente médico, em ordem decrescente. Use as abas para ver o cenário atual ou o histórico.</p>
                 </div>
-                <button class="btn outline" id="downloadHealthDoctorsRankingBtn" type="button">
-                  <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
-                </button>
+                <div class="page-actions">
+                  <button class="btn outline" type="button" data-health-compare-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span>Comparar
+                  </button>
+                  <button class="btn primary" id="downloadHealthDoctorsRankingBtn" type="button" data-health-history-export>
+                    <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
+                  </button>
+                </div>
               </div>
 
-              <div class="data-table health-overview-ranking-table" id="healthOverviewDoctorsRankingTable" data-table-empty-state-disabled="true">
-                <div class="data-row header">
-                  <span>Posição</span>
-                  <span>Médico</span>
-                  <span>Consultas com assistente</span>
-                  <span>Participação</span>
+              <div class="health-history-block" data-health-history="doctors">
+                <div class="tabs tabs-underline health-history-tabs" role="tablist" aria-label="Cenário atual e histórico">
+                  <button class="tab active" type="button" role="tab" aria-selected="true" data-health-history-tab="current">Cenário atual</button>
+                  <button class="tab" type="button" role="tab" aria-selected="false" data-health-history-tab="history">Histórico</button>
                 </div>
-                <div class="data-row"><span>1</span><span>Dra. Helena Prado</span><span>28</span><span>31,5%</span></div>
-                <div class="data-row"><span>2</span><span>Dr. Rafael Duarte</span><span>21</span><span>23,6%</span></div>
-                <div class="data-row"><span>3</span><span>Dra. Camila Nunes</span><span>16</span><span>18,0%</span></div>
-                <div class="data-row"><span>4</span><span>Dr. Marcos Vinícius</span><span>12</span><span>13,5%</span></div>
-                <div class="data-row"><span>5</span><span>Dra. Luciana Martins</span><span>8</span><span>9,0%</span></div>
-                <div class="data-row"><span>6</span><span>Dr. Paulo Reis</span><span>4</span><span>4,5%</span></div>
+
+                <div class="tab-panel active health-history-tab-panel" data-health-history-panel="current">
+                  <div class="health-history-headline" data-health-history-headline></div>
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewDoctorsRankingTable" data-health-history-ranking="current" data-table-empty-state-disabled="true"></div>
+                </div>
+
+                <div class="tab-panel health-history-tab-panel" data-health-history-panel="history">
+                  <div class="health-history-toolbar">
+                    <div class="tabs tabs-underline health-history-grain-tabs" role="group" aria-label="Agrupar o histórico por">
+                      <button class="tab" type="button" data-health-history-grain="week">Semana</button>
+                      <button class="tab active" type="button" data-health-history-grain="month">Mês</button>
+                      <button class="tab" type="button" data-health-history-grain="year">Ano</button>
+                    </div>
+                    <div class="health-history-nav">
+                      <button class="icon-btn" type="button" data-health-history-nav="prev" aria-label="Período anterior" title="Período anterior">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+                      </button>
+                      <button class="health-history-nav-label" type="button" data-health-history-nav-label data-health-history-picker-toggle aria-haspopup="true" aria-expanded="false" title="Escolher o período" aria-live="polite"></button>
+                      <button class="icon-btn" type="button" data-health-history-nav="next" aria-label="Período seguinte" title="Período seguinte">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+                      </button>
+                    </div>
+                  <div class="form-field health-history-period-field">
+                    <button class="btn filter-btn" type="button" data-health-doctor-filter-btn>
+                      <span class="material-symbols-rounded" aria-hidden="true">filter_list</span>
+                      <span data-health-doctor-filter-label>Filtros</span>
+                    </button>
+                    <div class="menu filter-menu filter-menu--standard filter-menu--groups-1 health-history-filter-menu" data-health-doctor-filter-menu>
+                      <div class="filter-footer">
+                        <button class="filter-clear" type="button" data-health-doctor-filter-clear>Limpar filtros</button>
+                      </div>
+                      <div class="filter-group" data-health-doctor-filter-group>
+                        <span>Médicos</span>
+                      </div>
+                    </div>
+                  </div>
+                  </div>
+
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewDoctorsHistoryTable" data-health-history-ranking="history" data-table-empty-state-disabled="true"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-overview-whatsapp" data-title="O que acontece no WhatsApp">
+            <div class="section health-page health-patient-detail-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/overview">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Visão geral</span>
+                </a>
+              </div>
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>O que acontece no WhatsApp</h2>
+                  <p class="page-subtitle">Distribuição dos atendimentos por tipo de solicitação. Use as abas para ver o cenário atual ou o histórico.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn outline" type="button" data-health-compare-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span>Comparar
+                  </button>
+                  <button class="btn primary" id="downloadHealthWhatsappRankingBtn" type="button" data-health-history-export>
+                    <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
+                  </button>
+                </div>
+              </div>
+
+              <div class="health-history-block" data-health-history="whatsapp">
+                <div class="tabs tabs-underline health-history-tabs" role="tablist" aria-label="Cenário atual e histórico">
+                  <button class="tab active" type="button" role="tab" aria-selected="true" data-health-history-tab="current">Cenário atual</button>
+                  <button class="tab" type="button" role="tab" aria-selected="false" data-health-history-tab="history">Histórico</button>
+                </div>
+
+                <div class="tab-panel active health-history-tab-panel" data-health-history-panel="current">
+                  <div class="health-history-headline" data-health-history-headline></div>
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewWhatsappRankingTable" data-health-history-ranking="current" data-table-empty-state-disabled="true"></div>
+                </div>
+
+                <div class="tab-panel health-history-tab-panel" data-health-history-panel="history">
+                  <div class="health-history-toolbar">
+                    <div class="tabs tabs-underline health-history-grain-tabs" role="group" aria-label="Agrupar o histórico por">
+                      <button class="tab" type="button" data-health-history-grain="week">Semana</button>
+                      <button class="tab active" type="button" data-health-history-grain="month">Mês</button>
+                      <button class="tab" type="button" data-health-history-grain="year">Ano</button>
+                    </div>
+                    <div class="health-history-nav">
+                      <button class="icon-btn" type="button" data-health-history-nav="prev" aria-label="Período anterior" title="Período anterior">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+                      </button>
+                      <button class="health-history-nav-label" type="button" data-health-history-nav-label data-health-history-picker-toggle aria-haspopup="true" aria-expanded="false" title="Escolher o período" aria-live="polite"></button>
+                      <button class="icon-btn" type="button" data-health-history-nav="next" aria-label="Período seguinte" title="Período seguinte">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewWhatsappHistoryTable" data-health-history-ranking="history" data-table-empty-state-disabled="true"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="page" id="page-health-overview-accountability" data-title="Prestação de contas — risco de glosa">
+            <div class="section health-page health-patient-detail-page">
+              <div class="health-patient-detail-top">
+                <a class="telegram-back-link" href="#/dashboard/health/overview">
+                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
+                  <span class="telegram-back-link-text">Voltar para Visão geral</span>
+                </a>
+              </div>
+              <div class="page-header health-integrations-header">
+                <div>
+                  <h2>Prestação de contas — risco de glosa</h2>
+                  <p class="page-subtitle">Documentos analisados classificados por risco de glosa. Use as abas para ver o cenário atual ou o histórico.</p>
+                </div>
+                <div class="page-actions">
+                  <button class="btn outline" type="button" data-health-compare-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">compare_arrows</span>Comparar
+                  </button>
+                  <button class="btn primary" id="downloadHealthAccountabilityRankingBtn" type="button" data-health-history-export>
+                    <span class="material-symbols-rounded" aria-hidden="true">download</span>Baixar dados
+                  </button>
+                </div>
+              </div>
+
+              <div class="health-history-block" data-health-history="accountability">
+                <div class="tabs tabs-underline health-history-tabs" role="tablist" aria-label="Cenário atual e histórico">
+                  <button class="tab active" type="button" role="tab" aria-selected="true" data-health-history-tab="current">Cenário atual</button>
+                  <button class="tab" type="button" role="tab" aria-selected="false" data-health-history-tab="history">Histórico</button>
+                </div>
+
+                <div class="tab-panel active health-history-tab-panel" data-health-history-panel="current">
+                  <div class="health-history-headline" data-health-history-headline></div>
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewAccountabilityRankingTable" data-health-history-ranking="current" data-table-empty-state-disabled="true"></div>
+                </div>
+
+                <div class="tab-panel health-history-tab-panel" data-health-history-panel="history">
+                  <div class="health-history-toolbar">
+                    <div class="tabs tabs-underline health-history-grain-tabs" role="group" aria-label="Agrupar o histórico por">
+                      <button class="tab" type="button" data-health-history-grain="week">Semana</button>
+                      <button class="tab active" type="button" data-health-history-grain="month">Mês</button>
+                      <button class="tab" type="button" data-health-history-grain="year">Ano</button>
+                    </div>
+                    <div class="health-history-nav">
+                      <button class="icon-btn" type="button" data-health-history-nav="prev" aria-label="Período anterior" title="Período anterior">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_left</span>
+                      </button>
+                      <button class="health-history-nav-label" type="button" data-health-history-nav-label data-health-history-picker-toggle aria-haspopup="true" aria-expanded="false" title="Escolher o período" aria-live="polite"></button>
+                      <button class="icon-btn" type="button" data-health-history-nav="next" aria-label="Período seguinte" title="Período seguinte">
+                        <span class="material-symbols-rounded" aria-hidden="true">chevron_right</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="data-table health-overview-ranking-table" id="healthOverviewAccountabilityHistoryTable" data-health-history-ranking="history" data-table-empty-state-disabled="true"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -9139,24 +9428,17 @@
                   <h2>Agente do paciente</h2>
                   <p class="page-subtitle">Acompanhe atendimentos automatizados, solicitações clínicas e encaminhamentos do canal de pacientes.</p>
                 </div>
+                <div class="page-actions">
+                  <button class="icon-btn" type="button" aria-haspopup="dialog" aria-controls="healthPatientFlowModal" aria-label="Ver fluxo do atendimento" title="Ver fluxo do atendimento" data-health-flow-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
+                  </button>
+                  <button class="icon-btn" type="button" aria-label="Abrir simulação no WhatsApp" title="Abrir simulação no WhatsApp" data-health-patient-preview-open>
+                    <span class="material-symbols-rounded" aria-hidden="true">chat</span>
+                  </button>
+                </div>
               </div>
 
               <div class="health-patient-card-grid">
-                <article class="health-patient-panel health-patient-panel--action">
-                  <div class="health-patient-panel-head">
-                    <div>
-                      <h3 class="health-patient-panel-title">Fluxo do atendimento</h3>
-                    </div>
-                  </div>
-                  <p class="health-patient-panel-note">Veja como o agente conduz cada solicitação no WhatsApp, da autenticação do paciente até a resolução ou o encaixe com o médico.</p>
-                  <div class="health-patient-panel-footer">
-                    <button class="btn primary" type="button" aria-haspopup="dialog" aria-controls="healthPatientFlowModal" data-health-flow-open>
-                      <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
-                      Ver fluxo
-                    </button>
-                  </div>
-                </article>
-
                 <article class="health-patient-panel health-patient-panel--action">
                   <div class="health-patient-panel-head">
                     <div>
@@ -9193,21 +9475,6 @@
                     </div>
                   </div>
                 </article>
-
-                <article class="health-patient-panel health-patient-panel--action">
-                  <div class="health-patient-panel-head">
-                    <div>
-                      <h3 class="health-patient-panel-title">Simulação no WhatsApp</h3>
-                    </div>
-                  </div>
-                  <p class="health-patient-panel-note">Abra uma prévia interativa da conversa do paciente para testar as respostas do agente antes de divulgar.</p>
-                  <div class="health-patient-panel-footer">
-                    <button class="btn primary" type="button" data-health-patient-preview-open>
-                      <span class="material-symbols-rounded" aria-hidden="true">chat</span>
-                      Abrir simulação
-                    </button>
-                  </div>
-                </article>
               </div>
             </div>
           </div>
@@ -9223,115 +9490,11 @@
               <div class="page-header health-integrations-header">
                 <div>
                   <h2>Insights de IA</h2>
-                  <p class="page-subtitle">Acompanhe sinais recorrentes, variações de demanda e motivos de atendimento do canal de pacientes.</p>
+                  <p class="page-subtitle">Leituras que a IA faz sobre os dados da Visão geral, com os pontos que pedem atenção e as oportunidades de melhoria.</p>
                 </div>
-                <span class="health-patient-period-chip health-patient-period-chip--orange">Últimos 7 dias</span>
               </div>
 
-              <div class="health-patient-detail-grid">
-                <article class="health-patient-detail-card">
-                  <span class="health-patient-kicker">Mais frequente</span>
-                  <strong>Dúvidas sobre exames</strong>
-                  <p>31% das conversas citam resultado de exames, preparo ou necessidade de retorno.</p>
-                  <span class="health-patient-tag">412 menções</span>
-                </article>
-                <article class="health-patient-detail-card">
-                  <span class="health-patient-kicker">Crescimento</span>
-                  <strong>Solicitação de consulta</strong>
-                  <p>Pedidos de encaixe crescem após envio de exames e renovação de receita.</p>
-                  <span class="health-patient-tag">+18%</span>
-                </article>
-              </div>
-
-              <article class="health-patient-detail-panel">
-                <div class="health-patient-panel-head">
-                  <span class="health-patient-kicker">Auditoria dos sinais</span>
-                  <span class="health-patient-period-chip">Base consolidada</span>
-                </div>
-                <div class="data-table health-patient-audit-table">
-                  <div class="data-row header">
-                    <span>Sinal</span>
-                    <span>Ocorrências</span>
-                    <span>Impacto</span>
-                    <span>Ação sugerida</span>
-                  </div>
-                  <div class="data-row">
-                    <span>Dúvidas sobre exames</span>
-                    <span>412</span>
-                    <span>Alta recorrência</span>
-                    <span>Revisar mensagens de preparo e retorno.</span>
-                  </div>
-                  <div class="data-row">
-                    <span>Solicitação de consulta</span>
-                    <span>193</span>
-                    <span>+18%</span>
-                    <span>Reservar encaixes após envio de exames.</span>
-                  </div>
-                </div>
-              </article>
-            </div>
-          </div>
-
-          <div class="page" id="page-health-whatsapp-history" data-title="Histórico do agente do paciente">
-            <div class="section health-page health-patient-detail-page">
-              <div class="health-patient-detail-top">
-                <a class="telegram-back-link" href="#/dashboard/health/whatsapp">
-                  <span class="material-symbols-rounded" aria-hidden="true">arrow_back</span>
-                  <span class="telegram-back-link-text">Voltar para Agente do paciente</span>
-                </a>
-              </div>
-              <div class="page-header health-integrations-header">
-                <div>
-                  <h2>Histórico de interações</h2>
-                  <p class="page-subtitle">Consulte eventos do agente do paciente para acompanhamento operacional e auditoria de atendimento.</p>
-                </div>
-                <span class="health-patient-period-chip">Tempo real</span>
-              </div>
-
-              <div class="data-table health-patient-history-table">
-                <div class="data-row header">
-                  <span>Horário</span>
-                  <span>Paciente</span>
-                  <span>Evento</span>
-                  <span>Detalhe</span>
-                  <span>Status</span>
-                </div>
-                <div class="data-row">
-                  <span>10:48</span>
-                  <span>Ana Beatriz Lima</span>
-                  <span>Solicitou consulta</span>
-                  <span>Escolheu amanhã 09:40 para avaliação de renovação.</span>
-                  <span><span class="chip success">Agendável</span></span>
-                </div>
-                <div class="data-row">
-                  <span>10:32</span>
-                  <span>Carlos Eduardo Nunes</span>
-                  <span>Pediu renovação</span>
-                  <span>Agente sinalizou necessidade de revisão médica.</span>
-                  <span><span class="chip warning">Revisão</span></span>
-                </div>
-                <div class="data-row">
-                  <span>09:58</span>
-                  <span>Marina Costa Rocha</span>
-                  <span>Enviou exames</span>
-                  <span>Arquivo exame-laboratorial.pdf recebido no histórico.</span>
-                  <span><span class="chip">Recebido</span></span>
-                </div>
-                <div class="data-row">
-                  <span>09:41</span>
-                  <span>Luciana Martins</span>
-                  <span>Atendimento humano</span>
-                  <span>Fluxo automatizado interrompido e solicitação encaminhada.</span>
-                  <span><span class="chip warning">Transbordo</span></span>
-                </div>
-                <div class="data-row">
-                  <span>09:22</span>
-                  <span>Raquel Sampaio</span>
-                  <span>Copiou link do agente</span>
-                  <span>Compartilhamento gerado para continuação do atendimento.</span>
-                  <span><span class="chip success">Compartilhado</span></span>
-                </div>
-              </div>
+              <div class="health-insights-grid" data-health-ai-insights aria-label="Insights gerados pela IA"></div>
             </div>
           </div>
 
@@ -9353,7 +9516,7 @@
                 <div class="form-field health-service-search-field-wrap">
                   <div class="search-field">
                     <span class="material-symbols-rounded" aria-hidden="true">search</span>
-                    <input id="healthServiceSearchInput" type="search" placeholder="Buscar pelo nome do paciente" autocomplete="off" aria-label="Buscar pelo nome do paciente" />
+                    <input id="healthServiceSearchInput" type="search" placeholder="Buscar pelo plano" autocomplete="off" aria-label="Buscar pelo plano" />
                   </div>
                 </div>
                 <div class="form-field health-service-period-field">
@@ -9392,7 +9555,6 @@
 
               <div class="data-table health-service-table" id="healthServiceTable">
                 <div class="data-row header">
-                  <span>Nome do paciente</span>
                   <span>Plano</span>
                   <span>Data e hora</span>
                   <span>Ações</span>
@@ -11387,7 +11549,7 @@
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/themes/classic/global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@7.0.1/locales/pt-br/global.js"></script>
     <script src="./assets/chart.umd.min.js"></script>
-    <script src="./auth.js?v=20260701-hybrid-flow-voice-page"></script>
-    <script src="./app.js?v=20260807-ui-tweaks7"></script>
+    <script src="./auth.js?v=20260813-org-edit-single-modal"></script>
+    <script src="./app.js?v=20260819-dark-mode"></script>
   </body>
 </html>

@@ -3856,7 +3856,8 @@ body.route-channels .app-shell.sidebar-collapsed #page-telegram-botfather {
   grid-template-columns: 1.4fr 1.1fr 0.7fr;
 }
 
-.health-service-filters {
+/* Especificidade dobrada: a regra base .filters-grid vem depois no arquivo e vencia o empate. */
+.filters-grid.health-service-filters {
   grid-template-columns: minmax(280px, 1fr) max-content;
 }
 
@@ -22878,7 +22879,7 @@ body.agent-chat-standalone .chat-thread {
     min-width: 760px;
   }
 
-  .health-service-filters {
+  .filters-grid.health-service-filters {
     grid-template-columns: minmax(0, 1fr);
   }
 
